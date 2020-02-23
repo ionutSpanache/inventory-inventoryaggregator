@@ -1,0 +1,56 @@
+<settings
+    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd"
+    xmlns="http://maven.apache.org/SETTINGS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <servers>
+        <server>
+            <id>msys.artifactory.central</id>
+            <username>svcci@metrosystems.net</username>
+            <password>metro2017.12345</password>
+        </server>
+        <server>
+            <id>msys.artifactory.snapshots</id>
+            <username>svcci@metrosystems.net</username>
+            <password>metro2017.12345</password>
+        </server>
+    </servers>
+	<profiles>
+		<profile>
+            <repositories>
+				<repository>
+					<snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <id>msys.artifactory.central</id>
+                    <name>libs-release</name>
+                    <url>http://artifactory.metrosystems.net/artifactory/libs-release</url>
+                </repository>
+				<repository>
+					<snapshots />
+					<id>msys.artifactory.snapshots</id>
+					<name>libs-snapshot</name>
+					<url>http://artifactory.metrosystems.net/artifactory/libs-snapshot</url>
+				</repository>
+			</repositories>
+            <pluginRepositories>
+                <pluginRepository>
+					<snapshots>
+						<enabled>false</enabled>
+                    </snapshots>
+                    <id>msys.artifactory.central</id>
+                    <name>plugins-release</name>
+                    <url>http://artifactory.metrosystems.net/artifactory/plugins-release</url>
+                </pluginRepository>
+                <pluginRepository>
+					<snapshots />
+                    <id>msys.artifactory.snapshots</id>
+                    <name>plugins-snapshot</name>
+                    <url>http://artifactory.metrosystems.net/artifactory/plugins-snapshot</url>
+                </pluginRepository>
+            </pluginRepositories>
+            <id>artifactory</id>
+        </profile>
+    </profiles>
+    <activeProfiles>
+		<activeProfile>artifactory</activeProfile>
+    </activeProfiles>
+</settings>

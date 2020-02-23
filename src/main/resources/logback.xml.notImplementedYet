@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <timestamp/>
+        <stackTrace>
+          <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+            <maxDepthPerThrowable>30</maxDepthPerThrowable>
+            <maxLength>2048</maxLength>
+            <shortenedClassNameLength>20</shortenedClassNameLength>
+            <exclude>^sun\.reflect\..*\.invoke</exclude>
+            <rootCauseFirst>true</rootCauseFirst>
+          </throwableConverter>
+        </stackTrace>
+        <pattern>
+          <pattern>
+            {
+            "@hostname": "${HOSTNAME}",
+            "@vertical": "${DRP_CF_VERTICAL}",
+            "@type":     "service",
+            "@service-name":    "${DRP_CF_SERVICE}",
+            "@service-version": "${project.version}",
+            "@trace-id":        "%X{traceId}",
+            "@retention":       "service",
+            "thread":    "%thread",
+            "logger":    "%logger",
+            "log-level":"%level",
+            "message":  "%message",
+            "marker":   "%marker"
+            }
+          </pattern>
+        </pattern>
+      </providers>
+    </encoder>
+  </appender>
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>simpleRest.log</file>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>- %msg%n    %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger %n %marker</Pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <FileNamePattern>logfile-%i.log.gz</FileNamePattern>
+      <MinIndex>1</MinIndex>
+      <MaxIndex>10</MaxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>100MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+  <root level='ERROR'>
+    <appender-ref ref="STDOUT" />
+    <!--<appender-ref ref="FILE" />-->
+  </root>
+  <logger name="net.metrosystems.gc.gcdesktopui" level="INFO"/>
+  <logger name="net.metrosystems.gc.gcdesktopui.config" level="DEBUG"/>
+  <logger name="net.metrosystems.gc.gcdesktopui.department" level="DEBUG"/>
+  <logger name="net.metrosystems.gc.gcdesktopui.controller" level="DEBUG"/>
+  <logger name="net.metrosystems.gc.gcdesktopui.gapcheck" level="DEBUG"/>
+  <logger name="net.metrosystems.gc.gcdesktopui.reasons" level="DEBUG"/>
+  <logger name="net.metrosystems.gc.gcdesktopui.references" level="DEBUG"/>
+  <logger name="net.metrosystems.gc.gcdesktopui.shifts" level="DEBUG"/>
+  <!--
+  <root level="INFO">
+      <appender-ref ref="STDOUT"/>
+      <appender-ref ref="FILE"/>
+  </root>-->
+</configuration>

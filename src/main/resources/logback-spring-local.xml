@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <logger name="io.micrometer.datadog" level="WARN"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+
+
+            <providers>
+                <logstashMarkers/>
+                <throwableRootCauseClassName>
+                    <useSimpleClassName>true</useSimpleClassName>
+                </throwableRootCauseClassName>
+            </providers>
+
+            <shortenedLoggerNameLength>36</shortenedLoggerNameLength>
+
+            <fieldNames>
+                <version>[ignore]</version>
+            </fieldNames>
+
+
+            <includeMdc>true</includeMdc>
+             <!--<includeMdcKeyName>@request.countryCode</includeMdcKeyName>-->
+             <!--<includeMdcKeyName>@request.salesLine</includeMdcKeyName>-->
+             <!--<includeMdcKeyName>@request.storeNumber</includeMdcKeyName>-->
+             <!--<includeMdcKeyName>@request.articleNumber</includeMdcKeyName>-->
+             <!--<includeMdcKeyName>@request.variantNumber</includeMdcKeyName>-->
+
+            <customFields>{"@vertical": "inventory", "@type": "service", "@service-name": "${DRP_CF_SERVICE}", "@hostname": "${HOSTNAME}", "@retention" : "technical"}</customFields>
+            <includeContext>false</includeContext>
+
+            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <maxDepthPerThrowable>50</maxDepthPerThrowable>
+                <maxLength>10240</maxLength>
+                <shortenedClassNameLength>30</shortenedClassNameLength>
+                <exclude>sun\.reflect\..*\.invoke.*</exclude>
+                <exclude>net\.sf\.cglib\.proxy\.MethodProxy\.invoke</exclude>
+                <rootCauseFirst>true</rootCauseFirst>
+            </throwableConverter>
+        </encoder>
+    </appender>
+
+    <!-- By default, the level of the root level is set to DEBUG -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <!-- <appender-ref ref="FILE" /> -->
+    </root>
+</configuration>
