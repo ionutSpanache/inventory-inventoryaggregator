@@ -268,7 +268,6 @@ public class ArticleDetailsService {
                     CompletableFuture<ArticleMasterData> articleMasterData = CompletableFuture.supplyAsync(
                             () -> {
                                 try {
-                                    System.out.println("Running articleMasterData... thread id: " + Thread.currentThread().getId());
                                     return articleMasterDataRepository.getArticleMasterData(
                                             articleId,countryCode, salesLine, languageCode, storeNo).get(20, TimeUnit.SECONDS);
                                 } catch (ArticleNotFoundException ex) {
@@ -283,7 +282,6 @@ public class ArticleDetailsService {
                     CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData = CompletableFuture.supplyAsync(
                             () -> {
                                 try {
-                                    System.out.println("Running rawArticleStoreMasterData... thread id: " + Thread.currentThread().getId());
                                     return rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
                                             articleId, countryCode, salesLine, languageCode, storeNo).get(20, TimeUnit.SECONDS);
                                 } catch (ArticleNotFoundException ex) {
@@ -298,7 +296,6 @@ public class ArticleDetailsService {
                     CompletableFuture<ArticleDataFromMovie> articleDataFromMovie = CompletableFuture.supplyAsync(
                             () -> {
                                 try {
-                                    System.out.println("Running articleDataFromMovie... thread id: " + Thread.currentThread().getId());
                                     return articleDataFromMovieRepository.getArticleDataFromMovie(
                                             articleId, countryCode, salesLine, storeNo).get(20, TimeUnit.SECONDS);
                                 } catch (ArticleNotFoundException ex) {
@@ -313,7 +310,6 @@ public class ArticleDetailsService {
                     CompletableFuture<List<ArticleStockLocation>> articleStockLocationList = CompletableFuture.supplyAsync(
                             () -> {
                                 try {
-                                    System.out.println("Running articleStockLocationList... thread id: " + Thread.currentThread().getId());
                                     return aclBundleStockLocationRepository.getArticleStockLocation(
                                             articleId, countryCode, salesLine, storeNo).get(20, TimeUnit.SECONDS);
                                 } catch (ArticleNotFoundException ex) {
@@ -325,8 +321,7 @@ public class ArticleDetailsService {
                             }, executor
                     );
 
-                    CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie, articleStockLocationList)
-                    ;
+                    CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie, articleStockLocationList);
                     StockInformation stockDetails = null;
                     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
                     if (articleDataFromMovie.get() != null) {
