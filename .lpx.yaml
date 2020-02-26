@@ -9,7 +9,7 @@ vertical: inventory
 # We use the checked in maven wrapper, to not rely on the package manager
 multistage: true
 services:
-- id: inventorysaggregator
+- id: inventoryaggregator
   type: dockerfile
   check: true
   secret: true
