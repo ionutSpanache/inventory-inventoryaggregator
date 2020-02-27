@@ -47,7 +47,7 @@ public class ArticleDetailsService {
     }
 
 
-    public List<RawArticleData> getArticleGapDataListByEan(
+    public List<RawArticleData> getArticleDataListByEan(
             String ean,
             String countryCode,
             String salesLine,
@@ -61,7 +61,7 @@ public class ArticleDetailsService {
                 countryCode, salesLine, languageCode, storeNo);
     }
 
-    public List<RawArticleData> getArticleGapDataListBySubsys(
+    public List<RawArticleData> getArticleDataListBySubsys(
             Long subsysArtNo,
             String countryCode,
             String salesLine,
@@ -75,7 +75,7 @@ public class ArticleDetailsService {
     }
 
 
-    public List<RawArticleData> getArticleGapDataListByArticleVariantBundle(
+    public List<RawArticleData> getArticleDataListByArticleVariantBundle(
             Long articleNumber,
             Long variantNumber,
             Long bundleNumber,

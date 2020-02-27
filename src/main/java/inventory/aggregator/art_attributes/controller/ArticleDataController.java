@@ -19,9 +19,6 @@ import java.util.List;
 @RequestMapping(value="/countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/stores/{storeno}/articles", produces=MediaType.APPLICATION_JSON_VALUE)
 public class ArticleDataController {
 	
-	//@Autowired
-    //private ArtAttibutesService artAttibutesService;
-	
 	@Autowired
     private ArticleDetailsService articleDetailsService;
 	
@@ -36,7 +33,7 @@ public class ArticleDataController {
 		//todo @Dacian to be delete when tests are finish
 			List<RawArticleData> rawArticleDataList = null;
 			try {
-				rawArticleDataList = articleDetailsService.getArticleGapDataListByEan(
+				rawArticleDataList = articleDetailsService.getArticleDataListByEan(
 						ean,
 						countryCode, salesLine, languageCode, storeNo);
 			} catch (EntityNotFoundException e) {
@@ -62,7 +59,7 @@ public class ArticleDataController {
 
 			List<RawArticleData> rawArticleDataList = null;
 			try {
-				rawArticleDataList = articleDetailsService.getArticleGapDataListByArticleVariantBundle(
+				rawArticleDataList = articleDetailsService.getArticleDataListByArticleVariantBundle(
 						articleNumber, variant, bundleNumber,
 						countryCode, salesLine, languageCode, storeNo);
 			} catch (EntityNotFoundException e) {
@@ -85,7 +82,7 @@ public class ArticleDataController {
 
 			List<RawArticleData> rawArticleDataList = null;
 			try {
-				rawArticleDataList = articleDetailsService.getArticleGapDataListBySubsys(
+				rawArticleDataList = articleDetailsService.getArticleDataListBySubsys(
 						subsystemArticleNumber,
 						countryCode, salesLine, languageCode, storeNo);
 			} catch (EntityNotFoundException e) {

@@ -69,8 +69,8 @@ public class AclBundleStockLocationRepository {
                     } else {
                         articleStockLocationList.add(articleStockLocation);
                     }
-                    return articleStockLocationList;
                 }
+                return articleStockLocationList;
             }
         }
         return null;

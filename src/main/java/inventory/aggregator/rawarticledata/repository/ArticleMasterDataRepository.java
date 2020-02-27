@@ -1,6 +1,6 @@
 package inventory.aggregator.rawarticledata.repository;
 
-import inventory.aggregator.common.article_information.articlecache.model.ArticleCacheFullDataForGapCheck;
+import inventory.aggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import inventory.aggregator.common.article_information.articlecache.service.ArticleCacheService;
 import inventory.aggregator.rawarticledata.model.ArticleId;
 import inventory.aggregator.rawarticledata.model.ArticleMasterData;
@@ -21,18 +21,18 @@ public class ArticleMasterDataRepository {
 
     @Async
     public CompletableFuture<ArticleMasterData> getArticleMasterData(ArticleId articleId, String countryCode, String salesLine, String languageCode, Integer storeNo) throws Exception {
-        ArticleCacheFullDataForGapCheck articleCacheFullDataForGapCheck = getArticleCacheFullDataForGapCheckByArtVarBundle(
+        ArticleCacheFullData articleCacheFullData = getArticleCacheFullDataByArtVarBundle(
                 articleId.getArticleNumber(),
                 articleId.getVariantNumber(),
                 articleId.getBundleNumber(),
                 countryCode, salesLine, languageCode, storeNo);
-        ArticleMasterData articleMasterData = transformArticleCacheFullDataForGapCheckToArticleMasterData(
-                articleCacheFullDataForGapCheck);
+        ArticleMasterData articleMasterData = transformArticleCacheFullToArticleMasterData(
+                articleCacheFullData);
 
         return CompletableFuture.completedFuture(articleMasterData);
     }
 
-    private ArticleCacheFullDataForGapCheck getArticleCacheFullDataForGapCheckByArtVarBundle(
+    private ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
             Long articleNumber,
             Long variantNumber,
             Long bundleNumber,
@@ -41,7 +41,7 @@ public class ArticleMasterDataRepository {
             String languageCode,
             Integer storeNo) throws Exception {
 
-        return articleCacheService.getArticleCacheFullDataForGapCheckByArtVarBundle(
+        return articleCacheService.getArticleCacheFullDataByArtVarBundle(
                         articleNumber,
                         variantNumber,
                         bundleNumber,
@@ -52,27 +52,27 @@ public class ArticleMasterDataRepository {
                 );
     }
 
-    private ArticleMasterData transformArticleCacheFullDataForGapCheckToArticleMasterData(
-            ArticleCacheFullDataForGapCheck articleCacheFullDataForGapCheck) {
-        if (articleCacheFullDataForGapCheck != null) {
+    private ArticleMasterData transformArticleCacheFullToArticleMasterData(
+            ArticleCacheFullData articleCacheFullData) {
+        if (articleCacheFullData != null) {
             return new ArticleMasterData(
-                    articleCacheFullDataForGapCheck.getArticleDescription(),
-                    articleCacheFullDataForGapCheck.getBarcode(),
-                    articleCacheFullDataForGapCheck.getCommercialSupplier(),
-                    articleCacheFullDataForGapCheck.getPresentationMerchandiseGroup(),
-                    articleCacheFullDataForGapCheck.getPromotionId(),
-                    articleCacheFullDataForGapCheck.getSellingBundleContent(),
-                    articleCacheFullDataForGapCheck.getSubsysArticleNumber(),
-                    articleCacheFullDataForGapCheck.getVatPercent(),
-                    articleCacheFullDataForGapCheck.getPieceNetSellPrice(),
-                    articleCacheFullDataForGapCheck.getBundleNetSellPrice(),
-                    articleCacheFullDataForGapCheck.getPromotionBundleNetPrice(),
-                    articleCacheFullDataForGapCheck.getVariantDescription(),
-                    articleCacheFullDataForGapCheck.getArticleClass(),
-                    articleCacheFullDataForGapCheck.getPresentationMainMerchandiseGroup(),
-                    articleCacheFullDataForGapCheck.getPresentationSubMerchandiseGroup(),
-                    articleCacheFullDataForGapCheck.getSupplierNumber(),
-                    articleCacheFullDataForGapCheck.getProcurementCode()
+                    articleCacheFullData.getArticleDescription(),
+                    articleCacheFullData.getBarcode(),
+                    articleCacheFullData.getCommercialSupplier(),
+                    articleCacheFullData.getPresentationMerchandiseGroup(),
+                    articleCacheFullData.getPromotionId(),
+                    articleCacheFullData.getSellingBundleContent(),
+                    articleCacheFullData.getSubsysArticleNumber(),
+                    articleCacheFullData.getVatPercent(),
+                    articleCacheFullData.getPieceNetSellPrice(),
+                    articleCacheFullData.getBundleNetSellPrice(),
+                    articleCacheFullData.getPromotionBundleNetPrice(),
+                    articleCacheFullData.getVariantDescription(),
+                    articleCacheFullData.getArticleClass(),
+                    articleCacheFullData.getPresentationMainMerchandiseGroup(),
+                    articleCacheFullData.getPresentationSubMerchandiseGroup(),
+                    articleCacheFullData.getSupplierNumber(),
+                    articleCacheFullData.getProcurementCode()
             );
         }
         return null;

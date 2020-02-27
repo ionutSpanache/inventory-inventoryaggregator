@@ -109,13 +109,13 @@ public class ArticleCacheService {
 		return articleVariantBundleIdentifierList;
 	}
 	
-	public List<ArticleCacheFullDataForGapCheck> getArticleCacheFullDataForGapCheckByEan(String ean,
-                                                                                         String countryCode, String salesLine, String languageCode, Integer storeNo) throws Exception {
+	public List<ArticleCacheFullData> getArticleCacheFullDataByEan(String ean,
+																   String countryCode, String salesLine, String languageCode, Integer storeNo) throws Exception {
 		Documents articleUrlPathList = articleCacheClient.getArticleUrlPathByEan(ean, countryCode, salesLine, languageCode);
 		if (articleUrlPathList.getArticleKeys().isEmpty()) {
 			throw new ArticleNotFoundException();
 		}
-		List<ArticleCacheFullDataForGapCheck> articleFullDataList = new ArrayList<ArticleCacheFullDataForGapCheck>();
+		List<ArticleCacheFullData> articleFullDataList = new ArrayList<ArticleCacheFullData>();
 		for (String articleUrlPath : articleUrlPathList.getArticleKeys()) {
 			articleFullDataList.add(
 					transformArticleCacheDocumentToArticleFullData(
@@ -125,7 +125,7 @@ public class ArticleCacheService {
 		return articleFullDataList;
 	}
 	
-	public ArticleCacheFullDataForGapCheck getArticleCacheFullDataForGapCheckByArtVarBundle(
+	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
 			Long articleNumber,
 			Long variantNumber,
 			Long bundleNumber,
@@ -145,14 +145,14 @@ public class ArticleCacheService {
 			throw new ArticleNotFoundException();
 		}
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
-		ArticleCacheFullDataForGapCheck articleCacheFullDataForGapCheck =
+		ArticleCacheFullData articleCacheFullData =
 				transformArticleCacheDocumentToArticleFullData(
 												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
 												storeNo);
-		return articleCacheFullDataForGapCheck;
+		return articleCacheFullData;
 	}
 	
-	private ArticleCacheFullDataForGapCheck transformArticleCacheDocumentToArticleFullData (
+	private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData (
 																			ArticleCacheIhdsTree articleCacheDocument,
 			                                                                Integer storeNo) {
 		Integer hierarchySequenceStoreNo = articleCacheDocument.getTransaction().getArticleCacheIncident().getHierarchySequenceStoreNo(storeNo);
@@ -165,7 +165,7 @@ public class ArticleCacheService {
 		ArticleCacheDataGroup articleCacheDataGroup320 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
 		ArticleCacheDataGroup articleCacheDataGroup325 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
 		
-		return new ArticleCacheFullDataForGapCheck(
+		return new ArticleCacheFullData(
 				articleCacheReaderDigest.getMmsArtNo(),
 				articleCacheReaderDigest.getVariantNo(),
 				articleCacheReaderDigest.getBundleNo(),

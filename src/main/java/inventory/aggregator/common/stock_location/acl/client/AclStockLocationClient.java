@@ -37,7 +37,7 @@ public class AclStockLocationClient {
 		this.restTemplate.setInterceptors(interceptors);*/
 		String urlInUse = String.format(aclStockLocationHost + aclStockLocationPathForVariant,
 				countryCode.toUpperCase(), salesLine.toUpperCase(), storeNo, articleNo, variantNo);
-		System.out.println("uri=" + urlInUse);
+		System.out.println("uriStockLocation=" + urlInUse);
 		PaginatedAclBundleStockLocation paginatedAclBundleStockLocation = restTemplate.getForObject(urlInUse, PaginatedAclBundleStockLocation.class);
 		try {
 			//return Arrays.asList(restTemplate.getForObject(urlInUse, AclBundleStockLocation[].class));

@@ -34,8 +34,7 @@ public class ArticleCacheIapplClient //implements ArticleCacheClient
     @Autowired
     public ArticleCacheIapplClient(RestTemplateBuilder restTemplateBuilder,
                                    @Value("${ARTICLE_CACHE_USERNAME}") final String username,
-                                   //@Value("${ARTICLE_CACHE_PASSWORD}") final String password) {
-                                   @Value("${NEW_ARTICLE_CACHE_PASSWORD}") final String password) {
+                                   @Value("${ARTICLE_CACHE_PASSWORD}") final String password) {
         this.restTemplateDocuments = restTemplateBuilder
                 .basicAuthorization(username, password)
                 .messageConverters(prepareArticleCacheDocumentMessageConverters())
