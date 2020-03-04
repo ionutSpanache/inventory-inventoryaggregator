@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class GapCheckPositionContext {
+public class PositionContext {
 
 	private List<String> country;
 	private List<String> salesLine;

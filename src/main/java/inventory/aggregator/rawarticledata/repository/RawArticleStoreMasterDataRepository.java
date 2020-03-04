@@ -6,6 +6,7 @@ import inventory.aggregator.common.article_information.articlecache.client.artic
 import inventory.aggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import inventory.aggregator.common.article_information.articlecache.service.ArticleCacheService;
 import inventory.aggregator.rawarticledata.model.ArticleId;
+import inventory.aggregator.rawarticledata.model.DiscountArticleStoreMasterData;
 import inventory.aggregator.rawarticledata.model.RawArticleStoreMasterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -62,5 +63,35 @@ public class RawArticleStoreMasterDataRepository {
                 .build();
 
         return CompletableFuture.completedFuture(rawArticleStoreMasterData);
+    }
+
+    @Async
+    public CompletableFuture<DiscountArticleStoreMasterData> getDiscountArticleStoreMasterData(ArticleId articleId, String countryCode, String salesLine, String languageCode, Integer storeNo) {
+        ArticleCacheStoreExceptionsIhdsTree articleCacheStoreExceptionsIhdsTree =
+                articleCacheService.getArticleCacheStoreExceptions(articleId.getArticleNumber(), articleId.getVariantNumber(), articleId.getBundleNumber()
+                        , countryCode, salesLine, languageCode, storeNo);
+        ArticleCacheStoreExceptionsDataGroup articleCacheStoreExceptionsDataGroup100 = new ArticleCacheStoreExceptionsDataGroup();
+        ArticleCacheStoreExceptionsDataGroup articleCacheStoreExceptionsDataGroup200 = new ArticleCacheStoreExceptionsDataGroup();
+        ArticleCacheStoreExceptionsDataGroup articleCacheStoreExceptionsDataGroup300 = new ArticleCacheStoreExceptionsDataGroup();
+
+        if (articleCacheStoreExceptionsIhdsTree != null) {
+            articleCacheStoreExceptionsDataGroup100 = articleCacheStoreExceptionsIhdsTree.getTransaction().getArticleCacheIncident().getArticleCacheStoreExceptionsDataGroupById(100);
+            articleCacheStoreExceptionsDataGroup200 = articleCacheStoreExceptionsIhdsTree.getTransaction().getArticleCacheIncident().getArticleCacheStoreExceptionsDataGroupById(200);
+            articleCacheStoreExceptionsDataGroup300 = articleCacheStoreExceptionsIhdsTree.getTransaction().getArticleCacheIncident().getArticleCacheStoreExceptionsDataGroupById(300);
+        }
+
+        DiscountArticleStoreMasterData discountArticleStoreMasterData = DiscountArticleStoreMasterData.builder()
+                .salesBlockingCode(articleCacheStoreExceptionsDataGroup300.getSalesBlockingCode())
+                .storePieceNetSellPrice(articleCacheStoreExceptionsDataGroup100.getNetSalesPricePerPiece())
+                .storeBundleNetSellPrice(articleCacheStoreExceptionsDataGroup100.getNetSalesPricePerBundle())
+                .storePieceGrossSellPrice(articleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerPiece())
+                .storeBundleGrossSellPrice(articleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerBundle())
+                .storePromotionPieceNetPrice(articleCacheStoreExceptionsDataGroup200.getPromotionNetSalesPricePerPiece())
+                .storePromotionBundleNetPrice(articleCacheStoreExceptionsDataGroup200.getPromotionNetSalesPricePerBundle())
+                .storePromotionPieceGrossPrice(articleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerPiece())
+                .storePromotionBundleGrossPrice(articleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerBundle())
+                .build();
+
+        return CompletableFuture.completedFuture(discountArticleStoreMasterData);
     }
 }

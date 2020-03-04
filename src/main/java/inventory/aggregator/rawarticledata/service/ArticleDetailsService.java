@@ -106,7 +106,7 @@ public class ArticleDetailsService {
     }
 
 
-    public CompleteArticleMasterData getCompleteArticleMasterDataByArticleVariantBundle(
+    public CompleteDiscountArticleMasterData getCompleteArticleMasterDataByArticleVariantBundle(
             Long articleNumber,
             Long variantNumber,
             Long bundleNumber,
@@ -135,10 +135,10 @@ public class ArticleDetailsService {
                 }, executor
         );
 
-        CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData = CompletableFuture.supplyAsync(
+        CompletableFuture<DiscountArticleStoreMasterData> discountArticleStoreMasterData = CompletableFuture.supplyAsync(
                 () -> {
                     try {
-                        return rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
+                        return rawArticleStoreMasterDataRepository.getDiscountArticleStoreMasterData(
                                 articleId, countryCode, salesLine, languageCode, storeNo).get(20, TimeUnit.SECONDS);
                     } catch (ArticleNotFoundException ex) {
                         throw new ArticleNotFoundException();
@@ -149,11 +149,11 @@ public class ArticleDetailsService {
                 }, executor
         );
 
-        CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData);
+        CompletableFuture.allOf(articleMasterData, discountArticleStoreMasterData);
 
-        return CompleteArticleMasterData.builder()
+        return CompleteDiscountArticleMasterData.builder()
                 .articleMasterData(articleMasterData.get())
-                .articleStoreMasterData(rawArticleStoreMasterData.get())
+                .discountArticleStoreMasterData(discountArticleStoreMasterData.get())
                 .build();
 
     }
