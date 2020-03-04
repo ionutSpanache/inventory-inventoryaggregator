@@ -47,18 +47,18 @@ public class OpenApiSwaggerConfig {
                         .extensions(extensions)
                 );
 
-/*        if (!profile.equalsIgnoreCase("local")) {
+        if (!profile.equalsIgnoreCase("local")) {
             String url;
 
             if (profile.equalsIgnoreCase("prod"))
-                url = "https://inventory.metronom.com/inventoryaggregator";
+                url = "https://inventory.metronom.com";
             else
-                url = "https://inventory-" + profile + ".metronom.com/inventoryaggregator";
+                url = "https://inventory-" + profile + ".metronom.com";
 
             var server = new Server();
             server.setUrl(url);
             openApi.addServersItem(server);
-        }*/
+        }
 
         return openApi;
     }
