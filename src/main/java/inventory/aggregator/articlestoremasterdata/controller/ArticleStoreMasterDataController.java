@@ -13,6 +13,7 @@ import java.util.List;
 
 
 @RestController
+@RequestMapping(value = "/inventoryaggregator")
 public class ArticleStoreMasterDataController {
 
 	@Autowired

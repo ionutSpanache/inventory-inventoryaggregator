@@ -17,7 +17,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(value="/countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/stores/{storeno}", produces=MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="/inventoryaggregator/countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/stores/{storeno}", produces=MediaType.APPLICATION_JSON_VALUE)
 public class ArticleMasterDataController {
 	
 	@Autowired
