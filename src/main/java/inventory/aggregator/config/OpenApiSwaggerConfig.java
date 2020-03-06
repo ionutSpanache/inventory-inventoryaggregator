@@ -28,6 +28,8 @@ public class OpenApiSwaggerConfig {
         extensions.put("x-related-masterdata", "article");
         extensions.put("x-solution", "Inventory");
         extensions.put("x-scope", "metro");
+        extensions.put("x-activated-countries", "ALL");
+        extensions.put("x-git-url", "https://git.metrosystems.net/storeinventory/inventoryaggregator");
         License license = new License();
         license.setName("Apache License Version 2.0");
         license.setUrl("https://www.apache.org/licenses/LICENSE-2.0");
@@ -39,7 +41,7 @@ public class OpenApiSwaggerConfig {
         var openApi = new OpenAPI()
                 .info(new Info()
                         .title("Store Inventory aggregator service")
-                        .description("REST API for MMS Store Master Data information")
+                        .description("REST API for Store Inventory article information")
                         .version("1.0.0")
                         .termsOfService("http://terms-of-services.url")
                         .license(license)
