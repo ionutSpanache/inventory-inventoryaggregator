@@ -1,5 +1,6 @@
 package inventory.aggregator.readinessandliveness;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class ReadinessCheckController {
 	// private static final Logger LOG = LoggerFactory.getLogger(ReadinessCheckController.class);	
-	@Autowired	private ReadinessCheck readinessCheckService;	
-	
+	@Autowired	private ReadinessCheck readinessCheckService;
+
+	@Hidden
 	@RequestMapping(value = { "/.well-known/ready" }, method = { RequestMethod.GET, RequestMethod.HEAD })	
 	public ResponseEntity<String> live(HttpServletRequest request, HttpServletResponse response) {		
 		ResponseEntity<String> re = null;		

@@ -1,5 +1,6 @@
 package inventory.aggregator.readinessandliveness;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class LivenessCheckController {
 	@Autowired	
-	private LivenessCheck livenessCheckService;	
-	
+	private LivenessCheck livenessCheckService;
+	@Hidden
 	@RequestMapping(value = "/.well-known/live", method = { RequestMethod.GET, RequestMethod.HEAD })	
 	public ResponseEntity<String> live(HttpServletRequest request, HttpServletResponse response) {		
 		ResponseEntity<String> re = null;		
