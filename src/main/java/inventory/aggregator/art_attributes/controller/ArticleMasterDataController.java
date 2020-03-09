@@ -3,7 +3,7 @@ package inventory.aggregator.art_attributes.controller;
 import inventory.aggregator.common.model.ArticleNotFoundException;
 import inventory.aggregator.exception.EntityNotFoundException;
 import inventory.aggregator.rawarticledata.model.ArticleMasterData;
-import inventory.aggregator.rawarticledata.model.CompleteDiscountArticleMasterData;
+import inventory.aggregator.rawarticledata.model.CompleteArticleMasterData;
 import inventory.aggregator.rawarticledata.service.ArticleDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class ArticleMasterDataController {
 			@PathVariable("variant") Long variant,
 			@PathVariable("bundlenumber") Long bundleNumber) throws Exception {
 
-        CompleteDiscountArticleMasterData articleMasterData;
+		CompleteArticleMasterData articleMasterData;
 		try {
 			articleMasterData = articleDetailsService.getCompleteArticleMasterDataByArticleVariantBundle(
 					articleNumber, variant, bundleNumber,

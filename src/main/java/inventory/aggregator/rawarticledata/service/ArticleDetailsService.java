@@ -106,7 +106,7 @@ public class ArticleDetailsService {
     }
 
 
-    public CompleteDiscountArticleMasterData getCompleteArticleMasterDataByArticleVariantBundle(
+    public CompleteArticleMasterData getCompleteArticleMasterDataByArticleVariantBundle(
             Long articleNumber,
             Long variantNumber,
             Long bundleNumber,
@@ -135,7 +135,7 @@ public class ArticleDetailsService {
                 }, executor
         );
 
-        CompletableFuture<DiscountArticleStoreMasterData> discountArticleStoreMasterData = CompletableFuture.supplyAsync(
+        CompletableFuture<RawArticleStoreMasterData> discountArticleStoreMasterData = CompletableFuture.supplyAsync(
                 () -> {
                     try {
                         return rawArticleStoreMasterDataRepository.getDiscountArticleStoreMasterData(
@@ -151,11 +151,10 @@ public class ArticleDetailsService {
 
         CompletableFuture.allOf(articleMasterData, discountArticleStoreMasterData);
 
-        return CompleteDiscountArticleMasterData.builder()
+        return CompleteArticleMasterData.builder()
                 .articleMasterData(articleMasterData.get())
-                .discountArticleStoreMasterData(discountArticleStoreMasterData.get())
+                .articleStoreMasterData(discountArticleStoreMasterData.get())
                 .build();
-
     }
 
 

@@ -6,7 +6,6 @@ import inventory.aggregator.common.article_information.articlecache.client.artic
 import inventory.aggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import inventory.aggregator.common.article_information.articlecache.service.ArticleCacheService;
 import inventory.aggregator.rawarticledata.model.ArticleId;
-import inventory.aggregator.rawarticledata.model.DiscountArticleStoreMasterData;
 import inventory.aggregator.rawarticledata.model.RawArticleStoreMasterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -66,7 +65,7 @@ public class RawArticleStoreMasterDataRepository {
     }
 
     @Async
-    public CompletableFuture<DiscountArticleStoreMasterData> getDiscountArticleStoreMasterData(ArticleId articleId, String countryCode, String salesLine, String languageCode, Integer storeNo) {
+    public CompletableFuture<RawArticleStoreMasterData> getDiscountArticleStoreMasterData(ArticleId articleId, String countryCode, String salesLine, String languageCode, Integer storeNo) {
         ArticleCacheStoreExceptionsIhdsTree articleCacheStoreExceptionsIhdsTree =
                 articleCacheService.getArticleCacheStoreExceptions(articleId.getArticleNumber(), articleId.getVariantNumber(), articleId.getBundleNumber()
                         , countryCode, salesLine, languageCode, storeNo);
@@ -80,7 +79,9 @@ public class RawArticleStoreMasterDataRepository {
             articleCacheStoreExceptionsDataGroup300 = articleCacheStoreExceptionsIhdsTree.getTransaction().getArticleCacheIncident().getArticleCacheStoreExceptionsDataGroupById(300);
         }
 
-        DiscountArticleStoreMasterData discountArticleStoreMasterData = DiscountArticleStoreMasterData.builder()
+        RawArticleStoreMasterData rawArticleStoreMasterData = RawArticleStoreMasterData.builder()
+                .departmentNumber(null)
+                .shelfEdgeTicketType(null)
                 .salesBlockingCode(articleCacheStoreExceptionsDataGroup300.getSalesBlockingCode())
                 .storePieceNetSellPrice(articleCacheStoreExceptionsDataGroup100.getNetSalesPricePerPiece())
                 .storeBundleNetSellPrice(articleCacheStoreExceptionsDataGroup100.getNetSalesPricePerBundle())
@@ -90,8 +91,9 @@ public class RawArticleStoreMasterDataRepository {
                 .storePromotionBundleNetPrice(articleCacheStoreExceptionsDataGroup200.getPromotionNetSalesPricePerBundle())
                 .storePromotionPieceGrossPrice(articleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerPiece())
                 .storePromotionBundleGrossPrice(articleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerBundle())
+                .leadTime(null)
                 .build();
 
-        return CompletableFuture.completedFuture(discountArticleStoreMasterData);
+        return CompletableFuture.completedFuture(rawArticleStoreMasterData);
     }
 }
