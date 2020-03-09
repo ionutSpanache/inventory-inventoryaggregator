@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
 public class OpenApiSwaggerConfig {
@@ -28,7 +25,7 @@ public class OpenApiSwaggerConfig {
         extensions.put("x-related-masterdata", "article");
         extensions.put("x-solution", "Inventory");
         extensions.put("x-scope", "metro");
-        extensions.put("x-activated-countries", "ALL");
+        extensions.put("x-activated-countries", Arrays.asList("ALL"));
         extensions.put("x-git-url", "https://git.metrosystems.net/storeinventory/inventoryaggregator");
         License license = new License();
         license.setName("Apache License Version 2.0");
