@@ -3,7 +3,7 @@ package inventory.aggregator.multithreading;
 import inventory.aggregator.common.article_information.articlecache.model.ArticleBundle;
 import inventory.aggregator.common.article_information.articlecache.model.ArticleVariant;
 import inventory.aggregator.common.stock_location.acl.model.AclBundleStockLocation;
-import inventory.aggregator.common.stock_location.acl.service.AclStockLocationService;
+import inventory.aggregator.common.stock_location.acl.service.AclStockService;
 import inventory.aggregator.rawarticledata.model.ArticleStockLocation;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class AclStockLocationServiceExecutableTask implements Callable<ArticleVariant> {
 
-	AclStockLocationService aclStockLocationService;   // autowired AclOrderingService object to call the ACL ordering Web Service
+	AclStockService aclStockService;   // autowired AclOrderingService object to call the ACL ordering Web Service
 	String countryCode;                                // country code to be used in the request to the ACL ordering Web Service
 	String salesLine;                                  // sales line to be used in the request to the ACL ordering Web Service
 	Integer storeNo;                                   // store number to be used in the request to the ACL ordering Web Service
@@ -25,13 +25,13 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 	private static final Logger logger = Logger.getLogger("AclStockLocationServiceExecutableTask");  // handler for logging messages
 	
 	// Public constructor that sets the attributes for the call to ACL ordering Web Service
-	public AclStockLocationServiceExecutableTask(AclStockLocationService aclStockLocationService,
-			                          String countryCode,
-			                          String salesLine,
-			                          Integer storeNo,
-			                          Long articleNumber,
-			                          ArticleVariant articleVariant) {
-		this.aclStockLocationService = aclStockLocationService;
+	public AclStockLocationServiceExecutableTask(AclStockService aclStockService,
+                                                 String countryCode,
+                                                 String salesLine,
+                                                 Integer storeNo,
+                                                 Long articleNumber,
+                                                 ArticleVariant articleVariant) {
+		this.aclStockService = aclStockService;
 		this.countryCode = countryCode;
 		this.salesLine = salesLine;
 		this.storeNo = storeNo;
@@ -76,7 +76,7 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 		List<AclBundleStockLocation> aclBundleStockLocations = new ArrayList<>();
 		try {
 			logger.info("Thread " + this.getIdAsString() + " has started");
-			aclBundleStockLocations = aclStockLocationService.getAclBundleStockLocations(
+			aclBundleStockLocations = aclStockService.getAclBundleStockLocations(
 					countryCode, salesLine, storeNo,
 					this.articleNumber,	articleVariant.getVariantNumber());
 			processAclStockLocationDataIntoArticleVariant(aclBundleStockLocations);

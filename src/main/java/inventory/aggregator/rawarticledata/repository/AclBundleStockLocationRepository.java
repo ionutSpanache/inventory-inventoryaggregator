@@ -1,9 +1,10 @@
 package inventory.aggregator.rawarticledata.repository;
 
 import inventory.aggregator.common.stock_location.acl.model.AclBundleStockLocation;
-import inventory.aggregator.common.stock_location.acl.service.AclStockLocationService;
+import inventory.aggregator.common.stock_location.acl.service.AclStockService;
 import inventory.aggregator.rawarticledata.model.ArticleId;
 import inventory.aggregator.rawarticledata.model.ArticleStockLocation;
+import inventory.aggregator.rawarticledata.model.articlelocation.ArticleLocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
@@ -16,16 +17,16 @@ import java.util.stream.Collectors;
 
 @Repository
 public class AclBundleStockLocationRepository {
-    private final AclStockLocationService aclStockLocationService;
+    private final AclStockService aclStockService;
 
     @Autowired
-    public AclBundleStockLocationRepository(AclStockLocationService aclStockLocationService){
-        this.aclStockLocationService = aclStockLocationService;
+    public AclBundleStockLocationRepository(AclStockService aclStockService){
+        this.aclStockService = aclStockService;
     }
 
     @Async
     public CompletableFuture<List<ArticleStockLocation>> getArticleStockLocation(ArticleId articleId, String countryCode, String salesLine, Integer storeNo) {
-        List<AclBundleStockLocation> aclBundleStockLocations = aclStockLocationService.getAclBundleStockLocations(
+        List<AclBundleStockLocation> aclBundleStockLocations = aclStockService.getAclBundleStockLocations(
                 countryCode, salesLine, storeNo,
                 articleId.getArticleNumber(),
                 articleId.getVariantNumber());
@@ -74,5 +75,13 @@ public class AclBundleStockLocationRepository {
             }
         }
         return null;
+    }
+
+    @Async
+    public CompletableFuture<ArticleLocation> getArticleLocation(String countryCode, String salesLine, Integer storeNo, ArticleId articleId) {
+        ArticleLocation articleLocation = aclStockService.getAclArticleLocations(
+                countryCode, salesLine, storeNo,articleId);
+
+        return CompletableFuture.completedFuture(articleLocation);
     }
 }

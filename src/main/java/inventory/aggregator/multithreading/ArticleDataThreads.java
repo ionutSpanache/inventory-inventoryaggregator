@@ -6,7 +6,7 @@ import inventory.aggregator.common.article_information.articlecache.client.Artic
 import inventory.aggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import inventory.aggregator.common.article_information.articlecache.model.ArticleVariant;
 import inventory.aggregator.common.stock_information.movie.service.MovieService;
-import inventory.aggregator.common.stock_location.acl.service.AclStockLocationService;
+import inventory.aggregator.common.stock_location.acl.service.AclStockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -20,21 +20,21 @@ public class ArticleDataThreads {
 	
 
 	private MovieService movieService;                              // service to call Movie service end points
-	private AclStockLocationService aclStockLocationService;        // service to call ACL daily mean sales service end points
+	private AclStockService aclStockService;        // service to call ACL daily mean sales service end points
 	private AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
 	private ArticleCacheClient articleCacheClient;
 	private ThreadExecutor threadExecutor;                          // thread pool task executor
 	
 	@Autowired
 	public ArticleDataThreads(
-			MovieService movieService,
-			AclStockLocationService aclStockLocationService,
-			AclArticleStoreMasterDataService aclArticleStoreMasterDataService,
-			@Qualifier("articleCacheAAAClient") ArticleCacheClient articleCacheClient,
-			ThreadExecutor threadExecutor
+            MovieService movieService,
+            AclStockService aclStockService,
+            AclArticleStoreMasterDataService aclArticleStoreMasterDataService,
+            @Qualifier("articleCacheAAAClient") ArticleCacheClient articleCacheClient,
+            ThreadExecutor threadExecutor
 			) {
 		this.movieService = movieService;
-		this.aclStockLocationService = aclStockLocationService;
+		this.aclStockService = aclStockService;
 		this.aclArticleStoreMasterDataService = aclArticleStoreMasterDataService;
 		this.articleCacheClient = articleCacheClient;
 		this.threadExecutor = threadExecutor;
@@ -162,7 +162,7 @@ public class ArticleDataThreads {
 				// Create a new task for the current article variant
 				AclStockLocationServiceExecutableTask aclStockLocationServiceExecutableTask =
 						new AclStockLocationServiceExecutableTask(
-								aclStockLocationService, countryCode, salesLine, storeNo,
+                                aclStockService, countryCode, salesLine, storeNo,
 						articleData.getArticleNumber(), articleVariant);
 				// Get an available thread index in the thread pool to execute the new task
 				availableThreadIdx = getAvailableThreadIndex(threadResultTasks);

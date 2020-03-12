@@ -4,6 +4,7 @@ import inventory.aggregator.common.article_information.articlecache.model.Articl
 import inventory.aggregator.common.article_information.articlecache.service.ArticleCacheService;
 import inventory.aggregator.common.model.ArticleNotFoundException;
 import inventory.aggregator.rawarticledata.model.*;
+import inventory.aggregator.rawarticledata.model.articlelocation.ArticleLocation;
 import inventory.aggregator.rawarticledata.repository.AclBundleStockLocationRepository;
 import inventory.aggregator.rawarticledata.repository.ArticleDataFromMovieRepository;
 import inventory.aggregator.rawarticledata.repository.ArticleMasterDataRepository;
@@ -320,7 +321,21 @@ public class ArticleDetailsService {
                             }, executor
                     );
 
-                    CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie, articleStockLocationList);
+                    CompletableFuture<ArticleLocation> articleLocationList = CompletableFuture.supplyAsync(
+                            () -> {
+                                try {
+                                    return aclBundleStockLocationRepository.getArticleLocation(
+                                            countryCode, salesLine, storeNo, articleId).get(20, TimeUnit.SECONDS);
+                                } catch (ArticleNotFoundException ex) {
+                                    throw new ArticleNotFoundException();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }, executor
+                    );
+
+                    CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie, articleStockLocationList, articleLocationList);
                     StockInformation stockDetails = null;
                     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
                     if (articleDataFromMovie.get() != null) {
@@ -335,6 +350,7 @@ public class ArticleDetailsService {
                             .stockDetails(stockDetails)
                             .plannedDeliveryDates(plannedDeliveryDates)
                             .stockLocations(articleStockLocationList.get())
+                            .articleLocation(articleLocationList.get())
                             .articleComponent(articleComponent)
                             .build();
 
