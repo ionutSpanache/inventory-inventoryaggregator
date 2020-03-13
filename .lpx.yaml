@@ -38,6 +38,15 @@ services:
         limits:
           memory: "400Mi"
           cpu: "0.5"
+    prod:
+      replicas: 1
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "0.5"
+        limits:
+          memory: "768Mi"
+          cpu: "1"
 # Specifies the files executed for tests on each environment. Need to be executable 'chmod +x'
 tests:
 # - stage: dev
