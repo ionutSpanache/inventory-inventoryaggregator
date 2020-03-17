@@ -5,6 +5,8 @@ import inventory.aggregator.common.stock_location.acl.service.AclStockService;
 import inventory.aggregator.rawarticledata.model.ArticleId;
 import inventory.aggregator.rawarticledata.model.ArticleStockLocation;
 import inventory.aggregator.rawarticledata.model.articlelocation.ArticleLocation;
+import inventory.aggregator.rawarticledata.model.articlelocation.StocktakingArticleLocation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -58,8 +61,8 @@ public class AclBundleStockLocationRepository {
                 for (AclBundleStockLocation aclBundleStockLocation : aclStockLocationsForBundle) {
                     ArticleStockLocation articleStockLocation = new ArticleStockLocation(
                             aclBundleStockLocation.getBundleNo(),
-                            aclBundleStockLocation.getAisleNo(),
-                            aclBundleStockLocation.getBayNo(),
+                            StringUtils.leftPad(String.valueOf(aclBundleStockLocation.getAisleNo()),3, "0"),
+                            StringUtils.leftPad(String.valueOf(aclBundleStockLocation.getBayNo()),3, "0"),
                             aclBundleStockLocation.getQuantity(),
                             aclBundleStockLocation.getBestBeforeDate(),
                             aclBundleStockLocation.getDateOfCreation(),
@@ -82,6 +85,20 @@ public class AclBundleStockLocationRepository {
         ArticleLocation articleLocation = aclStockService.getAclArticleLocations(
                 countryCode, salesLine, storeNo,articleId);
 
-        return CompletableFuture.completedFuture(articleLocation);
+        return CompletableFuture.completedFuture(transformAclArticleLocationsToInventoryArticleLocation(articleLocation));
+    }
+
+    private ArticleLocation transformAclArticleLocationsToInventoryArticleLocation(ArticleLocation articleLocation) {
+        if (Optional.ofNullable(articleLocation).isPresent()) {
+            if ((articleLocation.getStocktakingArticleLocationList() != null)
+                    && (!articleLocation.getStocktakingArticleLocationList().isEmpty())) {
+                for (StocktakingArticleLocation stocktakingArticleLocation : articleLocation.getStocktakingArticleLocationList()) {
+                    stocktakingArticleLocation.setAisle(StringUtils.leftPad(stocktakingArticleLocation.getAisle(), 3, "0"));
+                    stocktakingArticleLocation.setShelf(StringUtils.leftPad(stocktakingArticleLocation.getShelf(), 3, "0"));
+                }
+                return articleLocation;
+            }
+        }
+        return null;
     }
 }

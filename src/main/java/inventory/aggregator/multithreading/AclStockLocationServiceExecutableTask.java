@@ -5,6 +5,7 @@ import inventory.aggregator.common.article_information.articlecache.model.Articl
 import inventory.aggregator.common.stock_location.acl.model.AclBundleStockLocation;
 import inventory.aggregator.common.stock_location.acl.service.AclStockService;
 import inventory.aggregator.rawarticledata.model.ArticleStockLocation;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,8 +128,8 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 				for (AclBundleStockLocation aclBundleStockLocation : aclStockLocationsForBundle) {
 					ArticleStockLocation articleStockLocation = new ArticleStockLocation(
 							aclBundleStockLocation.getBundleNo(),
-							aclBundleStockLocation.getAisleNo(),
-							aclBundleStockLocation.getBayNo(),
+							StringUtils.leftPad(String.valueOf(aclBundleStockLocation.getAisleNo()),3, "0"),
+							StringUtils.leftPad(String.valueOf(aclBundleStockLocation.getBayNo()),3, "0"),
 							aclBundleStockLocation.getQuantity(),
 							aclBundleStockLocation.getBestBeforeDate(),
 							aclBundleStockLocation.getDateOfCreation(),

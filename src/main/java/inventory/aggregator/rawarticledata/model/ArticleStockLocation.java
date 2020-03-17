@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 public class ArticleStockLocation {
 
 	private Long bundleNo;
-	private Integer aisleNo;
-	private Integer bayNo;
+	private String aisleNo;
+	private String bayNo;
 	private Integer quantity;
 	private String bestBeforeDate;
 	private String creationDate;

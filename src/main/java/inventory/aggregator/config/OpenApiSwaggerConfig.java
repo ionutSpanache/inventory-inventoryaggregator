@@ -25,7 +25,7 @@ public class OpenApiSwaggerConfig {
         extensions.put("x-related-masterdata", "article");
         extensions.put("x-solution", "Inventory");
         extensions.put("x-scope", "metro");
-        extensions.put("x-activated-countries", Arrays.asList("ALL"));
+        extensions.put("x-activated-countries", Arrays.asList(new String[]{"ALL"}));
         extensions.put("x-git-url", "https://git.metrosystems.net/storeinventory/inventoryaggregator");
         License license = new License();
         license.setName("Apache License Version 2.0");

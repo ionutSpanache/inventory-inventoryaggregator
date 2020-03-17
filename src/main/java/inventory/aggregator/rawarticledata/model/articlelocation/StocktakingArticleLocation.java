@@ -14,8 +14,8 @@ import java.util.Date;
 public class StocktakingArticleLocation {
 
     private Date stocktakingDate;
-    private Integer shelf;
-    private Integer aisle;
+    private String shelf;
+    private String aisle;
 
     public Boolean isEmpty() {
 
