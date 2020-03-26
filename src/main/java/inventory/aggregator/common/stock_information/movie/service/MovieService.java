@@ -28,7 +28,7 @@ public class MovieService {
 		movieAdapter.setArticleNo(stockDetails.getArticleNo());
 		movieAdapter.setVariantId(stockDetails.getVariant());
 		movieAdapter.setBundleId(stockDetails.getBundleNo());
-		movieAdapter.setStock(stockDetails.getStockSummary().getAvailableStock());
+		movieAdapter.setStock(stockDetails.getStockSummary().getSystemStock());
 		movieAdapter.setStockMarkDown(stockDetails.getStockSummary().getMarkDownStock());
 		movieAdapter.setReservedStock(stockDetails.getStockSummary().getReservation());
 		movieAdapter.setUnavailableStock(stockDetails.getStockSummary().getBlockedStock() + stockDetails.getStockSummary().getReservation());
