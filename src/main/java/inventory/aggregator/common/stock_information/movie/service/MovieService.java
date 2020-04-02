@@ -24,6 +24,9 @@ public class MovieService {
 
 	
 	private MovieAdapter transformStockDetailToMovieAdapter(StockDetails stockDetails) {
+		Float openInterstoreQuantity = 0.0f;
+		Float openReturnQuantity = 0.0f;
+
 		MovieAdapter movieAdapter = new MovieAdapter();
 		movieAdapter.setArticleNo(stockDetails.getArticleNo());
 		movieAdapter.setVariantId(stockDetails.getVariant());
@@ -33,8 +36,6 @@ public class MovieService {
 		movieAdapter.setReservedStock(stockDetails.getStockSummary().getReservation());
 		movieAdapter.setUnavailableStock(stockDetails.getStockSummary().getBlockedStock() + stockDetails.getStockSummary().getReservation());
 		if (stockDetails.getOpenMovement() != null) {
-			Float openInterstoreQuantity = 0.0f;
-			Float openReturnQuantity = 0.0f; 
 			for (Integer i=0; i<stockDetails.getOpenMovement().size(); i++) {
 				if(stockDetails.getOpenMovement().get(i).getReason().equals("IST")) {
 				   openInterstoreQuantity = stockDetails.getOpenMovement().get(i).getQuantity();
