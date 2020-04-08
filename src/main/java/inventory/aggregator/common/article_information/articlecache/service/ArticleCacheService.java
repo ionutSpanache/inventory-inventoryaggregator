@@ -183,10 +183,13 @@ public class ArticleCacheService {
 				articleCacheDataGroup320.getPromotionBundleNetPrice(),
 				articleCacheReaderDigest.getVariantText(),
 				articleCacheDataGroup325.getArticleClass(),
-				articleCacheReaderDigest.getMerchGroupMain(),
-				articleCacheReaderDigest.getMerchGroupSub(),
+				articleCacheDataGroup100.getPresentationMainMerchandiseGroup(),
+				articleCacheDataGroup100.getPresentationSubMerchandiseGroup(),
 				articleCacheDataGroup320.getAssignedStoreSupplier(),
-				articleCacheDataGroup325.getProcurementCd()
+				articleCacheDataGroup325.getProcurementCd(),
+				articleCacheDataGroup320.getAssortmentCode(),
+				articleCacheDataGroup320.getBlockingCode(),
+				articleCacheDataGroup320.getActivationStatus()
 				);
 	}
 

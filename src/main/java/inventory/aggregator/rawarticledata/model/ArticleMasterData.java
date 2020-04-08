@@ -28,6 +28,9 @@ public class ArticleMasterData implements Serializable {
     private Long presentationSubMerchandiseGroup;
     private Integer supplierNumber;
     private Byte procurementCode;
+	private Byte assortmentCode;
+	private Byte blockingCode;
+	private Byte activationStatus;
     
 
 	public static long getSerialversionuid() {
@@ -36,23 +39,27 @@ public class ArticleMasterData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ArticleMasterData [articleDescription=" + articleDescription
-                + ", barcode=" + barcode
-				+ ", commercialSupplier=" + commercialSupplier
-                + ", presentationMainMerchandiseGroup=" + presentationMainMerchandiseGroup
-                + ", presentationMerchandiseGroup=" + presentationMerchandiseGroup
-                + ", presentationSubMerchandiseGroup=" + presentationSubMerchandiseGroup
-				+ ", promotionId=" + promotionId
-                + ", sellingBundleContent=" + sellingBundleContent
-				+ ", subsystemArticleNumber=" + subsystemArticleNumber
-                + ", vatPercent=" + vatPercent
-                + ", pieceNetSellPrice=" + pieceNetSellPrice
-                + ", bundleNetSellPrice=" + bundleNetSellPrice
-                + ", promotionBundleNetPrice=" + promotionBundleNetPrice
-                + ", variantDescription=" + variantDescription
-                + ", articleClass=" + articleClass
-                + ", supplierNumber=" + supplierNumber
-                + ", procurementCode=" + procurementCode
-                + "]";
+		return "ArticleMasterData{" +
+				"articleDescription='" + articleDescription + '\'' +
+				", barcode='" + barcode + '\'' +
+				", commercialSupplier=" + commercialSupplier +
+				", presentationMerchandiseGroup=" + presentationMerchandiseGroup +
+				", promotionId='" + promotionId + '\'' +
+				", sellingBundleContent=" + sellingBundleContent +
+				", subsystemArticleNumber=" + subsystemArticleNumber +
+				", vatPercent=" + vatPercent +
+				", pieceNetSellPrice=" + pieceNetSellPrice +
+				", bundleNetSellPrice=" + bundleNetSellPrice +
+				", promotionBundleNetPrice=" + promotionBundleNetPrice +
+				", variantDescription='" + variantDescription + '\'' +
+				", articleClass='" + articleClass + '\'' +
+				", presentationMainMerchandiseGroup=" + presentationMainMerchandiseGroup +
+				", presentationSubMerchandiseGroup=" + presentationSubMerchandiseGroup +
+				", supplierNumber=" + supplierNumber +
+				", procurementCode=" + procurementCode +
+				", assortmentCode=" + assortmentCode +
+				", blockingCode=" + blockingCode +
+				", activationStatus=" + activationStatus +
+				'}';
 	}
 }

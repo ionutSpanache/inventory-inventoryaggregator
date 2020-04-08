@@ -72,7 +72,10 @@ public class ArticleMasterDataRepository {
                     articleCacheFullData.getPresentationMainMerchandiseGroup(),
                     articleCacheFullData.getPresentationSubMerchandiseGroup(),
                     articleCacheFullData.getSupplierNumber(),
-                    articleCacheFullData.getProcurementCode()
+                    articleCacheFullData.getProcurementCode(),
+                    articleCacheFullData.getAssortmentCode(),
+                    articleCacheFullData.getBlockingCode(),
+                    articleCacheFullData.getActivationStatus()
             );
         }
         return null;

@@ -30,4 +30,7 @@ public class ArticleCacheFullData {
     private Long presentationSubMerchandiseGroup;
     private Integer supplierNumber;
     private Byte procurementCode;
+    private Byte assortmentCode;
+    private Byte blockingCode;
+    private Byte activationStatus;
 }

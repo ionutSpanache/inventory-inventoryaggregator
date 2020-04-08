@@ -23,15 +23,6 @@ public class ArticleCacheDataGroup {
         this.id = id;
     }
 
-    private Integer presentationMerchandiseGroup;
-    public Integer getPresentationMerchandiseGroup() {
-        return presentationMerchandiseGroup;
-    }
-    @XmlElement(name = "PRESENTATIONMERCHANDISEGROUP")
-    public void setPresentationMerchandiseGroup(Integer presentationMerchandiseGroup) {
-        this.presentationMerchandiseGroup = presentationMerchandiseGroup;
-    }
-
     private String ownBrandId;
     public String getOwnBrandId() {
         return ownBrandId;
@@ -49,6 +40,33 @@ public class ArticleCacheDataGroup {
     @XmlElement(name = "VATPERCENT")
     public void setVatPercent(Double vatPercent) {
         this.vatPercent = vatPercent;
+    }
+
+    private Long presentationMainMerchandiseGroup;
+    public Long getPresentationMainMerchandiseGroup() {
+        return presentationMainMerchandiseGroup;
+    }
+    @XmlElement(name = "PRESENTATIONMERCHANDISEMAINGROUP")
+    public void setPresentationMainMerchandiseGroup(Long presentationMainMerchandiseGroup) {
+        this.presentationMainMerchandiseGroup = presentationMainMerchandiseGroup;
+    }
+
+    private Integer presentationMerchandiseGroup;
+    public Integer getPresentationMerchandiseGroup() {
+        return presentationMerchandiseGroup;
+    }
+    @XmlElement(name = "PRESENTATIONMERCHANDISEGROUP")
+    public void setPresentationMerchandiseGroup(Integer presentationMerchandiseGroup) {
+        this.presentationMerchandiseGroup = presentationMerchandiseGroup;
+    }
+
+    private Long presentationSubMerchandiseGroup ;
+    public Long getPresentationSubMerchandiseGroup () {
+        return presentationSubMerchandiseGroup ;
+    }
+    @XmlElement(name = "PRESENTATIONMERCHANDISESUBGROUP")
+    public void setPresentationSubMerchandiseGroup (Long presentationSubMerchandiseGroup ) {
+        this.presentationSubMerchandiseGroup  = presentationSubMerchandiseGroup ;
     }
 
     /*Data Group 200*/
@@ -136,6 +154,15 @@ public class ArticleCacheDataGroup {
     @XmlElement(name = "BLOCKINGCODE")
     public void setBlockingCode(Byte blockingCode) {
         this.blockingCode = blockingCode;
+    }
+
+    private Byte assortmentCode;
+    public Byte getAssortmentCode() {
+        return assortmentCode;
+    }
+    @XmlElement(name = "ASSORTMENTCD")
+    public void setAssortmentCode(Byte assortmentCode) {
+        this.assortmentCode = assortmentCode;
     }
 
     private Boolean isWeightArticle;
