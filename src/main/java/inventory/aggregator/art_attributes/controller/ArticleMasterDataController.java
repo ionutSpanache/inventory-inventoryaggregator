@@ -62,7 +62,7 @@ public class ArticleMasterDataController {
 					articleNumber, variant, bundleNumber,
 					countryCode, salesLine, languageCode, storeNo);
 		} catch (EntityNotFoundException e) {
-			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity(e.getMessage(), HttpStatus.NO_CONTENT);
 		}
 		return ResponseEntity.ok(articleMasterData);
 	}

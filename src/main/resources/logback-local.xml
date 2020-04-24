@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <logger name="net.metrosystems.inventory" level="DEBUG"/>
+    <logger name="org.springframework.retry.support.RetryTemplate"  level="DEBUG"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="io.micrometer.datadog" level="DEBUG"/>
+    <logger name="com.zaxxer.hikari" level="DEBUG"/>
+
+    <root level="INFO"/>
+
+</configuration>
