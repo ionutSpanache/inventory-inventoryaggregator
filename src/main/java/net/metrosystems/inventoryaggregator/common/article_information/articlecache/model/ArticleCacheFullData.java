@@ -1,0 +1,36 @@
+package net.metrosystems.inventoryaggregator.common.article_information.articlecache.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ArticleCacheFullData {
+
+    private Long articleNumber;
+    private Long variantNumber;
+    private Long bundleNumber;
+    private String articleDescription;
+    private String barcode;
+    private Integer commercialSupplier;
+    private Integer presentationMerchandiseGroup;
+    private String promotionId;
+    private Integer sellingBundleContent;
+    private Boolean isWeightArticle;
+    private Long subsysArticleNumber;
+    private Double vatPercent;
+    private double pieceNetSellPrice;
+    private double bundleNetSellPrice;
+    private double promotionBundleNetPrice;
+    private String variantDescription;
+    private String articleClass;
+    private Long presentationMainMerchandiseGroup;
+    private Long presentationSubMerchandiseGroup;
+    private Integer supplierNumber;
+    private Byte procurementCode;
+    private Byte assortmentCode;
+    private Byte blockingCode;
+    private Byte activationStatus;
+}
