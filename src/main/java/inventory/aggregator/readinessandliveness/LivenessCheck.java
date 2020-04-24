@@ -16,7 +16,6 @@ public class LivenessCheck {
 	}
 	
 	public void setLive(boolean live) {
-		LOG.info("Set live to {}", live);
 		this.live = live;
 	}
 	

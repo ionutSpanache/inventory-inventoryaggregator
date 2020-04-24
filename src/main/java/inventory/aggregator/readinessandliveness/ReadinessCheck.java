@@ -16,7 +16,6 @@ public class ReadinessCheck {
 	}
 
 	public void setReady(boolean ready) {
-		LOG.info("Set ready to {}", ready);
 		this.ready = ready;
 	}
 }
