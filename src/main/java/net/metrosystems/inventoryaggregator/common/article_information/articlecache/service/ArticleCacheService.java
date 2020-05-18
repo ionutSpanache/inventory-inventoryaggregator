@@ -409,7 +409,8 @@ public class ArticleCacheService {
 			Integer storeNo) {
 
 		String articleUrlPath = String.format(articleCacheStoreExceptionsPath,
-				countryCode.toLowerCase(), bundleNumber, salesLine.toLowerCase(), languageCode, articleNumber, storeNo, variantNumber);
+				countryCode.toLowerCase(), bundleNumber, salesLine.toLowerCase(), "en", articleNumber, storeNo, variantNumber);
+		//todo: change "en" to country code
 		System.out.println("articleUrlPath: " + articleUrlPath);
 		ArticleCacheStoreExceptionsIhdsTree articleCacheStoreExceptionsIhdsTree = articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
 		return articleCacheStoreExceptionsIhdsTree;
