@@ -1,36 +1,46 @@
 package net.metrosystems.inventoryaggregator.articleId.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleId.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleId.service.ArticleIdService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
+import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
+import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.metrics.annotation.Timed;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
 @RestController
+@Timed("ArticleId")
 @RequestMapping(value = "/inventoryaggregator")
 @Slf4j
 public class ArticleIdController {
 
-    @Autowired
-    private ArticleIdService articleIdService;
+    private final ArticleIdService articleIdService;
 
+    @Autowired
+    public ArticleIdController(ArticleIdService articleIdService) {
+        this.articleIdService = articleIdService;
+    }
+
+    @AddTimer
+    @AddLogs
     @GetMapping(value = "/countries/{countryCode}/saleslines/{salesline}/languages/{languageCode}/stores/{storeno}/article-id/barcode/{barcode}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ArticleId>> getArticleIdByBarcode(
-            @PathVariable("countryCode") String countryCode,
-            @PathVariable("salesline") String salesLine,
+            @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+            @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
             @PathVariable("languageCode") String languageCode,
-            @PathVariable("storeno") Integer storeNo,
+            @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
             @PathVariable("barcode") String barCode
-    ) throws JsonProcessingException {
-        List<ArticleId> articleIds = null;
+    ) {
+        List<ArticleId> articleIds;
         try {
             articleIds = articleIdService.getArticleIdByBarcode(countryCode, salesLine, languageCode, storeNo, barCode);
         } catch (Exception e) {
@@ -42,16 +52,18 @@ public class ArticleIdController {
         return ResponseEntity.ok(articleIds);
     }
 
+    @AddTimer
+    @AddLogs
     @GetMapping(value = "/countries/{countryCode}/saleslines/{salesline}/languages/{languageCode}/stores/{storeno}/article-id/subsys-article-nunmber/{subsys-article-number}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ArticleId>> getArticleIdBySubsysArtNo(
-            @PathVariable("countryCode") String countryCode,
-            @PathVariable("salesline") String salesLine,
+            @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+            @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
             @PathVariable("languageCode") String languageCode,
-            @PathVariable("storeno") Integer storeNo,
+            @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
             @PathVariable("subsys-article-number") Long subsysArticleNumber
-    ) throws JsonProcessingException {
-        List<ArticleId> articleIds = null;
+    ) {
+        List<ArticleId> articleIds;
         try {
             articleIds = articleIdService.getArticleIdBySubsysArticleNumber(countryCode, salesLine, languageCode, storeNo, subsysArticleNumber);
         } catch (Exception e) {
@@ -63,17 +75,18 @@ public class ArticleIdController {
         return ResponseEntity.ok(articleIds);
     }
 
-
+    @AddTimer
+    @AddLogs
     @GetMapping(value = "/countries/{countryCode}/saleslines/{salesline}/languages/{languageCode}/stores/{storeno}/article-id/article-number/{articleNumber}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ArticleId>> getArticleIdByArticleNumber(
-            @PathVariable("countryCode") String countryCode,
-            @PathVariable("salesline") String salesLine,
+            @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+            @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
             @PathVariable("languageCode") String languageCode,
-            @PathVariable("storeno") Integer storeNo,
+            @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
             @PathVariable("articleNumber") Long articleNumber
-    ) throws JsonProcessingException {
-        List<ArticleId> articleIds = null;
+    ) {
+        List<ArticleId> articleIds;
         try {
             articleIds = articleIdService.getArticleIdByArticleNumber(countryCode, salesLine, languageCode, storeNo, articleNumber);
         } catch (Exception e) {
