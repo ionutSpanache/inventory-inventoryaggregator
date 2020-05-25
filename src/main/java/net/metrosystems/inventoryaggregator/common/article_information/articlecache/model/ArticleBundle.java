@@ -1,8 +1,8 @@
 
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.model;
 
-import net.metrosystems.inventoryaggregator.rawarticledata.model.ArticleStockLocation;
 import lombok.Data;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
 
 import java.util.List;
 

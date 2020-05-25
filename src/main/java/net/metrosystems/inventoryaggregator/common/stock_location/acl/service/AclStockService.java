@@ -1,9 +1,9 @@
 package net.metrosystems.inventoryaggregator.common.stock_location.acl.service;
 
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.client.AclStockClient;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclBundleStockLocation;
-import net.metrosystems.inventoryaggregator.rawarticledata.model.ArticleId;
-import net.metrosystems.inventoryaggregator.rawarticledata.model.articlelocation.ArticleLocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

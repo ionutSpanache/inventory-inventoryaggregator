@@ -1,8 +1,8 @@
 package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
 
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import lombok.Data;
+import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;

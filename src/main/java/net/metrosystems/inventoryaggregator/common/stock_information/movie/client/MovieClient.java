@@ -1,20 +1,13 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Article;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Bundle;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieDataGroups;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieRequestBody;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetails;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetailsResponse;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
-import net.metrosystems.inventoryaggregator.art_attributes.model.ArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclArticleStoreMasterDataService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;

@@ -1,12 +1,10 @@
 package net.metrosystems.inventoryaggregator.common.stock_location.acl.client;
 
+import lombok.extern.slf4j.Slf4j;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclBundleStockLocation;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.PaginatedAclBundleStockLocation;
-import net.metrosystems.inventoryaggregator.oauth.service.OAuth2ClientTokenSevice;
-import net.metrosystems.inventoryaggregator.rawarticledata.model.ArticleId;
-import net.metrosystems.inventoryaggregator.rawarticledata.model.articlelocation.ArticleLocation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -24,9 +22,6 @@ public class AclStockClient {
 	private String aclStockLocationPathForVariant;
 	@Value("${ACL_STOCK_ARTICLE_LOCATION}")
 	private String aclArticleLocationPath;
-
-	@Autowired
-	OAuth2ClientTokenSevice oauth2ClientTokenSevice;
 
 	public AclStockClient() {
 		restTemplate = new RestTemplate();

@@ -30,11 +30,13 @@ public class ArticleCacheStoreExceptionsClient //implements ArticleCacheClient
                                              @Value("${ARTICLE_CACHE_USERNAME}") final String username,
                                              @Value("${ARTICLE_CACHE_PASSWORD}") final String password) {
         this.restTemplateDocuments = restTemplateBuilder
-                .basicAuthorization(username, password)
+//                .basicAuthorization(username, password)
+                .basicAuthentication(username, password)
                 .messageConverters(prepareArticleCacheDocumentMessageConverters())
                 .build();
         this.restTemplateFilter = restTemplateBuilder
-                .basicAuthorization(username, password)
+//                .basicAuthorization(username, password)
+                .basicAuthentication(username, password)
                 .messageConverters(prepareArticleCacheFilterMessageConverters())
                 .build();
     }

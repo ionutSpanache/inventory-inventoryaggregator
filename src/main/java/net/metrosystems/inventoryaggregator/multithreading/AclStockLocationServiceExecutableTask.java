@@ -1,10 +1,10 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclBundleStockLocation;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.service.AclStockService;
-import net.metrosystems.inventoryaggregator.rawarticledata.model.ArticleStockLocation;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;

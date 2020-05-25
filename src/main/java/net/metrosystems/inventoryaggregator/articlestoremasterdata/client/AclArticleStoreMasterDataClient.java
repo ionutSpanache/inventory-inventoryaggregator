@@ -2,7 +2,6 @@ package net.metrosystems.inventoryaggregator.articlestoremasterdata.client;
 
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.client.model.ArticleStoreMasterDataACLResponse;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
-import net.metrosystems.inventoryaggregator.oauth.service.OAuth2ClientTokenSevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,9 +24,6 @@ public class AclArticleStoreMasterDataClient {
 	private String aclArticleMasterDataPathByArtVarBundle;
 
 	private String aclArticleStoreMasterDataUrl;
-
-	@Autowired
-    OAuth2ClientTokenSevice oauth2ClientTokenSevice;
 
 	public AclArticleStoreMasterDataClient() {
 		restTemplate = new RestTemplate();

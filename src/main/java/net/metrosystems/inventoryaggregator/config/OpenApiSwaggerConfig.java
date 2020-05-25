@@ -1,15 +1,22 @@
 package net.metrosystems.inventoryaggregator.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.OAuthFlow;
+import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.Scopes;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class OpenApiSwaggerConfig {
@@ -18,6 +25,16 @@ public class OpenApiSwaggerConfig {
 
     @Value("${spring.profiles.active}")
     private String profile;
+
+    @Value("${spring.security.oauth2.client.provider.idam.token-uri}")
+    private String tokenUrl;
+
+    @Value("${idam.realm_id}")
+    private String realmId;
+
+    @Value("${security.schema.openapi}")
+    private String securitySchema;
+
     @Bean
     public OpenAPI api() {
         Map<String,Object> extensions = new HashMap<>();
@@ -58,6 +75,24 @@ public class OpenApiSwaggerConfig {
             server.setUrl(url);
             openApi.addServersItem(server);
         }
+
+        openApi.components(
+                new Components()
+                        .addSecuritySchemes(securitySchema,
+                                new SecurityScheme().
+                                        type(SecurityScheme.Type.OAUTH2)
+                                        .in(SecurityScheme.In.HEADER)
+                                        .bearerFormat("jwt")
+                                        .flows(new OAuthFlows()
+                                                .clientCredentials(
+                                                        new OAuthFlow()
+                                                                .tokenUrl(tokenUrl)
+                                                                .scopes(new Scopes().addString("realm_id=" + realmId, "give access to MStore Realm"))
+                                                        )
+                                        )
+                        )
+
+        );
 
         return openApi;
     }

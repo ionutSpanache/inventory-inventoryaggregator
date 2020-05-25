@@ -24,7 +24,7 @@ public class Aspects {
             LOG.debug("{} returned with value {}", joinPoint.getSignature().getName(), response);
             return response;
         } catch (Exception ex) {
-            LOG.debug("{} returned with exception {}", joinPoint.getSignature().getName(), ex);
+            LOG.error("{} returned with exception {}", joinPoint.getSignature().getName(), ex);
             throw ex;
         } finally {
             long end = System.currentTimeMillis();

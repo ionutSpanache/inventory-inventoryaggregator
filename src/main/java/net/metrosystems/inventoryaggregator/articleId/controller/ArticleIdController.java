@@ -1,10 +1,10 @@
 package net.metrosystems.inventoryaggregator.articleId.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleId.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleId.service.ArticleIdService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
