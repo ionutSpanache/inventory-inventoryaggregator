@@ -22,6 +22,9 @@ public class MetricAspect extends AspectHelper {
     @Value("${metrics.serviceName}")
     private String serviceName;
 
+    @Value("${app.vertical}")
+    private String verticalName;
+
     @Autowired
     public MetricAspect(MeterRegistry registry) {
         this.registry = registry;
@@ -42,11 +45,11 @@ public class MetricAspect extends AspectHelper {
 
         Timer timer = tagMap.map(
                 strings -> Timer
-                        .builder(String.format("mstore.%s.%sTimer", serviceName, point.getStaticPart().getSignature().getName()))
+                        .builder(String.format("%s.%s.%sTimer", verticalName, serviceName, point.getStaticPart().getSignature().getName()))
                         .tags(strings.toArray(new String[0]))
                         .register(registry))
                 .orElseGet(() -> Timer
-                        .builder(String.format("mstore.%s.%sTimer", serviceName, point.getStaticPart().getSignature().getName()))
+                        .builder(String.format("%s.%s.%sTimer", verticalName, serviceName, point.getStaticPart().getSignature().getName()))
                         .register(registry));
 
 //        return timer.recordCallable(() -> {
