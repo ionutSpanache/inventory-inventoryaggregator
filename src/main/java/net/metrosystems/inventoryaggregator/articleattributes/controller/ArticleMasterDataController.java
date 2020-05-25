@@ -5,6 +5,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMaste
 import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleDetailsService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import net.metrosystems.inventoryaggregator.exception.EntityNotFoundException;
@@ -32,8 +33,9 @@ public class ArticleMasterDataController {
 	}
 
 	@AddTimer
+	@AddLogs
 	@RequestMapping(value="/articlemasterdata/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}", method=RequestMethod.GET)
-	public ResponseEntity<?> getArticleByArtVarBundle(
+	public ResponseEntity<?> getArticleMasterDataListByArtVarBundle(
 			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
 			@TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
 			@PathVariable("languageCode") String languageCode,
@@ -52,7 +54,9 @@ public class ArticleMasterDataController {
 			}
 			return ResponseEntity.ok(articleMasterData);
 	}
+
 	@AddTimer
+	@AddLogs
 	@RequestMapping(value="/completearticlemasterdata/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}", method=RequestMethod.GET)
 	public ResponseEntity<?> getArticleMasterDataByArtVarBundle(
 			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
