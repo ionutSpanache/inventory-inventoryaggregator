@@ -87,7 +87,7 @@ public class ArticleDataController {
 	
 	@ExceptionHandler(ArticleNotFoundException.class)
 	public final ResponseEntity<String> handleUserNotFoundException(ArticleNotFoundException ex, WebRequest request) {		      
-		return ResponseEntity.notFound().build();
+		return ResponseEntity.noContent().build();
 	}
 
 }
