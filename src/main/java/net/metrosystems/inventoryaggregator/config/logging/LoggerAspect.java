@@ -16,7 +16,7 @@ public class LoggerAspect {
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
 
         long start = System.currentTimeMillis();
-        addLogging(joinPoint, true);
+        addLogging(joinPoint, false);
         var result = joinPoint.proceed();
 
         try {
