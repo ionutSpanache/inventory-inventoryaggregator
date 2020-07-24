@@ -17,10 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Slf4j
@@ -84,10 +82,12 @@ public class ArticleDetailsService {
             String salesLine,
             String languageCode,
             Integer storeNo) throws Exception {
-        List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList =
-                getArticleVariantBundleIdentifierListForArticleVariantBundle(articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode);
         return getRawArticleDataListForArticleVariantBundleIdentifierList(
-                articleVariantBundleIdentifierList,
+                ArticleId.builder()
+                        .articleNumber(articleNumber)
+                        .variantNumber(variantNumber)
+                        .bundleNumber(bundleNumber)
+                        .build(),
                 countryCode, salesLine, languageCode, storeNo);
     }
 
@@ -243,7 +243,6 @@ public class ArticleDetailsService {
         return articleComponent;
     }
 
-
     private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(
             List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList,
             String countryCode, String salesLine, String languageCode, Integer storeNo) throws Exception {
@@ -264,106 +263,150 @@ public class ArticleDetailsService {
                             articleIdTreeStructure.getArticleNumber(),
                             articleVariant.getVariantNumber(),
                             articleBundle.getBundleNumber());
-
-                    CompletableFuture<ArticleMasterData> articleMasterData = CompletableFuture.supplyAsync(
-                            () -> {
-                                try {
-                                    return articleMasterDataRepository.getArticleMasterData(
-                                            articleId,countryCode, salesLine, languageCode, storeNo).get(20, TimeUnit.SECONDS);
-                                } catch (ArticleNotFoundException ex) {
-                                    throw new ArticleNotFoundException();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                return null;
-                            }, executor
-                    );
-
-                    CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData = CompletableFuture.supplyAsync(
-                            () -> {
-                                try {
-                                    return rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
-                                            articleId, countryCode, salesLine, languageCode, storeNo).get(20, TimeUnit.SECONDS);
-                                } catch (ArticleNotFoundException ex) {
-                                    throw new ArticleNotFoundException();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                return null;
-                            }, executor
-                    );
-
-                    CompletableFuture<ArticleDataFromMovie> articleDataFromMovie = CompletableFuture.supplyAsync(
-                            () -> {
-                                try {
-                                    return articleDataFromMovieRepository.getArticleDataFromMovie(
-                                            articleId, countryCode, salesLine, storeNo).get(20, TimeUnit.SECONDS);
-                                } catch (ArticleNotFoundException ex) {
-                                    throw new ArticleNotFoundException();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                return null;
-                            }, executor
-                    );
-
-                    CompletableFuture<List<ArticleStockLocation>> articleStockLocationList = CompletableFuture.supplyAsync(
-                            () -> {
-                                try {
-                                    return aclBundleStockLocationRepository.getArticleStockLocation(
-                                            articleId, countryCode, salesLine, storeNo).get(20, TimeUnit.SECONDS);
-                                } catch (ArticleNotFoundException ex) {
-                                    throw new ArticleNotFoundException();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                return null;
-                            }, executor
-                    );
-
-                    CompletableFuture<ArticleLocation> articleLocationList = CompletableFuture.supplyAsync(
-                            () -> {
-                                try {
-                                    return aclBundleStockLocationRepository.getArticleLocation(
-                                            countryCode, salesLine, storeNo, articleId).get(20, TimeUnit.SECONDS);
-                                } catch (ArticleNotFoundException ex) {
-                                    throw new ArticleNotFoundException();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                return null;
-                            }, executor
-                    );
-
-                    CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie, articleStockLocationList, articleLocationList);
-                    StockInformation stockDetails = null;
-                    List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
-                    if (articleDataFromMovie.get() != null) {
-                        stockDetails = articleDataFromMovie.get().getArticleStockData();
-                        plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
-                    }
-
-                    RawArticleData rawArticleData = RawArticleData.builder()
-                            .articleId(articleId)
-                            .articleMasterData(articleMasterData.get())
-                            .articleStoreMasterData(rawArticleStoreMasterData.get())
-                            .stockDetails(stockDetails)
-                            .plannedDeliveryDates(plannedDeliveryDates)
-                            .stockLocations(articleStockLocationList.get())
-                            .articleLocation(articleLocationList.get())
-                            .articleComponent(articleComponent)
-                            .build();
-
-                    if (rawArticleDataList == null) {
-                        rawArticleDataList = new ArrayList<>(Arrays.asList(rawArticleData));
-                    } else {
-                        rawArticleDataList.add(rawArticleData);
-                    }
-
+                    buildRawArticleDataList(articleId ,countryCode, salesLine, languageCode, storeNo,
+                            rawArticleDataList, articleComponent);
                 }
             }
         }
         return rawArticleDataList;
+    }
+
+    private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(
+            ArticleId articleId,
+            String countryCode, String salesLine, String languageCode, Integer storeNo) throws Exception {
+        List<RawArticleData> rawArticleDataList = new ArrayList<>();
+
+        ArticleComponent articleComponent = transformArticleVariantBundleListToArticleComponentByArticle(
+                getArticleVariantBundleIdentifierListForArticleNumber(
+                        articleId.getArticleNumber(),
+                        countryCode, salesLine, languageCode),
+                articleId.getArticleNumber());
+        buildRawArticleDataList(articleId ,countryCode, salesLine, languageCode, storeNo,
+                rawArticleDataList, articleComponent);
+        return rawArticleDataList;
+    }
+
+    private void buildRawArticleDataList(ArticleId articleId, String countryCode, String salesLine, String languageCode,
+                                         Integer storeNo, List<RawArticleData> rawArticleDataList, ArticleComponent articleComponent) throws ExecutionException, InterruptedException {
+
+        AtomicReference<Long> articleMasterDataDuration = new AtomicReference<>(0L);
+        AtomicReference<Long> rawArticleStoreMasterDataDuration = new AtomicReference<>(0L);
+        AtomicReference<Long> articleDataFromMovieDuration = new AtomicReference<>(0L);
+        AtomicReference<Long> articleStockLocationListDuration = new AtomicReference<>(0L);
+        AtomicReference<Long> articleLocationListDuration = new AtomicReference<>(0L);
+        CompletableFuture<ArticleMasterData> articleMasterData = CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        Long startTimeArticleMasterData = System.currentTimeMillis();
+                        var articleMasterDataResult = articleMasterDataRepository.getArticleMasterData(
+                                articleId,countryCode, salesLine, languageCode, storeNo).get(20, TimeUnit.SECONDS);
+                        articleMasterDataDuration.set(System.currentTimeMillis() - startTimeArticleMasterData);
+                        return articleMasterDataResult;
+                    } catch (ArticleNotFoundException ex) {
+                        throw new ArticleNotFoundException();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }, executor
+        );
+
+        CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData = CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        Long startTimeRawArticleStoreMasterData = System.currentTimeMillis();
+                        var rawArticleStoreMasterDataResult = rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
+                                articleId, countryCode, salesLine, languageCode, storeNo).get(20, TimeUnit.SECONDS);
+                        rawArticleStoreMasterDataDuration.set(System.currentTimeMillis() - startTimeRawArticleStoreMasterData);
+                        return rawArticleStoreMasterDataResult;
+                    } catch (ArticleNotFoundException ex) {
+                        throw new ArticleNotFoundException();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }, executor
+        );
+
+        CompletableFuture<ArticleDataFromMovie> articleDataFromMovie = CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        Long startTimeArticleDataFromMovie = System.currentTimeMillis();
+                        var articleDataFromMovieResult = articleDataFromMovieRepository.getArticleDataFromMovie(
+                                articleId, countryCode, salesLine, storeNo).get(20, TimeUnit.SECONDS);
+                        articleDataFromMovieDuration.set(System.currentTimeMillis() - startTimeArticleDataFromMovie);
+                        return articleDataFromMovieResult;
+                    } catch (ArticleNotFoundException ex) {
+                        throw new ArticleNotFoundException();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }, executor
+        );
+
+        CompletableFuture<List<ArticleStockLocation>> articleStockLocationList = CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        Long startTimeArticleStockLocationList= System.currentTimeMillis();
+                        var articleStockLocationListResult = aclBundleStockLocationRepository.getArticleStockLocation(
+                                articleId, countryCode, salesLine, storeNo).get(20, TimeUnit.SECONDS);
+                        articleStockLocationListDuration.set(System.currentTimeMillis() - startTimeArticleStockLocationList);
+                        return articleStockLocationListResult;
+                    } catch (ArticleNotFoundException ex) {
+                        throw new ArticleNotFoundException();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }, executor
+        );
+
+        CompletableFuture<ArticleLocation> articleLocationList = CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        Long startTimeArticleLocationList = System.currentTimeMillis();
+                        var articleLocationListResult = aclBundleStockLocationRepository.getArticleLocation(
+                                countryCode, salesLine, storeNo, articleId).get(20, TimeUnit.SECONDS);
+                        articleLocationListDuration.set(System.currentTimeMillis() - startTimeArticleLocationList);
+                        return articleLocationListResult;
+                    } catch (ArticleNotFoundException ex) {
+                        throw new ArticleNotFoundException();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }, executor
+        );
+
+        CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie, articleStockLocationList, articleLocationList);
+        StockInformation stockDetails = null;
+        List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
+        if (articleDataFromMovie.get() != null) {
+            stockDetails = articleDataFromMovie.get().getArticleStockData();
+            plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
+        }
+
+        RawArticleData rawArticleData = RawArticleData.builder()
+                .articleId(articleId)
+                .articleMasterData(articleMasterData.get())
+                .articleStoreMasterData(rawArticleStoreMasterData.get())
+                .stockDetails(stockDetails)
+                .plannedDeliveryDates(plannedDeliveryDates)
+                .stockLocations(articleStockLocationList.get())
+                .articleLocation(articleLocationList.get())
+                .articleComponent(articleComponent)
+                .build();
+
+        if (rawArticleDataList != null) {
+            rawArticleDataList.add(rawArticleData);
+        }
+        log.info("IPO - parallel execution duration \n" +
+                "articleMasterDataDuration: " + articleMasterDataDuration + "\n" +
+                "rawArticleStoreMasterDataDuration: " + rawArticleStoreMasterDataDuration + "\n" +
+                "articleDataFromMovieDuration: " + articleDataFromMovieDuration + "\n" +
+                "articleStockLocationListDuration: " + articleStockLocationListDuration + "\n" +
+                "articleLocationListDuration: " + articleLocationListDuration + "\n");
     }
 
     private List<ArticleMasterData> getRawArticleMasterDataListForArticleVariantBundleIdentifierList(
