@@ -264,7 +264,7 @@ public class ArticleDetailsService {
                             articleVariant.getVariantNumber(),
                             articleBundle.getBundleNumber());
                     buildRawArticleDataList(articleId ,countryCode, salesLine, languageCode, storeNo,
-                            rawArticleDataList, articleComponent);
+                            rawArticleDataList, articleComponent, 0l);
                 }
             }
         }
@@ -276,18 +276,22 @@ public class ArticleDetailsService {
             String countryCode, String salesLine, String languageCode, Integer storeNo) throws Exception {
         List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
+        Long startTimeArticleComponent = System.currentTimeMillis();
         ArticleComponent articleComponent = transformArticleVariantBundleListToArticleComponentByArticle(
                 getArticleVariantBundleIdentifierListForArticleNumber(
                         articleId.getArticleNumber(),
                         countryCode, salesLine, languageCode),
                 articleId.getArticleNumber());
+        Long articleComponentDuration = System.currentTimeMillis() - startTimeArticleComponent;
         buildRawArticleDataList(articleId ,countryCode, salesLine, languageCode, storeNo,
-                rawArticleDataList, articleComponent);
+                rawArticleDataList, articleComponent, articleComponentDuration);
         return rawArticleDataList;
     }
 
     private void buildRawArticleDataList(ArticleId articleId, String countryCode, String salesLine, String languageCode,
-                                         Integer storeNo, List<RawArticleData> rawArticleDataList, ArticleComponent articleComponent) throws ExecutionException, InterruptedException {
+                                         Integer storeNo, List<RawArticleData> rawArticleDataList,
+                                         ArticleComponent articleComponent, Long articleComponentDuration
+    ) throws ExecutionException, InterruptedException {
 
         AtomicReference<Long> articleMasterDataDuration = new AtomicReference<>(0L);
         AtomicReference<Long> rawArticleStoreMasterDataDuration = new AtomicReference<>(0L);
@@ -401,7 +405,8 @@ public class ArticleDetailsService {
         if (rawArticleDataList != null) {
             rawArticleDataList.add(rawArticleData);
         }
-        log.info("IPO - parallel execution duration \n" +
+        log.info("IPO - articleComponentDuration: " + articleComponentDuration + "\n" +
+                "parallel execution duration \n" +
                 "articleMasterDataDuration: " + articleMasterDataDuration + "\n" +
                 "rawArticleStoreMasterDataDuration: " + rawArticleStoreMasterDataDuration + "\n" +
                 "articleDataFromMovieDuration: " + articleDataFromMovieDuration + "\n" +
