@@ -17,13 +17,16 @@ public class ArticleMasterData implements Serializable {
 	private Integer presentationMerchandiseGroup;
 	private String promotionId;
 	private Integer sellingBundleContent;
+	private Double weightArticle;
 	private Long subsystemArticleNumber;
 	private Double vatPercent;
     private double pieceNetSellPrice;
     private double bundleNetSellPrice;
     private double promotionBundleNetPrice;
     private String variantDescription;
+	private Long articleType;
     private String articleClass;
+	private String foodNonfoodIndicator;
     private Long presentationMainMerchandiseGroup;
     private Long presentationSubMerchandiseGroup;
     private Integer supplierNumber;

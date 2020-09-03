@@ -42,6 +42,24 @@ public class ArticleCacheDataGroup {
         this.vatPercent = vatPercent;
     }
 
+    private Double weightArticles;
+    public Double getWeightArticles() {
+        return weightArticles;
+    }
+    @XmlElement(name = "WEIGHTARTICLE")
+    public void setWeightArticles(Double weightArticles) {
+        this.weightArticles = weightArticles;
+    }
+
+    private String foodNonfoodIndicator;
+    public String getFoodNonfoodIndicator() {
+        return foodNonfoodIndicator;
+    }
+    @XmlElement(name = "INDICATORFOODNONFOOD")
+    public void setFoodNonfoodIndicator(String foodNonfoodIndicator) {
+        this.foodNonfoodIndicator = foodNonfoodIndicator;
+    }
+
     private Long presentationMainMerchandiseGroup;
     public Long getPresentationMainMerchandiseGroup() {
         return presentationMainMerchandiseGroup;
@@ -173,7 +191,6 @@ public class ArticleCacheDataGroup {
     public void setWeightArticle(Boolean weightArticle) {
         isWeightArticle = weightArticle;
     }
-
     private int storeNo;
     public int getStoreNo() {
         return storeNo;
@@ -250,19 +267,34 @@ public class ArticleCacheDataGroup {
 
     @Override
     public String toString() {
-        return "ArticleCacheDataGroup [id=" + id + ", presentationMerchandiseGroup=" + presentationMerchandiseGroup
-                + ", ownBrandId=" + ownBrandId + ", vatPercent=" + vatPercent
-                + ", singleItemSalesBarcode=" + singleItemSalesBarcode + ", salesBundleIndicator=" + salesBundleIndicator
-                + ", sellingBundleContent=" + sellingBundleContent + ", priceCheckCodeMccSalesLine=" + priceCheckCodeMccSalesLine
-                + ", assignedStoreSupplier=" + assignedStoreSupplier + ", assignedStoreSupplierType=" + assignedStoreSupplierType
-                + ", hierarchySequenceStore=" + hierarchySequenceStore
-                + ", activationStatus=" + activationStatus + ", blockingCode=" + blockingCode
-                + ", isWeightArticle=" + isWeightArticle + ", storeNo=" + storeNo
-                + ", pieceNetSellPrice=" + pieceNetSellPrice + ", bundleNetSellPrice=" + bundleNetSellPrice
-                + ", promotionBundleNetPrice=" + promotionBundleNetPrice + ", hierarchySequenceStoreRef=" + hierarchySequenceStoreRef
-                + ", procurementCd=" + procurementCd + ", promotionId=" + promotionId
-				+ ", articleClass=" + articleClass
-                + "]";
+        return "ArticleCacheDataGroup{" +
+                "id=" + id +
+                ", ownBrandId='" + ownBrandId + '\'' +
+                ", vatPercent=" + vatPercent +
+                ", weightArticles=" + weightArticles +
+                ", foodNonfoodIndicator='" + foodNonfoodIndicator + '\'' +
+                ", presentationMainMerchandiseGroup=" + presentationMainMerchandiseGroup +
+                ", presentationMerchandiseGroup=" + presentationMerchandiseGroup +
+                ", presentationSubMerchandiseGroup=" + presentationSubMerchandiseGroup +
+                ", singleItemSalesBarcode=" + singleItemSalesBarcode +
+                ", salesBundleIndicator=" + salesBundleIndicator +
+                ", sellingBundleContent=" + sellingBundleContent +
+                ", priceCheckCodeMccSalesLine=" + priceCheckCodeMccSalesLine +
+                ", assignedStoreSupplier=" + assignedStoreSupplier +
+                ", assignedStoreSupplierType='" + assignedStoreSupplierType + '\'' +
+                ", hierarchySequenceStore=" + hierarchySequenceStore +
+                ", activationStatus=" + activationStatus +
+                ", blockingCode=" + blockingCode +
+                ", assortmentCode=" + assortmentCode +
+                ", isWeightArticle=" + isWeightArticle +
+                ", storeNo=" + storeNo +
+                ", pieceNetSellPrice=" + pieceNetSellPrice +
+                ", bundleNetSellPrice=" + bundleNetSellPrice +
+                ", promotionBundleNetPrice=" + promotionBundleNetPrice +
+                ", hierarchySequenceStoreRef=" + hierarchySequenceStoreRef +
+                ", procurementCd=" + procurementCd +
+                ", promotionId='" + promotionId + '\'' +
+                ", articleClass='" + articleClass + '\'' +
+                '}';
     }
-
 }
