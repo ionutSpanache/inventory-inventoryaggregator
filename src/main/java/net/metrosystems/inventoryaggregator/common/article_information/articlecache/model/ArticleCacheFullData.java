@@ -18,14 +18,16 @@ public class ArticleCacheFullData {
     private Integer presentationMerchandiseGroup;
     private String promotionId;
     private Integer sellingBundleContent;
-    private Boolean isWeightArticle;
+    private Double weightArticle;
     private Long subsysArticleNumber;
     private Double vatPercent;
     private double pieceNetSellPrice;
     private double bundleNetSellPrice;
     private double promotionBundleNetPrice;
     private String variantDescription;
+    private Long articleType;
     private String articleClass;
+    private String foodNonfoodIndicator;
     private Long presentationMainMerchandiseGroup;
     private Long presentationSubMerchandiseGroup;
     private Integer supplierNumber;
