@@ -39,7 +39,7 @@ services:
           memory: "400Mi"
           cpu: "0.5"
     prod:
-      replicas: 4
+      replicas: 3
       resources:
         requests:
           memory: "256Mi"
