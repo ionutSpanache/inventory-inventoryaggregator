@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import net.metrosystems.inventoryaggregator.config.aspect.TraceInformation;
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,9 @@ public class HTTPHeaderConfig {
     //        MultiValueMap<String, String> traceInformation = new LinkedMultiValueMap<>();
     //        traceInformation.setAll(TraceInformation.getTraceInformationForComunication());
     //        headers.addAll(traceInformation);
-    TraceInformation.getTraceInformationForComunication().forEach((k, v) -> headers.add(k, v));
+//    TraceInformation.getTraceInformationForComunication().forEach((k, v) -> headers.add(k, v));
+    headers.add("X-Correlation-ID", MDC.get("X-Correlation-ID"));
+    headers.add("Flow", MDC.get("Flow"));
     return this;
   }
 
