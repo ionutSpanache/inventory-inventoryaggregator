@@ -32,7 +32,8 @@ public class TraceInformationRestTemplateAgentInterceptor implements ClientHttpR
         request.getHeaders().remove("Content-Length");
         request.getHeaders().remove("Accept");
         request.getHeaders().remove("Accept-Charset");
-        request.getHeaders().addAll(httpHeaderConfig.buildHttpHeaders().buildAddTraceInformation().getHeaders());
+//        request.getHeaders().addAll(httpHeaderConfig.buildHttpHeaders().buildAddTraceInformation().getHeaders());
+        request.getHeaders().addAll(httpHeaderConfig.buildHttpHeaders().getHeaders());
         return execution.execute(request, body);
     }
 }

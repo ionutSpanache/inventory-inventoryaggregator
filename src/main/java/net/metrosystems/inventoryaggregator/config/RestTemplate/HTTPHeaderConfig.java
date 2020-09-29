@@ -27,7 +27,7 @@ public class HTTPHeaderConfig {
     return this;
   }
 
-  public HTTPHeaderConfig buildAddTraceInformation() {
+/*  public HTTPHeaderConfig buildAddTraceInformation() {
     //        MultiValueMap<String, String> traceInformation = new LinkedMultiValueMap<>();
     //        traceInformation.setAll(TraceInformation.getTraceInformationForComunication());
     //        headers.addAll(traceInformation);
@@ -35,10 +35,12 @@ public class HTTPHeaderConfig {
     headers.add("X-Correlation-ID", MDC.get("X-Correlation-ID"));
     headers.add("Flow", MDC.get("Flow"));
     return this;
-  }
+  }*/
 
   private void initHeader() {
     headers = new HttpHeaders();
+    headers.add("X-Correlation-ID", MDC.get("X-Correlation-ID"));
+    headers.add("Flow", MDC.get("Flow"));
     headers.setContentType(MediaType.valueOf("application/json;charset=UTF-8"));
     List<MediaType> acceptMediaTypeList = new ArrayList<>();
     acceptMediaTypeList.add(MediaType.valueOf("application/json;charset=UTF-8"));
