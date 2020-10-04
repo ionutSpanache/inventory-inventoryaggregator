@@ -73,7 +73,8 @@ public class ArticleDataFromMovieRepository {
                 movieAdapter.getStockCoverage(),
                 movieAdapter.getDailyMeanSales(),
                 movieAdapter.getOpenInterstoreQuantity(),
-                movieAdapter.getOpenReturnQuantity()
+                movieAdapter.getOpenReturnQuantity(),
+                movieAdapter.getOpenGoodReceiving()
         );
     }
 

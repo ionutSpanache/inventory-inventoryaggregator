@@ -78,6 +78,7 @@ public class MovieService {
 		}
 		movieAdapter.setBlockedStock(stockDetails.getStockSummary().getBlockedStock());
 		movieAdapter.setAvailableStock(stockDetails.getStockSummary().getAvailableStock());
+		movieAdapter.setOpenGoodReceiving(stockDetails.getStockSummary().getOpenGoodReceiving());
 		
 		return movieAdapter;
 	}

@@ -18,5 +18,5 @@ public class StockSummary {
     private Float openMovement;
     private Double reservation;
     private Float systemStock;
-
+    private Double openGoodReceiving;
 }
