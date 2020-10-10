@@ -1,40 +1,62 @@
 package net.metrosystems.inventoryaggregator.common.stock_location.acl.service;
 
+import java.util.Collections;
+import java.util.List;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.AclArticleStockLocation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.client.AclStockClient;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclBundleStockLocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class AclStockService {
-	private AclStockClient aclStockClient;
-	
-	@Autowired
-	public AclStockService(AclStockClient aclStockClient) {
-		this.aclStockClient = aclStockClient;
-	}
-	
-	public List<AclBundleStockLocation> getAclBundleStockLocations(
-												String countryCode, String salesLine, Integer storeNo,
-												Long articleNo, Long variantNo) {
-		try {
-			return aclStockClient.getStockLocationsForArticleVariant(countryCode, salesLine, storeNo, articleNo, variantNo);
-		}catch (Exception e) {
-			return null;
-		}
-		
-	}
+  private final AclStockClient aclStockClient;
 
-	public ArticleLocation getAclArticleLocations(
-			String countryCode, String salesLine, Integer storeNo, ArticleId articleId) {
-		try {
-			return aclStockClient.getArticleLocationsForArticleVariant(countryCode, salesLine, storeNo, articleId);
-		}catch (Exception e) {
-			return null;
-		}
-	}
+  @Autowired
+  public AclStockService(AclStockClient aclStockClient) {
+    this.aclStockClient = aclStockClient;
+  }
+
+  public List<AclBundleStockLocation> getAclBundleStockLocations(
+      String countryCode, String salesLine, Integer storeNo, Long articleNo, Long variantNo) {
+    try {
+      return aclStockClient.getStockLocationsForArticleVariant(
+          countryCode, salesLine, storeNo, articleNo, variantNo);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  public List<AclArticleStockLocation> getStockLocationsForArticleList(
+      String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
+    try {
+      return aclStockClient.getStockLocationsForArticleList(
+          countryCode, salesLine, storeNo, articleIdList);
+    } catch (Exception e) {
+      return Collections.emptyList();
+    }
+  }
+
+  public ArticleLocation getAclArticleLocations(
+      String countryCode, String salesLine, Integer storeNo, ArticleId articleId) {
+    try {
+      return aclStockClient.getArticleLocationsForArticleVariant(
+          countryCode, salesLine, storeNo, articleId);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  public List<ArticleLocationForArticleId> getAclArticleLocationsForArticleList(
+      String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
+    try {
+      return aclStockClient.getArticleLocationsForArticleList(
+          countryCode, salesLine, storeNo, articleIdList);
+    } catch (Exception e) {
+      return Collections.emptyList();
+    }
+  }
 }
