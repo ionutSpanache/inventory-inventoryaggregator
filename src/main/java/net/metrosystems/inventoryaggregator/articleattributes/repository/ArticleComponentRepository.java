@@ -3,6 +3,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,9 @@ public class ArticleComponentRepository {
   public CompletableFuture<List<ArticleComponentForArticleId>> getArticleComponentForArticleIdList(
       List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode)
       throws Exception {
-    ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads);
+//    ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads);
     List<ArticleComponentForArticleId> articleComponentForArticleIdList =
-        customThreadPool
+        createForkJoinPool()
             .submit(
                 () ->
                     articleIdList.parallelStream()
@@ -86,4 +87,20 @@ public class ArticleComponentRepository {
     }
     return articleComponent;
   }
+  private static class CustomForkJoinWorkerThread extends ForkJoinWorkerThread {
+    CustomForkJoinWorkerThread(ForkJoinPool pool) {
+      super(pool);
+      setContextClassLoader(Thread.currentThread().getContextClassLoader());
+    }
+  }
+
+  private ForkJoinPool createForkJoinPool() {
+    return new ForkJoinPool(
+        ForkJoinPool.getCommonPoolParallelism(),
+        CustomForkJoinWorkerThread::new,
+        null,
+        false
+    );
+  }
+
 }

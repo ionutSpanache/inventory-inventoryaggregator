@@ -3,6 +3,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,9 +56,9 @@ public class ArticleMasterDataRepository {
       String languageCode,
       Integer storeNo)
       throws Exception {
-    ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads);
+//    ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads);
     List<ArticleMasterDataForArticleId> articleMasterDataForArticleIds =
-        customThreadPool
+        createForkJoinPool()
             .submit(
                 () ->
                     articleIdList.parallelStream()
@@ -136,5 +137,21 @@ public class ArticleMasterDataRepository {
           articleCacheFullData.getActivationStatus());
     }
     return null;
+  }
+
+  private static class CustomForkJoinWorkerThread extends ForkJoinWorkerThread {
+    CustomForkJoinWorkerThread(ForkJoinPool pool) {
+      super(pool);
+      setContextClassLoader(Thread.currentThread().getContextClassLoader());
+    }
+  }
+
+  private ForkJoinPool createForkJoinPool() {
+    return new ForkJoinPool(
+        ForkJoinPool.getCommonPoolParallelism(),
+        CustomForkJoinWorkerThread::new,
+        null,
+        false
+    );
   }
 }

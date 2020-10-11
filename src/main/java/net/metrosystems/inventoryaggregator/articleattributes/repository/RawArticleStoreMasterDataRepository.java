@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,9 +53,9 @@ public class RawArticleStoreMasterDataRepository {
       String languageCode,
       Integer storeNo)
       throws ExecutionException, InterruptedException {
-    ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads);
+//    ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads);
     List<RawArticleStoreMasterDataForArticleId> rawArticleStoreMasterDataForArticleIdList =
-        customThreadPool
+        createForkJoinPool()
             .submit(
                 () ->
                     articleIdList.parallelStream()
@@ -232,5 +233,21 @@ public class RawArticleStoreMasterDataRepository {
             .build();
 
     return CompletableFuture.completedFuture(rawArticleStoreMasterData);
+  }
+
+  private static class CustomForkJoinWorkerThread extends ForkJoinWorkerThread {
+    CustomForkJoinWorkerThread(ForkJoinPool pool) {
+      super(pool);
+      setContextClassLoader(Thread.currentThread().getContextClassLoader());
+    }
+  }
+
+  private ForkJoinPool createForkJoinPool() {
+    return new ForkJoinPool(
+        ForkJoinPool.getCommonPoolParallelism(),
+        CustomForkJoinWorkerThread::new,
+        null,
+        false
+    );
   }
 }
