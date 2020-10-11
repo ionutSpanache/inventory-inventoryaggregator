@@ -33,10 +33,10 @@ services:
       replicas: 3
       resources:
         requests:
-          memory: "280Mi"
-          cpu: "5m"
-        limits:
           memory: "400Mi"
+          cpu: "0.4"
+        limits:
+          memory: "512Mi"
           cpu: "0.5"
     prod:
       replicas: 6
