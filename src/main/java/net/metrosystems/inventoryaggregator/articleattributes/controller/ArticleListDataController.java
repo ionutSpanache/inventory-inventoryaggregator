@@ -26,32 +26,37 @@ import org.springframework.web.context.request.WebRequest;
 @RestController
 @Timed("ArticleData")
 @RequiredArgsConstructor
-@RequestMapping(value="/inventoryaggregator/countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/stores/{storeno}/articles", produces=MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/inventoryaggregator", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArticleListDataController {
 
-    private final ArticleListDetailsService articleListDetailsService;
+  private final ArticleListDetailsService articleListDetailsService;
 
-	@AddTimer
-	@AddLogs
-	@RequestMapping(value="/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}", method=RequestMethod.POST)
-	public ResponseEntity<?> getArticleByArtVarBundle(
-			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-			@TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-			@PathVariable("languageCode") String languageCode,
-			@TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-			@RequestBody List<ArticleId> articleIdList) throws Exception {
+  @AddTimer
+  @AddLogs
+  @RequestMapping(
+      value =
+          "/countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/stores/{storeno}/articles",
+      method = RequestMethod.POST)
+  public ResponseEntity<?> getArticleByArtVarBundle(
+      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
+      @PathVariable("languageCode") String languageCode,
+      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
+      @RequestBody List<ArticleId> articleIdList)
+      throws Exception {
 
-			try {
-				return ResponseEntity.ok(articleListDetailsService.getArticleDataListByArticleVariantBundle(
-						articleIdList, countryCode, salesLine, languageCode, storeNo));
-			} catch (EntityNotFoundException e) {
-				return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
-			}
-	}
-	
-	@ExceptionHandler(ArticleNotFoundException.class)
-	public final ResponseEntity<String> handleUserNotFoundException(ArticleNotFoundException ex, WebRequest request) {		      
-		return ResponseEntity.noContent().build();
-	}
+    try {
+      return ResponseEntity.ok(
+          articleListDetailsService.getArticleDataListByArticleVariantBundle(
+              articleIdList, countryCode, salesLine, languageCode, storeNo));
+    } catch (EntityNotFoundException e) {
+      return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+  }
 
+  @ExceptionHandler(ArticleNotFoundException.class)
+  public final ResponseEntity<String> handleUserNotFoundException(
+      ArticleNotFoundException ex, WebRequest request) {
+    return ResponseEntity.noContent().build();
+  }
 }
