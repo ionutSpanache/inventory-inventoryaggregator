@@ -16,9 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.metrics.annotation.Timed;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
@@ -33,10 +33,11 @@ public class ArticleListDataController {
 
   @AddTimer
   @AddLogs
-  @RequestMapping(
+  @PostMapping(
       value =
-          "/countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/stores/{storeno}/articles",
-      method = RequestMethod.POST)
+          "countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/stores/{storeno}/articles",
+      consumes = "application/json",
+      produces = "application/json")
   public ResponseEntity<?> getArticleByArtVarBundle(
       @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,

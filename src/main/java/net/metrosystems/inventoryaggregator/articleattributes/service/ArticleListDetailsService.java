@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ArticleListDetailsService {
 
-  private final Executor executor = Executors.newFixedThreadPool(6);
+  private final Executor executor = Executors.newFixedThreadPool(8);
 
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final ArticleMasterDataRepository articleMasterDataRepository;
