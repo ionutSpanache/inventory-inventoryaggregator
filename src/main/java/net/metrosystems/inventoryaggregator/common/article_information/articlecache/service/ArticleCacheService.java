@@ -173,12 +173,18 @@ public class ArticleCacheService {
 		if (articleUrlPathList.getArticleKeys().isEmpty()) {
 			return null;
 		}
+
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
-		ArticleCacheFullData articleCacheFullData =
-				transformArticleCacheDocumentToArticleFullData(
-						articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
+		ArticleCacheIhdsTree articleCacheDocument = articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
+
+		Integer hierarchySequenceStoreNo = articleCacheDocument.getTransaction().getArticleCacheIncident().getHierarchySequenceStoreNo(storeNo);
+		if(hierarchySequenceStoreNo == null){
+			return null;
+		}
+
+		return transformArticleCacheDocumentToArticleFullData(
+						articleCacheDocument,
 						storeNo);
-		return articleCacheFullData;
 	}
 	
 	private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData (
