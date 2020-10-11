@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
+import java.util.Collections;
 import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.articleId.model.ArticleId;
@@ -92,7 +93,8 @@ public class ArticleCacheService {
 
 	private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(Documents filterUrlString) {
 		if (filterUrlString.getArticleKeys().isEmpty()) {
-			throw new ArticleNotFoundException();
+//			throw new ArticleNotFoundException();
+			return Collections.emptyList();
 		}
 		
 		List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList =
@@ -149,6 +151,33 @@ public class ArticleCacheService {
 				transformArticleCacheDocumentToArticleFullData(
 												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
 												storeNo);
+		return articleCacheFullData;
+	}
+
+	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
+			Long articleNumber,
+			Long variantNumber,
+			Long bundleNumber,
+			String countryCode,
+			String salesLine,
+			String languageCode,
+			Integer storeNo) throws Exception {
+		Documents articleUrlPathList = articleCacheClient.getArticleUrlPathByArtVarBundle(
+				articleNumber,
+				variantNumber,
+				bundleNumber,
+				countryCode,
+				salesLine,
+				languageCode
+		);
+		if (articleUrlPathList.getArticleKeys().isEmpty()) {
+			return null;
+		}
+		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+		ArticleCacheFullData articleCacheFullData =
+				transformArticleCacheDocumentToArticleFullData(
+						articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
+						storeNo);
 		return articleCacheFullData;
 	}
 	

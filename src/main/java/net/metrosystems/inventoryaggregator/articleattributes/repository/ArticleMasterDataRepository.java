@@ -22,9 +22,6 @@ import org.springframework.stereotype.Repository;
 public class ArticleMasterDataRepository {
   private final ArticleCacheService articleCacheService;
 
-  @Value("${fork.join.pool.number.of.threads}")
-  private Integer numberOfThreads;
-
   @Async
   public CompletableFuture<ArticleMasterData> getArticleMasterData(
       ArticleId articleId,
@@ -56,7 +53,6 @@ public class ArticleMasterDataRepository {
       String languageCode,
       Integer storeNo)
       throws Exception {
-//    ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads);
     List<ArticleMasterDataForArticleId> articleMasterDataForArticleIds =
         createForkJoinPool()
             .submit(
@@ -67,7 +63,7 @@ public class ArticleMasterDataRepository {
                               ArticleCacheFullData articleCacheFullData;
                               try {
                                 articleCacheFullData =
-                                    getArticleCacheFullDataByArtVarBundle(
+                                    articleCacheService.getArticleCacheFullDataByArtVarBundleForArticleId(
                                         articleId.getArticleNumber(),
                                         articleId.getVariantNumber(),
                                         articleId.getBundleNumber(),
