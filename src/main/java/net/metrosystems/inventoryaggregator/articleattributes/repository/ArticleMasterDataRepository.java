@@ -144,7 +144,8 @@ public class ArticleMasterDataRepository {
 
   private ForkJoinPool createForkJoinPool() {
     return new ForkJoinPool(
-        ForkJoinPool.getCommonPoolParallelism(),
+//        ForkJoinPool.getCommonPoolParallelism(),
+        10,
         CustomForkJoinWorkerThread::new,
         null,
         false
