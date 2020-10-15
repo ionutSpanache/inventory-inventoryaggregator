@@ -13,7 +13,6 @@ ARG CACHEBUST
 
 ADD src /src
 ADD pom.xml /pom.xml
-ADD scripts /scripts
 ADD mvn-settings.xml /mvn-settings.xml
 RUN mvn clean install --settings mvn-settings.xml
 
