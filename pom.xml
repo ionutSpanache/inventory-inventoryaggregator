@@ -23,6 +23,7 @@
 		<java.version>11</java.version>
 		<springdoc.version>1.2.33</springdoc.version>
 		<metrics.version>0.5.1.RELEASE</metrics.version>
+		<micrometer.version>1.5.1</micrometer.version>
 		<micrometer.statsd.version>1.5.1</micrometer.statsd.version>
 	</properties>
 
