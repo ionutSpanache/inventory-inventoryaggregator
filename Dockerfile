@@ -1,12 +1,26 @@
-FROM openjdk:13-alpine
-RUN apk add maven
-RUN apk add curl
-RUN apk add procps
-ADD mvn-settings.xml /mvn-settings.xml
-ADD pom.xml /pom.xml
+#Build image
+FROM openjdk:11-slim-sid as builder
+
+# Add Maintainer Info
+LABEL maintainer="cristiangabriel.jena@metrosystems.net"
+
+# Needed to fix 'Fontconfig warning: ignoring C.UTF-8: not a valid language tag'
+ENV LANG en_GB.UTF-8
+
+RUN apt-get update && apt-get -y install maven && apt-get install -y wget && wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer
+
+ARG CACHEBUST
+
 ADD src /src
-ADD startup.sh /startup.sh
-RUN chmod +x startup.sh
+ADD pom.xml /pom.xml
+ADD scripts /scripts
+ADD mvn-settings.xml /mvn-settings.xml
 RUN mvn clean install --settings mvn-settings.xml
-CMD ./startup.sh
-#CMD java -Xms190M -Xmx400M -jar ./target/regator.jar
+
+#Runtim image
+FROM openjdk:11-slim-sid
+ADD startup.sh /startup.sh
+RUN chmod +x /startup.sh
+COPY --from=builder /target/inventoryaggregator.jar /inventoryaggregator.jar
+COPY --from=builder /dd-java-agent.jar /dd-java-agent.jar
+CMD /startup.sh

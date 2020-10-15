@@ -16,7 +16,7 @@ services:
   probe:
     initialdelay: 180
     period: 10
-  # These are the defaults and 
+  # These are the defaults and
   # needs to be enhanced for most services
   perStageConfiguration: true
   stageConfig:
@@ -52,11 +52,10 @@ tests:
 # - stage: dev
 #   test: ./scripts/stop_pipeline.sh
 # - stage: pp
-#   test: ./scripts/stop_pipeline.sh 
+#   test: ./scripts/stop_pipeline.sh
 watchers:
   - alin.ciubotariu01@metrosystems.net
   - george.dumitrascu@metrosystems.net
-slack-channels:
-  - '@acl'
+  - cristiangabriel.jena@metrosystems.net
 
 
