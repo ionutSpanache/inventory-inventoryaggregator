@@ -12,6 +12,7 @@ JAVA_OPTS=$(cat <<-END
 -Ddd.logs.injection=true
 -Ddd.trace.analytics.enabled=true
 -Ddd.jdbc.analytics.enabled=true
+-Ddd.service.mapping=postgres:$DRP_EV_DD_SOLUTION.$DRP_CF_VERTICAL.postgres
 -Ddd.tags=solution:$DRP_EV_DD_SOLUTION,vertical:$DRP_CF_VERTICAL,service:$DRP_EV_DD_SOLUTION.$DRP_CF_VERTICAL.$DRP_CF_SERVICE
 -Ddd.trace.global.tags=marc_id:$DRP_EV_DD_MARC_ID,env:$DRP_CF_STAGE,solution:$DRP_EV_DD_SOLUTION,solution_id:$DRP_EV_DD_SOLUTION_ID,vertical:$DRP_CF_VERTICAL,service:$DRP_EV_DD_SOLUTION.$DRP_CF_VERTICAL.$DRP_CF_SERVICE
 END
