@@ -17,7 +17,6 @@ import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclAr
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
@@ -27,9 +26,6 @@ import org.springframework.stereotype.Repository;
 public class RawArticleStoreMasterDataRepository {
   private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
   private final ArticleCacheService articleCacheService;
-
-  @Value("${fork.join.pool.number.of.threads}")
-  private Integer numberOfThreads;
 
   @Async
   public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(
@@ -46,16 +42,16 @@ public class RawArticleStoreMasterDataRepository {
 
   @Async
   public CompletableFuture<List<RawArticleStoreMasterDataForArticleId>>
-  getRawArticleStoreMasterDataForArticleIdList(
-      List<ArticleId> articleIdList,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo)
-      throws ExecutionException, InterruptedException {
-//    ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads);
+      getRawArticleStoreMasterDataForArticleIdList(
+          List<ArticleId> articleIdList,
+          String countryCode,
+          String salesLine,
+          String languageCode,
+          Integer storeNo)
+          throws ExecutionException, InterruptedException {
+    ForkJoinPool forkJoinPool = createForkJoinPool();
     List<RawArticleStoreMasterDataForArticleId> rawArticleStoreMasterDataForArticleIdList =
-        createForkJoinPool()
+        forkJoinPool
             .submit(
                 () ->
                     articleIdList.parallelStream()
@@ -82,7 +78,7 @@ public class RawArticleStoreMasterDataRepository {
                             })
                         .collect(Collectors.toList()))
             .get();
-
+    forkJoinPool.shutdown();
     return CompletableFuture.completedFuture(rawArticleStoreMasterDataForArticleIdList);
   }
 
@@ -244,11 +240,7 @@ public class RawArticleStoreMasterDataRepository {
 
   private ForkJoinPool createForkJoinPool() {
     return new ForkJoinPool(
-//        ForkJoinPool.getCommonPoolParallelism(),
-        10,
-        CustomForkJoinWorkerThread::new,
-        null,
-        false
-    );
+        //        ForkJoinPool.getCommonPoolParallelism(),
+        10, CustomForkJoinWorkerThread::new, null, false);
   }
 }

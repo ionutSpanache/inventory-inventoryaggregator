@@ -12,7 +12,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMaste
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
@@ -46,15 +45,17 @@ public class ArticleMasterDataRepository {
   }
 
   @Async
-  public CompletableFuture<List<ArticleMasterDataForArticleId>> getArticleMasterDataForArticleIdList(
-      List<ArticleId> articleIdList,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo)
-      throws Exception {
+  public CompletableFuture<List<ArticleMasterDataForArticleId>>
+      getArticleMasterDataForArticleIdList(
+          List<ArticleId> articleIdList,
+          String countryCode,
+          String salesLine,
+          String languageCode,
+          Integer storeNo)
+          throws Exception {
+    ForkJoinPool forkJoinPool = createForkJoinPool();
     List<ArticleMasterDataForArticleId> articleMasterDataForArticleIds =
-        createForkJoinPool()
+        forkJoinPool
             .submit(
                 () ->
                     articleIdList.parallelStream()
@@ -63,14 +64,15 @@ public class ArticleMasterDataRepository {
                               ArticleCacheFullData articleCacheFullData;
                               try {
                                 articleCacheFullData =
-                                    articleCacheService.getArticleCacheFullDataByArtVarBundleForArticleId(
-                                        articleId.getArticleNumber(),
-                                        articleId.getVariantNumber(),
-                                        articleId.getBundleNumber(),
-                                        countryCode,
-                                        salesLine,
-                                        languageCode,
-                                        storeNo);
+                                    articleCacheService
+                                        .getArticleCacheFullDataByArtVarBundleForArticleId(
+                                            articleId.getArticleNumber(),
+                                            articleId.getVariantNumber(),
+                                            articleId.getBundleNumber(),
+                                            countryCode,
+                                            salesLine,
+                                            languageCode,
+                                            storeNo);
                               } catch (Exception e) {
                                 log.error(
                                     "ArticleMasterDataRepository.getArticleMasterDataForArticleIdList error: {}",
@@ -80,13 +82,14 @@ public class ArticleMasterDataRepository {
                               }
                               return ArticleMasterDataForArticleId.builder()
                                   .articleId(articleId)
-                                  .articleMasterData(transformArticleCacheFullToArticleMasterData(
-                                      articleCacheFullData))
+                                  .articleMasterData(
+                                      transformArticleCacheFullToArticleMasterData(
+                                          articleCacheFullData))
                                   .build();
                             })
                         .collect(Collectors.toList()))
             .get();
-
+    forkJoinPool.shutdown();
     return CompletableFuture.completedFuture(articleMasterDataForArticleIds);
   }
 
@@ -144,11 +147,7 @@ public class ArticleMasterDataRepository {
 
   private ForkJoinPool createForkJoinPool() {
     return new ForkJoinPool(
-//        ForkJoinPool.getCommonPoolParallelism(),
-        10,
-        CustomForkJoinWorkerThread::new,
-        null,
-        false
-    );
+        //        ForkJoinPool.getCommonPoolParallelism(),
+        10, CustomForkJoinWorkerThread::new, null, false);
   }
 }

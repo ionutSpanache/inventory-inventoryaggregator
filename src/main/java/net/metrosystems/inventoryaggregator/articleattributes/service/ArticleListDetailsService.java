@@ -111,8 +111,9 @@ public class ArticleListDetailsService {
                 e.printStackTrace();
               }
               return null;
-            },
-            executor);
+            }
+            ,executor
+        );
 
     CompletableFuture<List<ArticleMasterDataForArticleId>> articleMasterDataForArticleId =
         CompletableFuture.supplyAsync(
@@ -133,8 +134,9 @@ public class ArticleListDetailsService {
                 e.printStackTrace();
               }
               return null;
-            },
-            executor);
+            }
+            ,executor
+        );
 
     CompletableFuture<List<RawArticleStoreMasterDataForArticleId>> rawArticleStoreMasterData =
         CompletableFuture.supplyAsync(
@@ -155,8 +157,9 @@ public class ArticleListDetailsService {
                 e.printStackTrace();
               }
               return null;
-            },
-            executor);
+            }
+            ,executor
+        );
 
     CompletableFuture<List<StockData>> stockDataFromMovie =
         CompletableFuture.supplyAsync(
@@ -176,8 +179,9 @@ public class ArticleListDetailsService {
                 e.printStackTrace();
               }
               return null;
-            },
-            executor);
+            }
+            ,executor
+        );
 
     CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
         CompletableFuture.supplyAsync(
@@ -198,8 +202,9 @@ public class ArticleListDetailsService {
                 e.printStackTrace();
               }
               return null;
-            },
-            executor);
+            }
+            ,executor
+        );
 
     CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList =
         CompletableFuture.supplyAsync(
@@ -220,8 +225,9 @@ public class ArticleListDetailsService {
                 e.printStackTrace();
               }
               return null;
-            },
-            executor);
+            }
+            ,executor
+        );
 
     CompletableFuture.allOf(
         articleComponentForArticleId,

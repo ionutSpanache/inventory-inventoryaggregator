@@ -22,16 +22,13 @@ import org.springframework.stereotype.Repository;
 public class ArticleComponentRepository {
   private final ArticleCacheService articleCacheService;
 
-  @Value("${fork.join.pool.number.of.threads}")
-  private Integer numberOfThreads;
-
   @Async
   public CompletableFuture<List<ArticleComponentForArticleId>> getArticleComponentForArticleIdList(
       List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode)
       throws Exception {
-//    ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads);
+    ForkJoinPool forkJoinPool = createForkJoinPool();
     List<ArticleComponentForArticleId> articleComponentForArticleIdList =
-        createForkJoinPool()
+        forkJoinPool
             .submit(
                 () ->
                     articleIdList.parallelStream()
@@ -63,7 +60,7 @@ public class ArticleComponentRepository {
                             })
                         .collect(Collectors.toList()))
             .get();
-
+    forkJoinPool.shutdown();
     return CompletableFuture.completedFuture(articleComponentForArticleIdList);
   }
 
