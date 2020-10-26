@@ -1,20 +1,13 @@
-#Build image
-FROM openjdk:11-slim-sid as builder
-
-# Add Maintainer Info
+#Base build image with maven and DDAgent
+FROM registry.metroscales.io/inventory/inventory-base:latest as builder
 LABEL maintainer="cristiangabriel.jena@metrosystems.net"
-
-# Needed to fix 'Fontconfig warning: ignoring C.UTF-8: not a valid language tag'
-ENV LANG en_GB.UTF-8
-
-RUN apt-get update && apt-get -y install maven && apt-get install -y wget && wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer
 
 ARG CACHEBUST
 
 ADD src /src
 ADD pom.xml /pom.xml
 ADD mvn-settings.xml /mvn-settings.xml
-RUN mvn clean install --settings mvn-settings.xml
+RUN mvn --no-transfer-progress clean install --settings mvn-settings.xml
 
 #Runtim image
 FROM openjdk:11-slim-sid
