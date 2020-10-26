@@ -42,8 +42,8 @@ services:
       replicas: 6
       resources:
         requests:
-          memory: "1.5Gi"
-          cpu: "0.6"
+          memory: "1.2Gi"
+          cpu: "0.1"
         limits:
           memory: "2Gi"
           cpu: "0.8"
