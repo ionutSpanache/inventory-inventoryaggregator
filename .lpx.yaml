@@ -34,10 +34,10 @@ services:
       resources:
         requests:
           memory: "1.1Gi"
-          cpu: "0.6"
-        limits:
-          memory: "1.5Gi"
           cpu: "1"
+        limits:
+          memory: "2Gi"
+          cpu: "1.5"
     prod:
       replicas: 6
       resources:
