@@ -9,8 +9,8 @@ ADD pom.xml /pom.xml
 ADD mvn-settings.xml /mvn-settings.xml
 RUN mvn --no-transfer-progress clean install --settings mvn-settings.xml
 
-#Runtim image
-FROM openjdk:11-slim-sid
+#Runtime image
+FROM registry.metroscales.io/inventory/inventory-runtime:latest
 ADD startup.sh /startup.sh
 RUN chmod +x /startup.sh
 COPY --from=builder /target/inventoryaggregator.jar /inventoryaggregator.jar
