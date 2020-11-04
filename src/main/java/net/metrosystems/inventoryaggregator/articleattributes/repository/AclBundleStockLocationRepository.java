@@ -29,7 +29,7 @@ public class AclBundleStockLocationRepository {
     this.aclStockService = aclStockService;
   }
 
-  @Async
+  @Async("asyncExecutor")
   public CompletableFuture<List<ArticleStockLocation>> getArticleStockLocation(
       ArticleId articleId, String countryCode, String salesLine, Integer storeNo) {
     List<AclBundleStockLocation> aclBundleStockLocations =
@@ -47,7 +47,7 @@ public class AclBundleStockLocationRepository {
     return CompletableFuture.completedFuture(articleStockLocationList);
   }
 
-  @Async
+  @Async("asyncExecutor")
   public CompletableFuture<List<ArticleIdStockLocation>> getStockLocationsForArticleList(
       List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo) {
     List<AclArticleStockLocation> aclBundleStockLocations =
@@ -116,7 +116,7 @@ public class AclBundleStockLocationRepository {
     return null;
   }
 
-  @Async
+  @Async("asyncExecutor")
   public CompletableFuture<ArticleLocation> getArticleLocation(
       String countryCode, String salesLine, Integer storeNo, ArticleId articleId) {
     ArticleLocation articleLocation =
@@ -126,7 +126,7 @@ public class AclBundleStockLocationRepository {
         transformAclArticleLocationsToInventoryArticleLocation(articleLocation));
   }
 
-  @Async
+  @Async("asyncExecutor")
   public CompletableFuture<List<ArticleLocationForArticleId>> getArticleLocationForArticleList(
       String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
     List<ArticleLocationForArticleId> articleLocationForArticleIdList =
