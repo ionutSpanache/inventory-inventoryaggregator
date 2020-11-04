@@ -3,6 +3,7 @@ package net.metrosystems.inventoryaggregator.common.stock_information.movie.clie
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Article;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Bundle;
@@ -18,19 +19,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
+@RequiredArgsConstructor
 public class MovieClient {
 
-  RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
 
   @Value("${MOVIE_STOCK_HOST}")
   private String movieStockServiceHost;
 
   @Value("${MOVIE_STOCK_PATH_FOR_VARIANT}")
   private String movieStockPathForVariant;
-
-  public MovieClient() {
-    restTemplate = new RestTemplate();
-  }
 
   public List<StockDetails> getStockDetailsForArticleVariant(
       String countryCode, String salesLine, int storeNo, Long mmsArtNo, Long variantNo) {

@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.client;
 
+import java.util.List;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.client.model.ArticleStoreMasterDataACLResponse;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,11 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
 @Component
 public class AclArticleStoreMasterDataClient {
 
+	@Autowired
 	RestTemplate restTemplate;
 
 	@Value("${ACL_STORE_MASTER_DATA_HOST}")
@@ -24,10 +24,6 @@ public class AclArticleStoreMasterDataClient {
 	private String aclArticleMasterDataPathByArtVarBundle;
 
 	private String aclArticleStoreMasterDataUrl;
-
-	public AclArticleStoreMasterDataClient() {
-		restTemplate = new RestTemplate();
-	}
 
 	public List<ArticleStoreMasterData> getArticleStoreMasterDataByEan(String countryCode, String salesLine,
                                                                        Integer storeNo, String barcode) {

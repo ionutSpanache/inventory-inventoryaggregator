@@ -27,7 +27,8 @@ public class RawArticleStoreMasterDataRepository {
   private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
   private final ArticleCacheService articleCacheService;
 
-  @Async
+
+  @Async("asyncExecutor")
   public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(
       ArticleId articleId,
       String countryCode,
@@ -40,7 +41,7 @@ public class RawArticleStoreMasterDataRepository {
             articleId, countryCode, salesLine, languageCode, storeNo));
   }
 
-  @Async
+  @Async("asyncExecutor")
   public CompletableFuture<List<RawArticleStoreMasterDataForArticleId>>
       getRawArticleStoreMasterDataForArticleIdList(
           List<ArticleId> articleIdList,
@@ -163,7 +164,7 @@ public class RawArticleStoreMasterDataRepository {
         .build();
   }
 
-  @Async
+  @Async("asyncExecutor")
   public CompletableFuture<RawArticleStoreMasterData> getDiscountArticleStoreMasterData(
       ArticleId articleId,
       String countryCode,

@@ -1,19 +1,16 @@
 package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Service
@@ -24,19 +21,12 @@ public class RestTemplateCustom {
     private ConfigArticleCacheAAA configArticleCacheAAA;
 
     @Autowired
-    public RestTemplateCustom(ConfigArticleCacheAAA configArticleCacheAAA) {
-        this.restTemplate = new RestTemplate(clientHttpRequestFactory());
+    public RestTemplateCustom(ConfigArticleCacheAAA configArticleCacheAAA, RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
         this.configArticleCacheAAA = configArticleCacheAAA;
         addInterceptorToRestTemplate();
 
 
-    }
-
-    private ClientHttpRequestFactory clientHttpRequestFactory() {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setReadTimeout(30000);
-        factory.setConnectTimeout(30000);
-        return factory;
     }
 
     private void addInterceptorToRestTemplate() {

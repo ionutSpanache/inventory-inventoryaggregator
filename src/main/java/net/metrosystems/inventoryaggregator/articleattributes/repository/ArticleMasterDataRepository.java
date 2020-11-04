@@ -21,7 +21,8 @@ import org.springframework.stereotype.Repository;
 public class ArticleMasterDataRepository {
   private final ArticleCacheService articleCacheService;
 
-  @Async
+
+  @Async("asyncExecutor")
   public CompletableFuture<ArticleMasterData> getArticleMasterData(
       ArticleId articleId,
       String countryCode,
@@ -44,7 +45,7 @@ public class ArticleMasterDataRepository {
     return CompletableFuture.completedFuture(articleMasterData);
   }
 
-  @Async
+  @Async("asyncExecutor")
   public CompletableFuture<List<ArticleMasterDataForArticleId>>
       getArticleMasterDataForArticleIdList(
           List<ArticleId> articleIdList,

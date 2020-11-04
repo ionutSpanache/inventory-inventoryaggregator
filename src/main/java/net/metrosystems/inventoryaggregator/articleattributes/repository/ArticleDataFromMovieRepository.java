@@ -25,7 +25,8 @@ public class ArticleDataFromMovieRepository {
     this.movieService = movieService;
   }
 
-  @Async
+
+  @Async("asyncExecutor")
   public CompletableFuture<ArticleDataFromMovie> getArticleDataFromMovie(
       ArticleId articleId, String countryCode, String salesLine, Integer storeNo) {
     MovieAdapter movieAdapter =
@@ -46,7 +47,7 @@ public class ArticleDataFromMovieRepository {
     return CompletableFuture.completedFuture(articleDataFromMovie);
   }
 
-  @Async
+  @Async("asyncExecutor")
   public CompletableFuture<List<StockData>> getArticleListDataFromMovie(
       List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo) {
     List<MovieAdapter> movieAdapterList =

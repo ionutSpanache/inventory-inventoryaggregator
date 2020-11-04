@@ -3,6 +3,7 @@ package net.metrosystems.inventoryaggregator.common.stock_location.acl.client;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.AclArticleStockLocation;
@@ -24,8 +25,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AclStockClient {
-  RestTemplate restTemplate;
+
+  private final RestTemplate restTemplate;
 
   @Value("${ACL_STOCK_SERVICE_HOST}")
   private String aclStockLocationHost;
@@ -41,10 +44,6 @@ public class AclStockClient {
 
   @Value("${ACL_STOCK_ARTICLE_LOCATION_FOR_ARTICLE_LIST}")
   private String aclArticleLocationForArticleListPath;
-
-  public AclStockClient() {
-    restTemplate = new RestTemplate();
-  }
 
   public List<AclBundleStockLocation> getStockLocationsForArticleVariant(
       String countryCode, String salesLine, Integer storeNo, Long articleNo, Long variantNo) {
