@@ -106,6 +106,15 @@ public class ArticleCacheDataGroup {
         this.salesBundleIndicator = salesBundleIndicator;
     }
 
+    private Integer expiryDays;
+    public Integer getExpiryDays() {
+        return  expiryDays;
+    }
+    @XmlElement(name = "EXPIRYDAYS")
+    public void setExpiryDays(Integer expiryDays) {
+        this.expiryDays = expiryDays;
+    }
+
     /*Data Group 310*/
     private Integer sellingBundleContent;
     public Integer getSellingBundleContent() {

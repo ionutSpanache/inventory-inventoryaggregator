@@ -35,4 +35,5 @@ public class ArticleCacheFullData {
     private Byte assortmentCode;
     private Byte blockingCode;
     private Byte activationStatus;
+    private Integer expiryDays;
 }

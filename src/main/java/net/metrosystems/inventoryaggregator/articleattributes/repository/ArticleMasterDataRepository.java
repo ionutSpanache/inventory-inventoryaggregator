@@ -134,7 +134,8 @@ public class ArticleMasterDataRepository {
           articleCacheFullData.getProcurementCode(),
           articleCacheFullData.getAssortmentCode(),
           articleCacheFullData.getBlockingCode(),
-          articleCacheFullData.getActivationStatus());
+          articleCacheFullData.getActivationStatus(),
+          articleCacheFullData.getExpiryDays());
     }
     return null;
   }
