@@ -34,6 +34,7 @@ public class ArticleMasterData implements Serializable {
 	private Byte assortmentCode;
 	private Byte blockingCode;
 	private Byte activationStatus;
+	private Integer expiryDays;
     
 
 	public static long getSerialversionuid() {

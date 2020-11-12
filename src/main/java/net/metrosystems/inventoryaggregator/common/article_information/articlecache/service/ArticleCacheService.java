@@ -199,7 +199,8 @@ public class ArticleCacheService {
 		ArticleCacheDataGroup articleCacheDataGroup310 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(310);
 		ArticleCacheDataGroup articleCacheDataGroup320 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
 		ArticleCacheDataGroup articleCacheDataGroup325 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
-		
+		ArticleCacheDataGroup articleCacheDataGroup200 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(200);
+
 		return new ArticleCacheFullData(
 				articleCacheReaderDigest.getMmsArtNo(),
 				articleCacheReaderDigest.getVariantNo(),
@@ -226,7 +227,8 @@ public class ArticleCacheService {
 				articleCacheDataGroup325.getProcurementCd(),
 				articleCacheDataGroup320.getAssortmentCode(),
 				articleCacheDataGroup320.getBlockingCode(),
-				articleCacheDataGroup320.getActivationStatus()
+				articleCacheDataGroup320.getActivationStatus(),
+				articleCacheDataGroup200.getExpiryDays()
 				);
 	}
 
