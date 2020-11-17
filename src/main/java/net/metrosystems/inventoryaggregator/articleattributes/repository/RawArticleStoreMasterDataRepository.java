@@ -1,7 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Repository;
 public class RawArticleStoreMasterDataRepository {
   private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
   private final ArticleCacheService articleCacheService;
-
 
   @Async("asyncExecutor")
   public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(
@@ -134,13 +132,13 @@ public class RawArticleStoreMasterDataRepository {
 
     return RawArticleStoreMasterData.builder()
         .departmentNumber(
-            Optional.ofNullable(articleStoreMasterDataList)
-                .map(value -> value.get(0).getDepartmentNumber())
-                .orElse(null))
+            articleStoreMasterDataList == null || articleStoreMasterDataList.isEmpty()
+                ? null
+                : articleStoreMasterDataList.get(0).getDepartmentNumber())
         .shelfEdgeTicketType(
-            Optional.ofNullable(articleStoreMasterDataList)
-                .map(value -> value.get(0).getShelfEdgeTicketType())
-                .orElse(null))
+            articleStoreMasterDataList == null || articleStoreMasterDataList.isEmpty()
+                ? null
+                : articleStoreMasterDataList.get(0).getShelfEdgeTicketType())
         .salesBlockingCode(articleCacheStoreExceptionsDataGroup300.getSalesBlockingCode())
         .storePieceNetSellPrice(articleCacheStoreExceptionsDataGroup100.getNetSalesPricePerPiece())
         .storeBundleNetSellPrice(
@@ -158,9 +156,9 @@ public class RawArticleStoreMasterDataRepository {
         .storePromotionBundleGrossPrice(
             articleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerBundle())
         .leadTime(
-            Optional.ofNullable(articleStoreMasterDataList)
-                .map(value -> value.get(0).getLeadTime())
-                .orElse(null))
+            articleStoreMasterDataList == null || articleStoreMasterDataList.isEmpty()
+                ? null
+                : articleStoreMasterDataList.get(0).getLeadTime())
         .build();
   }
 
