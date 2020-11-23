@@ -106,7 +106,10 @@ public class ArticleDataFromMovieRepository {
         movieAdapter.getDailyMeanSales(),
         movieAdapter.getOpenInterstoreQuantity(),
         movieAdapter.getOpenReturnQuantity(),
-        movieAdapter.getOpenGoodReceiving());
+        movieAdapter.getOpenGoodReceiving(),
+        movieAdapter.getLastSCQuantity(),
+        movieAdapter.getLastSalesQuantity(),
+        movieAdapter.getLastGRQuantity());
   }
 
   private List<ArticlePlannedDeliveryDate> transformMovieAdapterToArticlePlannedDeliveryDateList(

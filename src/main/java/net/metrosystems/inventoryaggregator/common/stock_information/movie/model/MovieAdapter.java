@@ -28,4 +28,7 @@ public class MovieAdapter {
   private Float openInterstoreQuantity;
   private Float openReturnQuantity;
   private Double openGoodReceiving;
+  private Integer lastSCQuantity;
+  private Integer lastSalesQuantity;
+  private Integer lastGRQuantity;
 }
