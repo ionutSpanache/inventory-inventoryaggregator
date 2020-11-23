@@ -24,7 +24,9 @@ public class MovieService {
   private MovieAdapter transformStockDetailToMovieAdapter(StockDetails stockDetails) {
     Float openInterstoreQuantity = 0.0f;
     Float openReturnQuantity = 0.0f;
-
+    int lastGrDateIndex = 0;
+    int lastSaleDateIndex = 0;
+    int lastScdDateIndex = 0;
     MovieAdapter movieAdapter = new MovieAdapter();
     movieAdapter.setArticleNo(stockDetails.getArticleNo());
     movieAdapter.setVariantId(stockDetails.getVariant());
@@ -55,14 +57,17 @@ public class MovieService {
         if (Integer.parseInt(lastGRDateTemp)
             > Integer.parseInt(stockDetails.getSystemStock().get(i).getLastGRDate())) {
           lastGRDateTemp = stockDetails.getSystemStock().get(i).getLastGRDate();
+          lastGrDateIndex = i;
         }
         if (Integer.parseInt(lastSaleDateTemp)
             < Integer.parseInt(stockDetails.getSystemStock().get(i).getLastSalesDate())) {
           lastSaleDateTemp = stockDetails.getSystemStock().get(i).getLastSalesDate();
+          lastScdDateIndex = i;
         }
         if (Integer.parseInt(lastSCDDateTemp)
             < Integer.parseInt(stockDetails.getSystemStock().get(i).getLastSCDate())) {
           lastSCDDateTemp = stockDetails.getSystemStock().get(i).getLastSCDate();
+          lastScdDateIndex = i;
         }
       }
       movieAdapter.setLastGoodReceivingDate(lastGRDateTemp);
@@ -88,7 +93,9 @@ public class MovieService {
     movieAdapter.setBlockedStock(stockDetails.getStockSummary().getBlockedStock());
     movieAdapter.setAvailableStock(stockDetails.getStockSummary().getAvailableStock());
     movieAdapter.setOpenGoodReceiving(stockDetails.getStockSummary().getOpenGoodReceiving());
-
+    movieAdapter.setLastGRQuantity(stockDetails.getSystemStock().get(lastGrDateIndex).getLastGRQuantity());
+    movieAdapter.setLastSalesQuantity(stockDetails.getSystemStock().get(lastSaleDateIndex).getLastSalesQuantity());
+    movieAdapter.setLastSCQuantity(stockDetails.getSystemStock().get(lastScdDateIndex).getLastSCQuantity());
     return movieAdapter;
   }
 
