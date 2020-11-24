@@ -25,5 +25,8 @@ public class Stock {
     private String lastGRDate;
     private String lastSalesDate;
     private String lastSCDate;
-	private String reason;
+	  private String reason;
+	  private Integer lastSCQuantity;
+	  private Integer lastSalesQuantity;
+	  private Integer lastGRQuantity;
 }
