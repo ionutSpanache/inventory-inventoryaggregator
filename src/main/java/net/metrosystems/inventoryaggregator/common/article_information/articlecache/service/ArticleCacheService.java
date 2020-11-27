@@ -1,6 +1,9 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.articleId.model.ArticleId;
@@ -10,16 +13,16 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.*;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBasicData;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.multithreading.ArticleDataThreads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 
 @Service
@@ -30,29 +33,28 @@ public class ArticleCacheService {
 
 	@Autowired
 	DocumentsService documentsService;
-    
+
 	private ArticleDataThreads articleDataThreads;
-	//@Qualifier("articleCacheAAAClient")
+
 	@Autowired
 	private ArticleCacheAAAClient articleCacheClient;
 	private ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
+
 	@Autowired
-	//public ArticleCacheService(ArticleCacheClient pArticleCacheClient, ArticleDataThreads articleDataThreads) {
-//		this.articleCacheClient = pArticleCacheClient;
 	public ArticleCacheService(ArticleDataThreads articleDataThreads, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient) {
 		this.articleDataThreads = articleDataThreads;
 		this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
 	}
-	
+
 	public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForEan(
 			String ean,
 			String countryCode,
 			String salesLine,
 			String languageCode) throws Exception {
 		return getArticleVariantBundleIdentifierListFromFilterUrl(articleCacheClient.getArticleUrlPathByEan(ean, countryCode, salesLine, languageCode));
-		
+
 	}
-	
+
 	public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForSubsys(
 			Long subsysArtNo,
 			String countryCode,
@@ -61,9 +63,9 @@ public class ArticleCacheService {
 		return getArticleVariantBundleIdentifierListFromFilterUrl(
 				articleCacheClient.getArticleUrlPathBySubsysArtNo(subsysArtNo, countryCode, salesLine, languageCode)
 		);
-		
+
 	}
-	
+
 	public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForArticleVariantBundle(
 			Long articleNumber,
 			Long variantNumber,
@@ -75,9 +77,9 @@ public class ArticleCacheService {
 		return getArticleVariantBundleIdentifierListFromFilterUrl(
 				articleCacheClient.getArticleUrlPathByArtVarBundle(articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode)
 		);
-		
+
 	}
-	
+
 	public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForArticleNumber(
 			Long articleNumber,
 			String countryCode,
@@ -88,7 +90,7 @@ public class ArticleCacheService {
 		return getArticleVariantBundleIdentifierListFromFilterUrl(
 				articleCacheClient.getArticleUrlPathByMmsArtNo(articleNumber, countryCode, salesLine, languageCode)
 		);
-		
+
 	}
 
 	private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(Documents filterUrlString) {
@@ -96,7 +98,7 @@ public class ArticleCacheService {
 //			throw new ArticleNotFoundException();
 			return Collections.emptyList();
 		}
-		
+
 		List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList =
 				new ArrayList<ArticleVariantBundleIdentifier>();
 		for (String articleUrlPath : filterUrlString.getArticleKeys()) {
@@ -107,10 +109,10 @@ public class ArticleCacheService {
 			articleVariantBundleIdentifier.setBundleNumber(articleId.getBundleNumber());
 			articleVariantBundleIdentifierList.add(articleVariantBundleIdentifier);
 		}
-		
+
 		return articleVariantBundleIdentifierList;
 	}
-	
+
 	public List<ArticleCacheFullData> getArticleCacheFullDataByEan(String ean,
                                                                    String countryCode, String salesLine, String languageCode, Integer storeNo) throws Exception {
 		Documents articleUrlPathList = articleCacheClient.getArticleUrlPathByEan(ean, countryCode, salesLine, languageCode);
@@ -126,7 +128,7 @@ public class ArticleCacheService {
 		}
 		return articleFullDataList;
 	}
-	
+
 	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
 			Long articleNumber,
 			Long variantNumber,
@@ -186,7 +188,7 @@ public class ArticleCacheService {
 						articleCacheDocument,
 						storeNo);
 	}
-	
+
 	private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData (
 																			ArticleCacheIhdsTree articleCacheDocument,
 			                                                                Integer storeNo) {
@@ -303,15 +305,15 @@ public class ArticleCacheService {
         		}
         	}
     	}
-    	
-    	if(!variantAlreadyExists) {
+
+		if(!variantAlreadyExists) {
     		try {
-    			newArticleVariantList.add(transformArticleCacheDocumentToArticleVariant(articleCacheDocument, storeNo));	
-    		}catch (ArticleNotFoundException e) {
-    			
-    		}
-    		
-    	}
+					newArticleVariantList.add(transformArticleCacheDocumentToArticleVariant(articleCacheDocument, storeNo));
+				}catch (ArticleNotFoundException e) {
+
+				}
+
+		}
     	return newArticleVariantList;
     }
 	private ArticleVariant transformArticleCacheDocumentToArticleVariant(ArticleCacheIhdsTree articleCacheDocument,
@@ -327,7 +329,7 @@ public class ArticleCacheService {
 		}
 
 	}
-	
+
 	private ArticleBundle transformArticleCacheDocumentToArticleBundle(ArticleCacheIhdsTree articleCacheDocument,
                                                                        int storeNo) {
 		Integer hierarchySequenceStoreNo = articleCacheDocument.getTransaction().getArticleCacheIncident().getHierarchySequenceStoreNo(storeNo);
@@ -431,9 +433,9 @@ public class ArticleCacheService {
 	}
 
 	private List<ArticleCacheIhdsTree> getArticleCacheDocumentsByURLs(List<String> articleCacheDocumentURLs) {
-		List<ArticleCacheIhdsTree> articleCacheDocuments = new ArrayList<>(); 		
+		List<ArticleCacheIhdsTree> articleCacheDocuments = new ArrayList<>();
 		for (String articleCacheDocumentURL : articleCacheDocumentURLs) {
-			 articleCacheDocuments.add(articleCacheClient.getArticleCacheDocumentByURL(articleCacheDocumentURL));
+			articleCacheDocuments.add(articleCacheClient.getArticleCacheDocumentByURL(articleCacheDocumentURL));
 		}
 		return articleCacheDocuments;
 	}
@@ -454,5 +456,5 @@ public class ArticleCacheService {
 		ArticleCacheStoreExceptionsIhdsTree articleCacheStoreExceptionsIhdsTree = articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
 		return articleCacheStoreExceptionsIhdsTree;
 	}
-	
+
 }

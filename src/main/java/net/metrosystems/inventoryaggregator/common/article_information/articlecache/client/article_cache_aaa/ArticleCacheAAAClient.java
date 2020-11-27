@@ -1,22 +1,21 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 public class ArticleCacheAAAClient implements ArticleCacheClient {
@@ -29,24 +28,12 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
     @Value("${ARTICLE_CACHE_FILTER_PATH}")
     private String articleCacheFilterPath;
 
-    private RestTemplate restTemplateDocuments;
-    private RestTemplate restTemplateFilter;
-
+    private final RestTemplate restTemplateArticleCache;
 
     @Autowired
-    public ArticleCacheAAAClient(RestTemplateBuilder restTemplateBuilder,
-                                 @Value("${ARTICLE_CACHE_USERNAME}") final String username,
-                                 @Value("${ARTICLE_CACHE_PASSWORD}") final String password) {
-        this.restTemplateDocuments = restTemplateBuilder
-                //.basicAuthorization(username, password)
-                .basicAuthentication(username, password)
-                .messageConverters(prepareArticleCacheDocumentMessageConverters())
-                .build();
-        this.restTemplateFilter = restTemplateBuilder
-                //.basicAuthorization(username, password)
-                .basicAuthentication(username, password)
-                .messageConverters(prepareArticleCacheFilterMessageConverters())
-                .build();
+    public ArticleCacheAAAClient(@Qualifier("RestTemplate-ArticleCache") RestTemplate restTemplateArticleCache) {
+        this.restTemplateArticleCache = restTemplateArticleCache;
+        restTemplateArticleCache.setMessageConverters(prepareArticleCacheDocumentMessageConverters());
     }
 
     private List<HttpMessageConverter<?>> prepareArticleCacheDocumentMessageConverters() {
@@ -111,9 +98,7 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
     }
 
     private <T> T getForArticleCacheObject(String articleUrl, Class<T> responseType) {
-        return restTemplateDocuments.getForObject(
-                articleUrl,
-                responseType);
+        return restTemplateArticleCache.getForObject(articleUrl, responseType);
     }
 
 }

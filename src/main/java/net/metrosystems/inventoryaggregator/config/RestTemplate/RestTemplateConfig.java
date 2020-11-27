@@ -2,6 +2,8 @@ package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +14,12 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateConfig {
 
   private final CloseableHttpClient httpClient;
+
+  @Value("${ARTICLE_CACHE_USERNAME}")
+  private String AC_USERNAME;
+
+  @Value("${ARTICLE_CACHE_PASSWORD}")
+  private String AC_PASSWORD;
 
   @Autowired
   public RestTemplateConfig(CloseableHttpClient httpClient) {
@@ -27,11 +35,16 @@ public class RestTemplateConfig {
 
   @Bean
   public RestTemplate restTemplate() {
-    return new RestTemplateBuilder()
-        .requestFactory(this::clientHttpRequestFactory)
-        .errorHandler(new CustomClientErrorHandler())
-        .interceptors(new CustomClientHttpRequestInterceptor())
-        .build();
+    return new RestTemplateBuilder().requestFactory(this::clientHttpRequestFactory)
+                                    .errorHandler(new CustomClientErrorHandler())
+                                    .interceptors(new CustomClientHttpRequestInterceptor()).build();
+  }
+
+  @Bean
+  @Qualifier("RestTemplate-ArticleCache")
+  public RestTemplate restTemplateForAAA() {
+    return new RestTemplateBuilder().requestFactory(this::clientHttpRequestFactory)
+                                    .basicAuthentication(AC_USERNAME, AC_PASSWORD).build();
   }
 
 }
