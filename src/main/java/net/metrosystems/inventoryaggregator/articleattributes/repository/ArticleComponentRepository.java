@@ -3,7 +3,6 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleComponentForArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
@@ -20,18 +19,17 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @RequiredArgsConstructor
 public class ArticleComponentRepository {
+
   private final ArticleCacheService articleCacheService;
+
+  @Qualifier("ForkJoinCustomPool")
+  private final ForkJoinPool forkJoinPoolCustom;
 
   @Async
   public CompletableFuture<List<ArticleComponentForArticleId>> getArticleComponentForArticleIdList(
-      List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode)
-      throws Exception {
-    ForkJoinPool forkJoinPool = createForkJoinPool();
-    List<ArticleComponentForArticleId> articleComponentForArticleIdList =
-        forkJoinPool
-            .submit(
-                () ->
-                    articleIdList.parallelStream()
+      List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode) throws Exception {
+    List<ArticleComponentForArticleId> articleComponentForArticleIdList = forkJoinPoolCustom
+        .submit(() -> articleIdList.parallelStream()
                         .map(
                             articleId -> {
                               List<ArticleVariantBundleIdentifier>
@@ -60,7 +58,6 @@ public class ArticleComponentRepository {
                             })
                         .collect(Collectors.toList()))
             .get();
-    forkJoinPool.shutdown();
     return CompletableFuture.completedFuture(articleComponentForArticleIdList);
   }
 
@@ -83,22 +80,6 @@ public class ArticleComponentRepository {
       }
     }
     return articleComponent;
-  }
-  private static class CustomForkJoinWorkerThread extends ForkJoinWorkerThread {
-    CustomForkJoinWorkerThread(ForkJoinPool pool) {
-      super(pool);
-      setContextClassLoader(Thread.currentThread().getContextClassLoader());
-    }
-  }
-
-  private ForkJoinPool createForkJoinPool() {
-    return new ForkJoinPool(
-//        ForkJoinPool.getCommonPoolParallelism(),
-        10,
-        CustomForkJoinWorkerThread::new,
-        null,
-        false
-    );
   }
 
 }

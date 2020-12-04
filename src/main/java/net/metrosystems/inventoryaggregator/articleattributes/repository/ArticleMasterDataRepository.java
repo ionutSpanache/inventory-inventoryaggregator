@@ -3,7 +3,6 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMaste
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
@@ -19,17 +19,15 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @RequiredArgsConstructor
 public class ArticleMasterDataRepository {
+
   private final ArticleCacheService articleCacheService;
 
+  @Qualifier("ForkJoinCustomPool")
+  private final ForkJoinPool forkJoinPoolCustom;
 
   @Async("asyncExecutor")
-  public CompletableFuture<ArticleMasterData> getArticleMasterData(
-      ArticleId articleId,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo)
-      throws Exception {
+  public CompletableFuture<ArticleMasterData> getArticleMasterData(ArticleId articleId, String countryCode, String salesLine,
+      String languageCode, Integer storeNo) throws Exception {
     ArticleCacheFullData articleCacheFullData =
         getArticleCacheFullDataByArtVarBundle(
             articleId.getArticleNumber(),
@@ -54,9 +52,7 @@ public class ArticleMasterDataRepository {
           String languageCode,
           Integer storeNo)
           throws Exception {
-    ForkJoinPool forkJoinPool = createForkJoinPool();
-    List<ArticleMasterDataForArticleId> articleMasterDataForArticleIds =
-        forkJoinPool
+    List<ArticleMasterDataForArticleId> articleMasterDataForArticleIds = forkJoinPoolCustom
             .submit(
                 () ->
                     articleIdList.parallelStream()
@@ -90,7 +86,6 @@ public class ArticleMasterDataRepository {
                             })
                         .collect(Collectors.toList()))
             .get();
-    forkJoinPool.shutdown();
     return CompletableFuture.completedFuture(articleMasterDataForArticleIds);
   }
 
@@ -140,16 +135,4 @@ public class ArticleMasterDataRepository {
     return null;
   }
 
-  private static class CustomForkJoinWorkerThread extends ForkJoinWorkerThread {
-    CustomForkJoinWorkerThread(ForkJoinPool pool) {
-      super(pool);
-      setContextClassLoader(Thread.currentThread().getContextClassLoader());
-    }
-  }
-
-  private ForkJoinPool createForkJoinPool() {
-    return new ForkJoinPool(
-        //        ForkJoinPool.getCommonPoolParallelism(),
-        10, CustomForkJoinWorkerThread::new, null, false);
-  }
 }

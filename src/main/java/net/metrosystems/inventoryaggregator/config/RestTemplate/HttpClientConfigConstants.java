@@ -3,7 +3,7 @@ package net.metrosystems.inventoryaggregator.config.RestTemplate;
 public interface HttpClientConfigConstants {
 
   // Connection pool
-  int MAX_ROUTE_CONNECTIONS = 100;
+  int MAX_ROUTE_CONNECTIONS = 500;
   int MAX_TOTAL_CONNECTIONS = 1000;
   int MAX_LOCALHOST_CONNECTIONS = 80;
 

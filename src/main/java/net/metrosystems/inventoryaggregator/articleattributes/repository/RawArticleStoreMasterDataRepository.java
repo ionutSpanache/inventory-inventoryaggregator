@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,7 @@ import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclAr
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
@@ -23,16 +23,16 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @RequiredArgsConstructor
 public class RawArticleStoreMasterDataRepository {
+
   private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
   private final ArticleCacheService articleCacheService;
 
+  @Qualifier("ForkJoinCustomPool")
+  private final ForkJoinPool forkJoinPoolCustom;
+
   @Async("asyncExecutor")
-  public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(
-      ArticleId articleId,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo) {
+  public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(ArticleId articleId, String countryCode,
+      String salesLine, String languageCode, Integer storeNo) {
 
     return CompletableFuture.completedFuture(
         getSynchronouslyRawArticleStoreMasterData(
@@ -48,9 +48,7 @@ public class RawArticleStoreMasterDataRepository {
           String languageCode,
           Integer storeNo)
           throws ExecutionException, InterruptedException {
-    ForkJoinPool forkJoinPool = createForkJoinPool();
-    List<RawArticleStoreMasterDataForArticleId> rawArticleStoreMasterDataForArticleIdList =
-        forkJoinPool
+    List<RawArticleStoreMasterDataForArticleId> rawArticleStoreMasterDataForArticleIdList = forkJoinPoolCustom
             .submit(
                 () ->
                     articleIdList.parallelStream()
@@ -77,7 +75,6 @@ public class RawArticleStoreMasterDataRepository {
                             })
                         .collect(Collectors.toList()))
             .get();
-    forkJoinPool.shutdown();
     return CompletableFuture.completedFuture(rawArticleStoreMasterDataForArticleIdList);
   }
 
@@ -230,16 +227,4 @@ public class RawArticleStoreMasterDataRepository {
     return CompletableFuture.completedFuture(rawArticleStoreMasterData);
   }
 
-  private static class CustomForkJoinWorkerThread extends ForkJoinWorkerThread {
-    CustomForkJoinWorkerThread(ForkJoinPool pool) {
-      super(pool);
-      setContextClassLoader(Thread.currentThread().getContextClassLoader());
-    }
-  }
-
-  private ForkJoinPool createForkJoinPool() {
-    return new ForkJoinPool(
-        //        ForkJoinPool.getCommonPoolParallelism(),
-        10, CustomForkJoinWorkerThread::new, null, false);
-  }
 }
