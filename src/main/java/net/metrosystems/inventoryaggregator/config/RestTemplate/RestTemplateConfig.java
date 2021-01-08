@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
+import org.apache.http.HttpHeaders;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,7 +45,8 @@ public class RestTemplateConfig {
   @Qualifier("RestTemplate-ArticleCache")
   public RestTemplate restTemplateForAAA() {
     return new RestTemplateBuilder().requestFactory(this::clientHttpRequestFactory)
-                                    .basicAuthentication(AC_USERNAME, AC_PASSWORD).build();
+                                    .basicAuthentication(AC_USERNAME, AC_PASSWORD)
+                                    .defaultHeader(HttpHeaders.ACCEPT_ENCODING, "gzip").build();
   }
 
 }

@@ -3,15 +3,11 @@ package net.metrosystems.inventoryaggregator.config.RestTemplate;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-import net.metrosystems.inventoryaggregator.config.aspect.TraceInformation;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 @Component
 public class HTTPHeaderConfig {
@@ -22,21 +18,6 @@ public class HTTPHeaderConfig {
     initHeader();
   }
 
-  public HTTPHeaderConfig buildHttpHeaders() {
-    initHeader();
-    return this;
-  }
-
-/*  public HTTPHeaderConfig buildAddTraceInformation() {
-    //        MultiValueMap<String, String> traceInformation = new LinkedMultiValueMap<>();
-    //        traceInformation.setAll(TraceInformation.getTraceInformationForComunication());
-    //        headers.addAll(traceInformation);
-//    TraceInformation.getTraceInformationForComunication().forEach((k, v) -> headers.add(k, v));
-    headers.add("X-Correlation-ID", MDC.get("X-Correlation-ID"));
-    headers.add("Flow", MDC.get("Flow"));
-    return this;
-  }*/
-
   private void initHeader() {
     headers = new HttpHeaders();
     headers.add("X-Correlation-ID", MDC.get("X-Correlation-ID"));
@@ -45,39 +26,8 @@ public class HTTPHeaderConfig {
     List<MediaType> acceptMediaTypeList = new ArrayList<>();
     acceptMediaTypeList.add(MediaType.valueOf("application/json;charset=UTF-8"));
     headers.setAccept(acceptMediaTypeList);
-  }
+    headers.addIfAbsent(HttpHeaders.ACCEPT_ENCODING, "gzip");
 
-  public HttpHeaders getHeaders() {
-    return headers;
-  }
-
-  public void setHeaders(HttpHeaders headers) {
-    this.headers = headers;
-  }
-
-  public void addHeaderParam(String param, String value) {
-    this.headers.add(param, value);
-  }
-
-  public void addHeaderParams(MultiValueMap<String, String> value) {
-    this.headers.addAll(value);
-  }
-
-  public void resetHeaders() {
-    initHeader();
-  }
-
-  public void addTraceInforamtion() {
-    MultiValueMap<String, String> traceInformation = new LinkedMultiValueMap<>();
-    traceInformation.setAll(TraceInformation.getTraceInformationForComunication());
-    headers.addAll(traceInformation);
-  }
-
-  public HttpServletResponse addHeadersToResponse(HttpServletResponse response) {
-    for (String header : headers.keySet()) {
-      response.setHeader(header, headers.getFirst(header));
-    }
-    return response;
   }
 
   public String addBasicAuth(String username, String password) {

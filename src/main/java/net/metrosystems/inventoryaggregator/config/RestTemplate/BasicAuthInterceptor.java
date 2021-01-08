@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
+import java.io.IOException;
 import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -7,8 +8,6 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-
-import java.io.IOException;
 
 @Order(2)
 public class BasicAuthInterceptor implements ClientHttpRequestInterceptor {
@@ -28,9 +27,9 @@ public class BasicAuthInterceptor implements ClientHttpRequestInterceptor {
     ) throws IOException {
         HTTPHeaderConfig httpHeaderConfig = new HTTPHeaderConfig();
         if (request.getURI().toString().contains("articlesearch.service-phalanx")) {
-            request.getHeaders().add(HttpHeaders.AUTHORIZATION, httpHeaderConfig.addBasicAuth(configArticleCacheAAA.getUsername(), configArticleCacheAAA.getPassword())
-            );
-
+            request.getHeaders().add(HttpHeaders.AUTHORIZATION,
+                httpHeaderConfig.addBasicAuth(configArticleCacheAAA.getUsername(), configArticleCacheAAA.getPassword()));
+            request.getHeaders().addIfAbsent(HttpHeaders.ACCEPT_ENCODING, "gzip");
         }
 
         System.out.println("TraceInformationRestTemplateAgentInterceptor.intercept:" + request.getURI().toURL().toString());
