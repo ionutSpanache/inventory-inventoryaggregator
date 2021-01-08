@@ -25,8 +25,6 @@ public class RestTemplateCustom {
         this.restTemplate = restTemplate;
         this.configArticleCacheAAA = configArticleCacheAAA;
         addInterceptorToRestTemplate();
-
-
     }
 
     private void addInterceptorToRestTemplate() {
@@ -37,27 +35,6 @@ public class RestTemplateCustom {
         interceptors.add(new TraceInformationRestTemplateAgentInterceptor());
         interceptors.add(new BasicAuthInterceptor(configArticleCacheAAA));
         this.restTemplate.setInterceptors(interceptors);
-    }
-
-    public Object getForObject(String url, Class<?> returnType, Boolean sendDecodedURL) {
-        if (sendDecodedURL) {
-            return this.restTemplate.getForObject(UriUtils.decode(url, "UTF-8"), returnType);
-        } else {
-            return this.restTemplate.getForObject(url, returnType);
-        }
-
-    }
-
-    public Object getForObject(String url, Class<?> returnType) {
-        return this.getForObject(url, returnType, false);
-    }
-
-    public void delete(String url) {
-        this.restTemplate.delete(url);
-    }
-
-    public Object postForObject(String url, Object newValue, Class<?> returnType) {
-        return this.postForObject(url, newValue, returnType, false);
     }
 
     public Object postForObject(String url, Object newValue, Class<?> returnType, Boolean sendDecodedURL) {
