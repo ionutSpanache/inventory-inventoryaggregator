@@ -1,9 +1,10 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -24,7 +25,7 @@ public class StockInformation implements Serializable {
   private Float openInterstoreQuantity;
   private Float openReturnQuantity;
   private Double openGoodReceiving;
-  private Integer lastSCQuantity;
-  private Integer lastSalesQuantity;
-  private Integer lastGRQuantity;
+  private Double lastSCQuantity;
+  private Double lastSalesQuantity;
+  private Double lastGRQuantity;
 }
