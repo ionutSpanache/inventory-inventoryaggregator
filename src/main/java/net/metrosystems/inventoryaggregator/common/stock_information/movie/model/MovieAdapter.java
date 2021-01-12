@@ -1,9 +1,10 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.model;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +29,7 @@ public class MovieAdapter {
   private Float openInterstoreQuantity;
   private Float openReturnQuantity;
   private Double openGoodReceiving;
-  private Integer lastSCQuantity;
-  private Integer lastSalesQuantity;
-  private Integer lastGRQuantity;
+  private Double lastSCQuantity;
+  private Double lastSalesQuantity;
+  private Double lastGRQuantity;
 }
