@@ -175,7 +175,79 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!--SonarQube-->
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.7.0.1746</version>
+			</plugin>
+
+			<!--SonarQube with Spring Boot 2 settings-->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.5</version>
+				<executions>
+					<execution>
+						<id>pre-test</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<propertyName>jacocoArgLine</propertyName>
+							<destFile>${project.test.result.directory}/jacoco/jacoco.exec</destFile>
+						</configuration>
+					</execution>
+					<execution>
+						<id>post-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${project.test.result.directory}/jacoco/jacoco.exec</dataFile>
+							<outputDirectory>${project.test.result.directory}/jacoco</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M5</version>
+				<configuration>
+					<!--suppress UnresolvedMavenProperty -->
+					<argLine>${jacocoArgLine}</argLine>
+					<reportsDirectory>${project.test.result.directory}/surefire</reportsDirectory>
+				</configuration>
+			</plugin>
+			<!--SonarQube with Spring Boot 2 settings-->
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>coverage</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<project.test.result.directory>${project.build.directory}/test-results</project.test.result.directory>
+				<sonar.host.url>https://sonarqube.metrosystems.net</sonar.host.url>
+				<sonar.projectKey>inventory-inventoryaggregator</sonar.projectKey>
+				<sonar.login>8aef148ef484c80118f0e13f0adf9a20e60523c5</sonar.login>
+				<sonar.java.codeCoveragePlugin>jacoco</sonar.java.codeCoveragePlugin>
+				<sonar.coverage.jacoco.xmlReportPaths>${project.test.result.directory}/jacoco/jacoco.xml
+				</sonar.coverage.jacoco.xmlReportPaths>
+				<sonar.exclusions>
+					src/main/java/net/metrosystems/inventoryaggregator/InventoryAggregatorApplication.java,
+					src/main/java/net/metrosystems/inventoryaggregator/**/model/*.java
+				</sonar.exclusions>
+				<sonar.coverage.exclusions>
+					**/model/*.java
+				</sonar.coverage.exclusions>
+			</properties>
+		</profile>
+	</profiles>
 
 </project>
