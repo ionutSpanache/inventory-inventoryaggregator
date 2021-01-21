@@ -28,4 +28,5 @@ public class StockInformation implements Serializable {
   private Double lastSCQuantity;
   private Double lastSalesQuantity;
   private Double lastGRQuantity;
+  private boolean isConsignmentstock;
 }

@@ -1,9 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
@@ -15,6 +11,10 @@ import net.metrosystems.inventoryaggregator.common.stock_information.movie.servi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Repository
 public class ArticleDataFromMovieRepository {
@@ -109,7 +109,8 @@ public class ArticleDataFromMovieRepository {
         movieAdapter.getOpenGoodReceiving(),
         movieAdapter.getLastSCQuantity(),
         movieAdapter.getLastSalesQuantity(),
-        movieAdapter.getLastGRQuantity());
+        movieAdapter.getLastGRQuantity(),
+        movieAdapter.isConsignmentstock());
   }
 
   private List<ArticlePlannedDeliveryDate> transformMovieAdapterToArticlePlannedDeliveryDateList(

@@ -1,15 +1,12 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.client.MovieClient;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAdapter;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieOpenOrder;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Stock;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetails;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MovieService {
@@ -122,13 +119,22 @@ public class MovieService {
       Long articleNumber,
       Long variant,
       Long bundleNumber) {
+      MovieAdapter movieAdapterConsignment  = new MovieAdapter();
     List<StockDetails> stockDetailsList =
         movieClient.getStockDetailsForArticleVariantBundle(
             countryCode, salesLine, storeNo, articleNumber, variant, bundleNumber);
+      List<ConsignmentStock> consignmentStockList =
+              movieClient.getConsignmentStockForArticleVariantBundle(
+                      countryCode, salesLine, storeNo, articleNumber, variant, bundleNumber);
     if (stockDetailsList != null && !stockDetailsList.isEmpty()) {
       for (StockDetails stockDetails : stockDetailsList) {
         if (stockDetails.getReturnCode() == 0) {
-          return this.transformStockDetailToMovieAdapter(stockDetails);
+            movieAdapterConsignment = transformStockDetailToMovieAdapter(stockDetails);
+            if (consignmentStockList != null && !consignmentStockList.isEmpty() && consignmentStockList.get(0).getReturnCode() == 0) {
+                movieAdapterConsignment.setStock(consignmentStockList.get(0).getConsignmentStock().floatValue());
+                movieAdapterConsignment.setConsignmentstock(true);
+            }
+          return movieAdapterConsignment;
         }
       }
     }

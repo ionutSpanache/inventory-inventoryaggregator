@@ -32,4 +32,5 @@ public class MovieAdapter {
   private Double lastSCQuantity;
   private Double lastSalesQuantity;
   private Double lastGRQuantity;
+  private boolean isConsignmentstock;
 }
