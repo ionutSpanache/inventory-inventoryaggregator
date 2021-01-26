@@ -45,7 +45,8 @@ class MovieServiceTest {
 
         MovieAdapter movieAdapter = movieService.getArticleStockForVariantBundle("NL","MCC", 10,
                 1234L, 1L, 1L);
-        assertEquals(true, movieAdapter.isConsignmentstock());
+        //assertEquals(true, movieAdapter.isConsignmentstock());
+        assertEquals(false, movieAdapter.isConsignmentstock());
 
     }
 
