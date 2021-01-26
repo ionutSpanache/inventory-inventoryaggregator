@@ -130,10 +130,10 @@ public class MovieService {
       for (StockDetails stockDetails : stockDetailsList) {
         if (stockDetails.getReturnCode() == 0) {
             movieAdapterConsignment = transformStockDetailToMovieAdapter(stockDetails);
-            if (consignmentStockList != null && !consignmentStockList.isEmpty() && consignmentStockList.get(0).getReturnCode() == 0) {
+/*            if (consignmentStockList != null && !consignmentStockList.isEmpty() && consignmentStockList.get(0).getReturnCode() == 0) {
                 movieAdapterConsignment.setStock(consignmentStockList.get(0).getConsignmentStock().floatValue());
                 movieAdapterConsignment.setConsignmentstock(true);
-            }
+            }*/
           return movieAdapterConsignment;
         }
       }
