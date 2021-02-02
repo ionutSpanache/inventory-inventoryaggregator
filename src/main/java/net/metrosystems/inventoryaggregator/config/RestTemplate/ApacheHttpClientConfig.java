@@ -36,7 +36,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @EnableScheduling
 public class ApacheHttpClientConfig {
 
-    private final Logger LOG = LoggerFactory.getLogger(ApacheHttpClientConfig.class);
+    private final Logger logger = LoggerFactory.getLogger(ApacheHttpClientConfig.class);
 
     @Bean
     public PoolingHttpClientConnectionManager poolingConnectionManager() {
@@ -85,7 +85,7 @@ public class ApacheHttpClientConfig {
             pool.closeExpiredConnections();
             pool.closeIdleConnections(IDLE_CONNECTION_WAIT_TIME, TimeUnit.MILLISECONDS);
 
-            LOG.info("Idle connection monitor: Closing expired and idle connections");
+            logger.info("Idle connection monitor: Closing expired and idle connections");
           }
         }
       };

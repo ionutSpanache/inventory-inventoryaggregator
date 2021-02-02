@@ -72,7 +72,7 @@ public class MovieService {
       movieAdapter.setLastStockCorrectionDate(lastSCDDateTemp);
     }
     if (stockDetails.getOpenOrders() != null) {
-      movieAdapter.setOpenOrders(new ArrayList<MovieOpenOrder>());
+      movieAdapter.setOpenOrders(new ArrayList<>());
       for (Stock openOrder : stockDetails.getOpenOrders()) {
         movieAdapter
             .getOpenOrders()
@@ -98,7 +98,7 @@ public class MovieService {
 
   public List<MovieAdapter> getArticleStockForVariant(
       String countryCode, String salesLine, int storeNo, Long mmsArtNo, Long variantNo) {
-    List<MovieAdapter> movieStockAdapterList = new ArrayList<MovieAdapter>();
+    List<MovieAdapter> movieStockAdapterList = new ArrayList<>();
     List<StockDetails> stockDetailsList =
         movieClient.getStockDetailsForArticleVariant(
             countryCode, salesLine, storeNo, mmsArtNo, variantNo);
@@ -123,9 +123,6 @@ public class MovieService {
     List<StockDetails> stockDetailsList =
         movieClient.getStockDetailsForArticleVariantBundle(
             countryCode, salesLine, storeNo, articleNumber, variant, bundleNumber);
-      List<ConsignmentStock> consignmentStockList =
-              movieClient.getConsignmentStockForArticleVariantBundle(
-                      countryCode, salesLine, storeNo, articleNumber, variant, bundleNumber);
     if (stockDetailsList != null && !stockDetailsList.isEmpty()) {
       for (StockDetails stockDetails : stockDetailsList) {
         if (stockDetails.getReturnCode() == 0) {

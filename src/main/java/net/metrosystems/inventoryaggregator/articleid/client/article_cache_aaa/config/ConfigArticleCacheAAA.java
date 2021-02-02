@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.config;
+package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

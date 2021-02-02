@@ -13,9 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.metrics.annotation.Timed;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
@@ -34,7 +34,7 @@ public class ArticleDataController {
 
 	@AddTimer
 	@AddLogs
-	@RequestMapping(value="/ean/{ean}", method=RequestMethod.GET)
+	@GetMapping(value = "/ean/{ean}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getArticlesByEan(
 			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
 			@TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
@@ -52,7 +52,7 @@ public class ArticleDataController {
 	}
 	@AddTimer
 	@AddLogs
-	@RequestMapping(value="/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}", method=RequestMethod.GET)
+	@GetMapping(value = "/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getArticleByArtVarBundle(
 			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
 			@TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
@@ -72,7 +72,7 @@ public class ArticleDataController {
 	}
 	@AddTimer
 	@AddLogs
-	@RequestMapping(value="/subsystemarticlenumber/{subsystemarticlenumber}", method=RequestMethod.GET)
+	@GetMapping(value = "/subsystemarticlenumber/{subsystemarticlenumber}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getArticleBySubsys(
 			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
 			@TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,

@@ -10,14 +10,14 @@ import org.springframework.http.client.ClientHttpResponse;
 
 public class CustomClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
 
-  private Logger LOG = LoggerFactory.getLogger(CustomClientHttpRequestInterceptor.class);
+  private Logger logger = LoggerFactory.getLogger(CustomClientHttpRequestInterceptor.class);
 
   @Override
   public ClientHttpResponse intercept(HttpRequest request, byte[] bytes, ClientHttpRequestExecution execution) throws IOException {
     // log the http request
-    LOG.info("URI: {}", request.getURI());
-    LOG.info("HTTP Method: {}", request.getMethodValue());
-    LOG.info("HTTP Headers: {}", request.getHeaders());
+    logger.info("URI: {}", request.getURI());
+    logger.info("HTTP Method: {}", request.getMethodValue());
+    logger.info("HTTP Headers: {}", request.getHeaders());
 
     return execution.execute(request, bytes);
   }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.model.Documents;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.service.DocumentsService;
-import net.metrosystems.inventoryaggregator.articleId.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
+import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
@@ -95,12 +95,11 @@ public class ArticleCacheService {
 
 	private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(Documents filterUrlString) {
 		if (filterUrlString.getArticleKeys().isEmpty()) {
-//			throw new ArticleNotFoundException();
 			return Collections.emptyList();
 		}
 
 		List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList =
-				new ArrayList<ArticleVariantBundleIdentifier>();
+				new ArrayList<>();
 		for (String articleUrlPath : filterUrlString.getArticleKeys()) {
 			ArticleId articleId = documentsService.tranformDocumentInArticleId(articleUrlPath);
 			ArticleVariantBundleIdentifier articleVariantBundleIdentifier = new ArticleVariantBundleIdentifier();
@@ -119,7 +118,7 @@ public class ArticleCacheService {
 		if (articleUrlPathList.getArticleKeys().isEmpty()) {
 			throw new ArticleNotFoundException();
 		}
-		List<ArticleCacheFullData> articleFullDataList = new ArrayList<ArticleCacheFullData>();
+		List<ArticleCacheFullData> articleFullDataList = new ArrayList<>();
 		for (String articleUrlPath : articleUrlPathList.getArticleKeys()) {
 			articleFullDataList.add(
 					transformArticleCacheDocumentToArticleFullData(
@@ -149,11 +148,10 @@ public class ArticleCacheService {
 			throw new ArticleNotFoundException();
 		}
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
-		ArticleCacheFullData articleCacheFullData =
-				transformArticleCacheDocumentToArticleFullData(
+		return transformArticleCacheDocumentToArticleFullData(
 												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
 												storeNo);
-		return articleCacheFullData;
+
 	}
 
 	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
@@ -357,11 +355,10 @@ public class ArticleCacheService {
 	}
 
 	public List<ArticleVariant> getArticleVariantsByArticleNumber(ArticleBasicData articleMasterData, String countryCode, String salesLine, String languageCode, int storeNo) throws Exception {
-		List<ArticleVariant> articleVariantList = new ArrayList<ArticleVariant>();
+		List<ArticleVariant> articleVariantList = new ArrayList<>();
 		Documents articleCacheDocumentURLs = articleCacheClient.findArticleUrlPathByMmsArtNo(articleMasterData.getArticleNumber(), countryCode, salesLine, languageCode);
         List<String> articleCacheDocumentURLsWithsearchedDBundleOnFirstPosition = new ArrayList<>();
         articleCacheDocumentURLsWithsearchedDBundleOnFirstPosition.add(null);
-		List<CompletableFuture> articleVariantTasks = new ArrayList<>();
 		for (String articleCacheDocumentURL : articleCacheDocumentURLs.getArticleKeys()
         ) {
 			ArticleId articleId = documentsService.tranformDocumentInArticleId(articleCacheDocumentURL);
@@ -446,15 +443,13 @@ public class ArticleCacheService {
 			Long bundleNumber,
 			String countryCode,
 			String salesLine,
-			String languageCode,
 			Integer storeNo) {
 
 		String articleUrlPath = String.format(articleCacheStoreExceptionsPath,
 				countryCode.toLowerCase(), bundleNumber, salesLine.toLowerCase(), "en", articleNumber, storeNo, variantNumber);
 		//todo: change "en" to country code
 		System.out.println("articleUrlPath: " + articleUrlPath);
-		ArticleCacheStoreExceptionsIhdsTree articleCacheStoreExceptionsIhdsTree = articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
-		return articleCacheStoreExceptionsIhdsTree;
+		return articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
 	}
 
 }

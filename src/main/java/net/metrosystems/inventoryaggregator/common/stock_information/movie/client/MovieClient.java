@@ -56,11 +56,11 @@ public class MovieClient {
 
     Bundle bundle = new Bundle();
     bundle.setBundleNo(bundleNumber);
-    List<Bundle> bundleList = new ArrayList<Bundle>();
+    List<Bundle> bundleList = new ArrayList<>();
     bundleList.add(bundle);
     article.setBundles(bundleList);
 
-    List<Article> articleList = new ArrayList<Article>();
+    List<Article> articleList = new ArrayList<>();
     articleList.add(article);
     return getDataFromMovie(countryCode, salesLine, storeNo, articleList);
   }
@@ -100,11 +100,11 @@ public class MovieClient {
 
     Bundle bundle = new Bundle();
     bundle.setBundleNo(bundleNumber);
-    List<Integer> bundleList = new ArrayList<Integer>();
+    List<Integer> bundleList = new ArrayList<>();
     bundleList.add(bundleNumber.intValue());
     articleConsigStock.setBundles(bundleList);
 
-    List<ArticleConsignmentStock> articleConsigStockList = new ArrayList<ArticleConsignmentStock>();
+    List<ArticleConsignmentStock> articleConsigStockList = new ArrayList<>();
     articleConsigStockList.add(articleConsigStock);
     return getConsignmentStockFromMovie(countryCode, salesLine, storeNo, articleConsigStockList);
   }
@@ -113,14 +113,14 @@ public class MovieClient {
       String countryCode, String salesLine, int storeNo, List<Article> articleList) {
     String urlInUse = String.format(movieStockServiceHost + "/cache");
 
-    List<String> reasonsList = new ArrayList<String>();
+    List<String> reasonsList = new ArrayList<>();
     reasonsList.add("IST");
     reasonsList.add("RETURN");
 
-    List<Integer> storeNumber = new ArrayList<Integer>();
+    List<Integer> storeNumber = new ArrayList<>();
     storeNumber.add(storeNo);
 
-    List<MovieDataGroups> dataGroupsList = new ArrayList<MovieDataGroups>();
+    List<MovieDataGroups> dataGroupsList = new ArrayList<>();
     dataGroupsList.add(new MovieDataGroups("OPOR", -1));
     dataGroupsList.add(new MovieDataGroups("OPMO", reasonsList));
     dataGroupsList.add(new MovieDataGroups("SYST"));
@@ -141,7 +141,7 @@ public class MovieClient {
 
     try {
       jsonStringMovie = mapper.writeValueAsString(movieRequest);
-      HttpEntity<String> request = new HttpEntity<String>(jsonStringMovie, headers);
+      HttpEntity<String> request = new HttpEntity<>(jsonStringMovie, headers);
       return restTemplate
               .postForObject(urlInUse, request, StockDetailsResponse.class)
               .getStockDetails();
@@ -153,7 +153,7 @@ public class MovieClient {
             String countryCode, String salesLine, int storeNo, List<ArticleConsignmentStock> articleConsigStockList) {
       String urlInUse = String.format(movieStockServiceHost + "/cache/consignmentstock");
 
-      List<Integer> storeNumber = new ArrayList<Integer>();
+      List<Integer> storeNumber = new ArrayList<>();
       storeNumber.add(storeNo);
 
       MovieRequestConsignmentStockBody movieRequestConsigStock = new MovieRequestConsignmentStockBody();
@@ -170,7 +170,7 @@ public class MovieClient {
 
       try {
         jsonStringMovieConsigStock = mapper.writeValueAsString(movieRequestConsigStock);
-        HttpEntity<String> request = new HttpEntity<String>(jsonStringMovieConsigStock, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonStringMovieConsigStock, headers);
         return restTemplate
                 .postForObject(urlInUse, request, ConsignmentStockResponse.class)
                 .getStockDetails();

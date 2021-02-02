@@ -104,8 +104,8 @@ public class AclStockClient {
     log.debug("uriArticleLocation=" + urlInUse);
 
     try {
-      ArticleLocation articleLocation = restTemplate.getForObject(urlInUse, ArticleLocation.class);
-      return articleLocation;
+        return restTemplate.getForObject(urlInUse, ArticleLocation.class);
+
     } catch (Exception e) {
       return null;
     }

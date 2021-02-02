@@ -142,9 +142,7 @@ public class AclBundleStockLocationRepository {
 
   private ArticleLocation transformAclArticleLocationsToInventoryArticleLocation(
       ArticleLocation articleLocation) {
-    if (Optional.ofNullable(articleLocation).isPresent()) {
-      if ((articleLocation.getStocktakingArticleLocationList() != null)
-          && (!articleLocation.getStocktakingArticleLocationList().isEmpty())) {
+    if (Optional.ofNullable(articleLocation).isPresent() && isArticleLocationList(articleLocation)) {
         for (StocktakingArticleLocation stocktakingArticleLocation :
             articleLocation.getStocktakingArticleLocationList()) {
           stocktakingArticleLocation.setAisle(
@@ -153,8 +151,14 @@ public class AclBundleStockLocationRepository {
               StringUtils.leftPad(stocktakingArticleLocation.getShelf(), 3, "0"));
         }
         return articleLocation;
-      }
+
     }
     return null;
   }
+
+  private boolean isArticleLocationList(ArticleLocation articleLocation) {
+    return (articleLocation.getStocktakingArticleLocationList() != null)
+        && (!articleLocation.getStocktakingArticleLocationList().isEmpty());
+  }
+
 }

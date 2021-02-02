@@ -30,8 +30,7 @@ public class ArticleStoreMasterDataController {
 
 	@AddTimer
 	@AddLogs
-	@RequestMapping(value="/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/barcode/{barcode}/articlemasterdatabyean",
-	        method=RequestMethod.GET,
+	@GetMapping(value="/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/barcode/{barcode}/articlemasterdatabyean",
 	        produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ArticleStoreMasterData>> getAclArticleStoreMasterDataByEan(
 			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
@@ -48,8 +47,7 @@ public class ArticleStoreMasterDataController {
 
 	@AddTimer
 	@AddLogs
-	@RequestMapping(value="/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/articleNumber/{artNo}/variantNumber/{varNo}/bundleNumber/{bundleNo}/articlemasterdatabyartvarbundle",
-	        method=RequestMethod.GET,
+	@GetMapping(value="/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/articleNumber/{artNo}/variantNumber/{varNo}/bundleNumber/{bundleNo}/articlemasterdatabyartvarbundle",
 	        produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<ArticleStoreMasterData>> getAclArticleStoreMasterDataByArtVArBundle(
 			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,

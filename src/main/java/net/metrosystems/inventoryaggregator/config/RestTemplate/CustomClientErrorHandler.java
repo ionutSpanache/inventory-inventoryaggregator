@@ -8,7 +8,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 
 public class CustomClientErrorHandler implements ResponseErrorHandler {
 
-  private final Logger LOG = LoggerFactory.getLogger(CustomClientErrorHandler.class);
+  private final Logger logger = LoggerFactory.getLogger(CustomClientErrorHandler.class);
 
   @Override
   public boolean hasError(ClientHttpResponse clientHttpResponse) throws IOException {
@@ -17,6 +17,6 @@ public class CustomClientErrorHandler implements ResponseErrorHandler {
 
   @Override
   public void handleError(ClientHttpResponse clientHttpResponse) throws IOException {
-    LOG.error("CustomClientErrorHandler | HTTP Status Code: " + clientHttpResponse.getStatusCode().value());
+    logger.error("CustomClientErrorHandler | HTTP Status Code: " + clientHttpResponse.getStatusCode().value());
   }
 }

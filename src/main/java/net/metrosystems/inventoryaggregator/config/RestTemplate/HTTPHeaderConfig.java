@@ -1,6 +1,7 @@
 package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.codec.binary.Base64;
@@ -12,14 +13,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class HTTPHeaderConfig {
 
-  private HttpHeaders headers;
-
   public HTTPHeaderConfig() {
     initHeader();
   }
 
   private void initHeader() {
-    headers = new HttpHeaders();
+    HttpHeaders headers = new HttpHeaders();
     headers.add("X-Correlation-ID", MDC.get("X-Correlation-ID"));
     headers.add("Flow", MDC.get("Flow"));
     headers.setContentType(MediaType.valueOf("application/json;charset=UTF-8"));
@@ -31,11 +30,9 @@ public class HTTPHeaderConfig {
   }
 
   public String addBasicAuth(String username, String password) {
-    HttpHeaders httpHeaders = new HttpHeaders();
     String auth = username + ":" + password;
     byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
-    String authHeader = "Basic " + new String(encodedAuth);
 
-    return authHeader;
+    return  "Basic " + new String(encodedAuth);
   }
 }

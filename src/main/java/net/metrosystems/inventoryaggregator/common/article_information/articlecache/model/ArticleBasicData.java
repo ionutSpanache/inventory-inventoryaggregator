@@ -1,6 +1,6 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.model;
 
-import net.metrosystems.inventoryaggregator.articleId.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 
 
 public class ArticleBasicData {
