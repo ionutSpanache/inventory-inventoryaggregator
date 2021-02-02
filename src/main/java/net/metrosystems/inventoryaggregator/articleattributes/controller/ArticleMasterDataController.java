@@ -34,7 +34,8 @@ public class ArticleMasterDataController {
 
 	@AddTimer
 	@AddLogs
-	@RequestMapping(value="/articlemasterdata/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}", method=RequestMethod.GET)
+	@GetMapping(value="/articlemasterdata/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}",
+	produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getArticleMasterDataListByArtVarBundle(
 			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
 			@TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
@@ -44,7 +45,7 @@ public class ArticleMasterDataController {
 			@PathVariable("variant") Long variant,
 			@PathVariable("bundlenumber") Long bundleNumber) throws Exception {
 
-			List<ArticleMasterData> articleMasterData = null;
+			List<ArticleMasterData> articleMasterData;
 			try {
 				articleMasterData = articleDetailsService.getArticleMasterDataListByArticleVariantBundle(
 						articleNumber, variant, bundleNumber,
@@ -57,7 +58,8 @@ public class ArticleMasterDataController {
 
 	@AddTimer
 	@AddLogs
-	@RequestMapping(value="/completearticlemasterdata/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}", method=RequestMethod.GET)
+	@GetMapping(value="/completearticlemasterdata/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}",
+			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getArticleMasterDataByArtVarBundle(
 			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
 			@TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,

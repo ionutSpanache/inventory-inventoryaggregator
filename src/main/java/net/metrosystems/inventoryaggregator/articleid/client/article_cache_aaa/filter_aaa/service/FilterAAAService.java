@@ -1,10 +1,10 @@
-package net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.service;
+package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.service;
 
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.config.ConfigArticleCacheAAA;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.service.DocumentsService;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.client.FilterAAAClient;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.model.*;
-import net.metrosystems.inventoryaggregator.articleId.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.ConfigArticleCacheAAA;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client.FilterAAAClient;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.*;
+import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +17,6 @@ public class FilterAAAService {
 
     @Autowired
     ConfigArticleCacheAAA configArticleCacheAAA;
-    @Autowired
-    FilterAAAService filterAAAService;
     @Autowired
     FilterAAAClient filterAAAClient;
     @Autowired
@@ -41,7 +39,7 @@ public class FilterAAAService {
 
     public Filter initializeFilter(String countryCode, String salesLine) {
         Filter filter = new Filter();
-        List<FilterKey> filterKeyList = new ArrayList<FilterKey>();
+        List<FilterKey> filterKeyList = new ArrayList<>();
         filter.setFilterKeys(filterKeyList);
         FilterKey filterKey = new FilterKey();
         List<SubFilterKey> subFilterKeys = new ArrayList<>();
@@ -59,14 +57,14 @@ public class FilterAAAService {
                                 getDocumentsByBarcode(countryCode, salesLine, languageCode, barCode));
     }
 
-    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, String languageCode, Integer storeNo, Long articleNumber) throws Exception {
+    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, String languageCode, Long articleNumber) throws Exception {
         return documentsService.
                 transformDocumentListInArticleIdList(
                         documentsService.
                                 getDocumentsByArticleNumber(countryCode, salesLine, languageCode, articleNumber));
     }
 
-    public List<ArticleId> getArticleIdBySubsysArticleNumber(String countryCode, String salesLine, String languageCode, Integer storeNo, Long subsysArticleNumber) throws Exception {
+    public List<ArticleId> getArticleIdBySubsysArticleNumber(String countryCode, String salesLine, String languageCode, Long subsysArticleNumber) throws Exception {
         return documentsService.
                 transformDocumentListInArticleIdList(
                         documentsService.

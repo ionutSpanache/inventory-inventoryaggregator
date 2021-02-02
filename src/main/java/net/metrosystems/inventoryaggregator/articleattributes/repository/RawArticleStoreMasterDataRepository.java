@@ -32,11 +32,11 @@ public class RawArticleStoreMasterDataRepository {
 
   @Async("asyncExecutor")
   public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(ArticleId articleId, String countryCode,
-      String salesLine, String languageCode, Integer storeNo) {
+      String salesLine, Integer storeNo) {
 
     return CompletableFuture.completedFuture(
         getSynchronouslyRawArticleStoreMasterData(
-            articleId, countryCode, salesLine, languageCode, storeNo));
+            articleId, countryCode, salesLine, storeNo));
   }
 
   @Async("asyncExecutor")
@@ -62,7 +62,6 @@ public class RawArticleStoreMasterDataRepository {
                                             articleId,
                                             countryCode,
                                             salesLine,
-                                            languageCode,
                                             storeNo))
                                     .build();
                               } catch (Exception e) {
@@ -82,7 +81,6 @@ public class RawArticleStoreMasterDataRepository {
       ArticleId articleId,
       String countryCode,
       String salesLine,
-      String languageCode,
       Integer storeNo) {
     List<ArticleStoreMasterData> articleStoreMasterDataList =
         aclArticleStoreMasterDataService.getArticleStoreMasterDataByArtVarBundle(
@@ -100,7 +98,6 @@ public class RawArticleStoreMasterDataRepository {
             articleId.getBundleNumber(),
             countryCode,
             salesLine,
-            languageCode,
             storeNo);
     ArticleCacheStoreExceptionsDataGroup articleCacheStoreExceptionsDataGroup100 =
         new ArticleCacheStoreExceptionsDataGroup();
@@ -173,7 +170,6 @@ public class RawArticleStoreMasterDataRepository {
             articleId.getBundleNumber(),
             countryCode,
             salesLine,
-            languageCode,
             storeNo);
     ArticleCacheStoreExceptionsDataGroup articleCacheStoreExceptionsDataGroup100 =
         new ArticleCacheStoreExceptionsDataGroup();

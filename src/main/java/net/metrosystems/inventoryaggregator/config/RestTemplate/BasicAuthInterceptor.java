@@ -1,7 +1,7 @@
 package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
 import java.io.IOException;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.config.ConfigArticleCacheAAA;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;

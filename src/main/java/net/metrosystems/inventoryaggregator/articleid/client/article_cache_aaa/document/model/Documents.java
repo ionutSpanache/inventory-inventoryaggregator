@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.model;
+package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

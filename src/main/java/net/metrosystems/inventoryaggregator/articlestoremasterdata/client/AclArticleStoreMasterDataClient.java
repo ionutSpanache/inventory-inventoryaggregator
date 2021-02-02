@@ -14,6 +14,8 @@ public class AclArticleStoreMasterDataClient {
 	@Autowired
 	RestTemplate restTemplate;
 
+	private String exceptionMessage = "exceptie ";
+
 	@Value("${ACL_STORE_MASTER_DATA_HOST}")
 	private String aclArticleMasterDataHost;
 	@Value("${ACL_STORE_MASTER_DATA_PATH_BY_EAN}")
@@ -36,7 +38,7 @@ public class AclArticleStoreMasterDataClient {
 			return restTemplate.getForObject(urlInUse, ArticleStoreMasterDataACLResponse.class)
 					.getArticleStoreMasterData();
 		} catch (Exception e) {
-			System.out.println("exceptie " + e);
+			System.out.println(exceptionMessage + e);
 			return null;
 		}
 	}
@@ -62,7 +64,7 @@ public class AclArticleStoreMasterDataClient {
 			return restTemplate.getForObject(urlInUse, ArticleStoreMasterDataACLResponse.class)
 					.getArticleStoreMasterData();
 		} catch (Exception e) {
-			System.out.println("exceptie " + e);
+			System.out.println(exceptionMessage + e);
 			return null;
 		}
 
@@ -89,7 +91,7 @@ public class AclArticleStoreMasterDataClient {
 			return restTemplate.getForObject(urlInUse, ArticleStoreMasterDataACLResponse.class)
 					.getArticleStoreMasterData();
 		} catch (Exception e) {
-			System.out.println("exceptie " + e);
+			System.out.println(exceptionMessage + e);
 			return null;
 		}
 

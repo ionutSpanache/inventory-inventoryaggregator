@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.model;
+package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model;
 
 public enum KeysWithTypes {
     salesBarcode("salesBarcode", "long"),

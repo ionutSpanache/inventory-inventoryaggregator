@@ -1,8 +1,8 @@
-package net.metrosystems.inventoryaggregator.articleId.controller;
+package net.metrosystems.inventoryaggregator.articleid.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleId.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleId.service.ArticleIdService;
+import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleid.service.ArticleIdService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
@@ -42,7 +42,7 @@ public class ArticleIdController {
     ) {
         List<ArticleId> articleIds;
         try {
-            articleIds = articleIdService.getArticleIdByBarcode(countryCode, salesLine, languageCode, storeNo, barCode);
+            articleIds = articleIdService.getArticleIdByBarcode(countryCode, salesLine, languageCode, barCode);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -65,7 +65,7 @@ public class ArticleIdController {
     ) {
         List<ArticleId> articleIds;
         try {
-            articleIds = articleIdService.getArticleIdBySubsysArticleNumber(countryCode, salesLine, languageCode, storeNo, subsysArticleNumber);
+            articleIds = articleIdService.getArticleIdBySubsysArticleNumber(countryCode, salesLine, languageCode, subsysArticleNumber);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -88,7 +88,7 @@ public class ArticleIdController {
     ) {
         List<ArticleId> articleIds;
         try {
-            articleIds = articleIdService.getArticleIdByArticleNumber(countryCode, salesLine, languageCode, storeNo, articleNumber);
+            articleIds = articleIdService.getArticleIdByArticleNumber(countryCode, salesLine, languageCode, articleNumber);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

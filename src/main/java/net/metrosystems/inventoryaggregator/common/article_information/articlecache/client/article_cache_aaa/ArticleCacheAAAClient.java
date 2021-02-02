@@ -3,8 +3,8 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.model.Documents;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.service.DocumentsService;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -45,16 +44,6 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
         messageConverters.add(converter);
         return messageConverters;
     }
-
-    private List<HttpMessageConverter<?>> prepareArticleCacheFilterMessageConverters() {
-        StringHttpMessageConverter converter = new StringHttpMessageConverter();
-        converter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN));
-
-        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-        messageConverters.add(converter);
-        return messageConverters;
-    }
-
 
     @Override
     public Documents getArticleUrlPathByEan(String barCode, String countryCode, String salesLine, String languageCode) throws Exception {

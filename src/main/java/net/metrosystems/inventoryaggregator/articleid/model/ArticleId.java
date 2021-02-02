@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.articleId.model;
+package net.metrosystems.inventoryaggregator.articleid.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

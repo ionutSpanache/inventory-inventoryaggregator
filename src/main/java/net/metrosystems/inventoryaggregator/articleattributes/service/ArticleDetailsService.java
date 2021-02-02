@@ -265,7 +265,7 @@ public class ArticleDetailsService {
     CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData = new CompletableFuture<>();
     try {
       rawArticleStoreMasterData = rawArticleStoreMasterDataRepository
-          .getRawArticleStoreMasterData(articleId, countryCode, salesLine, languageCode, storeNo);
+          .getRawArticleStoreMasterData(articleId, countryCode, salesLine, storeNo);
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {

@@ -1,9 +1,9 @@
-package net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.client;
+package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.config.ConfigArticleCacheAAA;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.model.Documents;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.model.Filter;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.ConfigArticleCacheAAA;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.Filter;
 import net.metrosystems.inventoryaggregator.config.ObjectMapperCustom;
 import net.metrosystems.inventoryaggregator.config.RestTemplate.RestTemplateCustom;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class FilterAAAClient {
                 .encode();
         System.out.println("FilterAAAClient.getFilteredDocuments uriComponents:" + uriComponents.toUri().toString());
         //todo add suport for multi page response.
-        String filterAsString = null;
+        String filterAsString;
         try {
             filterAsString = ObjectMapperCustom.getMapper().writeValueAsString(filter);
         } catch (JsonProcessingException e) {
@@ -47,7 +47,7 @@ public class FilterAAAClient {
                 .buildAndExpand(nextPage)
                 .encode();
         System.out.println("FilterAAAClient.getFilteredDocuments uriComponents:" + uriComponents.toUri().toString());
-        String filterAsString = null;
+        String filterAsString;
         try {
             filterAsString = ObjectMapperCustom.getMapper().writeValueAsString(filter);
         } catch (JsonProcessingException e) {

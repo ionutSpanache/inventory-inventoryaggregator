@@ -28,6 +28,8 @@ public class ArticleCacheIapplClient //implements ArticleCacheClient
     @Value("${ARTICLE_CACHE_FILTER_PATH}")
     private String articleCacheFilterPath;
 
+    private String language = "&language=%s";
+
     private RestTemplate restTemplateDocuments;
     private RestTemplate restTemplateFilter;
 
@@ -70,7 +72,7 @@ public class ArticleCacheIapplClient //implements ArticleCacheClient
     public String getArticleUrlPathByEan(String ean, String countryCode, String languageCode) {
         return getForArticleCacheURL(
                 String.format(
-                        articleCacheServiceHost + articleCacheFilterPath + "?salesBarcode=%s" + "&language=%s",
+                        articleCacheServiceHost + articleCacheFilterPath + "?salesBarcode=%s" + language,
                         countryCode.toUpperCase(), ean, languageCode.toUpperCase()));
 
     }
@@ -78,7 +80,7 @@ public class ArticleCacheIapplClient //implements ArticleCacheClient
     public String getArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String languageCode) {
         return getForArticleCacheURL(
                 String.format(
-                        articleCacheServiceHost + articleCacheFilterPath + "?mmsArtNo=%d" + "&language=%s",
+                        articleCacheServiceHost + articleCacheFilterPath + "?mmsArtNo=%d" + language,
                         countryCode.toUpperCase(), mmsArtNo, languageCode.toUpperCase()));
     }
 
@@ -86,14 +88,14 @@ public class ArticleCacheIapplClient //implements ArticleCacheClient
                                                   String countryCode, String languageCode) {
         return getForArticleCacheURL(
                 String.format(
-                        articleCacheServiceHost + articleCacheFilterPath + "?mmsArtNo=%d" + "&variantNo=%d" + "&bundleNo=%d" + "&language=%s",
+                        articleCacheServiceHost + articleCacheFilterPath + "?mmsArtNo=%d" + "&variantNo=%d" + "&bundleNo=%d" + language,
                         countryCode.toUpperCase(), articleNumber, variantNumber, bundleNumber, languageCode.toUpperCase()));
     }
 
     public String getArticleUrlPathBySubsysArtNo(Long subsysArtNo, String countryCode, String languageCode) {
         return getForArticleCacheURL(
                 String.format(
-                        articleCacheServiceHost + articleCacheFilterPath + "?subsysNo=%d" + "&language=%s",
+                        articleCacheServiceHost + articleCacheFilterPath + "?subsysNo=%d" + language,
                         countryCode.toUpperCase(), subsysArtNo, languageCode.toUpperCase()));
     }
 
@@ -101,7 +103,7 @@ public class ArticleCacheIapplClient //implements ArticleCacheClient
         String[] articleCacheDocumentURLs = getForArticleCacheURL(
 
                 String.format(
-                        articleCacheServiceHost + articleCacheFilterPath + "?mmsArtNo=%s" + "&language=%s",
+                        articleCacheServiceHost + articleCacheFilterPath + "?mmsArtNo=%s" + language,
                         countryCode.toUpperCase(), mmsArtNo, languageCode.toUpperCase()))
                 .split("\\r?\\n");
         return Arrays.asList(articleCacheDocumentURLs);

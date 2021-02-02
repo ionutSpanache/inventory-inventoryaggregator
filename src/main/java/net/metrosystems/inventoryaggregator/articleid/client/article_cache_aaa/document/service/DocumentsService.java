@@ -1,12 +1,12 @@
-package net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.service;
+package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service;
 
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.document.model.Documents;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.client.FilterAAAClient;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.model.Filter;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.model.KeysWithTypes;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.model.SubFilterKey;
-import net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.filter_aaa.service.FilterAAAService;
-import net.metrosystems.inventoryaggregator.articleId.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client.FilterAAAClient;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.Filter;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.KeysWithTypes;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.SubFilterKey;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.service.FilterAAAService;
+import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,8 +70,7 @@ public class DocumentsService {
         Filter filter = filterAAAService.initializeFilter(countryCode, salesLine);
         SubFilterKey subFilterKey = filterAAAService.addSubFilterKey(KeysWithTypes.salesBarcode, barCode, languageCode);
         filter.getFilterKeys().get(0).getSubFilterKeys().add(subFilterKey);
-        Documents documents = filterAAAClient.getFilteredDocuments(filter);
-        return documents;
+        return filterAAAClient.getFilteredDocuments(filter);
     }
 
     public Documents getDocumentsByArticleNumber(String countryCode, String salesLine, String languageCode, Long articleNumber) throws Exception {

@@ -28,11 +28,11 @@ public class AspectConfig {
     public void client() {
     }
 
-    @Pointcut("execution (* net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.*.*.*(..))")
+    @Pointcut("execution (* net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.*.*.*(..))")
     public void articleCacheAAA() {
     }
 
-    @Pointcut("execution (* net.metrosystems.inventoryaggregator.articleId.client.article_cache_aaa.config.*.*(..))")
+    @Pointcut("execution (* net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.*.*(..))")
     public void articleCacheAAAConfig() {
     }
 
