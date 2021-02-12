@@ -14,7 +14,7 @@ services:
   check: true
   secret: true
   probe:
-    initialdelay: 180
+    initialdelay: 60
     period: 10
   # These are the defaults and
   # needs to be enhanced for most services
@@ -28,7 +28,7 @@ services:
           cpu: "100m"
         limits:
           memory: "812Mi"
-          cpu: "0.5"
+          cpu: "2"
     pp:
       replicas: 3
       resources:
@@ -37,7 +37,7 @@ services:
           cpu: "1"
         limits:
           memory: "2Gi"
-          cpu: "1.5"
+          cpu: "2"
     prod:
       replicas: 6
       resources:
