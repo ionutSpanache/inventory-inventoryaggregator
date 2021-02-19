@@ -46,7 +46,7 @@ services:
           cpu: "0.1"
         limits:
           memory: "2Gi"
-          cpu: "1.5"
+          cpu: "2"
 # Specifies the files executed for tests on each environment. Need to be executable 'chmod +x'
 tests:
 # - stage: dev
