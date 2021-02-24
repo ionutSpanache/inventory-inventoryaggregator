@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-inventoryaggregator
+spec:
+  selector:
+    matchLabels:
+      service: inventoryaggregator
+  template:
+    metadata:
+      labels:
+        service: inventoryaggregator
+    spec:
+      containers:
+      - image: inventoryaggregator
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: secret
+          mountPath: "/etc/secrets"
+          readOnly: true
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /.well-known/live
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: inventoryaggregator
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /.well-known/ready
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        env:
+        - name: DRP_CF_KUBERNETES_MINION_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: DRP_CF_KUBERNETES_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: DRP_CF_KUBERNETES_HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DRP_CF_KUBERNETES_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: DRP_CF_KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: COMMIT_SHA
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['repository.commit_sha']
+        envFrom:
+        - configMapRef:
+            name: inventoryaggregator
+        - secretRef:
+            name: inventoryaggregator-application-secrets
+      imagePullSecrets:
+      - name: dockerlogin
+      volumes:
+      - name: secret
+        secret:
+          secretName: "inventoryaggregator-secret"

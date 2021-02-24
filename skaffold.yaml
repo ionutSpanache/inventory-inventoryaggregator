@@ -1,0 +1,38 @@
+apiVersion: skaffold/v2beta10
+kind: Config
+metadata:
+  name: inventoryaggregator
+build:
+  artifacts:
+  - image: inventoryaggregator
+deploy:
+  kustomize: {}
+  statusCheckDeadlineSeconds: 240
+profiles:
+  - name: dev-be-gcw1
+    deploy:
+      kustomize:
+        buildArgs:
+        - --enable_alpha_plugins
+        paths:
+        - waas-config/environments/be-gcw1/dev
+    activation:
+      - command: dev-be-gcw1
+  - name: pp-be-gcw1
+    deploy:
+      kustomize:
+        buildArgs:
+        - --enable_alpha_plugins
+        paths:
+        - waas-config/environments/be-gcw1/pp
+    activation:
+      - command: pp-be-gcw1
+  - name: prod-be-gcw1
+    deploy:
+      kustomize:
+        buildArgs:
+        - --enable_alpha_plugins
+        paths:
+        - waas-config/environments/be-gcw1/prod
+    activation:
+      - command: prod-be-gcw1
