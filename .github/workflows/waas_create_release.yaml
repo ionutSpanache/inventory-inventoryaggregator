@@ -1,0 +1,271 @@
+name: Build & Release
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - ".github/waas.yaml"
+      - ".github/secret-management.yaml"
+env:
+  SKAFFOLD_BUILD_ARTIFACT: skaffold_build_artifact.json
+  SOPS_VERSION: 3.6.1
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup tools
+      uses: metro-digital/setup-tools-for-waas@0.1.0
+      with:
+        version: 'waas/v1alpha3'
+    - name: Decrypt common secrets of all environments
+      id: common_secrets
+      uses: metro-digital-inner-source/sops-decrypt@v0.2.0
+      with:
+        version: ${{ env.SOPS_VERSION }}
+        file: 'waas-config/base/application.secrets.yaml'
+        gpg_key: ${{ secrets.GPG_KEY }}
+        output_type: json
+    - name: Login to container registry
+      run: |
+        username=$(echo $connection_string | cut -d: -f2 | cut -d/ -f3)
+        password=$(echo $connection_string | cut -d@ -f1 | cut -d: -f3)
+        hostname=$(echo $connection_string | cut -d@ -f2 | cut -d/ -f1)
+        echo -n "$password" | docker login "$hostname" -u "$username" --password-stdin
+      env:
+        connection_string: ${{ fromJson(steps.common_secrets.outputs.data).DRP_PF_DOCKER_1 }}
+    - name: Build & push image to container registry
+      run: |
+        tag=$(echo $GITHUB_SHA | cut -c1-7)
+        build_dockerfile="Dockerfile"
+        for file_name in "inventoryaggregatorDockerFile" "inventoryaggregatorDockerfile" "DockerFile"; do
+          [ -f "$file_name" ] && build_dockerfile=$(echo "$file_name") && break
+        done
+        docker build --build-arg CACHEBUST=`date +%s%N` -f $build_dockerfile -t registry.metroscales.io/inventory/inventoryaggregator:$tag .
+        docker push registry.metroscales.io/inventory/inventoryaggregator:$tag
+  deploy-dev-be-gcw1:
+    needs: [build]
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup tools
+      uses: metro-digital/setup-tools-for-waas@0.1.0
+      with:
+        version: 'waas/v1alpha3'
+    - name: Set docker tag
+      run: |
+        tag=$(echo $GITHUB_SHA | cut -c1-7)
+        echo "TAG=$tag" >> $GITHUB_ENV
+    - name: Decrypt common secrets of all environments
+      id: secrets
+      uses: metro-digital-inner-source/sops-decrypt@v0.2.0
+      with:
+        version: ${{ env.SOPS_VERSION }}
+        file: 'waas-config/base/application.secrets.yaml'
+        gpg_key: ${{ secrets.GPG_KEY }}
+        output_type: json
+    - name: Setup deployment technical user
+      id: deployment_technical_user
+      run: |
+        access_token=$(curl -sSL -X POST -k \
+                      -H 'Content-Type:application/x-www-form-urlencoded' \
+                      -u "${{ secrets.PRODUCT_INVENTORY_TU_ID }}:${{ secrets.PRODUCT_INVENTORY_TU_SECRET }}" \
+                      -d "grant_type=client_credentials&realm_id=PENG_2TR_RLM&scope=clnt%3Dpcui&client_id=${{ secrets.PRODUCT_INVENTORY_TU_ID }}" \
+                      https://idam.metrosystems.net/authorize/api/oauth2/access_token \
+                      | jq -rc .access_token)
+        echo "::add-mask::$access_token"
+        echo "::set-output name=token::$access_token"
+    - name: Setup kubectl config for dev-be-gcw1
+      run: |
+        environment="inventory-dev"
+        kubectl config set-cluster ${environment} --server=${{ secrets.K8S_DEV_CLUSTER_URL }} --insecure-skip-tls-verify
+        kubectl config set-credentials ${environment}-user \
+        --auth-provider=oidc \
+        --auth-provider-arg=idp-issuer-url=https://idam.metrosystems.net \
+        --auth-provider-arg=client-id=${{ secrets.PRODUCT_INVENTORY_TU_ID }} \
+        --auth-provider-arg=id-token=${{ steps.deployment_technical_user.outputs.token }}
+        kubectl config set-context ${environment} --cluster=${environment} --namespace=${environment} --user=${environment}-user
+        kubectl config use-context ${environment}
+    - name: Produce skaffold build artifact
+      run: |
+        tag=${{ env.TAG }}
+        SKAFFOLD_UPDATE_CHECK=false \
+        skaffold build --default-repo=registry.metroscales.io/inventory --tag=$tag -q --dry-run > ${{ env.SKAFFOLD_BUILD_ARTIFACT }}
+    - name: Check if k8s deployment requires migration
+      id: migration
+      run: |
+        deploymentExists=$(kubectl get deployments | (grep 'inventory-inventoryaggregator' || true))
+        if [ -n "$deploymentExists" ]; then
+          provider=$(kubectl get deployment inventory-inventoryaggregator -o jsonpath='{.metadata.labels.provider}')
+          if [ "$provider" == "deployment-controller" ]; then
+            echo "::set-output name=needed::true"
+          fi
+        fi
+    - name: Migrate deployment definition if required
+      if: steps.migration.outputs.needed == 'true'
+      run: |
+        SKAFFOLD_UPDATE_CHECK=false \
+        skaffold render -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p dev-be-gcw1 \
+          | yq -j -d'*' r  - \
+          | jq 'select(.kind == "Deployment")' \
+          | kubectl replace --save-config -f -
+    - name: Get repository information
+      uses: octokit/request-action@v2.x
+      id: repo_information
+      with:
+        route: GET /repos/{owner}/{repo}
+        owner: octokit
+        repo: request-action
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Deploy to dev-be-gcw1
+      run: |
+        LABELS="provider=waas,repository.name=${{ github.event.repository.name }},repository.id=${{ fromJson(steps.repo_information.outputs.data).id }},repository.commit_sha=${GITHUB_SHA}"
+        SKAFFOLD_UPDATE_CHECK=false \
+        skaffold deploy -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p dev-be-gcw1 -l "$LABELS"
+  deploy-pp-be-gcw1:
+    needs: [deploy-dev-be-gcw1]
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup tools
+      uses: metro-digital/setup-tools-for-waas@0.1.0
+      with:
+        version: 'waas/v1alpha3'
+    - name: Set docker tag
+      run: |
+        tag=$(echo $GITHUB_SHA | cut -c1-7)
+        echo "TAG=$tag" >> $GITHUB_ENV
+    - name: Decrypt common secrets of all environments
+      id: secrets
+      uses: metro-digital-inner-source/sops-decrypt@v0.2.0
+      with:
+        version: ${{ env.SOPS_VERSION }}
+        file: 'waas-config/base/application.secrets.yaml'
+        gpg_key: ${{ secrets.GPG_KEY }}
+        output_type: json
+    - name: Setup deployment technical user
+      id: deployment_technical_user
+      run: |
+        access_token=$(curl -sSL -X POST -k \
+                      -H 'Content-Type:application/x-www-form-urlencoded' \
+                      -u "${{ secrets.PRODUCT_INVENTORY_TU_ID }}:${{ secrets.PRODUCT_INVENTORY_TU_SECRET }}" \
+                      -d "grant_type=client_credentials&realm_id=PENG_2TR_RLM&scope=clnt%3Dpcui&client_id=${{ secrets.PRODUCT_INVENTORY_TU_ID }}" \
+                      https://idam.metrosystems.net/authorize/api/oauth2/access_token \
+                      | jq -rc .access_token)
+        echo "::add-mask::$access_token"
+        echo "::set-output name=token::$access_token"
+    - name: Setup kubectl config for pp-be-gcw1
+      run: |
+        environment="inventory-pp"
+        kubectl config set-cluster ${environment} --server=${{ secrets.K8S_PP_CLUSTER_URL }} --insecure-skip-tls-verify
+        kubectl config set-credentials ${environment}-user \
+        --auth-provider=oidc \
+        --auth-provider-arg=idp-issuer-url=https://idam.metrosystems.net \
+        --auth-provider-arg=client-id=${{ secrets.PRODUCT_INVENTORY_TU_ID }} \
+        --auth-provider-arg=id-token=${{ steps.deployment_technical_user.outputs.token }}
+        kubectl config set-context ${environment} --cluster=${environment} --namespace=${environment} --user=${environment}-user
+        kubectl config use-context ${environment}
+    - name: Produce skaffold build artifact
+      run: |
+        tag=${{ env.TAG }}
+        SKAFFOLD_UPDATE_CHECK=false \
+        skaffold build --default-repo=registry.metroscales.io/inventory --tag=$tag -q --dry-run > ${{ env.SKAFFOLD_BUILD_ARTIFACT }}
+    - name: Check if k8s deployment requires migration
+      id: migration
+      run: |
+        deploymentExists=$(kubectl get deployments | (grep 'inventory-inventoryaggregator' || true))
+        if [ -n "$deploymentExists" ]; then
+          provider=$(kubectl get deployment inventory-inventoryaggregator -o jsonpath='{.metadata.labels.provider}')
+          if [ "$provider" == "deployment-controller" ]; then
+            echo "::set-output name=needed::true"
+          fi
+        fi
+    - name: Migrate deployment definition if required
+      if: steps.migration.outputs.needed == 'true'
+      run: |
+        SKAFFOLD_UPDATE_CHECK=false \
+        skaffold render -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p pp-be-gcw1 \
+          | yq -j -d'*' r  - \
+          | jq 'select(.kind == "Deployment")' \
+          | kubectl replace --save-config -f -
+    - name: Get repository information
+      uses: octokit/request-action@v2.x
+      id: repo_information
+      with:
+        route: GET /repos/{owner}/{repo}
+        owner: octokit
+        repo: request-action
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Deploy to pp-be-gcw1
+      run: |
+        LABELS="provider=waas,repository.name=${{ github.event.repository.name }},repository.id=${{ fromJson(steps.repo_information.outputs.data).id }},repository.commit_sha=${GITHUB_SHA}"
+        SKAFFOLD_UPDATE_CHECK=false \
+        skaffold deploy -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p pp-be-gcw1 -l "$LABELS"
+  release:
+    needs: [deploy-pp-be-gcw1]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup tools
+      uses: metro-digital/setup-tools-for-waas@0.1.0
+      with:
+        version: 'waas/v1alpha3'
+    - name: Set container image tag
+      run: |
+        tag=$(echo $GITHUB_SHA | cut -c1-7)
+        echo "TAG=$tag" >> $GITHUB_ENV
+    - name: Set changelog subject
+      id: changelog
+      run: echo ::set-output name=subject::$(git log -1 --format="%s")
+    - name: Produce skaffold build artifact
+      run: |
+        tag=${{ env.TAG }}
+        SKAFFOLD_UPDATE_CHECK=false \
+        skaffold build --default-repo=registry.metroscales.io/inventory/inventoryaggregator --tag=$tag -q --dry-run > ${{ env.SKAFFOLD_BUILD_ARTIFACT }}
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.TAG }}
+        release_name: ${{ env.TAG }}
+        body: |
+          **Changes**
+          - ${{ steps.changelog.outputs.subject }}
+        draft: false
+        prerelease: false
+    - name: Upload release artifact
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.SKAFFOLD_BUILD_ARTIFACT }}
+        asset_name: ${{ env.SKAFFOLD_BUILD_ARTIFACT }}
+        asset_content_type: application/json
+  notification:
+    needs: [release]
+    runs-on: self-hosted
+    if: always()
+    steps:
+    - name: Set workflow conclusion
+      uses: technote-space/workflow-conclusion-action@v1
+    - run: |
+        echo ${{ env.WORKFLOW_CONCLUSION }}
+    - name: Send notification email on workflow failure
+      if: contains( env.WORKFLOW_CONCLUSION, 'failure' )
+      uses: wadeww/send-email-action@master
+      with:
+        server_address: viruswall.mgi.de
+        port: 25
+        subject: GitHub WaaS workflow run failed
+        body: |
+          WaaS workflow failed for ${{ github.repository }}:
+          Commit message: ${{ github.event.head_commit.message }}
+          Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        to: 'alin.ciubotariu01@metrosystems.net, george.dumitrascu@metrosystems.net, cristiangabriel.jena@metrosystems.net'
+        from: do-not-reply@metrosystems.net
