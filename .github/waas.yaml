@@ -24,7 +24,7 @@ services:
     check: true
     secret: true
     probe:
-      initialdelay: 60
+      initialdelay: 180
       period: 10
     perStageConfiguration: true
     stageConfig:
