@@ -1,20 +1,20 @@
-apiVersion: waas/v1alpha3
+apiVersion: waas/v1alpha4
 _extends: .github
 subscribe: true
 stages:
   - environment: dev
     tags:
-      - be-gcw1
+      - name: be-gcw1
     deployOn:
       - push
   - environment: pp
     tags:
-      - be-gcw1
+      - name: be-gcw1
     deployOn:
       - push
   - environment: prod
     tags:
-      - be-gcw1
+      - name: be-gcw1
 customer: mcc
 vertical: inventory
 multistage: true
