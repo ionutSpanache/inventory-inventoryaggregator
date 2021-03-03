@@ -1,14 +1,28 @@
-apiVersion: skaffold/v2beta10
+apiVersion: skaffold/v2beta12
 kind: Config
 metadata:
   name: inventoryaggregator
 build:
   artifacts:
   - image: inventoryaggregator
+    docker:
+      dockerfile: Dockerfile
+  tagPolicy:
+    gitCommit:
+      variant: AbbrevCommitSha
+      ignoreChanges: true
+  local:
+    push: false
 deploy:
   kustomize: {}
   statusCheckDeadlineSeconds: 240
 profiles:
+  - name: push
+    build:
+      local:
+        push: true
+    activation:
+      - command: push
   - name: dev-be-gcw1
     deploy:
       kustomize:

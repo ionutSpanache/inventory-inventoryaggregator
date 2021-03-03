@@ -26,9 +26,9 @@ jobs:
       with:
         ref: ${{ env.release }}
     - name: Setup tools
-      uses: metro-digital/setup-tools-for-waas@0.1.0
+      uses: metro-digital/setup-tools-for-waas@v0.x
       with:
-        version: 'waas/v1alpha3'
+        version: 'waas/v1alpha4'
     - name: Decrypt common secrets of all environments
       uses: metro-digital-inner-source/sops-decrypt@v0.2.0
       with:
@@ -51,12 +51,16 @@ jobs:
       id: k8s
       run: |
         stage=$(echo "${{ env.stage }}" | tr '[:lower:]' '[:upper:]')
+        stage_with_dc=$(echo "${stage}_${{ env.datacenter }}" | tr '[:lower:]' '[:upper:]' | sed 's/-/_/g')
         key_name="K8S_${stage}_CLUSTER_URL"
-        echo "::set-output name=url::$key_name"
+        key_name_with_dc="K8S_${stage_with_dc}_CLUSTER_URL"
+        echo "::set-output name=key_name::$key_name"
+        echo "::set-output name=key_name_with_dc::$key_name_with_dc"
     - name: Setup kubectl config for ${{ env.stage }}
       run: |
         environment="inventory-${{ env.stage }}"
-        kubectl config set-cluster ${environment} --server=$K8S_URL --insecure-skip-tls-verify
+        k8s_api=`[ ! -z "${{ secrets[steps.k8s.outputs.key_name_with_dc] }}" ] && echo ${{ secrets[steps.k8s.outputs.key_name_with_dc] }} || echo ${{ secrets[steps.k8s.outputs.key_name] }}`
+        kubectl config set-cluster ${environment} --server=${k8s_api} --insecure-skip-tls-verify
         kubectl config set-credentials ${environment}-user \
         --auth-provider=oidc \
         --auth-provider-arg=idp-issuer-url=https://idam.metrosystems.net \
@@ -64,8 +68,6 @@ jobs:
         --auth-provider-arg=id-token=${{ steps.deployment_technical_user.outputs.token }}
         kubectl config set-context ${environment} --cluster=${environment} --namespace=${environment} --user=${environment}-user
         kubectl config use-context ${environment}
-      env:
-        K8S_URL: ${{ secrets[steps.k8s.outputs.url] }}
     - name: Produce skaffold build artifact
       run: |
         tag=${{ env.release }}
@@ -99,7 +101,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Deploy to ${{ env.stage }}
       run: |
-        LABELS="provider=waas,repository.name=${{ github.event.repository.name }},repository.id=${{ fromJson(steps.repo_information.outputs.data).id }},repository.commit_sha=${GITHUB_SHA}"
+        tag=${{ env.release }}
+        stage="${{ env.stage }}"
+        LABELS="provider=waas,repository.name=${{ github.event.repository.name }},repository.id=${{ fromJson(steps.repo_information.outputs.data).id }},repository.commit_sha=${GITHUB_SHA},tags.datadoghq.com/env=${stage},tags.datadoghq.com/version=${tag}"
         SKAFFOLD_UPDATE_CHECK=false \
         skaffold deploy -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p ${{ env.stage }}-${{ env.datacenter }} -l "$LABELS"
   notification:
