@@ -9,7 +9,7 @@ class ArticleIdServiceTest {
 
 
     @Test
-    void getArticleIdByBarcode() {
+    public void getArticleIdByBarcode() {
 
     }
 }

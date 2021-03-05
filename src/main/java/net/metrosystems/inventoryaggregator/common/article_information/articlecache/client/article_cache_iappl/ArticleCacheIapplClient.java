@@ -1,5 +1,8 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_iappl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,10 +13,6 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /*
  * Old service reading from OLD Article cache api IAPPL
@@ -28,10 +27,10 @@ public class ArticleCacheIapplClient //implements ArticleCacheClient
     @Value("${ARTICLE_CACHE_FILTER_PATH}")
     private String articleCacheFilterPath;
 
-    private String language = "&language=%s";
+    private final String language = "&language=%s";
 
-    private RestTemplate restTemplateDocuments;
-    private RestTemplate restTemplateFilter;
+    private final RestTemplate restTemplateDocuments;
+    private final RestTemplate restTemplateFilter;
 
     @Autowired
     public ArticleCacheIapplClient(RestTemplateBuilder restTemplateBuilder,

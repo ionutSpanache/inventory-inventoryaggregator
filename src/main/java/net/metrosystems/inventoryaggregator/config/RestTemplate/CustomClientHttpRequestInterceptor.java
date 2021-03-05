@@ -10,7 +10,7 @@ import org.springframework.http.client.ClientHttpResponse;
 
 public class CustomClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
 
-  private Logger logger = LoggerFactory.getLogger(CustomClientHttpRequestInterceptor.class);
+  private final Logger logger = LoggerFactory.getLogger(CustomClientHttpRequestInterceptor.class);
 
   @Override
   public ClientHttpResponse intercept(HttpRequest request, byte[] bytes, ClientHttpRequestExecution execution) throws IOException {

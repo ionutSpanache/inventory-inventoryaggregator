@@ -2,6 +2,8 @@ package net.metrosystems.inventoryaggregator.config.monitoring.aspect;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import java.util.List;
+import java.util.Optional;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -9,9 +11,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
 
 @Component
 @Aspect
@@ -52,13 +51,6 @@ public class MetricAspect extends AspectHelper {
                         .builder(String.format("%s.%s.%sTimer", verticalName, serviceName, point.getStaticPart().getSignature().getName()))
                         .register(registry));
 
-//        return timer.recordCallable(() -> {
-//            try {
-//                return point.proceed();
-//            } catch (Throwable throwable) {
-//                throw new RuntimeException(throwable);
-//            }
-//        });
         ThrowableHolder holder = new ThrowableHolder();
         Object result = timer.recordCallable(() -> {
             try {

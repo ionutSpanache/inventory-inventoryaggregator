@@ -6,8 +6,8 @@ public enum KeysWithTypes {
     variantNo("variantNo", "long"),
     bundleNo("bundleNo", "long"),
     subsysNo("subsysNo", "long");
-    private String code;
-    private String type;
+    private final String code;
+    private final String type;
 
     KeysWithTypes(String code, String type) {
         this.code = code;

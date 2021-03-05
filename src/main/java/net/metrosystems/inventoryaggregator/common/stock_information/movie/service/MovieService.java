@@ -1,17 +1,20 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.service;
 
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.client.MovieClient;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.client.MovieClient;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAdapter;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieOpenOrder;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Stock;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetails;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MovieService {
 
-  private MovieClient movieClient;
+  private final MovieClient movieClient;
 
   @Autowired
   public MovieService(MovieClient pMovieClient) {
@@ -127,10 +130,6 @@ public class MovieService {
       for (StockDetails stockDetails : stockDetailsList) {
         if (stockDetails.getReturnCode() == 0) {
             movieAdapterConsignment = transformStockDetailToMovieAdapter(stockDetails);
-/*            if (consignmentStockList != null && !consignmentStockList.isEmpty() && consignmentStockList.get(0).getReturnCode() == 0) {
-                movieAdapterConsignment.setStock(consignmentStockList.get(0).getConsignmentStock().floatValue());
-                movieAdapterConsignment.setConsignmentstock(true);
-            }*/
           return movieAdapterConsignment;
         }
       }

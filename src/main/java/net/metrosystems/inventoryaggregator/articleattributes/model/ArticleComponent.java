@@ -1,7 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,15 +13,15 @@ public class ArticleComponent implements Serializable {
 	public class ArticleBundle implements Serializable {
 		private static final long serialVersionUID = 4588860858277558630L;
 		Long bundleNumber;
-		
+
 		public ArticleBundle() {
-			
+
 		}
-		
+
 		public ArticleBundle(Long bundleNumber) {
 			this.bundleNumber = bundleNumber;
 		}
-		
+
 		@JsonIgnore
 		public long getSerialversionuid() {
 			return serialVersionUID;
@@ -41,16 +40,16 @@ public class ArticleComponent implements Serializable {
 			return "ArticleBundle [BundleNumber=" + bundleNumber + "]";
 		}
 	}
-	
+
 	public class ArticleVariant implements Serializable {
 		private static final long serialVersionUID = 5731686138457880568L;
 		private Long VariantNumber;
 		private List<ArticleBundle> bundleList;
-		
+
 		public ArticleVariant(){
-			
+
 		}
-		
+
 		public ArticleVariant(Long variantNumber, Long bundleNumber) {
 			this.VariantNumber = variantNumber;
 			this.bundleList = new ArrayList<ArticleBundle>(Arrays.asList(new ArticleBundle(bundleNumber)));
@@ -76,7 +75,7 @@ public class ArticleComponent implements Serializable {
 		public void setBundleList(List<ArticleBundle> bundleList) {
 			this.bundleList = bundleList;
 		}
-		
+
 		public Integer findBundleIndexByBundleNumber(Long bundleNumber) {
 			if(this.getBundleList() == null) {
 				return null;
@@ -91,7 +90,7 @@ public class ArticleComponent implements Serializable {
 			}
 			return -1;
 		}
-		
+
 		public void addBundle(Long bundleNumber) {
 			Integer bundleIndex = findBundleIndexByBundleNumber(bundleNumber);
 			if (bundleIndex == null) {
@@ -106,12 +105,12 @@ public class ArticleComponent implements Serializable {
 			return "ArticleVariant [VariantNumber=" + VariantNumber + ", bundeList=" + bundleList + "]";
 		}
 	}
-	
-	
+
+
 	private List<ArticleVariant> variantList;
-	
+
 	public ArticleComponent() {
-		
+
 	}
 
 	public static long getSerialversionuid() {
@@ -125,14 +124,14 @@ public class ArticleComponent implements Serializable {
 	public void setVariantList(List<ArticleVariant> variantList) {
 		this.variantList = variantList;
 	}
-	
+
 	private Integer findVariantIndex(Long variantNumber) {
 		if (this.variantList == null) {
 			return null;
 		}else {
 			Integer variantIndex = 0;
 			for(ArticleVariant articleVariant : variantList) {
-				if (articleVariant.getVariantNumber()==variantNumber) {
+				if (articleVariant.getVariantNumber().equals(variantNumber)) {
 					return variantIndex;
 				}
 				variantIndex++;
@@ -140,7 +139,7 @@ public class ArticleComponent implements Serializable {
 		}
 		return -1;
 	}
-	
+
 	public void addVariantBundle(
 			Long variantNumber,
 			Long bundleNumber) {

@@ -6,16 +6,17 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 
 public interface ArticleCacheClient {
 
-	public Documents getArticleUrlPathByEan(String ean, String countryCode, String salesLine, String languageCode) throws Exception;
+	Documents getArticleUrlPathByEan(String ean, String countryCode, String salesLine, String languageCode) throws Exception;
 
-	public Documents getArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
+	Documents getArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
 
-	public Documents getArticleUrlPathByArtVarBundle(Long articleNumber, Long variantNumber, Long bundleNumber, String countryCode, String salesLine, String languageCode) throws Exception;
+	Documents getArticleUrlPathByArtVarBundle(Long articleNumber, Long variantNumber, Long bundleNumber, String countryCode,
+      String salesLine, String languageCode) throws Exception;
 
-	public Documents getArticleUrlPathBySubsysArtNo(Long subsysArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
+	Documents getArticleUrlPathBySubsysArtNo(Long subsysArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
 
-	public Documents findArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
+	Documents findArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
 
-	public ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath);
+	ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath);
 
 }

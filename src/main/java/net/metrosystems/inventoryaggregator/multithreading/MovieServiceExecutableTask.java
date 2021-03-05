@@ -1,16 +1,15 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.logging.Logger;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticlePlannedDeliveryDate;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAdapter;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieOpenOrder;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.logging.Logger;
 
 
 // Implements the Callable interface adapted for a list of MovieAdapter objects
@@ -22,9 +21,9 @@ public class MovieServiceExecutableTask implements Callable<ArticleVariant> {
 	Integer storeNo;                  // store number to be used in the request to the Movie Web Service
 	Long articleNumber;               // article number to be used in the request to the Movie Web Service
 	ArticleVariant articleVariant;    // article variant number to be enhanced with Movie Data
-	
+
 	private static final Logger logger = Logger.getLogger("MovieServiceExecutableTask");      // handler for logging messages
-	
+
 	// Public constructor that sets the attributes for the call to Movie Web Service
 	public MovieServiceExecutableTask(MovieService movieService,
 			                          String countryCode,
@@ -39,8 +38,8 @@ public class MovieServiceExecutableTask implements Callable<ArticleVariant> {
 		this.articleNumber = articleNumber;
 		this.articleVariant = articleVariant;
 	}
-	
-	
+
+
 	// Getters section
 	public String getCountryCode() {
 		return countryCode;
@@ -62,7 +61,7 @@ public class MovieServiceExecutableTask implements Callable<ArticleVariant> {
 		return articleVariant;
 	}
 
-	
+
 	public String getIdAsString() {
 		return this.countryCode + "-" + this.movieSalesLine + "-" + this.storeNo.toString() + "-" +
 				this.articleNumber.toString() + "-" + this.articleVariant.getVariantNumber().toString();
@@ -76,7 +75,7 @@ public class MovieServiceExecutableTask implements Callable<ArticleVariant> {
 	public ArticleVariant call() throws Exception{
 		List<MovieAdapter> movieAdapterList = new ArrayList<>();
 		try {
-			logger.info("Thread " + this.getIdAsString() + " has started");;
+			logger.info("Thread " + this.getIdAsString() + " has started");
 			movieAdapterList = movieService.getArticleStockForVariant(
 					this.countryCode, this.movieSalesLine, this.storeNo,
 					this.articleNumber, this.articleVariant.getVariantNumber());
@@ -86,24 +85,24 @@ public class MovieServiceExecutableTask implements Callable<ArticleVariant> {
 			return null;
 		}
 	}
-	
-	
+
+
 	// Take the list of movie adapters received from the Movie Web Service
 	// and map them to the appropriate attributes in the current article variant
 	private void processMovieAdapterListIntoArticleVariant(List<MovieAdapter> movieAdapterList) {
-		
+
 		// Loop through the list of movie adapters
 		for(MovieAdapter movieAdapter : movieAdapterList) {
-			
+
 			// Search for the current bundle in the article variant
 			// Initialize the bundles index; needed later for updating the list of bundles
 			int bundleIndex = 0;
-			
+
 			// Loop though the list of bundles to find the current one
 			for(ArticleBundle articleBundle : this.articleVariant.getBundles()) {
-				
+
 				// Check if we found the current bundle
-				if(articleBundle.getBundleNumber() == movieAdapter.getBundleId()) {
+				if(articleBundle.getBundleNumber().equals(movieAdapter.getBundleId())) {
 					// This is the current bundle
 					// Map the attributes to the values from the current movie adapter
 					articleBundle.setStock(movieAdapter.getStock());
@@ -121,7 +120,7 @@ public class MovieServiceExecutableTask implements Callable<ArticleVariant> {
 					// Update the bundle in the bundle list of the variant to include the added data
 					this.articleVariant.getBundles().set(bundleIndex, articleBundle);
 				}
-				
+
 				// Move to the next bundle index
 				bundleIndex++;
 			}

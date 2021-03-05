@@ -1,20 +1,29 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.service;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.client.MovieClient;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.ConsignmentStock;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovementDetails;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovementDetailsMarkDownStock;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovementDetailsSystemStock;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAdapter;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Stock;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetails;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockRelatedData;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockSummary;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
 
 class MovieServiceTest {
 
@@ -46,7 +55,7 @@ class MovieServiceTest {
         MovieAdapter movieAdapter = movieService.getArticleStockForVariantBundle("NL","MCC", 10,
                 1234L, 1L, 1L);
         //assertEquals(true, movieAdapter.isConsignmentstock());
-        assertEquals(false, movieAdapter.isConsignmentstock());
+        Assertions.assertEquals(false, movieAdapter.isConsignmentstock());
 
     }
 
@@ -61,7 +70,7 @@ class MovieServiceTest {
 
         MovieAdapter movieAdapter = movieService.getArticleStockForVariantBundle("NL","MCC", 10,
                 1234L, 1L, 1L);
-        assertEquals(false, movieAdapter.isConsignmentstock());
+        Assertions.assertEquals(false, movieAdapter.isConsignmentstock());
 
     }
 

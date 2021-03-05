@@ -14,7 +14,7 @@ public class AclArticleStoreMasterDataClient {
 	@Autowired
 	RestTemplate restTemplate;
 
-	private String exceptionMessage = "exceptie ";
+	private final String exceptionMessage = "exceptie ";
 
 	@Value("${ACL_STORE_MASTER_DATA_HOST}")
 	private String aclArticleMasterDataHost;
@@ -46,16 +46,7 @@ public class AclArticleStoreMasterDataClient {
 	public List<ArticleStoreMasterData> getArticleStoreMasterDataBySubsys(String countryCode, String salesLine,
 			Integer storeNo, Integer subsys) {
 
-		/*String token = oauth2ClientTokenSevice.getAccessToken();
-		System.out.println("token bearer " + token);
-		List<ClientHttpRequestInterceptor> interceptors = this.restTemplate.getInterceptors();
-		if (CollectionUtils.isEmpty(interceptors)) {
-			interceptors = new ArrayList<>();
-		}
-		interceptors.add(new OAuth2Interceptor(token));
-		this.restTemplate.setInterceptors(interceptors);*/
-
-		aclArticleStoreMasterDataUrl = aclArticleMasterDataHost + aclArticleMasterDataPathBySubsys;
+    aclArticleStoreMasterDataUrl = aclArticleMasterDataHost + aclArticleMasterDataPathBySubsys;
 		String urlInUse = String.format(aclArticleStoreMasterDataUrl, countryCode.toUpperCase(),
 				salesLine.toUpperCase(), storeNo, subsys);
 		System.out.println(urlInUse);
@@ -73,16 +64,7 @@ public class AclArticleStoreMasterDataClient {
 	public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(String countryCode, String salesLine,
 			Integer storeNo, Integer articleNumber, Integer variantNumber, Integer bundleNumber) {
 
-		/*String token = oauth2ClientTokenSevice.getAccessToken();
-		System.out.println("token bearer " + token);
-		List<ClientHttpRequestInterceptor> interceptors = this.restTemplate.getInterceptors();
-		if (CollectionUtils.isEmpty(interceptors)) {
-			interceptors = new ArrayList<>();
-		}
-		interceptors.add(new OAuth2Interceptor(token));
-		this.restTemplate.setInterceptors(interceptors);*/
-
-		aclArticleStoreMasterDataUrl = aclArticleMasterDataHost + aclArticleMasterDataPathByArtVarBundle;
+    aclArticleStoreMasterDataUrl = aclArticleMasterDataHost + aclArticleMasterDataPathByArtVarBundle;
 		String urlInUse = String.format(aclArticleStoreMasterDataUrl, countryCode.toUpperCase(),
 				salesLine.toUpperCase(), storeNo, articleNumber, variantNumber, bundleNumber);
 		System.out.println("uri=" + urlInUse);

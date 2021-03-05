@@ -1,22 +1,21 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
+import java.util.concurrent.Callable;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclArticleStoreMasterDataService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
 
-import java.util.concurrent.Callable;
-
 public class AclArticleStoreMasterDataServiceExecutableTask implements Callable<ArticleVariant>{
 
-	private AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
-	private String countryCode;                                  
-	private String salesLine;                                    
-	private Integer storeNo;                                     
+	private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
+	private String countryCode;
+	private String salesLine;
+	private Integer storeNo;
 	private ArticleData articleData;
-	private ArticleVariant articleVariant;    
-	
+	private ArticleVariant articleVariant;
+
 	public AclArticleStoreMasterDataServiceExecutableTask( AclArticleStoreMasterDataService aclArticleStoreMasterDataService,String countryCode, String salesLine, Integer storeNo,	ArticleData articleData,ArticleVariant articleVariant) {
      this.aclArticleStoreMasterDataService = aclArticleStoreMasterDataService;
      this.countryCode = countryCode;
@@ -50,7 +49,7 @@ public class AclArticleStoreMasterDataServiceExecutableTask implements Callable<
 		this.storeNo = storeNo;
 	}
 
-	
+
 	public ArticleData getArticleData() {
 		return articleData;
 	}
@@ -71,35 +70,35 @@ public class AclArticleStoreMasterDataServiceExecutableTask implements Callable<
 		return this.countryCode + "-" + this.salesLine + "-" + this.storeNo + "-" +
 				this.articleData.getArticleNumber() + "-" + this.articleVariant.getVariantNumber().toString();
 	}
-	
+
 	private void processAclArticleStoreMasterData() {
 		ArticleStoreMasterData articleStoreMasterData = new ArticleStoreMasterData();
 		int bundleIndex = 0;
 		for(ArticleBundle articleBundle : articleVariant.getBundles()) {
 			try {
-				articleStoreMasterData = aclArticleStoreMasterDataService.getArticleStoreMasterData(countryCode, salesLine, storeNo, 
+				articleStoreMasterData = aclArticleStoreMasterDataService.getArticleStoreMasterData(countryCode, salesLine, storeNo,
                                                                                                     Math.toIntExact(this.articleData.getArticleNumber()),
 						                                                                            Math.toIntExact(articleVariant.getVariantNumber()),
 						                                                                            Math.toIntExact(articleBundle.getBundleNumber())
 						                                                                            );
-						
-						
+
+
 				if (articleStoreMasterData != null) {
 					try {
 					 articleData.setDepartmentNumber(Long.valueOf(articleStoreMasterData.getDepartmentNumber()));
 					}catch(Exception e) {
-					 System.out.println(e);	
+					 System.out.println(e);
 					}
 					articleBundle.setPriorityAssortmentCode(articleStoreMasterData.getPriorityAssortmentCode());
 					articleVariant.getBundles().set(bundleIndex, articleBundle);
 				}
-			}catch (Exception e) {   
+			}catch (Exception e) {
 				System.out.println("expeption "+e);
 			}
 			bundleIndex++;
-		}	
+		}
 	}
-	
+
 	@Override
 	public ArticleVariant call() throws Exception{
 		try {

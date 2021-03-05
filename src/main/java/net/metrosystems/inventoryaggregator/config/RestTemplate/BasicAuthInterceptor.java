@@ -12,7 +12,7 @@ import org.springframework.http.client.ClientHttpResponse;
 @Order(2)
 public class BasicAuthInterceptor implements ClientHttpRequestInterceptor {
 
-    private ConfigArticleCacheAAA configArticleCacheAAA;
+    private final ConfigArticleCacheAAA configArticleCacheAAA;
 
 
     public BasicAuthInterceptor(ConfigArticleCacheAAA configArticleCacheAAA) {

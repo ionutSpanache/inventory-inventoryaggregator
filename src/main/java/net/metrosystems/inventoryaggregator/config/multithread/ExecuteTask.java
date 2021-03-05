@@ -1,5 +1,5 @@
 package net.metrosystems.inventoryaggregator.config.multithread;
 
 public interface ExecuteTask {
-    public Object Execute(Object ExecutorRequest);
+    Object Execute(Object ExecutorRequest);
 }

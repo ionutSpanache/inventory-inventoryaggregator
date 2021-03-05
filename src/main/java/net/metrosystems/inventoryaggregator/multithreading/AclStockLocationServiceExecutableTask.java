@@ -1,18 +1,17 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
-import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclBundleStockLocation;
-import net.metrosystems.inventoryaggregator.common.stock_location.acl.service.AclStockService;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
+import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclBundleStockLocation;
+import net.metrosystems.inventoryaggregator.common.stock_location.acl.service.AclStockService;
+import org.apache.commons.lang3.StringUtils;
 
 public class AclStockLocationServiceExecutableTask implements Callable<ArticleVariant> {
 
@@ -22,9 +21,9 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 	Integer storeNo;                                   // store number to be used in the request to the ACL ordering Web Service
 	Long articleNumber;                                // article number to be used in the request to the ACL ordering Web Service
 	ArticleVariant articleVariant;                     // article variant number to be enhanced with ACL ordering Data
-	
+
 	private static final Logger logger = Logger.getLogger("AclStockLocationServiceExecutableTask");  // handler for logging messages
-	
+
 	// Public constructor that sets the attributes for the call to ACL ordering Web Service
 	public AclStockLocationServiceExecutableTask(AclStockService aclStockService,
                                                  String countryCode,
@@ -39,8 +38,8 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 		this.articleNumber = articleNumber;
 		this.articleVariant = articleVariant;
 	}
-	
-	
+
+
 	// Getters section
 	public String getCountryCode() {
 		return countryCode;
@@ -62,7 +61,7 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 		return articleVariant;
 	}
 
-	
+
 	public String getIdAsString() {
 		return this.countryCode + "-" + this.salesLine + "-" + this.storeNo.toString() + "-" +
 				this.articleNumber.toString() + "-" + this.articleVariant.getVariantNumber().toString();
@@ -87,8 +86,8 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 			return null;
 		}
 	}
-	
-	
+
+
 	// Take the ACL ordering data received from the ACL Ordering Web Service
 	// and map it to the appropriate attributes in the current article variant
 	private void processAclStockLocationDataIntoArticleVariant(List<AclBundleStockLocation> aclBundleStockLocations) {
@@ -96,7 +95,7 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 		for(ArticleBundle articleBundle : articleVariant.getBundles()) {
 			if (aclBundleStockLocations != null) {
 				for(AclBundleStockLocation aclBundleStockLocation : aclBundleStockLocations) {
-					if(articleBundle.getBundleNumber() == aclBundleStockLocation.getBundleNo()) {
+					if(articleBundle.getBundleNumber().equals(aclBundleStockLocation.getBundleNo())) {
 						articleBundle.setStockLocations(transformAclBundleStockLocationsToArticleStockLocationListByBundle(
 							aclBundleStockLocations,
 							articleBundle.getBundleNumber()));
@@ -107,8 +106,8 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 			bundleIndex++;
 			}
 	}
-	
-	
+
+
 	private List<ArticleStockLocation> transformAclBundleStockLocationsToArticleStockLocationListByBundle(
 			List<AclBundleStockLocation> aclBundleStockLocations,
 			Long bundleNo) {
@@ -117,7 +116,7 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 			List<AclBundleStockLocation> aclStockLocationsForBundle = null;
 			try {
 				aclStockLocationsForBundle = aclBundleStockLocations.stream()
-						.filter(aclBundleStockLocation -> (aclBundleStockLocation.getBundleNo() == bundleNo))
+						.filter(aclBundleStockLocation -> (aclBundleStockLocation.getBundleNo().equals(bundleNo)))
 						.collect(Collectors.toList());
 			}catch (Exception e) {
 				return null;
@@ -155,5 +154,5 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 				+ ", storeNo=" + storeNo + ", articleNumber=" + articleNumber + ", variantNumber=" + articleVariant.getVariantNumber()
 				+ "]";
 	}
-	
+
 }

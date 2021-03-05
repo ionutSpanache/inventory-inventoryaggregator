@@ -1,17 +1,16 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Logger;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 
 //Extends the FutureTask class parameterized with a list of MovieAdapter objects
 public class ArticleCacheDocumentThreadResultTask extends FutureTask<ArticleCacheIhdsTree> {
-	
+
 	private static final Logger logger = Logger.getLogger("ArticleCacheDocumentThreadResultTask");      // handler for logging messages
-	private String name;
-	
+	private final String name;
+
 	// Implement the constructor of the class
 	// It has to receive a Callable object as a parameter
 	public ArticleCacheDocumentThreadResultTask(
@@ -19,7 +18,7 @@ public class ArticleCacheDocumentThreadResultTask extends FutureTask<ArticleCach
 		super(callable);
 		this.name = "ArticleCacheDocumentThreadResultTask: " + ((ArticleCacheDocumentServiceTask) callable).getIdAsString();
 	}
-	
+
 	// Actions to be executed when the current task is finalized
 	// Called automatically by the FutureTask class
 	@Override

@@ -1,7 +1,6 @@
 package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.codec.binary.Base64;

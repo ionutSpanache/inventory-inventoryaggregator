@@ -3,7 +3,6 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
@@ -34,11 +33,11 @@ public class ArticleCacheService {
 	@Autowired
 	DocumentsService documentsService;
 
-	private ArticleDataThreads articleDataThreads;
+	private final ArticleDataThreads articleDataThreads;
 
 	@Autowired
 	private ArticleCacheAAAClient articleCacheClient;
-	private ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
+	private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
 
 	@Autowired
 	public ArticleCacheService(ArticleDataThreads articleDataThreads, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient) {
@@ -297,7 +296,9 @@ public class ArticleCacheService {
     	boolean variantAlreadyExists = false;
     	if(!newArticleVariantList.isEmpty()) {
         	for(int i=0; i<newArticleVariantList.size(); i++) {
-        		if(newArticleVariantList.get(i).getVariantNumber() == articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getVariantNo()){
+        		if(newArticleVariantList.get(i).getVariantNumber().equals(
+								articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest()
+																		.getVariantNo())){
         			newArticleVariantList.get(i).getBundles().add(transformArticleCacheDocumentToArticleBundle(articleCacheDocument, storeNo));
         			variantAlreadyExists = true;
         		}
@@ -371,57 +372,11 @@ public class ArticleCacheService {
             }
 
             //todo: check if this approach has better performance
-/*			Boolean added = false;
-
-
-			while (!added) {
-				if (TaskExecutor.getNoTasks() < TaskExecutor.getExecutor().getMaxPoolSize() - 1) {
-					TaskExecutor.addTask();
-					added = true;
-					CompletableFuture articleVariantCompletableFuture = CompletableFuture.supplyAsync(() ->
-					{
-						try {
-							return transformArticleCacheDocumentToArticleVariant(
-									articleCacheClient.getArticleCacheDocumentByURL(articleCacheDocumentURL)
-									, storeNo);
-						} catch (Exception e) {
-							throw e;
-						}
-					}, TaskExecutor.getExecutor());
-					articleVariantCompletableFuture.thenRun(() -> {
-						TaskExecutor.removeTask();
-					});
-					articleVariantTasks.add(articleVariantCompletableFuture);
-				} else {
-					try {
-
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}*/
-        }
+		}
         //todo: check if this approach has better performance
         //todo:check here error for art 931988 001 001 in list are 5 but here 2 or 3 are readded
-/*
-		List<ArticleVariant> finalArticleVariantList = articleVariantList;
-		articleVariantTasks.forEach(
-				articleVariantTask -> {
-					try {
-						articleVariantTask.join();
-						finalArticleVariantList.add((ArticleVariant) articleVariantTask.get());
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-					}
-				}
-		);
-*/
 
-
-        for (ArticleCacheIhdsTree articleCacheDocument : articleDataThreads.getArticleCacheDocuments(articleCacheDocumentURLsWithsearchedDBundleOnFirstPosition)) {
+		for (ArticleCacheIhdsTree articleCacheDocument : articleDataThreads.getArticleCacheDocuments(articleCacheDocumentURLsWithsearchedDBundleOnFirstPosition)) {
 
             articleVariantList = addArticleCacheDocumentToArticleVariantList(articleVariantList, articleCacheDocument, storeNo);
         }
