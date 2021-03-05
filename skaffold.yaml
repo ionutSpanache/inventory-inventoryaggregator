@@ -15,7 +15,7 @@ build:
     push: false
 deploy:
   kustomize: {}
-  statusCheckDeadlineSeconds: 240
+  statusCheckDeadlineSeconds: 360
 profiles:
   - name: push
     build:
