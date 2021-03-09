@@ -97,6 +97,15 @@ public class ArticleCacheDataGroup {
         this.singleItemSalesBarcode = singleItemSalesBarcode;
     }
 
+    private String generalSupplierName;
+    public String getGeneralSupplierName() {
+        return generalSupplierName;
+    }
+    @XmlElement(name = "GENERAL_SUPPLIER_NAME")
+    public void setGeneralSupplierName(String generalSupplierName) {
+        this.generalSupplierName = generalSupplierName;
+    }
+
     private Byte salesBundleIndicator;
     public Byte getSalesBundleIndicator() {
         return salesBundleIndicator;

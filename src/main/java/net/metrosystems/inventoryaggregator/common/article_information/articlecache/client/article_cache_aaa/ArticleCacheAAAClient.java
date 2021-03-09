@@ -3,6 +3,7 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
@@ -15,6 +16,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class ArticleCacheAAAClient implements ArticleCacheClient {
@@ -26,6 +29,12 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
     private String articleCacheServiceHost;
     @Value("${ARTICLE_CACHE_FILTER_PATH}")
     private String articleCacheFilterPath;
+
+    @Value("${ARTICLE_CACHE_SUPPLIER_INFORMATION}")
+    private String supplierInformationPath;
+
+    @Value("${ARTICLE_CACHE_SUPPLIER_INFORMATION_DEFAULT_ENVIRONMENT}")
+    private String defaultEnvironment;
 
     private final RestTemplate restTemplateArticleCache;
 
@@ -83,6 +92,18 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
         return getForArticleCacheObject(
                 articleCacheServiceHost + "/" + articleUrlPath,
                 ArticleCacheIhdsTree.class
+        );
+    }
+
+    @Override
+    public ArticleCacheIhdsTree getSupplierInformation(String countryCode, String salesLine, Optional<String> environment,
+        Long supplierNumber) {
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
+            articleCacheServiceHost + supplierInformationPath)
+            .buildAndExpand(countryCode, salesLine, environment.orElse(defaultEnvironment), supplierNumber);
+
+        return getForArticleCacheObject(uriComponents.toUriString(),
+            ArticleCacheIhdsTree.class
         );
     }
 

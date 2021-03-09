@@ -1,6 +1,7 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client;
 
 
+import java.util.Optional;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 
@@ -18,5 +19,7 @@ public interface ArticleCacheClient {
 	Documents findArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
 
 	ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath);
+
+	ArticleCacheIhdsTree getSupplierInformation(String countryCode, String salesLine, Optional<String> environment, Long supplierNumber);
 
 }
