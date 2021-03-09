@@ -1,7 +1,28 @@
 resources:
-- templates/deployment.yaml
-- templates/service.yaml
+  - templates/deployment.yaml
+  - templates/service.yaml
 configMapGenerator:
-- name: inventoryaggregator
-  envs:
-    - application.properties
+  - name: inventoryaggregator
+    envs:
+      - application.properties
+transformers:
+  - labels.yaml
+commonAnnotations:
+  ad.datadoghq.com/inventoryaggregator.logs: >-
+    [{"tags": [ "solution_id:S00409", "marc_id:A1459", "solution:mstore",
+    "vertical:inventory" ]}]
+patchesStrategicMerge:
+  - |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: inventory-inventoryaggregator
+    spec:
+      template:
+        spec:
+          containers:
+            - name: inventoryaggregator
+              env:
+                - name: DD_TAGS
+                  value: >-
+                    marc_id:A1459,solution:mstore,vertical:inventory,service:mstore.inventory.inventoryaggregator
