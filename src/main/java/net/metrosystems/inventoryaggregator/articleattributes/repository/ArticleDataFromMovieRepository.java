@@ -110,7 +110,8 @@ public class ArticleDataFromMovieRepository {
         movieAdapter.getLastSCQuantity(),
         movieAdapter.getLastSalesQuantity(),
         movieAdapter.getLastGRQuantity(),
-        movieAdapter.isConsignmentstock());
+        movieAdapter.isConsigStock(),
+        movieAdapter.getConsignmentStock());
   }
 
   private List<ArticlePlannedDeliveryDate> transformMovieAdapterToArticlePlannedDeliveryDateList(

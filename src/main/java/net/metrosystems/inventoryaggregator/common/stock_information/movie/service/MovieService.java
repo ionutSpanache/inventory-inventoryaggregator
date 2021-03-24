@@ -90,6 +90,13 @@ public class MovieService {
       movieAdapter.setStockCoverage(stockDetails.getStockRelatedData().getStockCoverage());
       movieAdapter.setDailyMeanSales(stockDetails.getStockRelatedData().getDailyMeanSales());
     }
+    if (stockDetails.getConsignmentStock() != null && !stockDetails.getConsignmentStock().isEmpty()) {
+      if (stockDetails.getConsignmentStock().get(0).getLastChange() != null
+              && !stockDetails.getConsignmentStock().get(0).getLastChange().isEmpty()) {
+        movieAdapter.setConsignmentStock(stockDetails.getConsignmentStock().get(0).getQuantity());
+        movieAdapter.setConsigStock(true);
+      }
+    }
     movieAdapter.setBlockedStock(stockDetails.getStockSummary().getBlockedStock());
     movieAdapter.setAvailableStock(stockDetails.getStockSummary().getAvailableStock());
     movieAdapter.setOpenGoodReceiving(stockDetails.getStockSummary().getOpenGoodReceiving());
