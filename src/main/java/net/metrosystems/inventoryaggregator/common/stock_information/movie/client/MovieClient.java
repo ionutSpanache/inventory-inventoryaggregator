@@ -86,29 +86,6 @@ public class MovieClient {
     return getDataFromMovie(countryCode, salesLine, storeNo, articleList);
   }
 
-  public List<ConsignmentStock> getConsignmentStockForArticleVariantBundle(
-          String countryCode,
-          String salesLine,
-          int storeNo,
-          Long articleNumber,
-          Long variant,
-          Long bundleNumber) {
-
-    ArticleConsignmentStock articleConsigStock = new ArticleConsignmentStock();
-    articleConsigStock.setArticleNo(articleNumber.intValue());
-    articleConsigStock.setVariant(variant.intValue());
-
-    Bundle bundle = new Bundle();
-    bundle.setBundleNo(bundleNumber);
-    List<Integer> bundleList = new ArrayList<>();
-    bundleList.add(bundleNumber.intValue());
-    articleConsigStock.setBundles(bundleList);
-
-    List<ArticleConsignmentStock> articleConsigStockList = new ArrayList<>();
-    articleConsigStockList.add(articleConsigStock);
-    return getConsignmentStockFromMovie(countryCode, salesLine, storeNo, articleConsigStockList);
-  }
-
   private List<StockDetails> getDataFromMovie(
       String countryCode, String salesLine, int storeNo, List<Article> articleList) {
     String urlInUse = String.format(movieStockServiceHost + "/cache");
@@ -149,33 +126,5 @@ public class MovieClient {
       return null;
     }
   }
-    private List<ConsignmentStock> getConsignmentStockFromMovie(
-            String countryCode, String salesLine, int storeNo, List<ArticleConsignmentStock> articleConsigStockList) {
-      String urlInUse = String.format(movieStockServiceHost + "/cache/consignmentstock");
 
-      List<Integer> storeNumber = new ArrayList<>();
-      storeNumber.add(storeNo);
-
-      MovieRequestConsignmentStockBody movieRequestConsigStock = new MovieRequestConsignmentStockBody();
-      movieRequestConsigStock.setConsumer("MSTORE");
-      movieRequestConsigStock.setCountry(countryCode.toUpperCase());
-      movieRequestConsigStock.setSalesLine(salesLine.toUpperCase());
-      movieRequestConsigStock.setLocationId(storeNumber);
-      movieRequestConsigStock.setArticles(articleConsigStockList);
-
-      ObjectMapper mapper = new ObjectMapper();
-      String jsonStringMovieConsigStock = null;
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
-
-      try {
-        jsonStringMovieConsigStock = mapper.writeValueAsString(movieRequestConsigStock);
-        HttpEntity<String> request = new HttpEntity<>(jsonStringMovieConsigStock, headers);
-        return restTemplate
-                .postForObject(urlInUse, request, ConsignmentStockResponse.class)
-                .getStockDetails();
-      } catch (Exception e) {
-        return null;
-      }
-  }
 }

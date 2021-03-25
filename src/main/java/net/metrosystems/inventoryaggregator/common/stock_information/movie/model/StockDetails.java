@@ -30,6 +30,7 @@ public class StockDetails {
     private List<Stock> virtualStock;
     private StockSummary stockSummary;
     private StockRelatedData stockRelatedData;
+    private List<ConsigmentStock> consignmentStock;
     private String message;
     private Integer returnCode;
 }
