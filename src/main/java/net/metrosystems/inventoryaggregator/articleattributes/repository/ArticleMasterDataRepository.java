@@ -26,8 +26,13 @@ public class ArticleMasterDataRepository {
   private final ForkJoinPool forkJoinPoolCustom;
 
   @Async("asyncExecutor")
-  public CompletableFuture<ArticleMasterData> getArticleMasterData(ArticleId articleId, String countryCode, String salesLine,
-      String languageCode, Integer storeNo) throws Exception {
+  public CompletableFuture<ArticleMasterData> getArticleMasterData(
+      ArticleId articleId,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo)
+      throws Exception {
     ArticleCacheFullData articleCacheFullData =
         getArticleCacheFullDataByArtVarBundle(
             articleId.getArticleNumber(),
@@ -52,7 +57,8 @@ public class ArticleMasterDataRepository {
           String languageCode,
           Integer storeNo)
           throws Exception {
-    List<ArticleMasterDataForArticleId> articleMasterDataForArticleIds = forkJoinPoolCustom
+    List<ArticleMasterDataForArticleId> articleMasterDataForArticleIds =
+        forkJoinPoolCustom
             .submit(
                 () ->
                     articleIdList.parallelStream()
@@ -130,9 +136,12 @@ public class ArticleMasterDataRepository {
           articleCacheFullData.getAssortmentCode(),
           articleCacheFullData.getBlockingCode(),
           articleCacheFullData.getActivationStatus(),
-          articleCacheFullData.getExpiryDays());
+          articleCacheFullData.getExpiryDays(),
+          articleCacheFullData.getPieceNetBuyingPrice(),
+          articleCacheFullData.getBundleNetBuyingPrice(),
+          articleCacheFullData.getPieceNetNetBuyingPrice(),
+          articleCacheFullData.getBundleNetNetBuyingPrice());
     }
     return null;
   }
-
 }

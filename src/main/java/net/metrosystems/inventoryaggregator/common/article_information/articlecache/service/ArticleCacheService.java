@@ -227,7 +227,11 @@ public class ArticleCacheService {
 				articleCacheDataGroup320.getAssortmentCode(),
 				articleCacheDataGroup320.getBlockingCode(),
 				articleCacheDataGroup320.getActivationStatus(),
-				articleCacheDataGroup200.getExpiryDays()
+				articleCacheDataGroup200.getExpiryDays(),
+				articleCacheDataGroup325.getPieceNetBuyingPrice(),
+				articleCacheDataGroup325.getBundleNetBuyingPrice(),
+				articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
+				articleCacheDataGroup325.getBundleNetNetBuyingPrice()
 				);
 	}
 
