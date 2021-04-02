@@ -36,4 +36,8 @@ public class ArticleCacheFullData {
     private Byte blockingCode;
     private Byte activationStatus;
     private Integer expiryDays;
+    private double pieceNetBuyingPrice;
+    private double bundleNetBuyingPrice;
+    private double pieceNetNetBuyingPrice;
+    private double bundleNetNetBuyingPrice;
 }

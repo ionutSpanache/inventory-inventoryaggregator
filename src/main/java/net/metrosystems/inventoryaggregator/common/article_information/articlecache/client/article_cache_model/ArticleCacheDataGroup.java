@@ -1,318 +1,461 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
+import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @XmlRootElement(name = "DataGroup")
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArticleCacheDataGroup {
 
-    /*Data Group 10*/
-    private int id;
-    public int getId() {
-        return id;
-    }
-    @XmlAttribute(name = "id")
-    public void setId(int id) {
-        this.id = id;
-    }
+  /*Data Group 10*/
+  private int id;
 
-    private String ownBrandId;
-    public String getOwnBrandId() {
-        return ownBrandId;
-    }
-    @XmlElement(name = "OWNBRANDID")
-    public void setOwnBrandId(String ownBrandId) {
-        this.ownBrandId = ownBrandId;
-    }
+  public int getId() {
+    return id;
+  }
 
-    /*Data Group 100*/
-    private Double vatPercent;
-    public Double getVatPercent() {
-        return vatPercent;
-    }
-    @XmlElement(name = "VATPERCENT")
-    public void setVatPercent(Double vatPercent) {
-        this.vatPercent = vatPercent;
-    }
+  @XmlAttribute(name = "id")
+  public void setId(int id) {
+    this.id = id;
+  }
 
-    private Double weightArticles;
-    public Double getWeightArticles() {
-        return weightArticles;
-    }
-    @XmlElement(name = "WEIGHTARTICLE")
-    public void setWeightArticles(Double weightArticles) {
-        this.weightArticles = weightArticles;
-    }
+  private String ownBrandId;
 
-    private String foodNonfoodIndicator;
-    public String getFoodNonfoodIndicator() {
-        return foodNonfoodIndicator;
-    }
-    @XmlElement(name = "INDICATORFOODNONFOOD")
-    public void setFoodNonfoodIndicator(String foodNonfoodIndicator) {
-        this.foodNonfoodIndicator = foodNonfoodIndicator;
-    }
+  public String getOwnBrandId() {
+    return ownBrandId;
+  }
 
-    private Long presentationMainMerchandiseGroup;
-    public Long getPresentationMainMerchandiseGroup() {
-        return presentationMainMerchandiseGroup;
-    }
-    @XmlElement(name = "PRESENTATIONMERCHANDISEMAINGROUP")
-    public void setPresentationMainMerchandiseGroup(Long presentationMainMerchandiseGroup) {
-        this.presentationMainMerchandiseGroup = presentationMainMerchandiseGroup;
-    }
+  @XmlElement(name = "OWNBRANDID")
+  public void setOwnBrandId(String ownBrandId) {
+    this.ownBrandId = ownBrandId;
+  }
 
-    private Integer presentationMerchandiseGroup;
-    public Integer getPresentationMerchandiseGroup() {
-        return presentationMerchandiseGroup;
-    }
-    @XmlElement(name = "PRESENTATIONMERCHANDISEGROUP")
-    public void setPresentationMerchandiseGroup(Integer presentationMerchandiseGroup) {
-        this.presentationMerchandiseGroup = presentationMerchandiseGroup;
-    }
+  /*Data Group 100*/
+  private Double vatPercent;
 
-    private Long presentationSubMerchandiseGroup ;
-    public Long getPresentationSubMerchandiseGroup () {
-        return presentationSubMerchandiseGroup ;
-    }
-    @XmlElement(name = "PRESENTATIONMERCHANDISESUBGROUP")
-    public void setPresentationSubMerchandiseGroup (Long presentationSubMerchandiseGroup ) {
-        this.presentationSubMerchandiseGroup  = presentationSubMerchandiseGroup ;
-    }
+  public Double getVatPercent() {
+    return vatPercent;
+  }
 
-    /*Data Group 200*/
-    private List<String> singleItemSalesBarcode;
-    public List<String> getSingleItemSalesBarcode() {
-        return singleItemSalesBarcode;
-    }
-    @XmlElement(name = "SINGLEITEMSALESBARCODE")
-    public void setSingleItemSalesBarcode(List<String> singleItemSalesBarcode) {
-        this.singleItemSalesBarcode = singleItemSalesBarcode;
-    }
+  @XmlElement(name = "VATPERCENT")
+  public void setVatPercent(Double vatPercent) {
+    this.vatPercent = vatPercent;
+  }
 
-    private String generalSupplierName;
-    public String getGeneralSupplierName() {
-        return generalSupplierName;
-    }
-    @XmlElement(name = "GENERAL_SUPPLIER_NAME")
-    public void setGeneralSupplierName(String generalSupplierName) {
-        this.generalSupplierName = generalSupplierName;
-    }
+  private Double weightArticles;
 
-    private Byte salesBundleIndicator;
-    public Byte getSalesBundleIndicator() {
-        return salesBundleIndicator;
-    }
-    @XmlElement(name = "SALESBUNDLEINDICATOR")
-    public void setSalesBundleIndicator(Byte salesBundleIndicator) {
-        this.salesBundleIndicator = salesBundleIndicator;
-    }
+  public Double getWeightArticles() {
+    return weightArticles;
+  }
 
-    private Integer expiryDays;
-    public Integer getExpiryDays() {
-        return  expiryDays;
-    }
-    @XmlElement(name = "EXPIRYDAYS")
-    public void setExpiryDays(Integer expiryDays) {
-        this.expiryDays = expiryDays;
-    }
+  @XmlElement(name = "WEIGHTARTICLE")
+  public void setWeightArticles(Double weightArticles) {
+    this.weightArticles = weightArticles;
+  }
 
-    /*Data Group 310*/
-    private Integer sellingBundleContent;
-    public Integer getSellingBundleContent() {
-        return sellingBundleContent;
-    }
-    @XmlElement(name = "SELLINGBUNDLECONTENT")
-    public void setSellingBundleContent(Integer sellingBundleContent) {
-        this.sellingBundleContent = sellingBundleContent;
-    }
+  private String foodNonfoodIndicator;
 
-    private Byte priceCheckCodeMccSalesLine;
-    public Byte getPriceCheckCodeMccSalesLine() {
-        return priceCheckCodeMccSalesLine;
-    }
-    @XmlElement(name = "PRICECHECKCODEMCCSALESLINE")
-    public void setPriceCheckCodeMccSalesLine(Byte priceCheckCodeMccSalesLine) {
-        this.priceCheckCodeMccSalesLine = priceCheckCodeMccSalesLine;
-    }
+  public String getFoodNonfoodIndicator() {
+    return foodNonfoodIndicator;
+  }
 
-    /*Data Group 320*/
-    private Integer assignedStoreSupplier;
-    public Integer getAssignedStoreSupplier() {
-        return assignedStoreSupplier;
-    }
-    @XmlElement(name = "ASSIGNEDSTORESUPPLIER")
-    public void setAssignedStoreSupplier(Integer assignedStoreSupplier) {
-        this.assignedStoreSupplier = assignedStoreSupplier;
-    }
+  @XmlElement(name = "INDICATORFOODNONFOOD")
+  public void setFoodNonfoodIndicator(String foodNonfoodIndicator) {
+    this.foodNonfoodIndicator = foodNonfoodIndicator;
+  }
 
-    private String assignedStoreSupplierType;
-    public String getAssignedStoreSupplierType() {
-        return assignedStoreSupplierType;
-    }
-    @XmlElement(name = "ASSIGNEDSTORESUPPLIERTYPE")
-    public void setAssignedStoreSupplierType(String assignedStoreSupplierType) {
-        this.assignedStoreSupplierType = assignedStoreSupplierType;
-    }
+  private Long presentationMainMerchandiseGroup;
 
-    private int hierarchySequenceStore;
-    public int getHierarchySequenceStore() {
-        return hierarchySequenceStore;
-    }
-    @XmlElement(name = "HIERARCHYSEQUENCESTORE")
-    public void setHierarchySequenceStore(int hierarchySequenceStore) {
-        this.hierarchySequenceStore = hierarchySequenceStore;
-    }
+  public Long getPresentationMainMerchandiseGroup() {
+    return presentationMainMerchandiseGroup;
+  }
 
-    private Byte activationStatus;
-    public Byte getActivationStatus() {
-        return activationStatus;
-    }
-    @XmlElement(name = "ACTIVATIONSTATUS")
-    public void setActivationStatus(Byte activationStatus) {
-        this.activationStatus = activationStatus;
-    }
+  @XmlElement(name = "PRESENTATIONMERCHANDISEMAINGROUP")
+  public void setPresentationMainMerchandiseGroup(Long presentationMainMerchandiseGroup) {
+    this.presentationMainMerchandiseGroup = presentationMainMerchandiseGroup;
+  }
 
-    private Byte blockingCode;
-    public Byte getBlockingCode() {
-        if (this.blockingCode != null) {
-            return blockingCode;
-        }
-        return null;
-    }
-    @XmlElement(name = "BLOCKINGCODE")
-    public void setBlockingCode(Byte blockingCode) {
-        this.blockingCode = blockingCode;
-    }
+  private Integer presentationMerchandiseGroup;
 
-    private Byte assortmentCode;
-    public Byte getAssortmentCode() {
-        return assortmentCode;
-    }
-    @XmlElement(name = "ASSORTMENTCD")
-    public void setAssortmentCode(Byte assortmentCode) {
-        this.assortmentCode = assortmentCode;
-    }
+  public Integer getPresentationMerchandiseGroup() {
+    return presentationMerchandiseGroup;
+  }
 
-    private Boolean isWeightArticle;
-    public Boolean getWeightArticle() {
-        return isWeightArticle;
-    }
-    @XmlElement(name = "WEIGHINGTYPE")
-    public void setWeightArticle(Boolean weightArticle) {
-        isWeightArticle = weightArticle;
-    }
-    private int storeNo;
-    public int getStoreNo() {
-        return storeNo;
-    }
-    @XmlElement(name = "STORENO")
-    public void setStoreNo(int storeNo) {
-        this.storeNo = storeNo;
-    }
+  @XmlElement(name = "PRESENTATIONMERCHANDISEGROUP")
+  public void setPresentationMerchandiseGroup(Integer presentationMerchandiseGroup) {
+    this.presentationMerchandiseGroup = presentationMerchandiseGroup;
+  }
 
-    private double pieceNetSellPrice;
-    private double bundleNetSellPrice;
-    private double promotionBundleNetPrice;
+  private Long presentationSubMerchandiseGroup;
 
-    public double getPieceNetSellPrice() {
-        return pieceNetSellPrice;
-    }
-    @XmlElement(name = "NETSALESPRICEPERPIECE")
-    public void setPieceNetSellPrice(double pieceNetSellPrice) {
-        this.pieceNetSellPrice = pieceNetSellPrice;
-    }
+  public Long getPresentationSubMerchandiseGroup() {
+    return presentationSubMerchandiseGroup;
+  }
 
-    public double getBundleNetSellPrice() {
-        return bundleNetSellPrice;
-    }
-    @XmlElement(name = "NETSALESPRICEPERBUNDLE")
-    public void setBundleNetSellPrice(double bundleNetSellPrice) {
-        this.bundleNetSellPrice = bundleNetSellPrice;
-    }
+  @XmlElement(name = "PRESENTATIONMERCHANDISESUBGROUP")
+  public void setPresentationSubMerchandiseGroup(Long presentationSubMerchandiseGroup) {
+    this.presentationSubMerchandiseGroup = presentationSubMerchandiseGroup;
+  }
 
-    public double getPromotionBundleNetPrice() {
-        return promotionBundleNetPrice;
-    }
-    @XmlElement(name = "PROMOTIONNETSALESPRICEPERBUNDLE")
-    public void setPromotionBundleNetPrice(double promotionBundleNetPrice) {
-        this.promotionBundleNetPrice = promotionBundleNetPrice;
-    }
+  /*Data Group 200*/
+  private List<String> singleItemSalesBarcode;
 
-    /*Data Group 325*/
-    private int hierarchySequenceStoreRef;
-    public int getHierarchySequenceStoreRef() {
-        return hierarchySequenceStoreRef;
-    }
-    @XmlElement(name = "HIERARCHYSEQUENCESTORE_REF")
-    public void setHierarchySequenceStoreRef(int hierarchySequenceStoreRef) {
-        this.hierarchySequenceStoreRef = hierarchySequenceStoreRef;
-    }
+  public List<String> getSingleItemSalesBarcode() {
+    return singleItemSalesBarcode;
+  }
 
-    private Byte procurementCd;
-    public Byte getProcurementCd() {
-        return procurementCd;
-    }
-    @XmlElement(name = "PROCUREMENTCD")
-    public void setProcurementCd(Byte procurementCd) {
-        this.procurementCd = procurementCd;
-    }
+  @XmlElement(name = "SINGLEITEMSALESBARCODE")
+  public void setSingleItemSalesBarcode(List<String> singleItemSalesBarcode) {
+    this.singleItemSalesBarcode = singleItemSalesBarcode;
+  }
 
-    private String promotionId;
-    public String getPromotionId() {
-        return promotionId;
-    }
-    @XmlElement(name = "PROMOTIONID")
-    public void setPromotionId(String promotionId) {
-        this.promotionId = promotionId;
-    }
+  private String generalSupplierName;
 
-	private String articleClass;
-	public String getArticleClass() {
-		return articleClass;
-	}
-	@XmlElement(name = "ARTICLECLASSDISPO")
-	public void setArticleClass(String articleClass) {
-		this.articleClass = articleClass;
-	}
+  public String getGeneralSupplierName() {
+    return generalSupplierName;
+  }
 
-    @Override
-    public String toString() {
-        return "ArticleCacheDataGroup{" +
-                "id=" + id +
-                ", ownBrandId='" + ownBrandId + '\'' +
-                ", vatPercent=" + vatPercent +
-                ", weightArticles=" + weightArticles +
-                ", foodNonfoodIndicator='" + foodNonfoodIndicator + '\'' +
-                ", presentationMainMerchandiseGroup=" + presentationMainMerchandiseGroup +
-                ", presentationMerchandiseGroup=" + presentationMerchandiseGroup +
-                ", presentationSubMerchandiseGroup=" + presentationSubMerchandiseGroup +
-                ", singleItemSalesBarcode=" + singleItemSalesBarcode +
-                ", salesBundleIndicator=" + salesBundleIndicator +
-                ", sellingBundleContent=" + sellingBundleContent +
-                ", priceCheckCodeMccSalesLine=" + priceCheckCodeMccSalesLine +
-                ", assignedStoreSupplier=" + assignedStoreSupplier +
-                ", assignedStoreSupplierType='" + assignedStoreSupplierType + '\'' +
-                ", hierarchySequenceStore=" + hierarchySequenceStore +
-                ", activationStatus=" + activationStatus +
-                ", blockingCode=" + blockingCode +
-                ", assortmentCode=" + assortmentCode +
-                ", isWeightArticle=" + isWeightArticle +
-                ", storeNo=" + storeNo +
-                ", pieceNetSellPrice=" + pieceNetSellPrice +
-                ", bundleNetSellPrice=" + bundleNetSellPrice +
-                ", promotionBundleNetPrice=" + promotionBundleNetPrice +
-                ", hierarchySequenceStoreRef=" + hierarchySequenceStoreRef +
-                ", procurementCd=" + procurementCd +
-                ", promotionId='" + promotionId + '\'' +
-                ", articleClass='" + articleClass + '\'' +
-                '}';
+  @XmlElement(name = "GENERAL_SUPPLIER_NAME")
+  public void setGeneralSupplierName(String generalSupplierName) {
+    this.generalSupplierName = generalSupplierName;
+  }
+
+  private Byte salesBundleIndicator;
+
+  public Byte getSalesBundleIndicator() {
+    return salesBundleIndicator;
+  }
+
+  @XmlElement(name = "SALESBUNDLEINDICATOR")
+  public void setSalesBundleIndicator(Byte salesBundleIndicator) {
+    this.salesBundleIndicator = salesBundleIndicator;
+  }
+
+  private Integer expiryDays;
+
+  public Integer getExpiryDays() {
+    return expiryDays;
+  }
+
+  @XmlElement(name = "EXPIRYDAYS")
+  public void setExpiryDays(Integer expiryDays) {
+    this.expiryDays = expiryDays;
+  }
+
+  /*Data Group 310*/
+  private Integer sellingBundleContent;
+
+  public Integer getSellingBundleContent() {
+    return sellingBundleContent;
+  }
+
+  @XmlElement(name = "SELLINGBUNDLECONTENT")
+  public void setSellingBundleContent(Integer sellingBundleContent) {
+    this.sellingBundleContent = sellingBundleContent;
+  }
+
+  private Byte priceCheckCodeMccSalesLine;
+
+  public Byte getPriceCheckCodeMccSalesLine() {
+    return priceCheckCodeMccSalesLine;
+  }
+
+  @XmlElement(name = "PRICECHECKCODEMCCSALESLINE")
+  public void setPriceCheckCodeMccSalesLine(Byte priceCheckCodeMccSalesLine) {
+    this.priceCheckCodeMccSalesLine = priceCheckCodeMccSalesLine;
+  }
+
+  /*Data Group 320*/
+  private Integer assignedStoreSupplier;
+
+  public Integer getAssignedStoreSupplier() {
+    return assignedStoreSupplier;
+  }
+
+  @XmlElement(name = "ASSIGNEDSTORESUPPLIER")
+  public void setAssignedStoreSupplier(Integer assignedStoreSupplier) {
+    this.assignedStoreSupplier = assignedStoreSupplier;
+  }
+
+  private String assignedStoreSupplierType;
+
+  public String getAssignedStoreSupplierType() {
+    return assignedStoreSupplierType;
+  }
+
+  @XmlElement(name = "ASSIGNEDSTORESUPPLIERTYPE")
+  public void setAssignedStoreSupplierType(String assignedStoreSupplierType) {
+    this.assignedStoreSupplierType = assignedStoreSupplierType;
+  }
+
+  private int hierarchySequenceStore;
+
+  public int getHierarchySequenceStore() {
+    return hierarchySequenceStore;
+  }
+
+  @XmlElement(name = "HIERARCHYSEQUENCESTORE")
+  public void setHierarchySequenceStore(int hierarchySequenceStore) {
+    this.hierarchySequenceStore = hierarchySequenceStore;
+  }
+
+  private Byte activationStatus;
+
+  public Byte getActivationStatus() {
+    return activationStatus;
+  }
+
+  @XmlElement(name = "ACTIVATIONSTATUS")
+  public void setActivationStatus(Byte activationStatus) {
+    this.activationStatus = activationStatus;
+  }
+
+  private Byte blockingCode;
+
+  public Byte getBlockingCode() {
+    if (this.blockingCode != null) {
+      return blockingCode;
     }
+    return null;
+  }
+
+  @XmlElement(name = "BLOCKINGCODE")
+  public void setBlockingCode(Byte blockingCode) {
+    this.blockingCode = blockingCode;
+  }
+
+  private Byte assortmentCode;
+
+  public Byte getAssortmentCode() {
+    return assortmentCode;
+  }
+
+  @XmlElement(name = "ASSORTMENTCD")
+  public void setAssortmentCode(Byte assortmentCode) {
+    this.assortmentCode = assortmentCode;
+  }
+
+  private Boolean isWeightArticle;
+
+  public Boolean getWeightArticle() {
+    return isWeightArticle;
+  }
+
+  @XmlElement(name = "WEIGHINGTYPE")
+  public void setWeightArticle(Boolean weightArticle) {
+    isWeightArticle = weightArticle;
+  }
+
+  private int storeNo;
+
+  public int getStoreNo() {
+    return storeNo;
+  }
+
+  @XmlElement(name = "STORENO")
+  public void setStoreNo(int storeNo) {
+    this.storeNo = storeNo;
+  }
+
+  private double pieceNetSellPrice;
+  private double bundleNetSellPrice;
+  private double promotionBundleNetPrice;
+
+  public double getPieceNetSellPrice() {
+    return pieceNetSellPrice;
+  }
+
+  @XmlElement(name = "NETSALESPRICEPERPIECE")
+  public void setPieceNetSellPrice(double pieceNetSellPrice) {
+    this.pieceNetSellPrice = pieceNetSellPrice;
+  }
+
+  public double getBundleNetSellPrice() {
+    return bundleNetSellPrice;
+  }
+
+  @XmlElement(name = "NETSALESPRICEPERBUNDLE")
+  public void setBundleNetSellPrice(double bundleNetSellPrice) {
+    this.bundleNetSellPrice = bundleNetSellPrice;
+  }
+
+  public double getPromotionBundleNetPrice() {
+    return promotionBundleNetPrice;
+  }
+
+  @XmlElement(name = "PROMOTIONNETSALESPRICEPERBUNDLE")
+  public void setPromotionBundleNetPrice(double promotionBundleNetPrice) {
+    this.promotionBundleNetPrice = promotionBundleNetPrice;
+  }
+
+  /*Data Group 325*/
+  private int hierarchySequenceStoreRef;
+
+  public int getHierarchySequenceStoreRef() {
+    return hierarchySequenceStoreRef;
+  }
+
+  @XmlElement(name = "HIERARCHYSEQUENCESTORE_REF")
+  public void setHierarchySequenceStoreRef(int hierarchySequenceStoreRef) {
+    this.hierarchySequenceStoreRef = hierarchySequenceStoreRef;
+  }
+
+  private Byte procurementCd;
+
+  public Byte getProcurementCd() {
+    return procurementCd;
+  }
+
+  @XmlElement(name = "PROCUREMENTCD")
+  public void setProcurementCd(Byte procurementCd) {
+    this.procurementCd = procurementCd;
+  }
+
+  private String promotionId;
+
+  public String getPromotionId() {
+    return promotionId;
+  }
+
+  @XmlElement(name = "PROMOTIONID")
+  public void setPromotionId(String promotionId) {
+    this.promotionId = promotionId;
+  }
+
+  private String articleClass;
+
+  public String getArticleClass() {
+    return articleClass;
+  }
+
+  @XmlElement(name = "ARTICLECLASSDISPO")
+  public void setArticleClass(String articleClass) {
+    this.articleClass = articleClass;
+  }
+
+  private double pieceNetBuyingPrice;
+
+  public double getPieceNetBuyingPrice() {
+    return pieceNetBuyingPrice;
+  }
+
+  @XmlElement(name = "NETBUYINGPRICEPERPIECE")
+  public void setPieceNetBuyingPrice(double pieceNetBuyingPrice) {
+    this.pieceNetBuyingPrice = pieceNetBuyingPrice;
+  }
+
+  private double bundleNetBuyingPrice;
+
+  public double getBundleNetBuyingPrice() {
+    return bundleNetBuyingPrice;
+  }
+
+  @XmlElement(name = "NETBUYINGPRICEPERSALESBUNDLE")
+  public void setBundleNetBuyingPrice(double bundleNetBuyingPrice) {
+    this.bundleNetBuyingPrice = bundleNetBuyingPrice;
+  }
+
+  private double pieceNetNetBuyingPrice;
+
+  public double getPieceNetNetBuyingPrice() {
+    return pieceNetNetBuyingPrice;
+  }
+
+  @XmlElement(name = "NETNETBUYINGPRICEPERPIECE")
+  public void setPieceNetNetBuyingPrice(double pieceNetNetBuyingPrice) {
+    this.pieceNetNetBuyingPrice = pieceNetNetBuyingPrice;
+  }
+
+  private double bundleNetNetBuyingPrice;
+
+  public double getBundleNetNetBuyingPrice() {
+    return bundleNetNetBuyingPrice;
+  }
+
+  @XmlElement(name = "NETNETBUYINGPRICEPERSALESBUNDLE")
+  public void setBundleNetNetBuyingPrice(double bundleNetNetBuyingPrice) {
+    this.bundleNetNetBuyingPrice = bundleNetNetBuyingPrice;
+  }
+
+  @Override
+  public String toString() {
+    return "ArticleCacheDataGroup{"
+        + "id="
+        + id
+        + ", ownBrandId='"
+        + ownBrandId
+        + '\''
+        + ", vatPercent="
+        + vatPercent
+        + ", weightArticles="
+        + weightArticles
+        + ", foodNonfoodIndicator='"
+        + foodNonfoodIndicator
+        + '\''
+        + ", presentationMainMerchandiseGroup="
+        + presentationMainMerchandiseGroup
+        + ", presentationMerchandiseGroup="
+        + presentationMerchandiseGroup
+        + ", presentationSubMerchandiseGroup="
+        + presentationSubMerchandiseGroup
+        + ", singleItemSalesBarcode="
+        + singleItemSalesBarcode
+        + ", salesBundleIndicator="
+        + salesBundleIndicator
+        + ", sellingBundleContent="
+        + sellingBundleContent
+        + ", priceCheckCodeMccSalesLine="
+        + priceCheckCodeMccSalesLine
+        + ", assignedStoreSupplier="
+        + assignedStoreSupplier
+        + ", assignedStoreSupplierType='"
+        + assignedStoreSupplierType
+        + '\''
+        + ", hierarchySequenceStore="
+        + hierarchySequenceStore
+        + ", activationStatus="
+        + activationStatus
+        + ", blockingCode="
+        + blockingCode
+        + ", assortmentCode="
+        + assortmentCode
+        + ", isWeightArticle="
+        + isWeightArticle
+        + ", storeNo="
+        + storeNo
+        + ", pieceNetSellPrice="
+        + pieceNetSellPrice
+        + ", bundleNetSellPrice="
+        + bundleNetSellPrice
+        + ", promotionBundleNetPrice="
+        + promotionBundleNetPrice
+        + ", hierarchySequenceStoreRef="
+        + hierarchySequenceStoreRef
+        + ", procurementCd="
+        + procurementCd
+        + ", promotionId='"
+        + promotionId
+        + '\''
+        + ", articleClass='"
+        + articleClass
+        + '\''
+        + ", pieceNetBuyingPrice='"
+        + pieceNetBuyingPrice
+        + '\''
+        + ", bundleNetBuyingPrice='"
+        + bundleNetBuyingPrice
+        + '\''
+        + ", pieceNetNetBuyingPrice='"
+        + pieceNetNetBuyingPrice
+        + '\''
+        + ", bundleNetNetBuyingPrice='"
+        + bundleNetNetBuyingPrice
+        + '\''
+        + '}';
+  }
 }
