@@ -92,7 +92,7 @@ public class MovieClient {
 
     List<String> reasonsList = new ArrayList<>();
     reasonsList.add("IST");
-    reasonsList.add("RETURN");
+    reasonsList.add("RET");
 
     List<Integer> storeNumber = new ArrayList<>();
     storeNumber.add(storeNo);
