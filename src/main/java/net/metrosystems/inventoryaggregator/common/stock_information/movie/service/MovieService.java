@@ -31,12 +31,17 @@ public class MovieService {
     movieAdapter.setArticleNo(stockDetails.getArticleNo());
     movieAdapter.setVariantId(stockDetails.getVariant());
     movieAdapter.setBundleId(stockDetails.getBundleNo());
-    movieAdapter.setStock(stockDetails.getStockSummary().getSystemStock());
-    movieAdapter.setStockMarkDown(stockDetails.getStockSummary().getMarkDownStock());
-    movieAdapter.setReservedStock(stockDetails.getStockSummary().getReservation());
-    movieAdapter.setUnavailableStock(
-        stockDetails.getStockSummary().getBlockedStock()
-            + stockDetails.getStockSummary().getReservation());
+    if (stockDetails.getStockSummary() != null) {
+      movieAdapter.setStock(stockDetails.getStockSummary().getSystemStock());
+      movieAdapter.setStockMarkDown(stockDetails.getStockSummary().getMarkDownStock());
+      movieAdapter.setReservedStock(stockDetails.getStockSummary().getReservation());
+      movieAdapter.setBlockedStock(stockDetails.getStockSummary().getBlockedStock());
+      movieAdapter.setAvailableStock(stockDetails.getStockSummary().getAvailableStock());
+      movieAdapter.setOpenGoodReceiving(stockDetails.getStockSummary().getOpenGoodReceiving());
+      movieAdapter.setUnavailableStock(
+          stockDetails.getStockSummary().getBlockedStock()
+              + stockDetails.getStockSummary().getReservation());
+    }
     if (stockDetails.getOpenMovement() != null) {
       for (Integer i = 0; i < stockDetails.getOpenMovement().size(); i++) {
         if (stockDetails.getOpenMovement().get(i).getReason().equals("IST")) {
@@ -73,6 +78,12 @@ public class MovieService {
       movieAdapter.setLastGoodReceivingDate(lastGRDateTemp);
       movieAdapter.setLastSalesDate(lastSaleDateTemp);
       movieAdapter.setLastStockCorrectionDate(lastSCDDateTemp);
+      movieAdapter.setLastGRQuantity(stockDetails.getSystemStock().get(lastGrDateIndex) != null ?
+          stockDetails.getSystemStock().get(lastGrDateIndex).getLastGRQuantity() : null);
+      movieAdapter.setLastSalesQuantity(stockDetails.getSystemStock().get(lastSaleDateIndex) != null ?
+          stockDetails.getSystemStock().get(lastSaleDateIndex).getLastSalesQuantity() : null);
+      movieAdapter.setLastSCQuantity(stockDetails.getSystemStock().get(lastScdDateIndex) != null ?
+          stockDetails.getSystemStock().get(lastScdDateIndex).getLastSCQuantity() : null);
     }
     if (stockDetails.getOpenOrders() != null) {
       movieAdapter.setOpenOrders(new ArrayList<>());
@@ -97,12 +108,7 @@ public class MovieService {
         movieAdapter.setConsigStock(true);
       }
     }
-    movieAdapter.setBlockedStock(stockDetails.getStockSummary().getBlockedStock());
-    movieAdapter.setAvailableStock(stockDetails.getStockSummary().getAvailableStock());
-    movieAdapter.setOpenGoodReceiving(stockDetails.getStockSummary().getOpenGoodReceiving());
-    movieAdapter.setLastGRQuantity(stockDetails.getSystemStock().get(lastGrDateIndex).getLastGRQuantity());
-    movieAdapter.setLastSalesQuantity(stockDetails.getSystemStock().get(lastSaleDateIndex).getLastSalesQuantity());
-    movieAdapter.setLastSCQuantity(stockDetails.getSystemStock().get(lastScdDateIndex).getLastSCQuantity());
+
     return movieAdapter;
   }
 
