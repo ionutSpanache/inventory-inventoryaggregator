@@ -1,11 +1,13 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.client;
 
+import java.util.Collections;
 import java.util.List;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.client.model.ArticleStoreMasterDataACLResponse;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -70,11 +72,15 @@ public class AclArticleStoreMasterDataClient {
 		System.out.println("uri=" + urlInUse);
 
 		try {
-			return restTemplate.getForObject(urlInUse, ArticleStoreMasterDataACLResponse.class)
-					.getArticleStoreMasterData();
+			ArticleStoreMasterDataACLResponse articleStoreMasterDataACLResponse =
+					restTemplate.getForObject(urlInUse, ArticleStoreMasterDataACLResponse.class);
+			if(articleStoreMasterDataACLResponse != null
+					&& !CollectionUtils.isEmpty(articleStoreMasterDataACLResponse.getArticleStoreMasterData()))
+				return articleStoreMasterDataACLResponse.getArticleStoreMasterData();
+			return Collections.emptyList();
 		} catch (Exception e) {
 			System.out.println(exceptionMessage + e);
-			return null;
+			return Collections.emptyList();
 		}
 
 	}

@@ -25,7 +25,7 @@ public class ArticleComponentRepository {
   @Qualifier("ForkJoinCustomPool")
   private final ForkJoinPool forkJoinPoolCustom;
 
-  @Async
+  @Async("asyncExecutor")
   public CompletableFuture<List<ArticleComponentForArticleId>> getArticleComponentForArticleIdList(
       List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode) throws Exception {
     List<ArticleComponentForArticleId> articleComponentForArticleIdList = forkJoinPoolCustom
