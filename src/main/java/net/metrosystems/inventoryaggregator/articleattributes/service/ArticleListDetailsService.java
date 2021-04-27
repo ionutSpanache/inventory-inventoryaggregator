@@ -151,9 +151,10 @@ public class ArticleListDetailsService {
     Map<ArticleId, ArticleComponentForArticleId> articleComponentForArticleIdMap = articleComponentForArticleId
         .get().stream().collect(Collectors.toMap(ArticleComponentForArticleId::getArticleId,
             articleComponent -> articleComponent));
-    Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap = articleMasterDataForArticleId
-        .get().stream().collect(Collectors.toMap(ArticleMasterDataForArticleId::getArticleId,
-            articleMasterData -> articleMasterData));
+    List<ArticleMasterDataForArticleId> result = articleMasterDataForArticleId.get();
+    Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap = result != null ?
+    result.stream().collect(Collectors.toMap(ArticleMasterDataForArticleId::getArticleId,
+            articleMasterData -> articleMasterData)) : Collections.emptyMap();
     Map<ArticleId, RawArticleStoreMasterDataForArticleId> rawArticleStoreMasterDataMap = rawArticleStoreMasterData
         .get().stream().collect(Collectors
             .toMap(RawArticleStoreMasterDataForArticleId::getArticleId,
