@@ -231,7 +231,8 @@ public class ArticleCacheService {
 				articleCacheDataGroup325.getPieceNetBuyingPrice(),
 				articleCacheDataGroup325.getBundleNetBuyingPrice(),
 				articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
-				articleCacheDataGroup325.getBundleNetNetBuyingPrice()
+				articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
+				articleCacheReaderDigest.getBrandName()
 				);
 	}
 
