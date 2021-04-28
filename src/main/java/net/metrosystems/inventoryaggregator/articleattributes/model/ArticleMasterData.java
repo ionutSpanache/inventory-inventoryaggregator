@@ -38,6 +38,7 @@ public class ArticleMasterData implements Serializable {
   private double bundleNetBuyingPrice;
   private double pieceNetNetBuyingPrice;
   private double bundleNetNetBuyingPrice;
+  private String brandName;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -45,60 +46,36 @@ public class ArticleMasterData implements Serializable {
 
   @Override
   public String toString() {
-    return "ArticleMasterData{"
-        + "articleDescription='"
-        + articleDescription
-        + '\''
-        + ", barcode='"
-        + barcode
-        + '\''
-        + ", commercialSupplier="
-        + commercialSupplier
-        + ", presentationMerchandiseGroup="
-        + presentationMerchandiseGroup
-        + ", promotionId='"
-        + promotionId
-        + '\''
-        + ", sellingBundleContent="
-        + sellingBundleContent
-        + ", subsystemArticleNumber="
-        + subsystemArticleNumber
-        + ", vatPercent="
-        + vatPercent
-        + ", pieceNetSellPrice="
-        + pieceNetSellPrice
-        + ", bundleNetSellPrice="
-        + bundleNetSellPrice
-        + ", promotionBundleNetPrice="
-        + promotionBundleNetPrice
-        + ", variantDescription='"
-        + variantDescription
-        + '\''
-        + ", articleClass='"
-        + articleClass
-        + '\''
-        + ", presentationMainMerchandiseGroup="
-        + presentationMainMerchandiseGroup
-        + ", presentationSubMerchandiseGroup="
-        + presentationSubMerchandiseGroup
-        + ", supplierNumber="
-        + supplierNumber
-        + ", procurementCode="
-        + procurementCode
-        + ", assortmentCode="
-        + assortmentCode
-        + ", blockingCode="
-        + blockingCode
-        + ", activationStatus="
-        + activationStatus
-        + ", pieceNetBuyingPrice='"
-        + pieceNetBuyingPrice
-        + ", bundleNetBuyingPrice='"
-        + bundleNetBuyingPrice
-        + ", pieceNetNetBuyingPrice='"
-        + pieceNetNetBuyingPrice
-        + ", bundleNetNetBuyingPrice='"
-        + bundleNetNetBuyingPrice
-        + '}';
+    return "ArticleMasterData{" +
+            "articleDescription='" + articleDescription + '\'' +
+            ", barcode='" + barcode + '\'' +
+            ", commercialSupplier=" + commercialSupplier +
+            ", presentationMerchandiseGroup=" + presentationMerchandiseGroup +
+            ", promotionId='" + promotionId + '\'' +
+            ", sellingBundleContent=" + sellingBundleContent +
+            ", weightArticle=" + weightArticle +
+            ", subsystemArticleNumber=" + subsystemArticleNumber +
+            ", vatPercent=" + vatPercent +
+            ", pieceNetSellPrice=" + pieceNetSellPrice +
+            ", bundleNetSellPrice=" + bundleNetSellPrice +
+            ", promotionBundleNetPrice=" + promotionBundleNetPrice +
+            ", variantDescription='" + variantDescription + '\'' +
+            ", articleType=" + articleType +
+            ", articleClass='" + articleClass + '\'' +
+            ", foodNonfoodIndicator='" + foodNonfoodIndicator + '\'' +
+            ", presentationMainMerchandiseGroup=" + presentationMainMerchandiseGroup +
+            ", presentationSubMerchandiseGroup=" + presentationSubMerchandiseGroup +
+            ", supplierNumber=" + supplierNumber +
+            ", procurementCode=" + procurementCode +
+            ", assortmentCode=" + assortmentCode +
+            ", blockingCode=" + blockingCode +
+            ", activationStatus=" + activationStatus +
+            ", expiryDays=" + expiryDays +
+            ", pieceNetBuyingPrice=" + pieceNetBuyingPrice +
+            ", bundleNetBuyingPrice=" + bundleNetBuyingPrice +
+            ", pieceNetNetBuyingPrice=" + pieceNetNetBuyingPrice +
+            ", bundleNetNetBuyingPrice=" + bundleNetNetBuyingPrice +
+            ", brandName='" + brandName + '\'' +
+            '}';
   }
 }

@@ -140,7 +140,8 @@ public class ArticleMasterDataRepository {
           articleCacheFullData.getPieceNetBuyingPrice(),
           articleCacheFullData.getBundleNetBuyingPrice(),
           articleCacheFullData.getPieceNetNetBuyingPrice(),
-          articleCacheFullData.getBundleNetNetBuyingPrice());
+          articleCacheFullData.getBundleNetNetBuyingPrice(),
+          articleCacheFullData.getBrandName());
     }
     return null;
   }
