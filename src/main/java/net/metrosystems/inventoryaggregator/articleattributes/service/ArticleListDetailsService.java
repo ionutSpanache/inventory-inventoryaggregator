@@ -1,10 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -149,7 +145,7 @@ public class ArticleListDetailsService {
         articleLocationList);
 
     Map<ArticleId, ArticleComponentForArticleId> articleComponentForArticleIdMap = articleComponentForArticleId
-        .get().stream().collect(Collectors.toMap(ArticleComponentForArticleId::getArticleId,
+        .get().stream().filter(Objects::nonNull).collect(Collectors.toMap(ArticleComponentForArticleId::getArticleId,
             articleComponent -> articleComponent));
     List<ArticleMasterDataForArticleId> result = articleMasterDataForArticleId.get();
     Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap = result != null ?

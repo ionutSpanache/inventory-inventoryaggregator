@@ -46,7 +46,7 @@ public class FilterAAAClient {
                 .query(configArticleCacheAAA.getGeneralQueryParam() + configArticleCacheAAA.getFrom())
                 .buildAndExpand(nextPage)
                 .encode();
-        System.out.println("FilterAAAClient.getFilteredDocuments uriComponents:" + uriComponents.toUri().toString());
+        System.out.println("FilterAAAClient.getFilteredDocuments next page uriComponents:" + uriComponents.toUri().toString());
         String filterAsString;
         try {
             filterAsString = ObjectMapperCustom.getMapper().writeValueAsString(filter);
