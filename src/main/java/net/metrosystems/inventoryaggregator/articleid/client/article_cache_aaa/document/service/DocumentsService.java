@@ -58,10 +58,12 @@ public class DocumentsService {
 
     public Documents getDocumentsNextpage(Documents documents, Filter filter) throws Exception {
 
-        while (documents.getNextPageToken() != null) {
+        while (documents != null && documents.getNextPageToken() != null) {
             Documents documentsNextPage = filterAAAClient.getFilteredDocumentsNextPage(filter, documents.getNextPageToken());
-            documents.getArticleKeys().addAll((Collection<? extends String>) documentsNextPage.getArticleKeys());
-            documents.setNextPageToken(documentsNextPage.getNextPageToken());
+            if(documentsNextPage != null) {
+                documents.getArticleKeys().addAll((Collection<? extends String>) documentsNextPage.getArticleKeys());
+                documents.setNextPageToken(documentsNextPage.getNextPageToken());
+            }
         }
         return documents;
     }

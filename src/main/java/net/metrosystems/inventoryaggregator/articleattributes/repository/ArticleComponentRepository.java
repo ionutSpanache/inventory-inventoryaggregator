@@ -1,6 +1,7 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
@@ -55,7 +56,7 @@ public class ArticleComponentRepository {
                                           articleVariantBundleIdentifierList,
                                           articleId.getArticleNumber()))
                                   .build();
-                            })
+                            }).filter(Objects::nonNull)
                         .collect(Collectors.toList()))
             .get();
     return CompletableFuture.completedFuture(articleComponentForArticleIdList);

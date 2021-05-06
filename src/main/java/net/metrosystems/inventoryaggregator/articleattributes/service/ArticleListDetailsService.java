@@ -145,7 +145,7 @@ public class ArticleListDetailsService {
         articleLocationList);
 
     Map<ArticleId, ArticleComponentForArticleId> articleComponentForArticleIdMap = articleComponentForArticleId
-        .get().stream().filter(Objects::nonNull).collect(Collectors.toMap(ArticleComponentForArticleId::getArticleId,
+        .get().stream().collect(Collectors.toMap(ArticleComponentForArticleId::getArticleId,
             articleComponent -> articleComponent));
     List<ArticleMasterDataForArticleId> result = articleMasterDataForArticleId.get();
     Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap = result != null ?
