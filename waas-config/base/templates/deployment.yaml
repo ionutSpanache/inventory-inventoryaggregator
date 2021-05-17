@@ -90,6 +90,15 @@ spec:
             name: inventoryaggregator
         - secretRef:
             name: inventoryaggregator-application-secrets
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  service: inventoryaggregator
+              topologyKey: "kubernetes.io/hostname"
       imagePullSecrets:
       - name: dockerlogin
       volumes:
