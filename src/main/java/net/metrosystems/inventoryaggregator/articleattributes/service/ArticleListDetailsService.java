@@ -21,6 +21,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.repository.Article
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
@@ -148,7 +149,7 @@ public class ArticleListDetailsService {
         .get().stream().collect(Collectors.toMap(ArticleComponentForArticleId::getArticleId,
             articleComponent -> articleComponent));
     List<ArticleMasterDataForArticleId> result = articleMasterDataForArticleId.get();
-    Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap = result != null ?
+    Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap = !CollectionUtils.isEmpty(result) ?
     result.stream().collect(Collectors.toMap(ArticleMasterDataForArticleId::getArticleId,
             articleMasterData -> articleMasterData)) : Collections.emptyMap();
     Map<ArticleId, RawArticleStoreMasterDataForArticleId> rawArticleStoreMasterDataMap = rawArticleStoreMasterData
