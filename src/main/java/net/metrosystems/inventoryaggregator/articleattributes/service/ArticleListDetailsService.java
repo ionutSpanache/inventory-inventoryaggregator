@@ -1,9 +1,15 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -35,165 +41,222 @@ public class ArticleListDetailsService {
   private final ArticleComponentRepository articleComponentRepository;
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
-      List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode,
-      Integer storeNo) throws Exception {
-    return getRawArticleDataListForArticleVariantBundleIdentifierList(articleIdList, countryCode,
-        salesLine, languageCode, storeNo);
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo)
+      throws Exception {
+    return getRawArticleDataListForArticleVariantBundleIdentifierList(
+        articleIdList, countryCode, salesLine, languageCode, storeNo);
   }
 
   private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(
-      List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode,
-      Integer storeNo) throws Exception {
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo)
+      throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
-    articleIdList.forEach(articleId -> {
-      try {
-        rawArticleDataList.add(RawArticleData.builder().articleId(articleId).build());
-      } catch (Exception e) {
-        log.error(
-            "ArticleListDetailsService.getRawArticleDataListForArticleVariantBundleIdentifierList - articleIdList - error: {}",
-            e.getMessage(), e);
-      }
-    });
+    articleIdList.forEach(
+        articleId -> {
+          try {
+            rawArticleDataList.add(RawArticleData.builder().articleId(articleId).build());
+          } catch (Exception e) {
+            log.error(
+                "ArticleListDetailsService.getRawArticleDataListForArticleVariantBundleIdentifierList - articleIdList - error: {}",
+                e.getMessage(),
+                e);
+          }
+        });
 
-    buildRawArticleDataList(articleIdList, countryCode, salesLine, languageCode, storeNo,
-        rawArticleDataList);
+    buildRawArticleDataList(
+        articleIdList, countryCode, salesLine, languageCode, storeNo, rawArticleDataList);
     return rawArticleDataList;
   }
 
-  private void buildRawArticleDataList(List<ArticleId> articleIdList, String countryCode,
-      String salesLine, String languageCode, Integer storeNo,
-      List<RawArticleData> rawArticleDataList) throws ExecutionException, InterruptedException {
+  private void buildRawArticleDataList(
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo,
+      List<RawArticleData> rawArticleDataList)
+      throws ExecutionException, InterruptedException {
 
-    CompletableFuture<List<ArticleComponentForArticleId>> articleComponentForArticleId = new CompletableFuture<>();
+    CompletableFuture<List<ArticleComponentForArticleId>> articleComponentForArticleId =
+        new CompletableFuture<>();
     try {
-      articleComponentForArticleId = articleComponentRepository
-          .getArticleComponentForArticleIdList(articleIdList, countryCode, salesLine, languageCode);
+      articleComponentForArticleId =
+          articleComponentRepository.getArticleComponentForArticleIdList(
+              articleIdList, countryCode, salesLine, languageCode);
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
           "ArticleListDetailsService.buildRawArticleDataList - articleComponentForArticleId - error: {}",
-          e.getMessage(), e);
+          e.getMessage(),
+          e);
     }
 
-    CompletableFuture<List<ArticleMasterDataForArticleId>> articleMasterDataForArticleId = new CompletableFuture<>();
+    CompletableFuture<List<ArticleMasterDataForArticleId>> articleMasterDataForArticleId =
+        new CompletableFuture<>();
     try {
-      articleMasterDataForArticleId = articleMasterDataRepository
-          .getArticleMasterDataForArticleIdList(articleIdList, countryCode, salesLine, languageCode,
-              storeNo);
+      articleMasterDataForArticleId =
+          articleMasterDataRepository.getArticleMasterDataForArticleIdList(
+              articleIdList, countryCode, salesLine, languageCode, storeNo);
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
           "ArticleListDetailsService.buildRawArticleDataList - articleMasterDataForArticleId - error: {}",
-          e.getMessage(), e);
+          e.getMessage(),
+          e);
     }
 
-    CompletableFuture<List<RawArticleStoreMasterDataForArticleId>> rawArticleStoreMasterData = new CompletableFuture<>();
+    CompletableFuture<List<RawArticleStoreMasterDataForArticleId>> rawArticleStoreMasterData =
+        new CompletableFuture<>();
     try {
-      rawArticleStoreMasterData = rawArticleStoreMasterDataRepository
-          .getRawArticleStoreMasterDataForArticleIdList(articleIdList, countryCode, salesLine,
-              languageCode, storeNo);
+      rawArticleStoreMasterData =
+          rawArticleStoreMasterDataRepository.getRawArticleStoreMasterDataForArticleIdList(
+              articleIdList, countryCode, salesLine, languageCode, storeNo);
 
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
           "ArticleListDetailsService.buildRawArticleDataList - rawArticleStoreMasterDataRepository - error: {}",
-          e.getMessage(), e);
+          e.getMessage(),
+          e);
     }
 
     CompletableFuture<List<StockData>> stockDataFromMovie = new CompletableFuture<>();
     try {
-      stockDataFromMovie = articleDataFromMovieRepository
-          .getArticleListDataFromMovie(articleIdList, countryCode, salesLine, storeNo);
+      stockDataFromMovie =
+          articleDataFromMovieRepository.getArticleListDataFromMovie(
+              articleIdList, countryCode, salesLine, storeNo);
 
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
           "ArticleListDetailsService.buildRawArticleDataList - articleDataFromMovieRepository - error: {}",
-          e.getMessage(), e);
+          e.getMessage(),
+          e);
     }
 
-    CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList = new CompletableFuture<>();
+    CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
+        new CompletableFuture<>();
     try {
-      articleStockLocationList = aclBundleStockLocationRepository
-          .getStockLocationsForArticleList(articleIdList, countryCode, salesLine, storeNo);
+      articleStockLocationList =
+          aclBundleStockLocationRepository.getStockLocationsForArticleList(
+              articleIdList, countryCode, salesLine, storeNo);
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
           "ArticleListDetailsService.articleStockLocationList - articleDataFromMovieRepository - error: {}",
-          e.getMessage(), e);
+          e.getMessage(),
+          e);
     }
 
-    CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList = new CompletableFuture<>();
+    CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList =
+        new CompletableFuture<>();
     try {
-      articleLocationList = aclBundleStockLocationRepository
-          .getArticleLocationForArticleList(countryCode, salesLine, storeNo, articleIdList);
+      articleLocationList =
+          aclBundleStockLocationRepository.getArticleLocationForArticleList(
+              countryCode, salesLine, storeNo, articleIdList);
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
           "ArticleListDetailsService.articleStockLocationList - articleLocationList - error: {}",
-          e.getMessage(), e);
+          e.getMessage(),
+          e);
     }
 
-    CompletableFuture.allOf(articleComponentForArticleId, articleMasterDataForArticleId,
-        rawArticleStoreMasterData, stockDataFromMovie, articleStockLocationList,
+    CompletableFuture.allOf(
+        articleComponentForArticleId,
+        articleMasterDataForArticleId,
+        rawArticleStoreMasterData,
+        stockDataFromMovie,
+        articleStockLocationList,
         articleLocationList);
 
-    Map<ArticleId, ArticleComponentForArticleId> articleComponentForArticleIdMap = articleComponentForArticleId
-        .get().stream().collect(Collectors.toMap(ArticleComponentForArticleId::getArticleId,
-            articleComponent -> articleComponent));
+    Map<ArticleId, ArticleComponentForArticleId> articleComponentForArticleIdMap =
+        articleComponentForArticleId.get().stream()
+            .collect(
+                Collectors.toMap(
+                    ArticleComponentForArticleId::getArticleId,
+                    articleComponent -> articleComponent));
     List<ArticleMasterDataForArticleId> result = articleMasterDataForArticleId.get();
-    Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap = !CollectionUtils.isEmpty(result) ?
-    result.stream().collect(Collectors.toMap(ArticleMasterDataForArticleId::getArticleId,
-            articleMasterData -> articleMasterData)) : Collections.emptyMap();
-    Map<ArticleId, RawArticleStoreMasterDataForArticleId> rawArticleStoreMasterDataMap = rawArticleStoreMasterData
-        .get().stream().collect(Collectors
-            .toMap(RawArticleStoreMasterDataForArticleId::getArticleId,
-                rawArticleStoreMasterDataForArticleId -> rawArticleStoreMasterDataForArticleId));
-    Map<ArticleId, StockData> stockDataFromMovieMap = stockDataFromMovie.get().stream().collect(
-        Collectors.toMap(StockData::getArticleId, stockData -> stockData));
-    Map<ArticleId, ArticleIdStockLocation> articleStockLocationListMap = articleStockLocationList
-        .get().stream().collect(Collectors.toMap(ArticleIdStockLocation::getArticleId,
-            articleIdStockLocation -> articleIdStockLocation));
-    Map<ArticleId, ArticleLocationForArticleId> articleLocationListMap = articleLocationList.get()
-                                                                                            .stream()
-                                                                                            .collect(
-                                                                                                Collectors
-                                                                                                    .toMap(
-                                                                                                        ArticleLocationForArticleId::getArticleId,
-                                                                                                        articleLocationForArticleId -> articleLocationForArticleId));
+    Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap =
+        !CollectionUtils.isEmpty(result)
+            ? Stream.ofNullable(result)
+                .flatMap(Collection::stream)
+                .collect(
+                    Collectors.toMap(
+                        ArticleMasterDataForArticleId::getArticleId,
+                        articleMasterData -> articleMasterData,
+                        (oldValue, newValue) -> oldValue))
+            : Collections.emptyMap();
+    Map<ArticleId, RawArticleStoreMasterDataForArticleId> rawArticleStoreMasterDataMap =
+        rawArticleStoreMasterData.get().stream()
+            .collect(
+                Collectors.toMap(
+                    RawArticleStoreMasterDataForArticleId::getArticleId,
+                    rawArticleStoreMasterDataForArticleId ->
+                        rawArticleStoreMasterDataForArticleId));
+    Map<ArticleId, StockData> stockDataFromMovieMap =
+        stockDataFromMovie.get().stream()
+            .collect(Collectors.toMap(StockData::getArticleId, stockData -> stockData));
+    Map<ArticleId, ArticleIdStockLocation> articleStockLocationListMap =
+        articleStockLocationList.get().stream()
+            .collect(
+                Collectors.toMap(
+                    ArticleIdStockLocation::getArticleId,
+                    articleIdStockLocation -> articleIdStockLocation));
+    Map<ArticleId, ArticleLocationForArticleId> articleLocationListMap =
+        articleLocationList.get().stream()
+            .collect(
+                Collectors.toMap(
+                    ArticleLocationForArticleId::getArticleId,
+                    articleLocationForArticleId -> articleLocationForArticleId));
 
-    rawArticleDataList.forEach(rawArticleData -> {
-      rawArticleData.setArticleMasterData(
-          Optional.ofNullable(articleMasterDataForArticleIdMap.get(rawArticleData.getArticleId()))
-                  .map(ArticleMasterDataForArticleId::getArticleMasterData).orElse(null));
-      rawArticleData.setArticleStoreMasterData(
-          Optional.ofNullable(rawArticleStoreMasterDataMap.get(rawArticleData.getArticleId()))
+    rawArticleDataList.forEach(
+        rawArticleData -> {
+          rawArticleData.setArticleMasterData(
+              Optional.ofNullable(
+                      articleMasterDataForArticleIdMap.get(rawArticleData.getArticleId()))
+                  .map(ArticleMasterDataForArticleId::getArticleMasterData)
+                  .orElse(null));
+          rawArticleData.setArticleStoreMasterData(
+              Optional.ofNullable(rawArticleStoreMasterDataMap.get(rawArticleData.getArticleId()))
                   .map(RawArticleStoreMasterDataForArticleId::getRawArticleStoreMasterData)
                   .orElse(null));
-      rawArticleData.setStockDetails(
-          Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
-                  .map(StockData::getArticleStockData).orElse(null));
-      rawArticleData.setPlannedDeliveryDates(
-          Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
-                  .map(StockData::getArticlePlannedDeliveryDates).orElse(Collections.emptyList()));
-      rawArticleData.setStockLocations(
-          Optional.ofNullable(articleStockLocationListMap.get(rawArticleData.getArticleId()))
+          rawArticleData.setStockDetails(
+              Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
+                  .map(StockData::getArticleStockData)
+                  .orElse(null));
+          rawArticleData.setPlannedDeliveryDates(
+              Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
+                  .map(StockData::getArticlePlannedDeliveryDates)
+                  .orElse(Collections.emptyList()));
+          rawArticleData.setStockLocations(
+              Optional.ofNullable(articleStockLocationListMap.get(rawArticleData.getArticleId()))
                   .map(ArticleIdStockLocation::getArticleStockLocationList)
                   .orElse(Collections.emptyList()));
-      rawArticleData.setArticleLocation(
-          Optional.ofNullable(articleLocationListMap.get(rawArticleData.getArticleId()))
-                  .map(ArticleLocationForArticleId::getArticleLocation).orElse(null));
-      rawArticleData.setArticleComponent(
-          Optional.ofNullable(articleComponentForArticleIdMap.get(rawArticleData.getArticleId()))
-                  .map(ArticleComponentForArticleId::getArticleComponent).orElse(null));
-    });
-
+          rawArticleData.setArticleLocation(
+              Optional.ofNullable(articleLocationListMap.get(rawArticleData.getArticleId()))
+                  .map(ArticleLocationForArticleId::getArticleLocation)
+                  .orElse(null));
+          rawArticleData.setArticleComponent(
+              Optional.ofNullable(
+                      articleComponentForArticleIdMap.get(rawArticleData.getArticleId()))
+                  .map(ArticleComponentForArticleId::getArticleComponent)
+                  .orElse(null));
+        });
   }
 }

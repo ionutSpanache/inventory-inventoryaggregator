@@ -22,6 +22,7 @@ import net.metrosystems.inventoryaggregator.multithreading.ArticleDataThreads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 
 @Service
@@ -93,9 +94,10 @@ public class ArticleCacheService {
 	}
 
 	private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(Documents filterUrlString) {
-		if (filterUrlString.getArticleKeys().isEmpty()) {
-			return Collections.emptyList();
-		}
+    if (filterUrlString == null
+        || CollectionUtils.isEmpty(filterUrlString.getArticleKeys())) {
+      return Collections.emptyList();
+    }
 
 		List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList =
 				new ArrayList<>();
