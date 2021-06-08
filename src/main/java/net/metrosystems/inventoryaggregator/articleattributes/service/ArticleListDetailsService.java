@@ -192,6 +192,7 @@ public class ArticleListDetailsService {
                     ArticleComponentForArticleId::getArticleId,
                     articleComponent -> articleComponent));
     List<ArticleMasterDataForArticleId> result = articleMasterDataForArticleId.get();
+    log.info("Test result values: " + result);
     Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap =
         !CollectionUtils.isEmpty(result)
             ? Stream.ofNullable(result)
@@ -202,6 +203,7 @@ public class ArticleListDetailsService {
                         articleMasterData -> articleMasterData,
                         (oldValue, newValue) -> oldValue))
             : Collections.emptyMap();
+    log.info("Test sa vedem daca ajunge aici: " + articleMasterDataForArticleIdMap);
     Map<ArticleId, RawArticleStoreMasterDataForArticleId> rawArticleStoreMasterDataMap =
         rawArticleStoreMasterData.get().stream()
             .collect(

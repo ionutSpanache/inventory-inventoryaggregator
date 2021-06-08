@@ -1,9 +1,12 @@
 package net.metrosystems.inventoryaggregator.config.logging;
 
+import java.lang.reflect.Parameter;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -38,10 +41,12 @@ public class LoggerAspect {
     }
 
     private void addLogging(ProceedingJoinPoint joinPoint, Boolean doClear) {
-        if(doClear) MDC.clear();
-        MDC.put("countryCode", joinPoint.getArgs()[0].toString());
-        MDC.put("salesLine", joinPoint.getArgs()[1].toString());
-        MDC.put("storeNumber", joinPoint.getArgs()[2].toString());
+        if(Boolean.TRUE.equals(doClear)) MDC.clear();
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        Parameter[] parametersNames = methodSignature.getMethod().getParameters();
+        Object[] parametersValues = joinPoint.getArgs();
+        IntStream.range(0, parametersNames.length).forEach(index ->
+            MDC.put(parametersNames[index].getName(), parametersValues[index].toString()));
     }
 
 }
