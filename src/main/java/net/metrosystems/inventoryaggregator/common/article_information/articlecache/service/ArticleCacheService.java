@@ -172,9 +172,9 @@ public class ArticleCacheService {
 				salesLine,
 				languageCode
 		);
-		if (articleUrlPathList.getArticleKeys().isEmpty()) {
-			return null;
-		}
+    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+      return null;
+    }
 
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 		ArticleCacheIhdsTree articleCacheDocument = articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
