@@ -191,7 +191,6 @@ public class ArticleCacheService {
         return null;
       }
     } else {
-      log.info("articleCacheDocument was null: " + articleCacheDocument);
       return null;
     }
 
