@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service;
 
+import java.util.stream.Stream;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client.FilterAAAClient;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.Filter;
@@ -49,7 +50,7 @@ public class DocumentsService {
     public List<ArticleId> transformDocumentListInArticleIdList(Documents documents) {
 
         List<ArticleId> articleIdList = new ArrayList<>();
-        documents.getArticleKeys().stream().forEach(document -> {
+        Stream.ofNullable(documents.getArticleKeys()).flatMap(Collection::stream).forEach(document -> {
             ArticleId articleId = this.tranformDocumentInArticleId(document);
             articleIdList.add(articleId);
         });

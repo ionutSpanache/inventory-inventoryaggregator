@@ -146,9 +146,9 @@ public class ArticleCacheService {
 				salesLine,
 																languageCode
 																);
-		if (articleUrlPathList.getArticleKeys().isEmpty()) {
-			throw new ArticleNotFoundException();
-		}
+    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+      throw new ArticleNotFoundException();
+    }
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 		return transformArticleCacheDocumentToArticleFullData(
 												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
@@ -268,9 +268,9 @@ public class ArticleCacheService {
 	}
 
 	private ArticleBasicData processDocumentsReceivedFromArticleCache(Documents articleUrlPathList, int storeNo) {
-		if (articleUrlPathList.getArticleKeys().isEmpty()) {
-            throw new ArticleNotFoundException();
-        }
+    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+      throw new ArticleNotFoundException();
+    }
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
         ArticleId articleId = new ArticleId();
         String[] articleUrlPathObtaineArticleIdComponent = articleUrlPath.split("&");
