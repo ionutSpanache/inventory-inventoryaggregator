@@ -3,6 +3,7 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
@@ -24,7 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-
+@Slf4j
 @Service
 public class ArticleCacheService {
 
@@ -178,10 +179,21 @@ public class ArticleCacheService {
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 		ArticleCacheIhdsTree articleCacheDocument = articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
 
-		Integer hierarchySequenceStoreNo = articleCacheDocument.getTransaction().getArticleCacheIncident().getHierarchySequenceStoreNo(storeNo);
-		if(hierarchySequenceStoreNo == null){
-			return null;
-		}
+    if (articleCacheDocument != null
+        && articleCacheDocument.getTransaction() != null
+        && articleCacheDocument.getTransaction().getArticleCacheIncident() != null) {
+      Integer hierarchySequenceStoreNo =
+          articleCacheDocument
+              .getTransaction()
+              .getArticleCacheIncident()
+              .getHierarchySequenceStoreNo(storeNo);
+      if (hierarchySequenceStoreNo == null) {
+        return null;
+      }
+    } else {
+      log.info("articleCacheDocument was null: " + articleCacheDocument);
+      return null;
+    }
 
 		return transformArticleCacheDocumentToArticleFullData(
 						articleCacheDocument,
