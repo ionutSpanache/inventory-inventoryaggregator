@@ -16,9 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
@@ -28,15 +27,6 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
 
   @Value("${ARTICLE_CACHE_SERVICE_HOST}")
   private String articleCacheServiceHost;
-
-  @Value("${ARTICLE_CACHE_FILTER_PATH}")
-  private String articleCacheFilterPath;
-
-  @Value("${ARTICLE_CACHE_SUPPLIER_INFORMATION}")
-  private String supplierInformationPath;
-
-  @Value("${ARTICLE_CACHE_SUPPLIER_INFORMATION_DEFAULT_ENVIRONMENT}")
-  private String defaultEnvironment;
 
   private final RestTemplate restTemplateArticleCache;
 
@@ -110,14 +100,14 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   }
 
   @Override
-  public ArticleCacheIhdsTree getSupplierInformation(
+  public Optional<ArticleCacheIhdsTree> getSupplierInformation(
       String countryCode, String salesLine, Optional<String> environment, Long supplierNumber) {
-    UriComponents uriComponents =
-        UriComponentsBuilder.fromHttpUrl(articleCacheServiceHost + supplierInformationPath)
-            .buildAndExpand(
-                countryCode, salesLine, environment.orElse(defaultEnvironment), supplierNumber);
+    Documents articleUrlPathList =
+        documentsService.getDocumentsBySupplier(countryCode, salesLine, supplierNumber);
+    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) return Optional.empty();
 
-    return getForArticleCacheObject(uriComponents.toUriString(), ArticleCacheIhdsTree.class);
+    String url = articleCacheServiceHost + "/" + articleUrlPathList.getArticleKeys().get(0);
+    return Optional.ofNullable(getForArticleCacheObject(url, ArticleCacheIhdsTree.class));
   }
 
   private <T> T getForArticleCacheObject(String articleUrl, Class<T> responseType) {

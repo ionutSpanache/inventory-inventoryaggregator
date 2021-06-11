@@ -20,6 +20,6 @@ public interface ArticleCacheClient {
 
 	ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath);
 
-	ArticleCacheIhdsTree getSupplierInformation(String countryCode, String salesLine, Optional<String> environment, Long supplierNumber);
+	Optional<ArticleCacheIhdsTree> getSupplierInformation(String countryCode, String salesLine, Optional<String> environment, Long supplierNumber);
 
 }
