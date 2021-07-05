@@ -14,6 +14,7 @@ import org.apache.http.HeaderElement;
 import org.apache.http.HeaderElementIterator;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpHost;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.routing.HttpRoute;
@@ -24,6 +25,7 @@ import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +39,13 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 public class ApacheHttpClientConfig {
 
     private final Logger logger = LoggerFactory.getLogger(ApacheHttpClientConfig.class);
+
+    private HttpRequestRetryHandler retryHandler;
+
+    @Autowired
+    public  ApacheHttpClientConfig(HttpRequestRetryHandler retryHandler) {
+        this.retryHandler = retryHandler;
+    }
 
     @Bean
     public PoolingHttpClientConnectionManager poolingConnectionManager() {
@@ -112,6 +121,7 @@ public class ApacheHttpClientConfig {
                         .setDefaultRequestConfig(requestConfig)
                         .setConnectionManager(poolingConnectionManager())
                         .setKeepAliveStrategy(connectionKeepAliveStrategy())
+                        .setRetryHandler(retryHandler)
                         .build();
     }
 
