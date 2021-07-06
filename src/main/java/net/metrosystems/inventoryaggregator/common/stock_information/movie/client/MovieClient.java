@@ -1,9 +1,11 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,8 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
-@RequiredArgsConstructor
 public class MovieClient {
 
   private final RestTemplate restTemplate;
@@ -24,6 +26,11 @@ public class MovieClient {
 
   @Value("${MOVIE_STOCK_PATH_FOR_VARIANT}")
   private String movieStockPathForVariant;
+
+  @Autowired
+  public  MovieClient(@Qualifier("restTemplateMovie") RestTemplate restTemplate) {
+    this.restTemplate = restTemplate;
+  }
 
   public List<StockDetails> getStockDetailsForArticleVariant(
       String countryCode, String salesLine, int storeNo, Long mmsArtNo, Long variantNo) {
@@ -38,6 +45,7 @@ public class MovieClient {
     try {
       return restTemplate.getForObject(urlInUse, StockDetailsResponse.class).getStockDetails();
     } catch (Exception e) {
+      log.error("Error while calling MOVIE input{} exception{}", urlInUse, e);
       return null;
     }
   }
@@ -123,6 +131,7 @@ public class MovieClient {
               .postForObject(urlInUse, request, StockDetailsResponse.class)
               .getStockDetails();
     } catch (Exception e) {
+      log.error("Error while calling MOVIE input{} exception{}", jsonStringMovie, e);
       return null;
     }
   }
