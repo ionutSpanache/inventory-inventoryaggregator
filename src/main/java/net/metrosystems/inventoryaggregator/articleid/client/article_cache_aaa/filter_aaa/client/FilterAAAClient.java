@@ -9,6 +9,7 @@ import net.metrosystems.inventoryaggregator.config.ObjectMapperCustom;
 import net.metrosystems.inventoryaggregator.config.RestTemplate.RestTemplateCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -37,7 +38,15 @@ public class FilterAAAClient {
             throw new Exception(e);
         }
         System.out.println("FilterAAAClient.getFilteredDocuments filterAsString");
-        return (Documents) restTemplateCustom.postForObject(uriComponents.toUri().toString(), filterAsString, Documents.class, true);
+        Documents documents = (Documents) restTemplateCustom.postForObject(uriComponents.toUri().toString(), filterAsString, Documents.class, true);
+        if (documents != null && !CollectionUtils.isEmpty(documents.getArticleKeys()))
+            documents
+                .getArticleKeys()
+                .removeIf(
+                    articleKey ->
+                        articleKey.toLowerCase().contains("environment=dev")
+                            || articleKey.toLowerCase().contains("environment=qa"));
+        return documents;
     }
 
     public Documents getFilteredDocuments(FilterSupplierInformation filter) throws Exception {
