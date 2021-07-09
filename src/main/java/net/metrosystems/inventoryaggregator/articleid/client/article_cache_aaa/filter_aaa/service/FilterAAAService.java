@@ -63,24 +63,24 @@ public class FilterAAAService {
         return filter;
     }
 
-    public List<ArticleId> getArticleIdByBarcode(String countryCode, String salesLine, String languageCode, String barCode) throws Exception {
+    public List<ArticleId> getArticleIdByBarcode(String countryCode, String salesLine, String languageCode, Integer storeNo, String barCode) throws Exception {
         return documentsService.
                 transformDocumentListInArticleIdList(
                         documentsService.
-                                getDocumentsByBarcode(countryCode, salesLine, languageCode, barCode));
+                                getDocumentsByBarcode(countryCode, salesLine, languageCode, barCode), storeNo);
     }
 
-    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, String languageCode, Long articleNumber) throws Exception {
+    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, String languageCode, Integer storeNo, Long articleNumber) throws Exception {
         return documentsService.
                 transformDocumentListInArticleIdList(
                         documentsService.
-                                getDocumentsByArticleNumber(countryCode, salesLine, languageCode, articleNumber));
+                                getDocumentsByArticleNumber(countryCode, salesLine, languageCode, articleNumber), storeNo);
     }
 
-    public List<ArticleId> getArticleIdBySubsysArticleNumber(String countryCode, String salesLine, String languageCode, Long subsysArticleNumber) throws Exception {
+    public List<ArticleId> getArticleIdBySubsysArticleNumber(String countryCode, String salesLine, String languageCode, Integer storeNo, Long subsysArticleNumber) throws Exception {
         return documentsService.
                 transformDocumentListInArticleIdList(
                         documentsService.
-                                getDocumentsBySubsysArticleNumber(countryCode, salesLine, languageCode, subsysArticleNumber));
+                                getDocumentsBySubsysArticleNumber(countryCode, salesLine, languageCode, subsysArticleNumber), storeNo);
     }
 }
