@@ -42,7 +42,7 @@ public class ArticleIdController {
     ) {
         List<ArticleId> articleIds;
         try {
-            articleIds = articleIdService.getArticleIdByBarcode(countryCode, salesLine, languageCode, barCode);
+            articleIds = articleIdService.getArticleIdByBarcode(countryCode, salesLine, languageCode, storeNo, barCode);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -65,7 +65,7 @@ public class ArticleIdController {
     ) {
         List<ArticleId> articleIds;
         try {
-            articleIds = articleIdService.getArticleIdBySubsysArticleNumber(countryCode, salesLine, languageCode, subsysArticleNumber);
+            articleIds = articleIdService.getArticleIdBySubsysArticleNumber(countryCode, salesLine, languageCode, storeNo, subsysArticleNumber);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -88,7 +88,7 @@ public class ArticleIdController {
     ) {
         List<ArticleId> articleIds;
         try {
-            articleIds = articleIdService.getArticleIdByArticleNumber(countryCode, salesLine, languageCode, articleNumber);
+            articleIds = articleIdService.getArticleIdByArticleNumber(countryCode, salesLine, languageCode, storeNo, articleNumber);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

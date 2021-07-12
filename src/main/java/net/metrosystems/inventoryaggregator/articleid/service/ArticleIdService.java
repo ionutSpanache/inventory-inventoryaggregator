@@ -16,16 +16,16 @@ public class ArticleIdService {
     @Autowired
     private ArticleIdClient articleIdClient;
 
-    public List<ArticleId> getArticleIdByBarcode(String countryCode, String salesLine, String languageCode, String barCode) throws Exception {
-        return articleIdClient.getArticleIdByBarcode(countryCode, salesLine, languageCode, barCode);
+    public List<ArticleId> getArticleIdByBarcode(String countryCode, String salesLine, String languageCode, Integer storeNo, String barCode) throws Exception {
+        return articleIdClient.getArticleIdByBarcode(countryCode, salesLine, languageCode, storeNo, barCode);
     }
 
-    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, String languageCode, Long articleNumber) throws Exception {
-        return articleIdClient.getArticleIdByArticleNumber(countryCode, salesLine, languageCode, articleNumber);
+    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, String languageCode, Integer storeNo, Long articleNumber) throws Exception {
+        return articleIdClient.getArticleIdByArticleNumber(countryCode, salesLine, languageCode, storeNo, articleNumber);
     }
 
 
-    public List<ArticleId> getArticleIdBySubsysArticleNumber(String countryCode, String salesLine, String languageCode, Long subsysArticleNumber) throws Exception {
-        return articleIdClient.getArticleIdBySubsysArticleNumber(countryCode, salesLine, languageCode, subsysArticleNumber);
+    public List<ArticleId> getArticleIdBySubsysArticleNumber(String countryCode, String salesLine, String languageCode, Integer storeNo, Long subsysArticleNumber) throws Exception {
+        return articleIdClient.getArticleIdBySubsysArticleNumber(countryCode, salesLine, languageCode, storeNo, subsysArticleNumber);
     }
 }

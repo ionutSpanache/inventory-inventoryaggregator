@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
@@ -14,6 +15,8 @@ import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.f
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.SubFilterKey;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.service.FilterAAAService;
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -23,6 +26,8 @@ public class DocumentsService {
 
   @Autowired FilterAAAClient filterAAAClient;
   @Autowired FilterAAAService filterAAAService;
+  @Autowired
+  private ArticleCacheAAAClient articleCacheClient;
 
   public ArticleId tranformDocumentInArticleId(String document) {
     ArticleId articleId = new ArticleId();
@@ -42,18 +47,21 @@ public class DocumentsService {
                 articleId.setBundleNumber(Long.valueOf(articleAtributes.replace("bundleno=", "")));
               }
             });
+
     return articleId;
   }
 
-  public List<ArticleId> transformDocumentListInArticleIdList(Documents documents) {
+  public List<ArticleId> transformDocumentListInArticleIdList(Documents documents, Integer storeNo) {
 
     List<ArticleId> articleIdList = new ArrayList<>();
     Stream.ofNullable(documents.getArticleKeys())
         .flatMap(Collection::stream)
         .forEach(
             document -> {
-              ArticleId articleId = this.tranformDocumentInArticleId(document);
-              articleIdList.add(articleId);
+              if(isStorePresent(document, storeNo)) {
+                ArticleId articleId = this.tranformDocumentInArticleId(document);
+                articleIdList.add(articleId);
+              }
             });
     return articleIdList;
   }
@@ -146,5 +154,20 @@ public class DocumentsService {
                   articleKey.toLowerCase().contains("environment=dev")
                       || articleKey.toLowerCase().contains("environment=qa"));
     return documents;
+  }
+
+  public boolean isStorePresent(String documents, Integer storeNo) {
+    ArticleCacheIhdsTree articleCacheDocument = articleCacheClient.getArticleCacheDocumentByURL(documents);
+    boolean storeNumberFound;
+    try {
+      storeNumberFound = !articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroup().stream()
+              .filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
+              .filter(articleCacheDataGroup -> (articleCacheDataGroup.getStoreNo() == storeNo))
+              .collect(Collectors.toList()).isEmpty();
+    }catch(Exception e) {
+      return false;
+    }
+
+    return storeNumberFound;
   }
 }
