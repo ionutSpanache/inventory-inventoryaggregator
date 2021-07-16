@@ -22,4 +22,5 @@ public class RawArticleStoreMasterData {
     private Double storePromotionPieceGrossPrice;
     private Double storePromotionBundleGrossPrice;
     private Integer leadTime;
+    private Integer orderProposalBlockingCode;
 }

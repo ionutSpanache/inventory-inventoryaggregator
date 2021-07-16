@@ -18,6 +18,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 @Repository
 @Slf4j
@@ -153,6 +154,9 @@ public class RawArticleStoreMasterDataRepository {
             articleStoreMasterDataList == null || articleStoreMasterDataList.isEmpty()
                 ? null
                 : articleStoreMasterDataList.get(0).getLeadTime())
+        .orderProposalBlockingCode(CollectionUtils.isEmpty(articleStoreMasterDataList)
+                    ? null
+                    : articleStoreMasterDataList.get(0).getOrderProposalBlockingCode())
         .build();
   }
 
