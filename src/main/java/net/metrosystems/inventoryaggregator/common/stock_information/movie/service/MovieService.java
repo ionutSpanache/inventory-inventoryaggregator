@@ -135,7 +135,7 @@ public class MovieService {
       Long articleNumber,
       Long variant,
       Long bundleNumber) {
-      MovieAdapter movieAdapterConsignment  = new MovieAdapter();
+      MovieAdapter movieAdapterConsignment = new MovieAdapter();
     List<StockDetails> stockDetailsList =
         movieClient.getStockDetailsForArticleVariantBundle(
             countryCode, salesLine, storeNo, articleNumber, variant, bundleNumber);
@@ -146,8 +146,10 @@ public class MovieService {
           return movieAdapterConsignment;
         }
       }
+    } else {
+      return null;
     }
-    return null;
+    return movieAdapterConsignment;
   }
 
   public List<MovieAdapter> getArticleStockListForVariantBundle(
