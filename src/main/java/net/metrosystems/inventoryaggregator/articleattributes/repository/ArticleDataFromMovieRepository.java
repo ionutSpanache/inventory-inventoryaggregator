@@ -76,7 +76,7 @@ public class ArticleDataFromMovieRepository {
 
   private ArticleDataFromMovie transformMovieAdapterToRawArticleDataFromMovieByArtVarBundle(
       MovieAdapter movieAdapter, Long articleNumber, Long variantNumber, Long bundleNumber) {
-    ArticleDataFromMovie articleDataFromMovie = new ArticleDataFromMovie();
+    ArticleDataFromMovie articleDataFromMovie = buildEmptyStockDataFromMovie();
     if (movieAdapter != null) {
       if ((articleNumber.equals(movieAdapter.getArticleNo()))
           && (variantNumber.equals(movieAdapter.getVariantId()))
@@ -89,6 +89,14 @@ public class ArticleDataFromMovieRepository {
       return articleDataFromMovie;
     }
     return null;
+  }
+
+  private ArticleDataFromMovie buildEmptyStockDataFromMovie(){
+    List<ArticlePlannedDeliveryDate> plannedDeliveryDates = new ArrayList<>();
+    return new ArticleDataFromMovie(
+      new StockInformation(),
+        plannedDeliveryDates
+    );
   }
 
   private StockInformation transformMovieAdapterToArticleStockData(MovieAdapter movieAdapter) {
