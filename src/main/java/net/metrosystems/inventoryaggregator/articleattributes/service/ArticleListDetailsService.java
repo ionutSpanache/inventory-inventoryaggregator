@@ -250,7 +250,8 @@ public class ArticleListDetailsService {
                     .collect(
                             Collectors.toMap(
                                     ProductLifeCycleForArticleId::getArticleId,
-                                    articleComponent -> articleComponent.getProductLifeCycleData()));
+                                    articleComponent -> articleComponent.getProductLifeCycleData() == null ?
+                                    ProductLifeCycleData.builder().build() : articleComponent.getProductLifeCycleData()));
 
     rawArticleDataList.forEach(
         rawArticleData -> {
