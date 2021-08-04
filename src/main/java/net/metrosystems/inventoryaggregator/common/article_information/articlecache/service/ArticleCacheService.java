@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
@@ -156,6 +158,18 @@ public class ArticleCacheService {
 
 	}
 
+	public ProductLifeCycleData getArticleProductLifeCycleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
+		Documents articleUrlPathList = articleCacheClient.getProductLifeCycleDocumentUrl(countryCode, articleId);
+
+		if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+			throw new ArticleNotFoundException();
+		}
+		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+		return mapToProductLifeCycleData(
+				articleCacheClient.getProductLifeCycleData(articleUrlPath));
+
+	}
+
 	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
 			Long articleNumber,
 			Long variantNumber,
@@ -248,6 +262,25 @@ public class ArticleCacheService {
 				articleCacheReaderDigest.getBrandName()
 				);
 	}
+
+	private ProductLifeCycleData mapToProductLifeCycleData(IsuItemMaster isuItemMaster) {
+		if(isuItemMaster.getContent().getAssortmentClusterSpecification()  == null)
+			return null;
+
+		return  ProductLifeCycleData
+				.builder()
+				.assortmentCluster(isuItemMaster.getContent().getAssortmentClusterSpecification().getAssortmentCluster())
+				.presencePeriodEndWeek(isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
+				.getPresencePeriodEndWeek())
+				.presencePeriodEndYear(isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
+				.getPresencePeriodEndYear())
+				.presencePeriodStartWeek(isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
+				.getPresencePeriodStartWeek())
+				.presencePeriodStartYear(isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
+				.getPresencePeriodStartYear())
+				.build();
+	}
+
 
 	public ArticleBasicData getArticleBasicDataByEan(String ean, String countryCode, String salesLine, String languageCode, int storeNo) throws Exception {
 		return processDocumentsReceivedFromArticleCache(

@@ -1,9 +1,11 @@
 package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.Filter;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.FilterIsuMaster;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.FilterSupplierInformation;
 import net.metrosystems.inventoryaggregator.config.ObjectMapperCustom;
 import net.metrosystems.inventoryaggregator.config.RestTemplate.RestTemplateCustom;
@@ -14,6 +16,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
+@Slf4j
 public class FilterAAAClient {
 
 
@@ -46,6 +49,33 @@ public class FilterAAAClient {
                     articleKey ->
                         articleKey.toLowerCase().contains("environment=dev")
                             || articleKey.toLowerCase().contains("environment=qa"));
+        return documents;
+    }
+
+    public Documents getFilteredDocumentsForIsuMaster(FilterIsuMaster filterIsuMaster) {
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .uri(configArticleCacheAAA.getHost())
+                .path(configArticleCacheAAA.getGeneral())
+                .query(configArticleCacheAAA.getGeneralQueryParam())
+                .buildAndExpand()
+                .encode();
+        log.info("FilterAAAClient.getFilteredDocuments ISU_MASTER uriComponents:" + uriComponents.toUri().toString());
+        //todo add suport for multi page response.
+        String filterAsString = null;
+        try {
+            filterAsString = ObjectMapperCustom.getMapper().writeValueAsString(filterIsuMaster);
+        } catch (JsonProcessingException e) {
+            log.error("ISU_ITEM_MASTER error when receiving data");
+        }
+        System.out.println("FilterAAAClient.getFilteredDocuments filterAsString");
+        Documents documents = (Documents) restTemplateCustom.postForObject(uriComponents.toUri().toString(), filterAsString, Documents.class, true);
+        if (documents != null && !CollectionUtils.isEmpty(documents.getArticleKeys()))
+            documents
+                    .getArticleKeys()
+                    .removeIf(
+                            articleKey ->
+                                    articleKey.toLowerCase().contains("environment=dev")
+                                            || articleKey.toLowerCase().contains("environment=qa"));
         return documents;
     }
 

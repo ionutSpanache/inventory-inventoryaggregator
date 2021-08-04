@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,6 +50,14 @@ public class ArticleMasterDataRepository {
 
     return CompletableFuture.completedFuture(articleMasterData);
   }
+
+    @Async("asyncExecutor")
+    public CompletableFuture<ProductLifeCycleData> getProductLifeCycleData(
+            String countryCode, ArticleId articleId) {
+        ProductLifeCycleData productLifeCycleData = getLifeCycleData(countryCode, articleId);
+
+        return CompletableFuture.completedFuture(productLifeCycleData);
+    }
 
   @Async("asyncExecutor")
   public CompletableFuture<List<ArticleMasterDataForArticleId>>
@@ -95,6 +105,11 @@ public class ArticleMasterDataRepository {
                         .collect(Collectors.toList()))
             .get();
     return CompletableFuture.completedFuture(articleMasterDataForArticleIds);
+  }
+
+  private ProductLifeCycleData getLifeCycleData(String countryCode, ArticleId articleId) {
+
+      return  articleCacheService.getArticleProductLifeCycleData(countryCode, articleId);
   }
 
   private ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
