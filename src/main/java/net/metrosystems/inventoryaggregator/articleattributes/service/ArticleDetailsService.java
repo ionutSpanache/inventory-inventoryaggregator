@@ -7,18 +7,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructure;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructureList;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
-import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBundleStockLocationRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
@@ -308,8 +297,11 @@ public class ArticleDetailsService {
           e.getMessage(), e);
     }
 
+    CompletableFuture<ProductLifeCycleData> productLifeCycleData =
+            articleMasterDataRepository.getProductLifeCycleData(countryCode, articleId);
+
     CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie,
-        articleStockLocationList, articleLocationList);
+        articleStockLocationList, articleLocationList, productLifeCycleData);
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
@@ -326,7 +318,10 @@ public class ArticleDetailsService {
                                                   .plannedDeliveryDates(plannedDeliveryDates)
                                                   .stockLocations(articleStockLocationList.get())
                                                   .articleLocation(articleLocationList.get())
-                                                  .articleComponent(articleComponent).build();
+                                                  .articleComponent(articleComponent)
+                                                  .productLifeCycleData(productLifeCycleData.get())
+                                                  .build();
+
 
     if (rawArticleDataList != null) {
       rawArticleDataList.add(rawArticleData);

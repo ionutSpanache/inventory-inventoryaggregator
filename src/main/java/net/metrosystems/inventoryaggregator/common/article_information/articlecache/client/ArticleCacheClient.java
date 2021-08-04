@@ -2,7 +2,10 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 
 
 import java.util.Optional;
+
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 
 public interface ArticleCacheClient {
@@ -22,4 +25,7 @@ public interface ArticleCacheClient {
 
 	Optional<ArticleCacheIhdsTree> getSupplierInformation(String countryCode, String salesLine, Optional<String> environment, Long supplierNumber);
 
+	Documents getProductLifeCycleDocumentUrl(String countryCode, ArticleId articleId);
+
+	IsuItemMaster getProductLifeCycleData(String articlePath);
 }

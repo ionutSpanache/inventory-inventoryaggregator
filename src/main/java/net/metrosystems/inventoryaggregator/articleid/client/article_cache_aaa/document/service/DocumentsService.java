@@ -9,10 +9,7 @@ import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client.FilterAAAClient;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.Filter;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.FilterSupplierInformation;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.KeysWithTypes;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.SubFilterKey;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.*;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.service.FilterAAAService;
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
@@ -88,6 +85,23 @@ public class DocumentsService {
         filterAAAService.addSubFilterKey(KeysWithTypes.salesBarcode, barCode, languageCode);
     filter.getFilterKeys().get(0).getSubFilterKeys().add(subFilterKey);
     return filterAAAClient.getFilteredDocuments(filter);
+  }
+
+  public Documents getIsuItemUrlByArtVarBundle(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
+    FilterKeyIsuMaster filterKeyIsuMaster = FilterKeyIsuMaster.builder()
+            .bundleNumber(articleId.getBundleNumber())
+            .variantNumber(articleId.getVariantNumber())
+            .articleNumber(articleId.getArticleNumber())
+            .countryCode(countryCode)
+            .build();
+
+    FilterIsuMaster filterIsuMaster = FilterIsuMaster
+            .builder()
+            .filterKeys(List.of(filterKeyIsuMaster))
+            .build();
+
+    return  filterAAAClient.getFilteredDocumentsForIsuMaster(filterIsuMaster);
+
   }
 
   public Documents getDocumentsByArticleNumber(

@@ -5,9 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -100,6 +102,17 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   }
 
   @Override
+  public IsuItemMaster getProductLifeCycleData(String articleUrlPath) {
+    log.info(
+            "ArticleCacheAAAClient.getArticleCacheDocumentByURL url:"
+                    + articleCacheServiceHost
+                    + "/"
+                    + articleUrlPath);
+    return getForArticleCacheObject(
+            articleCacheServiceHost + "/" + articleUrlPath, IsuItemMaster.class);
+  }
+
+  @Override
   public Optional<ArticleCacheIhdsTree> getSupplierInformation(
       String countryCode, String salesLine, Optional<String> environment, Long supplierNumber) {
     Documents articleUrlPathList =
@@ -108,6 +121,11 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
 
     String url = articleCacheServiceHost + "/" + articleUrlPathList.getArticleKeys().get(0);
     return Optional.ofNullable(getForArticleCacheObject(url, ArticleCacheIhdsTree.class));
+  }
+
+  @Override
+  public Documents getProductLifeCycleDocumentUrl(String countryCode, ArticleId articleId) {
+    return documentsService.getIsuItemUrlByArtVarBundle(countryCode, articleId);
   }
 
   private <T> T getForArticleCacheObject(String articleUrl, Class<T> responseType) {

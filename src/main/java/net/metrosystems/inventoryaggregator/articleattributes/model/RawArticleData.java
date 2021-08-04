@@ -24,7 +24,7 @@ public class RawArticleData implements Serializable {
     private List<ArticleStockLocation> stockLocations;
     private ArticleLocation articleLocation;
     private ArticleComponent articleComponent;
-
+    private ProductLifeCycleData productLifeCycleData;
 
     public static long getSerialversionuid() {
         return serialVersionUID;
