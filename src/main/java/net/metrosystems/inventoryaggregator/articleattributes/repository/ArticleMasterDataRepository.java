@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
@@ -106,6 +107,42 @@ public class ArticleMasterDataRepository {
             .get();
     return CompletableFuture.completedFuture(articleMasterDataForArticleIds);
   }
+
+    @Async("asyncExecutor")
+    public CompletableFuture<List<ProductLifeCycleForArticleId>>
+    getProductLifeCycleForArticleIds(
+            List<ArticleId> articleIdList,
+            String countryCode)
+            throws Exception {
+        List<ProductLifeCycleForArticleId> productLifeCycleForArticleIds =
+                forkJoinPoolCustom
+                        .submit(
+                                () ->
+                                        articleIdList.parallelStream()
+                                                .map(
+                                                        articleId -> {
+                                                            ProductLifeCycleData productLifeCycleData;
+                                                            try {
+                                                                productLifeCycleData =
+                                                                        getLifeCycleData(countryCode, articleId);
+                                                            } catch (Exception e) {
+                                                                log.error(
+                                                                        "ArticleMasterDataRepository.getArticleMasterDataForArticleIdList error: {}",
+                                                                        e.getMessage(),
+                                                                        e);
+                                                                return null;
+                                                            }
+                                                            return ProductLifeCycleForArticleId.builder()
+                                                                    .articleId(articleId)
+                                                                    .productLifeCycleData(productLifeCycleData)
+                                                                    .build();
+                                                        })
+                                                .filter(Objects::nonNull)
+                                                .collect(Collectors.toList()))
+                        .get();
+        return CompletableFuture.completedFuture(productLifeCycleForArticleIds);
+    }
+
 
   private ProductLifeCycleData getLifeCycleData(String countryCode, ArticleId articleId) {
 

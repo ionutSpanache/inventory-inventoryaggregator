@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleComponentForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
@@ -116,6 +118,21 @@ public class ArticleListDetailsService {
           e);
     }
 
+    CompletableFuture<List<ProductLifeCycleForArticleId>>  lifeCycleDataList =
+            new CompletableFuture<>();
+    try {
+      lifeCycleDataList =
+              articleMasterDataRepository.getProductLifeCycleForArticleIds(
+                      articleIdList, countryCode);
+    } catch (ArticleNotFoundException ex) {
+      throw new ArticleNotFoundException();
+    } catch (Exception e) {
+      log.error(
+              "ArticleListDetailsService.getProductLifeCycleData - getProductLyfeCycleData - error: {}",
+              e.getMessage(),
+              e);
+    }
+
     CompletableFuture<List<RawArticleStoreMasterDataForArticleId>> rawArticleStoreMasterData =
         new CompletableFuture<>();
     try {
@@ -183,7 +200,8 @@ public class ArticleListDetailsService {
         rawArticleStoreMasterData,
         stockDataFromMovie,
         articleStockLocationList,
-        articleLocationList);
+        articleLocationList,
+        lifeCycleDataList);
 
     Map<ArticleId, ArticleComponentForArticleId> articleComponentForArticleIdMap =
         articleComponentForArticleId.get().stream()
@@ -227,6 +245,13 @@ public class ArticleListDetailsService {
                     ArticleLocationForArticleId::getArticleId,
                     articleLocationForArticleId -> articleLocationForArticleId));
 
+    Map<ArticleId, ProductLifeCycleData> productLifeCycleMap =
+            lifeCycleDataList.get().stream()
+                    .collect(
+                            Collectors.toMap(
+                                    ProductLifeCycleForArticleId::getArticleId,
+                                    articleComponent -> articleComponent.getProductLifeCycleData()));
+
     rawArticleDataList.forEach(
         rawArticleData -> {
           rawArticleData.setArticleMasterData(
@@ -259,6 +284,11 @@ public class ArticleListDetailsService {
                       articleComponentForArticleIdMap.get(rawArticleData.getArticleId()))
                   .map(ArticleComponentForArticleId::getArticleComponent)
                   .orElse(null));
+          rawArticleData.setProductLifeCycleData(
+                  Optional.ofNullable(
+                          productLifeCycleMap.get(rawArticleData.getArticleId()))
+                          .orElse(null));
+
         });
   }
 }
