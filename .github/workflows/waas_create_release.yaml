@@ -1,4 +1,4 @@
-# waas-version: 86ceced - 2021-05-17 - 1621241095
+# waas-version: b0fbb0b - 2021-08-05 - 1628149395
 name: Build & Release
 on:
   push:
@@ -10,21 +10,21 @@ on:
       - ".github/waas.yaml"
       - ".github/secret-management.yaml"
 env:
-  SKAFFOLD_BUILD_ARTIFACT: skaffold_build_artifact.json
   SOPS_VERSION: 3.6.1
 jobs:
   build:
     runs-on: [self-hosted, Linux, metro-network]
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
       with:
         fetch-depth: 1
-    - name: Setup tools
+    - name: Setup tools used by WaaS
       uses: metro-digital/setup-tools-for-waas@v0.x
       with:
         version: 'waas/v1alpha4'
-    - name: Decrypt common secrets of all environments
-      id: common_secrets
+    - name: Decrypt secrets to get docker login credentials
+      id: decrypt_docker_secrets
       uses: metro-digital/sops-decrypt@v0.x
       with:
         version: ${{ env.SOPS_VERSION }}
@@ -33,45 +33,60 @@ jobs:
         output_type: json
     - name: Login to container registry
       run: |
+        set +e
+        set -o pipefail
         username=$(echo $connection_string | cut -d: -f2 | cut -d/ -f3)
         password=$(echo $connection_string | cut -d@ -f1 | cut -d: -f3)
         hostname=$(echo $connection_string | cut -d@ -f2 | cut -d/ -f1)
+        echo "Login to docker registry $hostname"
         echo -n "$password" | docker login "$hostname" -u "$username" --password-stdin
+        if [ $? -ne 0 ]; then
+          echo "::error ::WaaS: build: login to docker registry failed"
+          exit 10
+        fi
       env:
-        connection_string: ${{ fromJson(steps.common_secrets.outputs.data).DRP_PF_DOCKER_1 }}
-    - name: Check if docker image exist in registry
-      id: build
+        connection_string: ${{ fromJson(steps.decrypt_docker_secrets.outputs.data).DRP_PF_DOCKER_1 }}
+    - name: Check if docker image exist in container registry
+      id: check_for_existing_docker_image
       run: |
+        set +e
+        set -o pipefail
         image=$(skaffold --default-repo=registry.metroscales.io/inventory build -q --dry-run | jq -r ".builds[0].tag")
+        if [ $? -ne 0 ]; then
+          echo "::error ::WaaS: build: check for docker image: skaffold build failed"
+          exit 15
+        fi
         imageExist=$(docker manifest inspect $image > /dev/null && echo "true" || echo "false")
         echo "::set-output name=needed::$imageExist"
-    - name: Build & push image to container registry
-      if: steps.build.outputs.needed == 'false'
+    - name: Build & push image to container registry (if needed)
+      id: build_and_push_docker_image
+      if: steps.check_for_existing_docker_image.outputs.needed == 'false'
       run: |
-        skaffold build --default-repo=registry.metroscales.io/inventory -p push
+        set +e
+        set -o pipefail
+        skaffold --default-repo=registry.metroscales.io/inventory build -p push
+        if [ $? -ne 0 ]; then
+          echo "::error ::WaaS: build: skaffold build and push failed"
+          exit 20
+        fi
   deploy-dev-be-gcw1:
     needs: [build]
+    environment: dev-be-gcw1
     runs-on: [self-hosted, Linux, metro-network]
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
       with:
         fetch-depth: 1
-    - name: Setup tools
+    - name: Setup tools used by WaaS
       uses: metro-digital/setup-tools-for-waas@v0.x
       with:
         version: 'waas/v1alpha4'
-    - name: Set docker tag
-      run: |
-        tag=$(echo $GITHUB_SHA | cut -c1-7)
-        echo "TAG=$tag" >> $GITHUB_ENV
-    - name: Decrypt common secrets of all environments
-      id: secrets
-      uses: metro-digital/sops-decrypt@v0.x
+    - name: Import GPG key (used by skaffold deploy)
+      id: import_gpg_kex
+      uses: crazy-max/ghaction-import-gpg@v3
       with:
-        version: ${{ env.SOPS_VERSION }}
-        file: 'waas-config/base/application.secrets.yaml'
-        gpg_key: ${{ secrets.GPG_KEY }}
-        output_type: json
+        gpg-private-key: ${{ secrets.GPG_KEY }}
     - name: Setup kubectl config for dev-be-gcw1
       uses: metro-digital/oidc-set-context@v0.x
       with:
@@ -81,29 +96,7 @@ jobs:
         k8s_url: ${{ secrets.K8S_DEV_BE_GCW1_CLUSTER_URL || secrets.K8S_DEV_CLUSTER_URL }}
         k8s_namespace: 'inventory-dev'
         k8s_skip_tls_verify: true
-    - name: Produce skaffold build artifact
-      run: |
-        SKAFFOLD_UPDATE_CHECK=false \
-        skaffold build --default-repo=registry.metroscales.io/inventory -q --dry-run > ${{ env.SKAFFOLD_BUILD_ARTIFACT }}
-    - name: Check if k8s deployment requires migration
-      id: migration
-      run: |
-        deploymentExists=$(kubectl get deployments | (grep 'inventory-inventoryaggregator' || true))
-        if [ -n "$deploymentExists" ]; then
-          provider=$(kubectl get deployment inventory-inventoryaggregator -o jsonpath='{.metadata.labels.provider}')
-          if [ "$provider" == "deployment-controller" ]; then
-            echo "::set-output name=needed::true"
-          fi
-        fi
-    - name: Migrate deployment definition if required
-      if: steps.migration.outputs.needed == 'true'
-      run: |
-        SKAFFOLD_UPDATE_CHECK=false \
-        skaffold render -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p dev-be-gcw1 \
-          | yq -j -d'*' r  - \
-          | jq 'select(.kind == "Deployment")' \
-          | kubectl replace --save-config -f -
-    - name: Get repository information
+    - name: Get repository information (to put in K8S deployment)
       uses: octokit/request-action@v2.x
       id: repo_information
       with:
@@ -112,33 +105,34 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Deploy to dev-be-gcw1
       run: |
-        tag=${{ env.TAG }}
+        set +e
+        set -o pipefail
+        tag=$(echo $GITHUB_SHA | cut -c1-7)
         LABELS="provider=waas,repository.name=${{ github.event.repository.name }},repository.id=${{ fromJson(steps.repo_information.outputs.data).id }},repository.commit_sha=${GITHUB_SHA},tags.datadoghq.com/env=dev,tags.datadoghq.com/version=${tag}"
         SKAFFOLD_UPDATE_CHECK=false \
-        skaffold deploy -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p dev-be-gcw1 -l "$LABELS"
+        skaffold deploy -a <(skaffold --default-repo=registry.metroscales.io/inventory build -q --dry-run) -p dev-be-gcw1 -l "$LABELS"
+        if [ $? -ne 0 ]; then
+          echo "::error ::WaaS: deploy: skaffold deploy failed"
+          exit 40
+        fi
   deploy-pp-be-gcw1:
     needs: [deploy-dev-be-gcw1]
+    environment: pp-be-gcw1
     runs-on: [self-hosted, Linux, metro-network]
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
       with:
         fetch-depth: 1
-    - name: Setup tools
+    - name: Setup tools used by WaaS
       uses: metro-digital/setup-tools-for-waas@v0.x
       with:
         version: 'waas/v1alpha4'
-    - name: Set docker tag
-      run: |
-        tag=$(echo $GITHUB_SHA | cut -c1-7)
-        echo "TAG=$tag" >> $GITHUB_ENV
-    - name: Decrypt common secrets of all environments
-      id: secrets
-      uses: metro-digital/sops-decrypt@v0.x
+    - name: Import GPG key (used by skaffold deploy)
+      id: import_gpg_kex
+      uses: crazy-max/ghaction-import-gpg@v3
       with:
-        version: ${{ env.SOPS_VERSION }}
-        file: 'waas-config/base/application.secrets.yaml'
-        gpg_key: ${{ secrets.GPG_KEY }}
-        output_type: json
+        gpg-private-key: ${{ secrets.GPG_KEY }}
     - name: Setup kubectl config for pp-be-gcw1
       uses: metro-digital/oidc-set-context@v0.x
       with:
@@ -148,29 +142,7 @@ jobs:
         k8s_url: ${{ secrets.K8S_PP_BE_GCW1_CLUSTER_URL || secrets.K8S_PP_CLUSTER_URL }}
         k8s_namespace: 'inventory-pp'
         k8s_skip_tls_verify: true
-    - name: Produce skaffold build artifact
-      run: |
-        SKAFFOLD_UPDATE_CHECK=false \
-        skaffold build --default-repo=registry.metroscales.io/inventory -q --dry-run > ${{ env.SKAFFOLD_BUILD_ARTIFACT }}
-    - name: Check if k8s deployment requires migration
-      id: migration
-      run: |
-        deploymentExists=$(kubectl get deployments | (grep 'inventory-inventoryaggregator' || true))
-        if [ -n "$deploymentExists" ]; then
-          provider=$(kubectl get deployment inventory-inventoryaggregator -o jsonpath='{.metadata.labels.provider}')
-          if [ "$provider" == "deployment-controller" ]; then
-            echo "::set-output name=needed::true"
-          fi
-        fi
-    - name: Migrate deployment definition if required
-      if: steps.migration.outputs.needed == 'true'
-      run: |
-        SKAFFOLD_UPDATE_CHECK=false \
-        skaffold render -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p pp-be-gcw1 \
-          | yq -j -d'*' r  - \
-          | jq 'select(.kind == "Deployment")' \
-          | kubectl replace --save-config -f -
-    - name: Get repository information
+    - name: Get repository information (to put in K8S deployment)
       uses: octokit/request-action@v2.x
       id: repo_information
       with:
@@ -179,20 +151,27 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Deploy to pp-be-gcw1
       run: |
-        tag=${{ env.TAG }}
+        set +e
+        set -o pipefail
+        tag=$(echo $GITHUB_SHA | cut -c1-7)
         LABELS="provider=waas,repository.name=${{ github.event.repository.name }},repository.id=${{ fromJson(steps.repo_information.outputs.data).id }},repository.commit_sha=${GITHUB_SHA},tags.datadoghq.com/env=pp,tags.datadoghq.com/version=${tag}"
         SKAFFOLD_UPDATE_CHECK=false \
-        skaffold deploy -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p pp-be-gcw1 -l "$LABELS"
+        skaffold deploy -a <(skaffold --default-repo=registry.metroscales.io/inventory build -q --dry-run) -p pp-be-gcw1 -l "$LABELS"
+        if [ $? -ne 0 ]; then
+          echo "::error ::WaaS: deploy: skaffold deploy failed"
+          exit 40
+        fi
   release:
     needs: [deploy-pp-be-gcw1]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Generate default tag
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Generate default release tag
       run: |
         tag="build-`date +"%Y%m%d"`-${{ github.run_number }}"
         echo "TAG=$tag" >> $GITHUB_ENV
-    - name: Set git tag
+    - name: Override default release tag (if a git tag is set)
       if: startsWith(github.ref, 'refs/tags/')
       run: |
         echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
