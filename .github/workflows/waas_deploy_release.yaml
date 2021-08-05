@@ -1,4 +1,4 @@
-# waas-version: 86ceced - 2021-05-17 - 1621241095
+# waas-version: b0fbb0b - 2021-08-05 - 1628149395
 name: Deploy
 on:
   workflow_dispatch:
@@ -14,7 +14,6 @@ on:
         description: 'Environment to deploy'
         required: true
 env:
-  SKAFFOLD_BUILD_ARTIFACT: skaffold_build_artifact.json
   SOPS_VERSION: 3.6.1
   release: ${{ github.event.inputs.release }}
   stage: ${{ github.event.inputs.stage }}
@@ -23,22 +22,25 @@ jobs:
   deploy:
     runs-on: [self-hosted, Linux, metro-network]
     steps:
+    - name: Trim inputs
+      run: |
+        echo "release=$(echo "${{ env.release }}" | tr -d '[:space:]')" >> $GITHUB_ENV
+        echo "datacenter=$(echo "${{ env.datacenter }}" | tr -d '[:space:]')" >> $GITHUB_ENV
+        echo "stage=$(echo "${{ env.stage }}" | tr -d '[:space:]')" >> $GITHUB_ENV
     - uses: actions/checkout@v2
       with:
         ref: ${{ env.release }}
         fetch-depth: 1
-    - name: Setup tools
+    - name: Setup tools used by WaaS
       uses: metro-digital/setup-tools-for-waas@v0.x
       with:
         version: 'waas/v1alpha4'
-    - name: Decrypt common secrets of all environments
-      uses: metro-digital/sops-decrypt@v0.x
+    - name: Import GPG key (used by skaffold deploy)
+      id: import_gpg_kex
+      uses: crazy-max/ghaction-import-gpg@v3
       with:
-        version: ${{ env.SOPS_VERSION }}
-        file: 'waas-config/base/application.secrets.yaml'
-        gpg_key: ${{ secrets.GPG_KEY }}
-        output_type: json
-    - name: Get k8s URL key name
+        gpg-private-key: ${{ secrets.GPG_KEY }}
+    - name: Get secret name for K8S API URL
       id: k8s
       run: |
         stage=$(echo "${{ env.stage }}" | tr '[:lower:]' '[:upper:]')
@@ -56,41 +58,61 @@ jobs:
         k8s_url: ${{ secrets[steps.k8s.outputs.key_name_with_dc] || secrets[steps.k8s.outputs.key_name] }}
         k8s_namespace: 'inventory-${{ env.stage }}'
         k8s_skip_tls_verify: true
-    - name: Produce skaffold build artifact
-      run: |
-        skaffold build --default-repo=registry.metroscales.io/inventory -q --dry-run > ${{ env.SKAFFOLD_BUILD_ARTIFACT }}
-    - name: Check if k8s deployment requires migration
-      id: migration
-      run: |
-        deploymentExists=$(kubectl get deployments | (grep 'inventory-inventoryaggregator' || true))
-        if [ -n "$deploymentExists" ]; then
-          provider=$(kubectl get deployment inventory-inventoryaggregator -o jsonpath='{.metadata.labels.provider}')
-          if [ "$provider" == "deployment-controller" ]; then
-            echo "::set-output name=needed::true"
-          fi
-        fi
-    - name: Migrate deployment definition if required
-      if: steps.migration.outputs.needed == 'true'
-      run: |
-        SKAFFOLD_UPDATE_CHECK=false \
-        skaffold render -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p ${{ env.stage }}-${{ env.datacenter }} \
-          | yq -j -d'*' r  - \
-          | jq 'select(.kind == "Deployment")' \
-          | kubectl replace --save-config -f -
-    - name: Get repository information
+    - name: Get repository information (to put in K8S deployment)
       uses: octokit/request-action@v2.x
       id: repo_information
       with:
         route: GET /repos/${{ github.repository }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create GitHub deployment
+      uses: octokit/request-action@v2.x
+      id: create_deployment
+      with:
+        route: POST /repos/${{ github.repository }}/deployments
+        mediaType: '{"previews": ["ant-man","flash"]}'
+        ref: ${{ env.release }}
+        environment: ${{ env.stage }}-${{ env.datacenter }}
+        auto_merge: false
+        required_contexts: '[]'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Deploy to ${{ env.stage }}
+      id: do_deployment
+      continue-on-error: true
       run: |
         tag=${{ env.release }}
         stage="${{ env.stage }}"
         LABELS="provider=waas,repository.name=${{ github.event.repository.name }},repository.id=${{ fromJson(steps.repo_information.outputs.data).id }},repository.commit_sha=${GITHUB_SHA},tags.datadoghq.com/env=${stage},tags.datadoghq.com/version=${tag}"
         SKAFFOLD_UPDATE_CHECK=false \
-        skaffold deploy -a ${{ env.SKAFFOLD_BUILD_ARTIFACT }} -p ${{ env.stage }}-${{ env.datacenter }} -l "$LABELS"
+        skaffold deploy -a <(skaffold --default-repo=registry.metroscales.io/inventory build -q --dry-run) -p ${{ env.stage }}-${{ env.datacenter }} -l "$LABELS"
+    - name: Create deployment status success
+      if: steps.do_deployment.outcome == 'success'
+      uses: octokit/request-action@v2.x
+      with:
+        route: POST /repos/${{ github.repository }}/deployments/{deployment_id}/statuses
+        mediaType: '{"previews": ["ant-man","flash"]}'
+        deployment_id: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+        state: success
+        auto_inactive: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create deployment status failure
+      if: steps.do_deployment.outcome == 'failure'
+      uses: octokit/request-action@v2.x
+      with:
+        route: POST /repos/${{ github.repository }}/deployments/{deployment_id}/statuses
+        mediaType: '{"previews": ["ant-man","flash"]}'
+        deployment_id: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+        state: failure
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check for errors during deployment into K8S
+      if: steps.do_deployment.outcome == 'failure'
+      uses: actions/github-script@v4
+      with:
+        script: |
+          core.setFailed('WaaS: deploy: skaffold deploy failed')
   notification:
     needs: [deploy]
     runs-on: [self-hosted, Linux, metro-network]
