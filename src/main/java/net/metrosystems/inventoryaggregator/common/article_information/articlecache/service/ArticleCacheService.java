@@ -267,17 +267,29 @@ public class ArticleCacheService {
 		if(isuItemMaster.getContent().getAssortmentClusterSpecification()  == null)
 			return null;
 
+		Long presencePeriodEndWeek = isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2() == null ? null :
+				isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
+						.getPresencePeriodEndWeek();
+
+		Long presencePeriodEndYear = isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2() == null ? null :
+				isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
+						.getPresencePeriodEndYear();
+
+		Long presencePeriodStartWeek = isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2() == null ? null :
+				isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
+						.getPresencePeriodStartWeek();
+
+		Long presencePeriodStartYear = isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2() == null ? null :
+				isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
+						.getPresencePeriodStartYear();
+
 		return  ProductLifeCycleData
 				.builder()
 				.assortmentCluster(isuItemMaster.getContent().getAssortmentClusterSpecification().getAssortmentCluster())
-				.presencePeriodEndWeek(isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
-				.getPresencePeriodEndWeek())
-				.presencePeriodEndYear(isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
-				.getPresencePeriodEndYear())
-				.presencePeriodStartWeek(isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
-				.getPresencePeriodStartWeek())
-				.presencePeriodStartYear(isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
-				.getPresencePeriodStartYear())
+				.presencePeriodEndWeek(presencePeriodEndWeek)
+				.presencePeriodEndYear(presencePeriodEndYear)
+				.presencePeriodStartWeek(presencePeriodStartWeek)
+				.presencePeriodStartYear(presencePeriodStartYear)
 				.build();
 	}
 
