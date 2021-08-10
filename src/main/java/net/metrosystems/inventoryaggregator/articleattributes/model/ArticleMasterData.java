@@ -38,6 +38,7 @@ public class ArticleMasterData implements Serializable {
   private double bundleNetBuyingPrice;
   private double pieceNetNetBuyingPrice;
   private double bundleNetNetBuyingPrice;
+  private Long articleNoEmptiesSales;
   private String brandName;
 
   public static long getSerialversionuid() {
@@ -75,6 +76,7 @@ public class ArticleMasterData implements Serializable {
             ", bundleNetBuyingPrice=" + bundleNetBuyingPrice +
             ", pieceNetNetBuyingPrice=" + pieceNetNetBuyingPrice +
             ", bundleNetNetBuyingPrice=" + bundleNetNetBuyingPrice +
+            ", articleNoEmptiesSales=" + articleNoEmptiesSales +
             ", brandName='" + brandName + '\'' +
             '}';
   }

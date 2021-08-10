@@ -147,6 +147,18 @@ public class ArticleCacheDataGroup {
     this.expiryDays = expiryDays;
   }
 
+  /*Data Group 300*/
+  private Long articleNoEmptiesSales;
+
+  public Long getArticleNoEmptiesSales() {
+    return articleNoEmptiesSales;
+  }
+
+  @XmlElement(name = "ARTICLENOEMPTIESSALES")
+  public void setArticleNoEmptiesSales(Long articleNoEmptiesSales) {
+    this.articleNoEmptiesSales = articleNoEmptiesSales;
+  }
+
   /*Data Group 310*/
   private Integer sellingBundleContent;
 
