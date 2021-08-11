@@ -222,6 +222,7 @@ public class ArticleCacheService {
 		}
 		ArticleCacheReaderDigest articleCacheReaderDigest = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest();
 		ArticleCacheDataGroup articleCacheDataGroup100 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100);
+		ArticleCacheDataGroup articleCacheDataGroup300 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(300);
 		ArticleCacheDataGroup articleCacheDataGroup310 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(310);
 		ArticleCacheDataGroup articleCacheDataGroup320 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
 		ArticleCacheDataGroup articleCacheDataGroup325 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
@@ -259,6 +260,7 @@ public class ArticleCacheService {
 				articleCacheDataGroup325.getBundleNetBuyingPrice(),
 				articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
 				articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
+				articleCacheDataGroup300.getArticleNoEmptiesSales(),
 				articleCacheReaderDigest.getBrandName()
 				);
 	}

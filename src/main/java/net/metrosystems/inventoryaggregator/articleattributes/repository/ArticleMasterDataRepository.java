@@ -12,7 +12,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMaste
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -195,6 +194,7 @@ public class ArticleMasterDataRepository {
           articleCacheFullData.getBundleNetBuyingPrice(),
           articleCacheFullData.getPieceNetNetBuyingPrice(),
           articleCacheFullData.getBundleNetNetBuyingPrice(),
+          articleCacheFullData.getArticleNoEmptiesSales(),
           articleCacheFullData.getBrandName());
     }
     return null;
