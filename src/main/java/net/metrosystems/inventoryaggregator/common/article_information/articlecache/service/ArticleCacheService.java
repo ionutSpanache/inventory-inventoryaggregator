@@ -161,8 +161,8 @@ public class ArticleCacheService {
 	public ProductLifeCycleData getArticleProductLifeCycleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
 		Documents articleUrlPathList = articleCacheClient.getProductLifeCycleDocumentUrl(countryCode, articleId);
 
-		if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-			throw new ArticleNotFoundException();
+		if (articleUrlPathList == null || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+			return new ProductLifeCycleData();
 		}
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 		return mapToProductLifeCycleData(
