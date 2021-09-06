@@ -1,13 +1,9 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.RawArticleStoreMasterDataForArticleId;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
@@ -20,6 +16,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
+
 @Repository
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class RawArticleStoreMasterDataRepository {
 
   private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
   private final ArticleCacheService articleCacheService;
+  private static final String INDIA_COUNTRY_CODE = "IN";
 
   @Qualifier("ForkJoinCustomPool")
   private final ForkJoinPool forkJoinPoolCustom;
@@ -38,6 +41,18 @@ public class RawArticleStoreMasterDataRepository {
     return CompletableFuture.completedFuture(
         getSynchronouslyRawArticleStoreMasterData(
             articleId, countryCode, salesLine, storeNo));
+  }
+
+  @Async("asyncExecutor")
+  public CompletableFuture<MaximumRetailPrice> getMaximumRetailPrice(
+          String countryCode, String salesLine, Integer storeNumber, ArticleId articleId) {
+
+    if (INDIA_COUNTRY_CODE.equalsIgnoreCase(countryCode)) {
+      return CompletableFuture.completedFuture(aclArticleStoreMasterDataService.getMaximumRetailPrice(countryCode,
+              salesLine, storeNumber, articleId));
+    }
+
+    return CompletableFuture.completedFuture(MaximumRetailPrice.builder().build());
   }
 
   @Async("asyncExecutor")
