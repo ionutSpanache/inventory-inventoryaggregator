@@ -1,6 +1,9 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.service;
 
 import java.util.List;
+
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.client.AclArticleStoreMasterDataClient;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +51,10 @@ public class AclArticleStoreMasterDataService {
 	   }
 	   return null;
    }
+
+	public MaximumRetailPrice getMaximumRetailPrice(
+			String countryCode, String salesLine, Integer storeNumber, ArticleId articleId) {
+		return aclArticleStoreMasterDataClient.getMaximumRetailPrice(countryCode, salesLine, storeNumber, articleId);
+	}
 }
 
