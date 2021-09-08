@@ -45,7 +45,7 @@ services:
             cpu: '1'
           limits:
             memory: 3Gi
-            cpu: '2'
+            cpu: '3'
       prod:
         replicas: 6
         resources:
@@ -54,7 +54,7 @@ services:
             cpu: '0.1'
           limits:
             memory: 3Gi
-            cpu: '2'
+            cpu: '3'
 tests: null
 watchers:
   - alin.ciubotariu01@metrosystems.net

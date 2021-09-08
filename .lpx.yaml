@@ -37,7 +37,7 @@ services:
           cpu: "1"
         limits:
           memory: "3Gi"
-          cpu: "2"
+          cpu: "3"
     prod:
       replicas: 6
       resources:
@@ -46,7 +46,7 @@ services:
           cpu: "0.1"
         limits:
           memory: "3Gi"
-          cpu: "2"
+          cpu: "3"
 # Specifies the files executed for tests on each environment. Need to be executable 'chmod +x'
 tests:
 # - stage: dev
