@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.Filter;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.FilterIsuItemStoreMerchandise;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.FilterIsuMaster;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.FilterSupplierInformation;
 import net.metrosystems.inventoryaggregator.config.ObjectMapperCustom;
@@ -64,6 +65,33 @@ public class FilterAAAClient {
         String filterAsString = null;
         try {
             filterAsString = ObjectMapperCustom.getMapper().writeValueAsString(filterIsuMaster);
+        } catch (JsonProcessingException e) {
+            log.error("ISU_ITEM_MASTER error when receiving data");
+        }
+        System.out.println("FilterAAAClient.getFilteredDocuments filterAsString");
+        Documents documents = (Documents) restTemplateCustom.postForObject(uriComponents.toUri().toString(), filterAsString, Documents.class, true);
+        if (documents != null && !CollectionUtils.isEmpty(documents.getArticleKeys()))
+            documents
+                    .getArticleKeys()
+                    .removeIf(
+                            articleKey ->
+                                    articleKey.toLowerCase().contains("environment=dev")
+                                            || articleKey.toLowerCase().contains("environment=qa"));
+        return documents;
+    }
+
+    public Documents getFilteredDocumentsForIsuStoreMerchandise(FilterIsuItemStoreMerchandise filterIsuItemStoreMerchandise) {
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .uri(configArticleCacheAAA.getHost())
+                .path(configArticleCacheAAA.getGeneral())
+                .query(configArticleCacheAAA.getGeneralQueryParam())
+                .buildAndExpand()
+                .encode();
+        log.info("FilterAAAClient.getFilteredDocuments ISU_ITEM_STORE_MERCHANDISE uriComponents:" + uriComponents.toUri().toString());
+        //todo add suport for multi page response.
+        String filterAsString = null;
+        try {
+            filterAsString = ObjectMapperCustom.getMapper().writeValueAsString(filterIsuItemStoreMerchandise);
         } catch (JsonProcessingException e) {
             log.error("ISU_ITEM_MASTER error when receiving data");
         }

@@ -26,6 +26,7 @@ public class RawArticleData implements Serializable {
     private ArticleComponent articleComponent;
     private ProductLifeCycleData productLifeCycleData;
     private MaximumRetailPrice maximumRetailPrice;
+    private String channelDeliveryFlag;
 
     public static long getSerialversionuid() {
         return serialVersionUID;
@@ -36,6 +37,7 @@ public class RawArticleData implements Serializable {
         return "RawArticleData [articleId=" + articleId + ", articleMasterData=" + articleMasterData
                 + ", stockDetails=" + stockDetails + ", plannedDeliveryDates=" + plannedDeliveryDates
                 + ", stockLocations=" + stockLocations + ", articleComponent=" + articleComponent +
-                ", maximumRetailPrice=" + maximumRetailPrice + ", util=" + "]";
+                ", maximumRetailPrice=" + maximumRetailPrice +
+                ", channelDeliveryFlag=" + channelDeliveryFlag +", util=" + "]";
     }
 }

@@ -3,11 +3,14 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
@@ -168,6 +171,28 @@ public class ArticleCacheService {
 		return mapToProductLifeCycleData(
 				articleCacheClient.getProductLifeCycleData(articleUrlPath));
 
+	}
+
+	public Optional<String> getChannelDeliveryFlag(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
+												   Integer storeNumber) {
+		Documents articleUrlPathList = articleCacheClient.getChannelDeliveryFlagUrl(countryCode, articleId);
+
+		if (articleUrlPathList == null || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+			return Optional.empty();
+		}
+		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+
+		IsuItemStoreMerchandise isuItemStoreMerchandise = articleCacheClient.getChannelDeliveryFlagDocument(articleUrlPath);
+
+		return mapToDeliveryFlagForStore(isuItemStoreMerchandise, storeNumber);
+
+	}
+
+	private Optional<String> mapToDeliveryFlagForStore(IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
+		return isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
+				.stream().filter(storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
+				.map(storeInformationGroup -> storeInformationGroup.getChannelDeliveryFlag())
+				.findFirst();
 	}
 
 	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
