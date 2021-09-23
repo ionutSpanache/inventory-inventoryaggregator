@@ -1,17 +1,12 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
@@ -19,17 +14,18 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBasicData;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.*;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.multithreading.ArticleDataThreads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -190,10 +186,16 @@ public class ArticleCacheService {
 	}
 
 	private Optional<String> mapToDeliveryFlagForStore(IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
-		return isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
+		Optional<StoreInformationGroup> response = isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
+				== null ? Optional.empty() : isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
 				.stream().filter(storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
-				.flatMap(storeInformationGroup -> Stream.ofNullable(storeInformationGroup.getChannelDeliveryFlag()))
 				.findFirst();
+
+		if(response.isPresent()) {
+			return response.map(storeInformationGroup -> storeInformationGroup.getChannelDeliveryFlag());
+		}
+
+		return Optional.empty();
 	}
 
 	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
