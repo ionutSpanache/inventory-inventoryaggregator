@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
@@ -191,7 +192,7 @@ public class ArticleCacheService {
 	private Optional<String> mapToDeliveryFlagForStore(IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
 		return isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
 				.stream().filter(storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
-				.map(storeInformationGroup -> storeInformationGroup.getChannelDeliveryFlag())
+				.flatMap(storeInformationGroup -> Stream.ofNullable(storeInformationGroup.getChannelDeliveryFlag()))
 				.findFirst();
 	}
 

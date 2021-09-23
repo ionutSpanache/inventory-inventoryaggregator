@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.client;
 
+import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.client.model.ArticleStoreMasterDataACLResponse;
@@ -13,11 +14,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
 
 @Component
+@Slf4j
 public class AclArticleStoreMasterDataClient {
 
 	@Autowired
@@ -112,6 +115,10 @@ public class AclArticleStoreMasterDataClient {
 				.uri(uriComponents.toString())
 				.retrieve()
 				.bodyToMono(MaximumRetailPrice.class)
+				.onErrorResume(throwable -> {
+					log.error("ACL error when calling " + maximumRetailPricePath);
+					return Mono.just(MaximumRetailPrice.builder().build());
+				})
 				.block();
 
 	}
