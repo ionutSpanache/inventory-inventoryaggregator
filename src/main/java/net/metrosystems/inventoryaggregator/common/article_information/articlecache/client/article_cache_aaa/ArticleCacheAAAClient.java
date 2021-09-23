@@ -9,6 +9,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +114,17 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   }
 
   @Override
+  public IsuItemStoreMerchandise getChannelDeliveryFlagDocument(String articleUrlPath) {
+    log.info(
+            "ArticleCacheAAAClient.getArticleCacheDocumentByURL url:"
+                    + articleCacheServiceHost
+                    + "/"
+                    + articleUrlPath);
+    return getForArticleCacheObject(
+            articleCacheServiceHost + "/" + articleUrlPath, IsuItemStoreMerchandise.class);
+  }
+
+  @Override
   public Optional<ArticleCacheIhdsTree> getSupplierInformation(
       String countryCode, String salesLine, Optional<String> environment, Long supplierNumber) {
     Documents articleUrlPathList =
@@ -126,6 +138,11 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   @Override
   public Documents getProductLifeCycleDocumentUrl(String countryCode, ArticleId articleId) {
     return documentsService.getIsuItemUrlByArtVarBundle(countryCode, articleId);
+  }
+
+  @Override
+  public Documents getChannelDeliveryFlagUrl(String countryCode, ArticleId articleId) {
+    return documentsService.getIsuItemStoreMerchandiseByArtVarBundle(countryCode, articleId);
   }
 
   private <T> T getForArticleCacheObject(String articleUrl, Class<T> responseType) {

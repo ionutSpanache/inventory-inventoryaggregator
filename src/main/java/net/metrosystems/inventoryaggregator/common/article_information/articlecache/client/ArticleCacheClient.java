@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 
@@ -28,4 +29,8 @@ public interface ArticleCacheClient {
 	Documents getProductLifeCycleDocumentUrl(String countryCode, ArticleId articleId);
 
 	IsuItemMaster getProductLifeCycleData(String articlePath);
+
+	Documents getChannelDeliveryFlagUrl(String countryCode, ArticleId articleId);
+
+	IsuItemStoreMerchandise getChannelDeliveryFlagDocument(String articlePath);
 }

@@ -2,6 +2,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeC
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
@@ -57,6 +59,15 @@ public class ArticleMasterDataRepository {
         ProductLifeCycleData productLifeCycleData = getLifeCycleData(countryCode, articleId);
 
         return CompletableFuture.completedFuture(productLifeCycleData);
+    }
+
+    @Async("asyncExecutor")
+    public CompletableFuture<String> getChannelDeliveryFlag(
+            String countryCode, ArticleId articleId, Integer storeNumber) {
+        String channelDeliveryFlag = getDeliveryFlag(countryCode, articleId, storeNumber)
+                .orElse(StringUtils.EMPTY);
+
+        return CompletableFuture.completedFuture(channelDeliveryFlag);
     }
 
   @Async("asyncExecutor")
@@ -147,6 +158,11 @@ public class ArticleMasterDataRepository {
 
       return  articleCacheService.getArticleProductLifeCycleData(countryCode, articleId);
   }
+
+    private Optional<String> getDeliveryFlag(String countryCode, ArticleId articleId, Integer storeNumber) {
+
+        return  articleCacheService.getChannelDeliveryFlag(countryCode, articleId, storeNumber);
+    }
 
   private ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
       Long articleNumber,

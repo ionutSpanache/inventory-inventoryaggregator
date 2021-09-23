@@ -303,6 +303,9 @@ public class ArticleDetailsService {
     CompletableFuture<MaximumRetailPrice> maximumRetailPrice =
             rawArticleStoreMasterDataRepository.getMaximumRetailPrice(countryCode, salesLine, storeNo, articleId);
 
+    CompletableFuture<String> channelDeliveryFlag = articleMasterDataRepository.getChannelDeliveryFlag(
+            countryCode, articleId, storeNo);
+
     CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie,
         articleStockLocationList, articleLocationList, productLifeCycleData, maximumRetailPrice);
 
@@ -324,6 +327,7 @@ public class ArticleDetailsService {
                                                   .articleComponent(articleComponent)
                                                   .productLifeCycleData(productLifeCycleData.get())
                                                   .maximumRetailPrice(maximumRetailPrice.get())
+                                                  .channelDeliveryFlag(channelDeliveryFlag.get())
                                                   .build();
 
 
