@@ -328,6 +328,7 @@ public class ArticleDetailsService {
                                                   .productLifeCycleData(productLifeCycleData.get())
                                                   .maximumRetailPrice(maximumRetailPrice.get())
                                                   .channelDeliveryFlag(channelDeliveryFlag.get())
+                                                  .minimumRetailPrice(articleMasterData.get().getMinimumRetailPrice())
                                                   .build();
 
 

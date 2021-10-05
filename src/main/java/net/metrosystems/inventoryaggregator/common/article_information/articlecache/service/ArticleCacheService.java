@@ -43,6 +43,9 @@ public class ArticleCacheService {
 	private ArticleCacheAAAClient articleCacheClient;
 	private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
 
+	private static final String PAKISTAN_COUNTRY_CODE = "PK";
+	private static final Double ZERO = 0.0;
+
 	@Autowired
 	public ArticleCacheService(ArticleDataThreads articleDataThreads, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient) {
 		this.articleDataThreads = articleDataThreads;
@@ -289,8 +292,34 @@ public class ArticleCacheService {
 				articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
 				articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
 				articleCacheDataGroup300.getArticleNoEmptiesSales(),
-				articleCacheReaderDigest.getBrandName()
+				articleCacheReaderDigest.getBrandName(),
+				calculateMinimumRetailPrice(articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent())
 				);
+	}
+
+	private Double calculateMinimumRetailPrice(ArticleCacheIhdsTree articleCacheIhdsTree, Integer storeNumber, Integer sellingBundleContent) {
+		String countryCode = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
+				.getArticleCacheDomain().getPlkz();
+
+		if (PAKISTAN_COUNTRY_CODE.equalsIgnoreCase(countryCode)) {
+			Boolean hasMinimumRetailPrice = articleCacheIhdsTree.getTransaction()
+					.getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100)
+					.getHasMinimumRetailPrice();
+
+			if (hasMinimumRetailPrice == true) {
+				Double minimumRetailPriceForVatCalculation = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
+						.getArticleCacheDataGroup().stream()
+						.filter(articleCacheDataGroup -> articleCacheDataGroup.getStoreNo() == storeNumber)
+						.findFirst()
+						.map(articleCacheDataGroup -> articleCacheDataGroup.getMinimumRetailPriceForVatCalculation())
+						.orElse(ZERO);
+				return minimumRetailPriceForVatCalculation * sellingBundleContent;
+			}
+
+			return ZERO;
+		}
+
+		return ZERO;
 	}
 
 	private ProductLifeCycleData mapToProductLifeCycleData(IsuItemMaster isuItemMaster) {

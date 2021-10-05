@@ -44,4 +44,5 @@ public class ArticleCacheFullData {
     private double bundleNetNetBuyingPrice;
     private Long articleNoEmptiesSales;
     private String brandName;
+    private Double minimumRetailPrice;
 }

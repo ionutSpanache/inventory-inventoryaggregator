@@ -102,6 +102,18 @@ public class ArticleCacheDataGroup {
     this.presentationSubMerchandiseGroup = presentationSubMerchandiseGroup;
   }
 
+  private Boolean hasMinimumRetailPrice;
+
+  @XmlElement(name = "ISTRADEITEMWITHMINIMUMRETAILPRICEFORVATCALCULATION")
+  public void setHasMinimumRetailPrice(Boolean hasMinimumRetailPrice) {
+    this.hasMinimumRetailPrice = hasMinimumRetailPrice;
+  }
+
+  public Boolean getHasMinimumRetailPrice() {
+    return  hasMinimumRetailPrice;
+  }
+
+
   /*Data Group 200*/
   private List<String> singleItemSalesBarcode;
 
@@ -303,6 +315,17 @@ public class ArticleCacheDataGroup {
   @XmlElement(name = "PROMOTIONNETSALESPRICEPERBUNDLE")
   public void setPromotionBundleNetPrice(double promotionBundleNetPrice) {
     this.promotionBundleNetPrice = promotionBundleNetPrice;
+  }
+
+  private Double minimumRetailPriceForVatCalculation;
+
+  public Double getMinimumRetailPriceForVatCalculation() {
+    return minimumRetailPriceForVatCalculation;
+  }
+
+  @XmlElement(name = "MINIMUMRETAILPRICEFORVATCALCULATIONPERPIECE")
+  public void setMinimumRetailPriceForVatCalculation(Double minimumRetailPriceForVatCalculation) {
+    this.minimumRetailPriceForVatCalculation = minimumRetailPriceForVatCalculation;
   }
 
   /*Data Group 325*/
