@@ -25,7 +25,6 @@ public class ArticleDataFromMovieRepository {
     this.movieService = movieService;
   }
 
-
   @Async("asyncExecutor")
   public CompletableFuture<ArticleDataFromMovie> getArticleDataFromMovie(
       ArticleId articleId, String countryCode, String salesLine, Integer storeNo) {
@@ -52,24 +51,22 @@ public class ArticleDataFromMovieRepository {
       List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo) {
     List<MovieAdapter> movieAdapterList =
         movieService.getArticleStockListForVariantBundle(
-            countryCode,
-            salesLine,
-            storeNo,
-            articleIdList);
+            countryCode, salesLine, storeNo, articleIdList);
     List<StockData> stockDataList = new ArrayList<>();
-    movieAdapterList.forEach(movieAdapter -> {
-      StockData stockData = new StockData();
-      stockData.setArticleId(ArticleId.builder()
-          .articleNumber(movieAdapter.getArticleNo())
-          .variantNumber(movieAdapter.getVariantId())
-          .bundleNumber(movieAdapter.getBundleId())
-          .build());
-      stockData.setArticleStockData(
-          transformMovieAdapterToArticleStockData(movieAdapter));
-      stockData.setArticlePlannedDeliveryDates(
-          transformMovieAdapterToArticlePlannedDeliveryDateList(movieAdapter));
-      stockDataList.add(stockData);
-    });
+    movieAdapterList.forEach(
+        movieAdapter -> {
+          StockData stockData = new StockData();
+          stockData.setArticleId(
+              ArticleId.builder()
+                  .articleNumber(movieAdapter.getArticleNo())
+                  .variantNumber(movieAdapter.getVariantId())
+                  .bundleNumber(movieAdapter.getBundleId())
+                  .build());
+          stockData.setArticleStockData(transformMovieAdapterToArticleStockData(movieAdapter));
+          stockData.setArticlePlannedDeliveryDates(
+              transformMovieAdapterToArticlePlannedDeliveryDateList(movieAdapter));
+          stockDataList.add(stockData);
+        });
 
     return CompletableFuture.completedFuture(stockDataList);
   }
@@ -91,12 +88,9 @@ public class ArticleDataFromMovieRepository {
     return null;
   }
 
-  private ArticleDataFromMovie buildEmptyStockDataFromMovie(){
+  private ArticleDataFromMovie buildEmptyStockDataFromMovie() {
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = new ArrayList<>();
-    return new ArticleDataFromMovie(
-      new StockInformation(),
-        plannedDeliveryDates
-    );
+    return new ArticleDataFromMovie(new StockInformation(), plannedDeliveryDates);
   }
 
   private StockInformation transformMovieAdapterToArticleStockData(MovieAdapter movieAdapter) {
@@ -119,7 +113,8 @@ public class ArticleDataFromMovieRepository {
         movieAdapter.getLastSalesQuantity(),
         movieAdapter.getLastGRQuantity(),
         movieAdapter.isConsigStock(),
-        movieAdapter.getConsignmentStock());
+        movieAdapter.getConsignmentStock(),
+        movieAdapter.getParkedStock());
   }
 
   private List<ArticlePlannedDeliveryDate> transformMovieAdapterToArticlePlannedDeliveryDateList(

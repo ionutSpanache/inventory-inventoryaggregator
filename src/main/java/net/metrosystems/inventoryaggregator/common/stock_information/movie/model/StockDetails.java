@@ -33,4 +33,5 @@ public class StockDetails {
     private List<ConsigmentStock> consignmentStock;
     private String message;
     private Integer returnCode;
+    private List<ParkedStock> parkedStock;
 }
