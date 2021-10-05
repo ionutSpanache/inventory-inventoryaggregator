@@ -8,6 +8,7 @@ import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.Article
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
@@ -18,108 +19,107 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class AclArticleStoreMasterDataClient {
 
-	@Autowired
-	RestTemplate restTemplate;
+  @Qualifier("webClientForAcl")
+  @Autowired
+  private WebClient webClient;
 
-	@Qualifier("webClientForAcl")
-	@Autowired
-	private WebClient webClient;
+  @Value("${ACL_STORE_MASTER_DATA_HOST}")
+  private String aclArticleMasterDataHost;
+  @Value("${ACL_STORE_MASTER_DATA_PATH_BY_EAN}")
+  private String aclArticleMasterDataPathByEan;
+  @Value("${ACL_STORE_MASTER_DATA_PATH_BY_SUBSYS}")
+  private String aclArticleMasterDataPathBySubsys;
+  @Value("${ACL_STORE_MASTER_DATA_PATH_BY_ART_VAR_BUNDLE}")
+  private String aclArticleMasterDataPathByArtVarBundle;
+  @Value("${ACL_MAXIMUM_RETAIL_PRICE_PATH}")
+  private String maximumRetailPricePath;
 
-	private final String exceptionMessage = "exceptie ";
+  public List<ArticleStoreMasterData> getArticleStoreMasterDataByEan(String countryCode,
+                                                                     String salesLine,
+                                                                     Integer storeNo,
+                                                                     String barcode) {
+    UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
+            aclArticleMasterDataHost + aclArticleMasterDataPathByEan)
+            .buildAndExpand(countryCode.toUpperCase(),
+                    salesLine.toUpperCase(),
+                    storeNo,
+                    barcode);
 
-	@Value("${ACL_STORE_MASTER_DATA_HOST}")
-	private String aclArticleMasterDataHost;
-	@Value("${ACL_STORE_MASTER_DATA_PATH_BY_EAN}")
-	private String aclArticleMasterDataPathByEan;
-	@Value("${ACL_STORE_MASTER_DATA_PATH_BY_SUBSYS}")
-	private String aclArticleMasterDataPathBySubsys;
-	@Value("${ACL_STORE_MASTER_DATA_PATH_BY_ART_VAR_BUNDLE}")
-	private String aclArticleMasterDataPathByArtVarBundle;
-	@Value("${ACL_MAXIMUM_RETAIL_PRICE_PATH}")
-	private String maximumRetailPricePath;
+    return getArticleStoreMasterData(uriComponents);
+  }
 
-	private String aclArticleStoreMasterDataUrl;
+  public List<ArticleStoreMasterData> getArticleStoreMasterDataBySubsys(String countryCode,
+                                                                        String salesLine,
+                                                                        Integer storeNo,
+                                                                        Integer subsys) {
+    UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
+            aclArticleMasterDataHost + aclArticleMasterDataPathBySubsys)
+            .buildAndExpand(countryCode.toUpperCase(),
+                    salesLine.toUpperCase(),
+                    storeNo,
+                    subsys);
 
-	public List<ArticleStoreMasterData> getArticleStoreMasterDataByEan(String countryCode, String salesLine,
-                                                                       Integer storeNo, String barcode) {
+    return getArticleStoreMasterData(uriComponents);
+  }
 
-		aclArticleStoreMasterDataUrl = aclArticleMasterDataHost + aclArticleMasterDataPathByEan;
-		String urlInUse = String.format(aclArticleStoreMasterDataUrl, countryCode.toUpperCase(),
-				salesLine.toUpperCase(), storeNo, barcode);
+  public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(String countryCode,
+																			  String salesLine,
+                                                                              Integer storeNo,
+																			  Integer articleNumber,
+																			  Integer variantNumber,
+																			  Integer bundleNumber) {
+	  UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
+					  aclArticleMasterDataHost + aclArticleMasterDataPathByArtVarBundle)
+					  .buildAndExpand(countryCode.toUpperCase(),
+									  salesLine.toUpperCase(),
+									  storeNo,
+									  articleNumber,
+									  variantNumber,
+									  bundleNumber);
 
-		try {
-			return restTemplate.getForObject(urlInUse, ArticleStoreMasterDataACLResponse.class)
-					.getArticleStoreMasterData();
-		} catch (Exception e) {
-			System.out.println(exceptionMessage + e);
-			return null;
-		}
-	}
+    return getArticleStoreMasterData(uriComponents);
+  }
 
-	public List<ArticleStoreMasterData> getArticleStoreMasterDataBySubsys(String countryCode, String salesLine,
-			Integer storeNo, Integer subsys) {
 
-    aclArticleStoreMasterDataUrl = aclArticleMasterDataHost + aclArticleMasterDataPathBySubsys;
-		String urlInUse = String.format(aclArticleStoreMasterDataUrl, countryCode.toUpperCase(),
-				salesLine.toUpperCase(), storeNo, subsys);
-		System.out.println(urlInUse);
+  private List<ArticleStoreMasterData> getArticleStoreMasterData(UriComponents uriComponents) {
+    return webClient.get()
+            .uri(uriComponents.toString())
+            .retrieve()
+            .bodyToMono(ArticleStoreMasterDataACLResponse.class)
+            .map(ArticleStoreMasterDataACLResponse::getArticleStoreMasterData)
+            .defaultIfEmpty(Collections.emptyList())
+            .onErrorResume(throwable -> {
+              log.error("ACL error when calling " + uriComponents.toUriString());
+              return Mono.just(Collections.emptyList());
+            })
+            .block();
+  }
 
-		try {
-			return restTemplate.getForObject(urlInUse, ArticleStoreMasterDataACLResponse.class)
-					.getArticleStoreMasterData();
-		} catch (Exception e) {
-			System.out.println(exceptionMessage + e);
-			return null;
-		}
+  public MaximumRetailPrice getMaximumRetailPrice(
+          String countryCode, String salesLine, Integer storeNumber, ArticleId articleId) {
 
-	}
+    UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
+            aclArticleMasterDataHost + maximumRetailPricePath)
+            .queryParam("articleNumber", articleId.getArticleNumber())
+            .queryParam("variantNumber", articleId.getVariantNumber())
+            .queryParam("bundleNumber", articleId.getBundleNumber())
+            .buildAndExpand(countryCode, salesLine, storeNumber);
 
-	public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(String countryCode, String salesLine,
-			Integer storeNo, Integer articleNumber, Integer variantNumber, Integer bundleNumber) {
+    return webClient.get()
+            .uri(uriComponents.toString())
+            .retrieve()
+            .bodyToMono(MaximumRetailPrice.class)
+            .onErrorResume(throwable -> {
+              log.error("ACL error when calling " + maximumRetailPricePath);
+              return Mono.just(MaximumRetailPrice.builder().build());
+            })
+            .block();
 
-    aclArticleStoreMasterDataUrl = aclArticleMasterDataHost + aclArticleMasterDataPathByArtVarBundle;
-		String urlInUse = String.format(aclArticleStoreMasterDataUrl, countryCode.toUpperCase(),
-				salesLine.toUpperCase(), storeNo, articleNumber, variantNumber, bundleNumber);
-		System.out.println("uri=" + urlInUse);
-
-		try {
-			ArticleStoreMasterDataACLResponse articleStoreMasterDataACLResponse =
-					restTemplate.getForObject(urlInUse, ArticleStoreMasterDataACLResponse.class);
-			if(articleStoreMasterDataACLResponse != null
-					&& !CollectionUtils.isEmpty(articleStoreMasterDataACLResponse.getArticleStoreMasterData()))
-				return articleStoreMasterDataACLResponse.getArticleStoreMasterData();
-			return Collections.emptyList();
-		} catch (Exception e) {
-			System.out.println(exceptionMessage + e);
-			return Collections.emptyList();
-		}
-
-	}
-
-	public MaximumRetailPrice getMaximumRetailPrice(
-			String countryCode, String salesLine, Integer storeNumber, ArticleId articleId) {
-
-		UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
-				aclArticleMasterDataHost + maximumRetailPricePath)
-				.queryParam("articleNumber", articleId.getArticleNumber())
-				.queryParam("variantNumber", articleId.getVariantNumber())
-				.queryParam("bundleNumber", articleId.getBundleNumber())
-				.buildAndExpand(countryCode, salesLine, storeNumber);
-
-		return webClient.get()
-				.uri(uriComponents.toString())
-				.retrieve()
-				.bodyToMono(MaximumRetailPrice.class)
-				.onErrorResume(throwable -> {
-					log.error("ACL error when calling " + maximumRetailPricePath);
-					return Mono.just(MaximumRetailPrice.builder().build());
-				})
-				.block();
-
-	}
+  }
 }
