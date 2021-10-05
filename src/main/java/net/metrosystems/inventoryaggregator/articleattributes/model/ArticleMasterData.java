@@ -41,6 +41,7 @@ public class ArticleMasterData implements Serializable {
   private Long articleNoEmptiesSales;
   private String brandName;
   private Double minimumRetailPrice;
+  private String countryOfOrigin;
 
   public static long getSerialversionuid() {
     return serialVersionUID;

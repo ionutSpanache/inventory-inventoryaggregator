@@ -293,7 +293,8 @@ public class ArticleCacheService {
 				articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
 				articleCacheDataGroup300.getArticleNoEmptiesSales(),
 				articleCacheReaderDigest.getBrandName(),
-				calculateMinimumRetailPrice(articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent())
+				calculateMinimumRetailPrice(articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
+				articleCacheDataGroup200.getCountryOfOrigin()
 				);
 	}
 

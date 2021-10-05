@@ -159,6 +159,17 @@ public class ArticleCacheDataGroup {
     this.expiryDays = expiryDays;
   }
 
+  private String countryOfOrigin;
+
+  public String getCountryOfOrigin() {
+    return countryOfOrigin;
+  }
+
+  @XmlElement(name = "COUNTRYOFORIGIN")
+  public void setCountryOfOrigin(String countryOfOrigin) {
+    this.countryOfOrigin = countryOfOrigin;
+  }
+
   /*Data Group 300*/
   private Long articleNoEmptiesSales;
 
