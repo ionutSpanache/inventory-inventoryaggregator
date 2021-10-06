@@ -212,7 +212,8 @@ public class ArticleMasterDataRepository {
           articleCacheFullData.getBundleNetNetBuyingPrice(),
           articleCacheFullData.getArticleNoEmptiesSales(),
           articleCacheFullData.getBrandName(),
-          articleCacheFullData.getMinimumRetailPrice());
+          articleCacheFullData.getMinimumRetailPrice(),
+          articleCacheFullData.getCountryOfOrigin());
     }
     return null;
   }
