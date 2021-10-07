@@ -57,7 +57,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: inventoryaggregator-secret
-              key: idam_secretkube
+              key: idam_secret
         - name: DD_AGENT_HOST
           valueFrom:
             fieldRef:
