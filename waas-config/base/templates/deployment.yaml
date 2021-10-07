@@ -43,6 +43,21 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         env:
+        - name: ARTICLE_CACHE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: inventoryaggregator-secret
+              key: article_cache_password
+        - name: IDAM_CLIENT_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: inventoryaggregator-secret
+              key: idam_client_client_secret
+        - name: IDAM_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: inventoryaggregator-secret
+              key: idam_secretkube
         - name: DD_AGENT_HOST
           valueFrom:
             fieldRef:

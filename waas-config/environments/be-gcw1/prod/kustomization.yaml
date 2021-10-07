@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: inventory-prod
 resources:
 - ../../../base
+- ingress.yaml
 generators:
 - generator.yaml
 configMapGenerator:
