@@ -6,7 +6,7 @@ metadata:
   name: inventoryaggregator
 spec:
   rules:
-    - host: inventory-prod-inventoryaggregator.apps-api-mcdr-001-test15-mcc-be-gcw1.metroscales.io
+    - host: inventory-prod-inventoryaggregator.apps-api-mcdr-001-live15-mcc-be-gcw1.metroscales.io
       http:
         paths:
           - backend:
