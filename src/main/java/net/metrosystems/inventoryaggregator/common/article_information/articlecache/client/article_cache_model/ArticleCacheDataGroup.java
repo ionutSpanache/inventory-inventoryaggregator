@@ -229,14 +229,14 @@ public class ArticleCacheDataGroup {
     this.blockingCode = blockingCode;
   }
 
-  private Byte assortmentCode;
+  private String assortmentCode;
 
-  public Byte getAssortmentCode() {
+  public String getAssortmentCode() {
     return assortmentCode;
   }
 
   @XmlElement(name = "ASSORTMENTCD")
-  public void setAssortmentCode(Byte assortmentCode) {
+  public void setAssortmentCode(String assortmentCode) {
     this.assortmentCode = assortmentCode;
   }
 
