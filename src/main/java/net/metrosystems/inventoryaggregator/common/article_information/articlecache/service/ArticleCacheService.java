@@ -1,6 +1,7 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
 import lombok.extern.slf4j.Slf4j;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
@@ -298,7 +299,7 @@ public class ArticleCacheService {
 				);
 	}
 
-	private Double calculateMinimumRetailPrice(ArticleCacheIhdsTree articleCacheIhdsTree, Integer storeNumber, Integer sellingBundleContent) {
+	private MinimumRetailPrice calculateMinimumRetailPrice(ArticleCacheIhdsTree articleCacheIhdsTree, Integer storeNumber, Integer sellingBundleContent) {
 		String countryCode = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
 				.getArticleCacheDomain().getPlkz();
 
@@ -314,13 +315,15 @@ public class ArticleCacheService {
 						.findFirst()
 						.map(articleCacheDataGroup -> articleCacheDataGroup.getMinimumRetailPriceForVatCalculation())
 						.orElse(ZERO);
-				return minimumRetailPriceForVatCalculation * sellingBundleContent;
+				return MinimumRetailPrice.builder().indicator(Boolean.TRUE)
+						.value(minimumRetailPriceForVatCalculation * sellingBundleContent)
+						.build();
 			}
 
-			return ZERO;
+			return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
 		}
 
-		return ZERO;
+		return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
 	}
 
 	private ProductLifeCycleData mapToProductLifeCycleData(IsuItemMaster isuItemMaster) {

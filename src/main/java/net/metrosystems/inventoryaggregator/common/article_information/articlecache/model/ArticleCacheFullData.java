@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
 
 @Data
 @Builder
@@ -44,6 +45,6 @@ public class ArticleCacheFullData {
     private double bundleNetNetBuyingPrice;
     private Long articleNoEmptiesSales;
     private String brandName;
-    private Double minimumRetailPrice;
+    private MinimumRetailPrice minimumRetailPrice;
     private String countryOfOrigin;
 }

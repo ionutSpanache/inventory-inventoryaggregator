@@ -40,7 +40,7 @@ public class ArticleMasterData implements Serializable {
   private double bundleNetNetBuyingPrice;
   private Long articleNoEmptiesSales;
   private String brandName;
-  private Double minimumRetailPrice;
+  private MinimumRetailPrice minimumRetailPrice;
   private String countryOfOrigin;
 
   public static long getSerialversionuid() {
