@@ -21,4 +21,5 @@ public class StockSummary {
     private Double reservation;
     private Float systemStock;
     private Double openGoodReceiving;
+    private Double parkedStock;
 }

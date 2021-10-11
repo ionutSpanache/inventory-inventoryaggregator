@@ -104,6 +104,23 @@ public class DocumentsService {
 
   }
 
+  public Documents getIsuItemStoreMerchandiseByArtVarBundle(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
+    FilterKeyIsuItemStoreMerchandise filterKeyStoreMerchandise = FilterKeyIsuItemStoreMerchandise.builder()
+            .bundleNumber(articleId.getBundleNumber())
+            .variantNumber(articleId.getVariantNumber())
+            .articleNumber(articleId.getArticleNumber())
+            .countryCode(countryCode)
+            .build();
+
+    FilterIsuItemStoreMerchandise filterStoreMerchandise = FilterIsuItemStoreMerchandise
+            .builder()
+            .filterKeys(List.of(filterKeyStoreMerchandise))
+            .build();
+
+    return  filterAAAClient.getFilteredDocumentsForIsuStoreMerchandise(filterStoreMerchandise);
+
+  }
+
   public Documents getDocumentsByArticleNumber(
       String countryCode, String salesLine, String languageCode, Long articleNumber)
       throws Exception {

@@ -108,6 +108,7 @@ public class MovieService {
         movieAdapter.setConsigStock(true);
       }
     }
+    movieAdapter.setParkedStock(stockDetails.getParkedStock());
 
     return movieAdapter;
   }

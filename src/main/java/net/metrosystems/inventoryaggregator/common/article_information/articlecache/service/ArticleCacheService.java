@@ -1,13 +1,13 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
@@ -15,17 +15,18 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBasicData;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.*;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.multithreading.ArticleDataThreads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -42,6 +43,9 @@ public class ArticleCacheService {
 	@Autowired
 	private ArticleCacheAAAClient articleCacheClient;
 	private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
+
+	private static final String PAKISTAN_COUNTRY_CODE = "PK";
+	private static final Double ZERO = 0.0;
 
 	@Autowired
 	public ArticleCacheService(ArticleDataThreads articleDataThreads, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient) {
@@ -161,13 +165,41 @@ public class ArticleCacheService {
 	public ProductLifeCycleData getArticleProductLifeCycleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
 		Documents articleUrlPathList = articleCacheClient.getProductLifeCycleDocumentUrl(countryCode, articleId);
 
-		if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-			throw new ArticleNotFoundException();
+		if (articleUrlPathList == null || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+			return new ProductLifeCycleData();
 		}
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 		return mapToProductLifeCycleData(
 				articleCacheClient.getProductLifeCycleData(articleUrlPath));
 
+	}
+
+	public Optional<String> getChannelDeliveryFlag(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
+												   Integer storeNumber) {
+		Documents articleUrlPathList = articleCacheClient.getChannelDeliveryFlagUrl(countryCode, articleId);
+
+		if (articleUrlPathList == null || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+			return Optional.empty();
+		}
+		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+
+		IsuItemStoreMerchandise isuItemStoreMerchandise = articleCacheClient.getChannelDeliveryFlagDocument(articleUrlPath);
+
+		return mapToDeliveryFlagForStore(isuItemStoreMerchandise, storeNumber);
+
+	}
+
+	private Optional<String> mapToDeliveryFlagForStore(IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
+		Optional<StoreInformationGroup> response = isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
+				== null ? Optional.empty() : isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
+				.stream().filter(storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
+				.findFirst();
+
+		if(response.isPresent()) {
+			return response.map(storeInformationGroup -> storeInformationGroup.getChannelDeliveryFlag());
+		}
+
+		return Optional.empty();
 	}
 
 	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
@@ -222,6 +254,7 @@ public class ArticleCacheService {
 		}
 		ArticleCacheReaderDigest articleCacheReaderDigest = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest();
 		ArticleCacheDataGroup articleCacheDataGroup100 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100);
+		ArticleCacheDataGroup articleCacheDataGroup300 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(300);
 		ArticleCacheDataGroup articleCacheDataGroup310 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(310);
 		ArticleCacheDataGroup articleCacheDataGroup320 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
 		ArticleCacheDataGroup articleCacheDataGroup325 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
@@ -259,8 +292,38 @@ public class ArticleCacheService {
 				articleCacheDataGroup325.getBundleNetBuyingPrice(),
 				articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
 				articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
-				articleCacheReaderDigest.getBrandName()
+				articleCacheDataGroup300.getArticleNoEmptiesSales(),
+				articleCacheReaderDigest.getBrandName(),
+				calculateMinimumRetailPrice(articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
+				articleCacheDataGroup200.getCountryOfOrigin()
 				);
+	}
+
+	private MinimumRetailPrice calculateMinimumRetailPrice(ArticleCacheIhdsTree articleCacheIhdsTree, Integer storeNumber, Integer sellingBundleContent) {
+		String countryCode = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
+				.getArticleCacheDomain().getPlkz();
+
+		if (PAKISTAN_COUNTRY_CODE.equalsIgnoreCase(countryCode)) {
+			Boolean hasMinimumRetailPrice = articleCacheIhdsTree.getTransaction()
+					.getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100)
+					.getHasMinimumRetailPrice();
+
+			if (hasMinimumRetailPrice == true) {
+				Double minimumRetailPriceForVatCalculation = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
+						.getArticleCacheDataGroup().stream()
+						.filter(articleCacheDataGroup -> articleCacheDataGroup.getStoreNo() == storeNumber)
+						.findFirst()
+						.map(articleCacheDataGroup -> articleCacheDataGroup.getMinimumRetailPriceForVatCalculation())
+						.orElse(ZERO);
+				return MinimumRetailPrice.builder().indicator(Boolean.TRUE)
+						.value(minimumRetailPriceForVatCalculation * sellingBundleContent)
+						.build();
+			}
+
+			return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
+		}
+
+		return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
 	}
 
 	private ProductLifeCycleData mapToProductLifeCycleData(IsuItemMaster isuItemMaster) {

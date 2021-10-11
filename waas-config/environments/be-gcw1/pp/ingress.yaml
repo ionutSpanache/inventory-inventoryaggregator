@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    provider: deployment-controller
+  name: inventoryaggregator
+spec:
+  rules:
+    - host: inventory-pp-inventoryaggregator.apps-api-mcdr-001-test15-mcc-be-gcw1.metroscales.io
+      http:
+        paths:
+          - backend:
+              serviceName: inventoryaggregator
+              servicePort: 80
+            pathType: ImplementationSpecific

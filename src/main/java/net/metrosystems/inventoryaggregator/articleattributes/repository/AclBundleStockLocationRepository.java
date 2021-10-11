@@ -1,11 +1,13 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.AclArticleStockLocation;
@@ -55,15 +57,24 @@ public class AclBundleStockLocationRepository {
             countryCode, salesLine, storeNo, articleIdList);
 
     List<ArticleIdStockLocation> articleIdStockLocationList =
-        aclBundleStockLocations.stream()
+        Stream.ofNullable(aclBundleStockLocations)
+            .flatMap(Collection::stream)
+            .filter(
+                aclArticleStockLocation ->
+                    aclArticleStockLocation.getArticleNumber() != null
+                        && aclArticleStockLocation.getVariantNumber() != null
+                        && aclArticleStockLocation.getBundleNumber() != null)
             .map(
                 aclArticleStockLocation ->
                     ArticleIdStockLocation.builder()
-                        .articleId(ArticleId.builder()
-                            .articleNumber(aclArticleStockLocation.getArticleNumber())
-                            .variantNumber(Long.valueOf(aclArticleStockLocation.getVariantNumber()))
-                            .bundleNumber(Long.valueOf(aclArticleStockLocation.getBundleNumber()))
-                            .build())
+                        .articleId(
+                            ArticleId.builder()
+                                .articleNumber(aclArticleStockLocation.getArticleNumber())
+                                .variantNumber(
+                                    Long.valueOf(aclArticleStockLocation.getVariantNumber()))
+                                .bundleNumber(
+                                    Long.valueOf(aclArticleStockLocation.getBundleNumber()))
+                                .build())
                         .articleStockLocationList(
                             transformAclBundleStockLocationsToArticleStockLocationListByBundle(
                                 aclArticleStockLocation.getAisleBay(),
@@ -142,16 +153,16 @@ public class AclBundleStockLocationRepository {
 
   private ArticleLocation transformAclArticleLocationsToInventoryArticleLocation(
       ArticleLocation articleLocation) {
-    if (Optional.ofNullable(articleLocation).isPresent() && isArticleLocationList(articleLocation)) {
-        for (StocktakingArticleLocation stocktakingArticleLocation :
-            articleLocation.getStocktakingArticleLocationList()) {
-          stocktakingArticleLocation.setAisle(
-              StringUtils.leftPad(stocktakingArticleLocation.getAisle(), 3, "0"));
-          stocktakingArticleLocation.setShelf(
-              StringUtils.leftPad(stocktakingArticleLocation.getShelf(), 3, "0"));
-        }
-        return articleLocation;
-
+    if (Optional.ofNullable(articleLocation).isPresent()
+        && isArticleLocationList(articleLocation)) {
+      for (StocktakingArticleLocation stocktakingArticleLocation :
+          articleLocation.getStocktakingArticleLocationList()) {
+        stocktakingArticleLocation.setAisle(
+            StringUtils.leftPad(stocktakingArticleLocation.getAisle(), 3, "0"));
+        stocktakingArticleLocation.setShelf(
+            StringUtils.leftPad(stocktakingArticleLocation.getShelf(), 3, "0"));
+      }
+      return articleLocation;
     }
     return null;
   }
@@ -160,5 +171,4 @@ public class AclBundleStockLocationRepository {
     return (articleLocation.getStocktakingArticleLocationList() != null)
         && (!articleLocation.getStocktakingArticleLocationList().isEmpty());
   }
-
 }

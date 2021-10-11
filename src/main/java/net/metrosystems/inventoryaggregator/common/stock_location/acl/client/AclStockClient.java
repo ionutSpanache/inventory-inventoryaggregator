@@ -1,9 +1,5 @@
 package net.metrosystems.inventoryaggregator.common.stock_location.acl.client;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.AclArticleStockLocation;
@@ -11,24 +7,27 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.articleattri
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclBundleStockLocation;
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.PaginatedAclBundleStockLocation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class AclStockClient {
 
-  private final RestTemplate restTemplate;
+
+  private WebClient webClient;
 
   @Value("${ACL_STOCK_SERVICE_HOST}")
   private String aclStockLocationHost;
@@ -45,19 +44,30 @@ public class AclStockClient {
   @Value("${ACL_STOCK_ARTICLE_LOCATION_FOR_ARTICLE_LIST}")
   private String aclArticleLocationForArticleListPath;
 
+  @Autowired
+  public  AclStockClient(@Qualifier("webClientForAcl") WebClient webClient) {
+        this.webClient = webClient;
+  }
+
   public List<AclBundleStockLocation> getStockLocationsForArticleVariant(
       String countryCode, String salesLine, Integer storeNo, Long articleNo, Long variantNo) {
-    String urlInUse =
-        String.format(
-            aclStockLocationHost + aclStockLocationPathForVariant,
-            countryCode.toUpperCase(),
-            salesLine.toUpperCase(),
-            storeNo,
-            articleNo,
-            variantNo);
-    log.debug("uriStockLocation=" + urlInUse);
+    UriComponents uri =
+            UriComponentsBuilder.fromHttpUrl(aclStockLocationHost + aclStockLocationPathForVariant)
+                    .buildAndExpand(
+                            countryCode.toUpperCase(),
+                            salesLine.toUpperCase(),
+                            storeNo,
+                            articleNo,
+                            variantNo);
+
+
+    log.debug("uriStockLocation=" + uri.toString());
     PaginatedAclBundleStockLocation paginatedAclBundleStockLocation =
-        restTemplate.getForObject(urlInUse, PaginatedAclBundleStockLocation.class);
+            webClient.get()
+                    .uri(uri.toString())
+                    .retrieve()
+                    .bodyToMono(PaginatedAclBundleStockLocation.class)
+                    .block();
     try {
       return paginatedAclBundleStockLocation.getStockLocations();
     } catch (Exception e) {
@@ -73,38 +83,39 @@ public class AclStockClient {
     log.debug("uriStockLocation=" + urlInUse);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<?> request = new HttpEntity<>(articleIdList, headers);
-    ResponseEntity<List<AclArticleStockLocation>> response =
-        restTemplate.exchange(
-            urlInUse.toUriString(),
-            HttpMethod.POST,
-            request,
-            new ParameterizedTypeReference<List<AclArticleStockLocation>>() {});
-    if (!response.getStatusCode().is2xxSuccessful()) {
-      String message =
-          String.format(
-              "StockLocation - api call unsuccessful  : status %d", response.getStatusCodeValue());
-      log.error(message);
-      return Collections.emptyList();
-    }
-    return !Objects.requireNonNull(response.getBody()).isEmpty() ? response.getBody() : Collections.emptyList();
+    List<AclArticleStockLocation> aclArticleStockLocations = webClient.post()
+            .uri(urlInUse.toUriString())
+            .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
+            .bodyValue(articleIdList)
+            .retrieve()
+            .onStatus(this::isErrorResponse, clientResponse -> log(clientResponse, "StockLocation - api call unsuccessful  : status %d"))
+            .bodyToFlux(AclArticleStockLocation.class)
+            .collectList()
+            .block();
+
+
+    return !Objects.requireNonNull(aclArticleStockLocations).isEmpty() ? aclArticleStockLocations : Collections.emptyList();
   }
 
   public ArticleLocation getArticleLocationsForArticleVariant(
       String countryCode, String salesLine, Integer storeNo, ArticleId articleId) {
-    String urlInUse =
-        String.format(
-            aclStockLocationHost + aclArticleLocationPath,
-            countryCode.toUpperCase(),
-            salesLine.toUpperCase(),
-            storeNo,
-            articleId.getArticleNumber(),
-            articleId.getVariantNumber(),
-            articleId.getBundleNumber());
-    log.debug("uriArticleLocation=" + urlInUse);
+    UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
+            aclStockLocationHost + aclArticleLocationPath)
+            .buildAndExpand(
+                    countryCode.toUpperCase(),
+                    salesLine.toUpperCase(),
+                    storeNo,
+                    articleId.getArticleNumber(),
+                    articleId.getVariantNumber(),
+                    articleId.getBundleNumber());
+    log.debug("uriArticleLocation=" + uriComponents.toString());
 
     try {
-        return restTemplate.getForObject(urlInUse, ArticleLocation.class);
+        return webClient.get()
+                .uri(uriComponents.toUriString())
+                .retrieve()
+                .bodyToMono(ArticleLocation.class)
+                .block();
 
     } catch (Exception e) {
       return null;
@@ -120,27 +131,31 @@ public class AclStockClient {
     log.debug("uriArticleLocation=" + urlInUse.toUriString());
 
     try {
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
-      HttpEntity<?> request = new HttpEntity<>(articleIdList, headers);
-      ResponseEntity<List<ArticleLocationForArticleId>> response =
-          restTemplate.exchange(
-              urlInUse.toUriString(),
-              HttpMethod.POST,
-              request,
-              new ParameterizedTypeReference<List<ArticleLocationForArticleId>>() {});
-      if (!response.getStatusCode().is2xxSuccessful()) {
-        String message =
-            String.format(
-                "ArticleLocation - getArticleLocationsForArticleList - api call unsuccessful  : status %d",
-                response.getStatusCodeValue());
-        log.error(message);
-        return Collections.emptyList();
-      }
-      return !Objects.requireNonNull(response.getBody()).isEmpty() ? response.getBody() : Collections.emptyList();
+      List<ArticleLocationForArticleId> articleLocationForArticleIds = webClient.post()
+              .uri(urlInUse.toUriString())
+              .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
+              .bodyValue(articleIdList)
+              .retrieve()
+              .onStatus(this::isErrorResponse, clientResponse -> log(clientResponse, "ArticleLocation - getArticleLocationsForArticleList - api call unsuccessful  : status %d"))
+              .bodyToFlux(ArticleLocationForArticleId.class)
+              .collectList()
+              .block();
+
+      return !Objects.requireNonNull(articleLocationForArticleIds).isEmpty() ? articleLocationForArticleIds : Collections.emptyList();
     } catch (Exception e) {
       log.error("AclStockClient.getArticleLocationsForArticleList - error {} ", e.getMessage(), e);
       return Collections.emptyList();
     }
   }
+
+  private boolean isErrorResponse(HttpStatus httpStatus) {
+    return  !httpStatus.is2xxSuccessful();
+  }
+
+  private Mono<? extends Throwable> log(ClientResponse clientResponse, String message) {
+    log.error(message, clientResponse.statusCode().value());
+    return Mono.empty();
+  }
+
+
 }

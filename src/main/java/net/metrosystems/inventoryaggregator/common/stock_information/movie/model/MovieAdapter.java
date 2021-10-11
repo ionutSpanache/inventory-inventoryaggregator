@@ -34,4 +34,5 @@ public class MovieAdapter {
   private Double lastGRQuantity;
   private boolean isConsigStock;
   private Float consignmentStock;
+  private List<ParkedStock> parkedStock;
 }

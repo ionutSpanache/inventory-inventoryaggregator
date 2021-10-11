@@ -300,8 +300,14 @@ public class ArticleDetailsService {
     CompletableFuture<ProductLifeCycleData> productLifeCycleData =
             articleMasterDataRepository.getProductLifeCycleData(countryCode, articleId);
 
+    CompletableFuture<MaximumRetailPrice> maximumRetailPrice =
+            rawArticleStoreMasterDataRepository.getMaximumRetailPrice(countryCode, salesLine, storeNo, articleId);
+
+    CompletableFuture<String> channelDeliveryFlag = articleMasterDataRepository.getChannelDeliveryFlag(
+            countryCode, articleId, storeNo);
+
     CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie,
-        articleStockLocationList, articleLocationList, productLifeCycleData);
+        articleStockLocationList, articleLocationList, productLifeCycleData, maximumRetailPrice);
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
@@ -320,6 +326,9 @@ public class ArticleDetailsService {
                                                   .articleLocation(articleLocationList.get())
                                                   .articleComponent(articleComponent)
                                                   .productLifeCycleData(productLifeCycleData.get())
+                                                  .maximumRetailPrice(maximumRetailPrice.get())
+                                                  .channelDeliveryFlag(channelDeliveryFlag.get())
+                                                  .minimumRetailPrice(articleMasterData.get().getMinimumRetailPrice())
                                                   .build();
 
 

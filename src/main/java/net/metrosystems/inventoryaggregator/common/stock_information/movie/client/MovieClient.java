@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -110,6 +111,9 @@ public class MovieClient {
     dataGroupsList.add(new MovieDataGroups("OPMO", reasonsList));
     dataGroupsList.add(new MovieDataGroups("SYST"));
     dataGroupsList.add(new MovieDataGroups("STRD"));
+    if ("IN".equals(countryCode) && "MCC".equals(salesLine)) {
+      dataGroupsList.add(new MovieDataGroups("PARK"));
+    }
 
     MovieRequestBody movieRequest = new MovieRequestBody();
     movieRequest.setConsumer("MSTORE");
@@ -127,9 +131,8 @@ public class MovieClient {
     try {
       jsonStringMovie = mapper.writeValueAsString(movieRequest);
       HttpEntity<String> request = new HttpEntity<>(jsonStringMovie, headers);
-      return restTemplate
-              .postForObject(urlInUse, request, StockDetailsResponse.class)
-              .getStockDetails();
+      StockDetailsResponse response = restTemplate.postForObject(urlInUse, request, StockDetailsResponse.class);
+      return response == null ? Collections.emptyList() : response.getStockDetails();
     } catch (Exception e) {
       log.error("Error while calling MOVIE input{} exception{}", jsonStringMovie, e);
       return null;
