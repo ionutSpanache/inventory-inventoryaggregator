@@ -109,6 +109,9 @@ public class MovieService {
       }
     }
     movieAdapter.setParkedStock(stockDetails.getParkedStock());
+    movieAdapter.setTotalSaleQuantity(stockDetails.getMovementDetails().getSystemStock().getSALES());
+    movieAdapter.setTotalGoodsReceivingQuantity(stockDetails.getMovementDetails().getSystemStock().getGR());
+    movieAdapter.setTotalStockCorrectionQuantity(stockDetails.getMovementDetails().getSystemStock().getSC());
 
     return movieAdapter;
   }

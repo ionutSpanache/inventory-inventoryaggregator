@@ -35,4 +35,7 @@ public class MovieAdapter {
   private boolean isConsigStock;
   private Float consignmentStock;
   private List<ParkedStock> parkedStock;
+  private Float totalSaleQuantity;
+  private Float totalGoodsReceivingQuantity;
+  private Float totalStockCorrectionQuantity;
 }

@@ -12,6 +12,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +99,7 @@ public class MovieClient {
 
   private List<StockDetails> getDataFromMovie(
       String countryCode, String salesLine, int storeNo, List<Article> articleList) {
-    String urlInUse = String.format(movieStockServiceHost + "/cache");
+    String urlInUse = String.format("%s/cache", movieStockServiceHost);
 
     List<String> reasonsList = new ArrayList<>();
     reasonsList.add("IST");
@@ -114,6 +116,7 @@ public class MovieClient {
     if ("IN".equals(countryCode) && "MCC".equals(salesLine)) {
       dataGroupsList.add(new MovieDataGroups("PARK"));
     }
+    dataGroupsList.add(new MovieDataGroups("MODE", LocalDate.now()));
 
     MovieRequestBody movieRequest = new MovieRequestBody();
     movieRequest.setConsumer("MSTORE");
