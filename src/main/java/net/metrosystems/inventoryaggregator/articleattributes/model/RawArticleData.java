@@ -28,6 +28,7 @@ public class RawArticleData implements Serializable {
     private MaximumRetailPrice maximumRetailPrice;
     private String channelDeliveryFlag;
     private MinimumRetailPrice minimumRetailPrice;
+    private MultiLanguageData multiLanguageData;
 
     public static long getSerialversionuid() {
         return serialVersionUID;
@@ -41,6 +42,7 @@ public class RawArticleData implements Serializable {
                 ", maximumRetailPrice=" + maximumRetailPrice +
                 ", channelDeliveryFlag=" + channelDeliveryFlag +
                 ", minimumRetailPrice=" + minimumRetailPrice +
+                ", multiLanguageData=" + multiLanguageData +
                 ", util=" + "]";
     }
 }

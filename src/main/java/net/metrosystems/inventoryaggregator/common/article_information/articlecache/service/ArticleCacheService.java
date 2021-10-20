@@ -11,6 +11,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
@@ -160,6 +161,23 @@ public class ArticleCacheService {
 												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
 												storeNo);
 
+	}
+
+	public Optional<IduItemDerivedStandard> getMultiLanguageDataByArtVarBundle(
+			String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
+		Documents articleUrlPathList = articleCacheClient.getMultiLanguageDocumentUrl(
+				countryCode, articleId);
+		if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+			return Optional.empty();
+		}
+
+		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+		try {
+			IduItemDerivedStandard iduItemDerivedStandard = articleCacheClient.getIduItemDerivedStandardDocument(articleUrlPath);
+			return Optional.of(iduItemDerivedStandard);
+		} catch (Exception e) {
+			return Optional.empty();
+		}
 	}
 
 	public ProductLifeCycleData getArticleProductLifeCycleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {

@@ -1,11 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
@@ -13,11 +7,17 @@ import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBund
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -28,6 +28,8 @@ public class ArticleDetailsService {
   private final ArticleMasterDataRepository articleMasterDataRepository;
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
+
+  private static final String MERCHANDISE_GROUP_INFORMATION = "merchandiseGroupInformation";
 
   @Autowired
   public ArticleDetailsService(ArticleCacheService articleCacheService,
@@ -306,8 +308,11 @@ public class ArticleDetailsService {
     CompletableFuture<String> channelDeliveryFlag = articleMasterDataRepository.getChannelDeliveryFlag(
             countryCode, articleId, storeNo);
 
+    CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard = articleMasterDataRepository.getMultiLanguageData(
+            countryCode, articleId);
+
     CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie,
-        articleStockLocationList, articleLocationList, productLifeCycleData, maximumRetailPrice);
+        articleStockLocationList, articleLocationList, productLifeCycleData, maximumRetailPrice, iduItemDerivedStandard);
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
@@ -329,12 +334,72 @@ public class ArticleDetailsService {
                                                   .maximumRetailPrice(maximumRetailPrice.get())
                                                   .channelDeliveryFlag(channelDeliveryFlag.get())
                                                   .minimumRetailPrice(articleMasterData.get().getMinimumRetailPrice())
+                                                  .multiLanguageData(mapToMultiLanguageData(articleMasterData.get(), iduItemDerivedStandard.get()))
                                                   .build();
 
 
     if (rawArticleDataList != null) {
       rawArticleDataList.add(rawArticleData);
     }
+  }
+
+  private MultiLanguageData mapToMultiLanguageData(ArticleMasterData articleMasterData, Optional<IduItemDerivedStandard> iduItemDerivedStandard) {
+    if(!iduItemDerivedStandard.isPresent()) {
+      return null;
+    }
+
+    List<VariantDescription> variantDescriptions = iduItemDerivedStandard.get()
+            .getContentIduItemDerivedStandard().getVariantSortDescriptionV2()
+            .stream().map(variantSortDescription -> VariantDescription.builder().description(
+                    variantSortDescription.getDescription())
+                    .languageCode(variantSortDescription.getLanguage())
+                    .validFrom(variantSortDescription.getValidFrom())
+                    .build())
+            .collect(Collectors.toList());
+
+    List<LanguageData> articleDescriptions = iduItemDerivedStandard.get()
+            .getContentIduItemDerivedStandard().getMerchandiseArticleDescription()
+            .stream().map(merchandiseArticleDescription -> LanguageData.builder()
+                    .description(merchandiseArticleDescription.getDescription())
+                    .languageCode(merchandiseArticleDescription.getLanguage())
+                    .build())
+            .collect(Collectors.toList());
+
+    List<LanguageData> presentationMainMerchandiseGroupDescriptions = getPmmgData(iduItemDerivedStandard.get(),"" + articleMasterData.getPresentationMainMerchandiseGroup());
+
+
+    List<LanguageData> presentationMerchandiseGroupDescriptions = getPmmgData(iduItemDerivedStandard.get(),
+            "" + articleMasterData.getPresentationMainMerchandiseGroup() +
+                 "-" + articleMasterData.getPresentationMerchandiseGroup());
+
+
+    List<LanguageData> presentationSubMerchandiseGroupDescriptions = getPmmgData(iduItemDerivedStandard.get(),
+            "" + articleMasterData.getPresentationMainMerchandiseGroup() +
+                 "-" + articleMasterData.getPresentationMerchandiseGroup()    +
+                 "-" + articleMasterData.getPresentationSubMerchandiseGroup());
+
+    MultiLanguageData multiLanguageData = MultiLanguageData.builder()
+              .variantDescriptions(variantDescriptions)
+              .articleDescriptions(articleDescriptions)
+              .presentationMainMerchandiseGroupDescriptions(presentationMainMerchandiseGroupDescriptions)
+              .presentationMerchandiseGroupDescriptions(presentationMerchandiseGroupDescriptions)
+              .presentationSubMerchandiseGroupDescriptions(presentationSubMerchandiseGroupDescriptions)
+            .build();
+
+    return multiLanguageData;
+  }
+
+  private List<LanguageData> getPmmgData(IduItemDerivedStandard iduItemDerivedStandard, String filter) {
+    return iduItemDerivedStandard.getReferences().getReferenceList()
+            .stream()
+            .filter(reference -> reference.getRefName().equalsIgnoreCase(MERCHANDISE_GROUP_INFORMATION)
+                    && reference.getRefKey().equalsIgnoreCase(filter))
+            .flatMap(reference -> reference.getLabels().stream())
+            .map(label -> LanguageData.builder()
+                    .description(label.getDescription())
+                    .languageCode(label.getLanguage())
+                    .build())
+            .collect(Collectors.toList());
   }
 
   private List<ArticleMasterData> getRawArticleMasterDataListForArticleVariantBundleIdentifierList(

@@ -5,7 +5,10 @@ public enum KeysWithTypes {
     mmsArtNo("mmsArtNo", "long"),
     variantNo("variantNo", "long"),
     bundleNo("bundleNo", "long"),
-    subsysNo("subsysNo", "long");
+    subsysNo("subsysNo", "long"),
+    articleNumber("articleNumber", "string"),
+    variantNumber("variantNumber", "string"),
+    bundleNumber("bundleNumber", "string");
     private final String code;
     private final String type;
 
