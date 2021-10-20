@@ -8,11 +8,9 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleForArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +50,15 @@ public class ArticleMasterDataRepository {
 
     return CompletableFuture.completedFuture(articleMasterData);
   }
+
+    @Async("asyncExecutor")
+    public CompletableFuture<Optional<IduItemDerivedStandard>> getMultiLanguageData(
+            String countryCode, ArticleId articleId) {
+        Optional<IduItemDerivedStandard> multiLanguageData =
+                getMultiLanguageDataByArtVarBundle(countryCode, articleId);
+
+        return CompletableFuture.completedFuture(multiLanguageData);
+    }
 
     @Async("asyncExecutor")
     public CompletableFuture<ProductLifeCycleData> getProductLifeCycleData(
@@ -177,6 +184,13 @@ public class ArticleMasterDataRepository {
     return articleCacheService.getArticleCacheFullDataByArtVarBundle(
         articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode, storeNo);
   }
+
+    private Optional<IduItemDerivedStandard> getMultiLanguageDataByArtVarBundle(
+            String countryCode,
+            ArticleId articleId) {
+
+        return articleCacheService.getMultiLanguageDataByArtVarBundle(countryCode, articleId);
+    }
 
   private ArticleMasterData transformArticleCacheFullToArticleMasterData(
       ArticleCacheFullData articleCacheFullData) {

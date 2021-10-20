@@ -104,6 +104,43 @@ public class DocumentsService {
 
   }
 
+  public Documents getIduItemDerivedUrlByArtVarBundle(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
+
+    SubFilterKey articleNumberSubFilterKey = SubFilterKey.builder()
+            .key(KeysWithTypes.articleNumber.getCode())
+            .type(KeysWithTypes.articleNumber.getType())
+            .query(String.valueOf(articleId.getArticleNumber()))
+            .build();
+
+    SubFilterKey variantNumberSubFilterKey = SubFilterKey.builder()
+            .key(KeysWithTypes.variantNumber.getCode())
+            .type(KeysWithTypes.variantNumber.getType())
+            .query(String.valueOf(articleId.getVariantNumber()))
+            .build();
+
+    SubFilterKey bundleNumberSubFilterKey = SubFilterKey.builder()
+            .key(KeysWithTypes.bundleNumber.getCode())
+            .type(KeysWithTypes.bundleNumber.getType())
+            .query(String.valueOf(articleId.getBundleNumber()))
+            .build();
+
+    FilterKeyIduItemDerivedStandard filterKeyIduItemDerivedStandard = FilterKeyIduItemDerivedStandard
+        .builder()
+        .subFilterKeys(List.of(articleNumberSubFilterKey, variantNumberSubFilterKey, bundleNumberSubFilterKey))
+        .country(countryCode)
+        .build();
+
+
+    FilterIduItemDerivedStandard filterIduItemDerivedStandard = FilterIduItemDerivedStandard.builder()
+            .filterKeys(List.of(filterKeyIduItemDerivedStandard))
+            .build();
+
+    return  filterAAAClient.getFilteredDocumentsForIduItemDerivedStandard(filterIduItemDerivedStandard);
+
+  }
+
+
+
   public Documents getIsuItemStoreMerchandiseByArtVarBundle(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
     FilterKeyIsuItemStoreMerchandise filterKeyStoreMerchandise = FilterKeyIsuItemStoreMerchandise.builder()
             .bundleNumber(articleId.getBundleNumber())
