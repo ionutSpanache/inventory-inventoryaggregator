@@ -317,15 +317,21 @@ public class ArticleCacheService {
 	}
 
   private String getPromotionIdAvailable(ArticleCacheDataGroup articleCacheDataGroup320) {
-    LocalDate sysDate = LocalDate.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    LocalDate promotionEnd = LocalDate.parse(articleCacheDataGroup320.getPromotionEnd(), formatter);
 
-    if (promotionEnd.isBefore(sysDate)) {
-      return null;
+    if (articleCacheDataGroup320 != null && articleCacheDataGroup320.getPromotionEnd() != null) {
+      LocalDate sysDate = LocalDate.now();
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+      LocalDate promotionEnd =
+          LocalDate.parse(articleCacheDataGroup320.getPromotionEnd(), formatter);
+
+      if (promotionEnd.isBefore(sysDate)) {
+        return null;
+      }
+
+      return articleCacheDataGroup320.getPromotionId();
     }
 
-    return articleCacheDataGroup320.getPromotionId();
+    return null;
   }
 
 	private MinimumRetailPrice calculateMinimumRetailPrice(ArticleCacheIhdsTree articleCacheIhdsTree, Integer storeNumber, Integer sellingBundleContent) {
