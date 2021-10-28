@@ -24,10 +24,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -286,7 +285,7 @@ public class ArticleCacheService {
 				articleCacheDocument.getTransaction().getArticleCacheIncident().getBarcodeForBundle(),
 				articleCacheReaderDigest.getProducingSupplier(),
 				articleCacheDataGroup100.getPresentationMerchandiseGroup(),
-				articleCacheDataGroup320.getPromotionId(),
+				getPromotionIdAvailable(articleCacheDataGroup320),
 				articleCacheDataGroup310.getSellingBundleContent(),
 				articleCacheDataGroup100.getWeightArticles(),
 				articleCacheReaderDigest.getSubsysNo(),
@@ -316,6 +315,18 @@ public class ArticleCacheService {
 				articleCacheDataGroup200.getCountryOfOrigin()
 				);
 	}
+
+  private String getPromotionIdAvailable(ArticleCacheDataGroup articleCacheDataGroup320) {
+    LocalDate sysDate = LocalDate.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate promotionEnd = LocalDate.parse(articleCacheDataGroup320.getPromotionEnd(), formatter);
+
+    if (promotionEnd.isBefore(sysDate)) {
+      return null;
+    }
+
+    return articleCacheDataGroup320.getPromotionId();
+  }
 
 	private MinimumRetailPrice calculateMinimumRetailPrice(ArticleCacheIhdsTree articleCacheIhdsTree, Integer storeNumber, Integer sellingBundleContent) {
 		String countryCode = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()

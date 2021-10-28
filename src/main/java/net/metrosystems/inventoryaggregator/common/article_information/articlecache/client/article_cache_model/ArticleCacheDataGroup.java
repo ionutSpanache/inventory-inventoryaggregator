@@ -373,6 +373,17 @@ public class ArticleCacheDataGroup {
     this.promotionId = promotionId;
   }
 
+  private String promotionEnd;
+
+  public String getPromotionEnd() {
+    return promotionEnd;
+  }
+
+  @XmlElement(name = "PROMOTIONEND")
+  public void setPromotionEnd(String promotionEnd) {
+    this.promotionEnd = promotionEnd;
+  }
+
   private String articleClass;
 
   public String getArticleClass() {
