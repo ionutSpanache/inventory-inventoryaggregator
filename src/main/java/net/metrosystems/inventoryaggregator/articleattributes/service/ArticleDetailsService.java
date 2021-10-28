@@ -1,7 +1,31 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructure;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructureList;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.LanguageData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MultiLanguageData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.VariantDescription;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBundleStockLocationRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
@@ -13,11 +37,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
@@ -390,16 +410,20 @@ public class ArticleDetailsService {
   }
 
   private List<LanguageData> getPmmgData(IduItemDerivedStandard iduItemDerivedStandard, String filter) {
-    return iduItemDerivedStandard.getReferences().getReferenceList()
-            .stream()
-            .filter(reference -> reference.getRefName().equalsIgnoreCase(MERCHANDISE_GROUP_INFORMATION)
-                    && reference.getRefKey().equalsIgnoreCase(filter))
-            .flatMap(reference -> reference.getLabels().stream())
-            .map(label -> LanguageData.builder()
+    return iduItemDerivedStandard.getReferences().getReferenceList().stream()
+        .filter(
+            reference ->
+                reference.getRefName().equalsIgnoreCase(MERCHANDISE_GROUP_INFORMATION)
+                    && reference.getRefKey().equalsIgnoreCase(filter)
+                    && !CollectionUtils.isEmpty(reference.getLabels()))
+        .flatMap(reference -> reference.getLabels().stream())
+        .map(
+            label ->
+                LanguageData.builder()
                     .description(label.getDescription())
                     .languageCode(label.getLanguage())
                     .build())
-            .collect(Collectors.toList());
+        .collect(Collectors.toList());
   }
 
   private List<ArticleMasterData> getRawArticleMasterDataListForArticleVariantBundleIdentifierList(
