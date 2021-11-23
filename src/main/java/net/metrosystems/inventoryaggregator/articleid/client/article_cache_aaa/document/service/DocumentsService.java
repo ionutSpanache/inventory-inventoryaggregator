@@ -104,7 +104,9 @@ public class DocumentsService {
 
   }
 
-  public Documents getIduItemDerivedUrlByArtVarBundle(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
+  public Documents getIduItemDerivedUrlByArtVarBundle(String countryCode,
+                                                      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
+                                                      String company) {
 
     SubFilterKey articleNumberSubFilterKey = SubFilterKey.builder()
             .key(KeysWithTypes.articleNumber.getCode())
@@ -124,9 +126,22 @@ public class DocumentsService {
             .query(String.valueOf(articleId.getBundleNumber()))
             .build();
 
+    List<SubFilterKey> subFilterKeys;
+    if (company != null) {
+      SubFilterKey companySubFilterKey =
+          SubFilterKey.builder()
+              .key(KeysWithTypes.company.getCode())
+              .type(KeysWithTypes.company.getType())
+              .query(company)
+              .build();
+      subFilterKeys = List.of(articleNumberSubFilterKey, variantNumberSubFilterKey, bundleNumberSubFilterKey, companySubFilterKey);
+    } else {
+      subFilterKeys = List.of(articleNumberSubFilterKey, variantNumberSubFilterKey, bundleNumberSubFilterKey);
+    }
+
     FilterKeyIduItemDerivedStandard filterKeyIduItemDerivedStandard = FilterKeyIduItemDerivedStandard
         .builder()
-        .subFilterKeys(List.of(articleNumberSubFilterKey, variantNumberSubFilterKey, bundleNumberSubFilterKey))
+        .subFilterKeys(subFilterKeys)
         .country(countryCode)
         .build();
 

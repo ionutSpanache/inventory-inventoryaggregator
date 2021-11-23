@@ -47,4 +47,5 @@ public class ArticleCacheFullData {
     private String brandName;
     private MinimumRetailPrice minimumRetailPrice;
     private String countryOfOrigin;
+    private Boolean isTradeItemExcludedFromDiscounts;
 }

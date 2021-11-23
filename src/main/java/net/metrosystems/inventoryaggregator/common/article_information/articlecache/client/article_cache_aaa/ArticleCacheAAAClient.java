@@ -149,7 +149,7 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
 
   @Override
   public Documents getMultiLanguageDocumentUrl(String countryCode, ArticleId articleId) {
-    return documentsService.getIduItemDerivedUrlByArtVarBundle(countryCode, articleId);
+    return documentsService.getIduItemDerivedUrlByArtVarBundle(countryCode, articleId, null);
   }
 
   @Override

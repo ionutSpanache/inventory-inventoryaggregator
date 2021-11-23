@@ -12,10 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleForArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleComponentForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
@@ -27,6 +24,8 @@ import net.metrosystems.inventoryaggregator.articleattributes.repository.Article
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -41,6 +40,7 @@ public class ArticleListDetailsService {
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
   private final ArticleComponentRepository articleComponentRepository;
+  private final ArticleCacheService articleCacheService;
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       List<ArticleId> articleIdList,
@@ -51,6 +51,29 @@ public class ArticleListDetailsService {
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
         articleIdList, countryCode, salesLine, languageCode, storeNo);
+  }
+
+  public List<RawIsTradeItemExcludedFromDiscounts> isTradeItemExcludedFromDiscounts(
+      List<ArticleId> articleIdList, String countryCode, String salesLine) {
+    return articleIdList.stream()
+        .map(
+            articleId -> {
+              IsTradeItemExcludedFromDiscounts isExcluded =
+                  articleCacheService.isTradeItemExcludedFromDiscounts(
+                      countryCode,
+                      articleId.getArticleNumber(),
+                      articleId.getBundleNumber(),
+                      articleId.getVariantNumber(),
+                      salesLine);
+              return RawIsTradeItemExcludedFromDiscounts.builder()
+                  .value(isExcluded.getValue())
+                  .validFrom(isExcluded.getValidFrom())
+                  .articleNumber(articleId.getArticleNumber())
+                  .bundleNumber(articleId.getBundleNumber())
+                  .variantNumber(articleId.getVariantNumber())
+                  .build();
+            })
+        .collect(Collectors.toList());
   }
 
   private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(

@@ -227,7 +227,8 @@ public class ArticleMasterDataRepository {
           articleCacheFullData.getArticleNoEmptiesSales(),
           articleCacheFullData.getBrandName(),
           articleCacheFullData.getMinimumRetailPrice(),
-          articleCacheFullData.getCountryOfOrigin());
+          articleCacheFullData.getCountryOfOrigin(),
+          articleCacheFullData.getIsTradeItemExcludedFromDiscounts());
     }
     return null;
   }

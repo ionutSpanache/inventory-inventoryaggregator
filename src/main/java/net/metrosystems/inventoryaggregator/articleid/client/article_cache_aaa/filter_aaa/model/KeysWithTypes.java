@@ -8,7 +8,8 @@ public enum KeysWithTypes {
     subsysNo("subsysNo", "long"),
     articleNumber("articleNumber", "string"),
     variantNumber("variantNumber", "string"),
-    bundleNumber("bundleNumber", "string");
+    bundleNumber("bundleNumber", "string"),
+    company("company", "string");
     private final String code;
     private final String type;
 

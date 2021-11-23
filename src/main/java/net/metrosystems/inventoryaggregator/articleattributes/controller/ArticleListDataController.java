@@ -55,6 +55,22 @@ public class ArticleListDataController {
     }
   }
 
+  @AddTimer
+  @AddLogs
+  @PostMapping(
+          value =
+                  "countries/{countryCode}/saleslines/{salesLine}/articles/isexcludedfromdiscounts",
+          consumes = "application/json",
+          produces = "application/json")
+  public ResponseEntity<?> getIsTradeItemExcludedFromDiscountsByArtVarBundle(
+          @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+          @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
+          @RequestBody List<ArticleId> articleIdList) {
+
+    return ResponseEntity.ok(
+              articleListDetailsService.isTradeItemExcludedFromDiscounts(articleIdList, countryCode, salesLine));
+  }
+
   @ExceptionHandler(ArticleNotFoundException.class)
   public final ResponseEntity<String> handleUserNotFoundException(
       ArticleNotFoundException ex, WebRequest request) {

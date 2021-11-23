@@ -13,6 +13,8 @@ public class ContentIduItemDerivedStandard implements Serializable {
 
     private List<VariantSortDescriptionV2> variantSortDescriptionV2;
 
+    private IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts;
+
     public List<MerchandiseArticleDescription> getMerchandiseArticleDescription() {
         return merchandiseArticleDescription;
     }
@@ -29,5 +31,14 @@ public class ContentIduItemDerivedStandard implements Serializable {
     @XmlElement("variantSortDescriptionV2")
     public void setVariantSortDescriptionV2(List<VariantSortDescriptionV2> variantSortDescriptionV2) {
         this.variantSortDescriptionV2 = variantSortDescriptionV2;
+    }
+
+    public IsTradeItemExcludedFromDiscounts getIsTradeItemExcludedFromDiscounts() {
+        return isTradeItemExcludedFromDiscounts;
+    }
+
+    @XmlElement("isTradeItemExcludedFromDiscounts")
+    public void setIsTradeItemExcludedFromDiscounts(IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts) {
+        this.isTradeItemExcludedFromDiscounts = isTradeItemExcludedFromDiscounts;
     }
 }
