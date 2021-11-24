@@ -366,7 +366,8 @@ public class ArticleCacheService {
         articleCacheReaderDigest.getBrandName(),
         calculateMinimumRetailPrice(
             articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
-        articleCacheDataGroup200.getCountryOfOrigin());
+        articleCacheDataGroup200.getCountryOfOrigin(),
+		isTradeItemExcludedFromDiscounts);
 	}
 
   private String getPromotionIdAvailable(
@@ -388,12 +389,12 @@ public class ArticleCacheService {
 					.getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100)
 					.getHasMinimumRetailPrice();
 
-			if (hasMinimumRetailPrice == true) {
+			if (hasMinimumRetailPrice) {
 				Double minimumRetailPriceForVatCalculation = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
 						.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> articleCacheDataGroup.getStoreNo() == storeNumber)
 						.findFirst()
-						.map(articleCacheDataGroup -> articleCacheDataGroup.getMinimumRetailPriceForVatCalculation())
+						.map(ArticleCacheDataGroup::getMinimumRetailPriceForVatCalculation)
 						.orElse(ZERO);
 				return MinimumRetailPrice.builder().indicator(Boolean.TRUE)
 						.value(minimumRetailPriceForVatCalculation * sellingBundleContent)
@@ -462,15 +463,15 @@ public class ArticleCacheService {
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
         ArticleId articleId = new ArticleId();
         String[] articleUrlPathObtaineArticleIdComponent = articleUrlPath.split("&");
-		for (int i = 0; i < articleUrlPathObtaineArticleIdComponent.length; i++) {
-			if (articleUrlPathObtaineArticleIdComponent[i].contains("bundleno")) {
-				articleId.setBundleNumber(Long.valueOf(articleUrlPathObtaineArticleIdComponent[i].substring(articleUrlPathObtaineArticleIdComponent[i].indexOf("=") + 1)));
+		for (String s : articleUrlPathObtaineArticleIdComponent) {
+			if (s.contains("bundleno")) {
+				articleId.setBundleNumber(Long.valueOf(s.substring(s.indexOf("=") + 1)));
 			}
-			if (articleUrlPathObtaineArticleIdComponent[i].contains("variantno")) {
-				articleId.setVariantNumber(Long.valueOf(articleUrlPathObtaineArticleIdComponent[i].substring(articleUrlPathObtaineArticleIdComponent[i].indexOf("=") + 1)));
+			if (s.contains("variantno")) {
+				articleId.setVariantNumber(Long.valueOf(s.substring(s.indexOf("=") + 1)));
 			}
-			if (articleUrlPathObtaineArticleIdComponent[i].contains("mmsartno")) {
-				articleId.setArticleNumber(Long.valueOf(articleUrlPathObtaineArticleIdComponent[i].substring(articleUrlPathObtaineArticleIdComponent[i].indexOf("=") + 1)));
+			if (s.contains("mmsartno")) {
+				articleId.setArticleNumber(Long.valueOf(s.substring(s.indexOf("=") + 1)));
 			}
 
 		}
@@ -498,28 +499,27 @@ public class ArticleCacheService {
 	private List<ArticleVariant> addArticleCacheDocumentToArticleVariantList(List<ArticleVariant> articleVariantList,
                                                                              ArticleCacheIhdsTree articleCacheDocument,
                                                                              int storeNo) {
-    	List<ArticleVariant> newArticleVariantList = articleVariantList;
-    	boolean variantAlreadyExists = false;
-    	if(!newArticleVariantList.isEmpty()) {
-        	for(int i=0; i<newArticleVariantList.size(); i++) {
-        		if(newArticleVariantList.get(i).getVariantNumber().equals(
-								articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest()
-																		.getVariantNo())){
-        			newArticleVariantList.get(i).getBundles().add(transformArticleCacheDocumentToArticleBundle(articleCacheDocument, storeNo));
-        			variantAlreadyExists = true;
-        		}
-        	}
+		boolean variantAlreadyExists = false;
+    	if(!articleVariantList.isEmpty()) {
+			for (ArticleVariant articleVariant : articleVariantList) {
+				if (articleVariant.getVariantNumber().equals(
+						articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest()
+								.getVariantNo())) {
+					articleVariant.getBundles().add(transformArticleCacheDocumentToArticleBundle(articleCacheDocument, storeNo));
+					variantAlreadyExists = true;
+				}
+			}
     	}
 
 		if(!variantAlreadyExists) {
     		try {
-					newArticleVariantList.add(transformArticleCacheDocumentToArticleVariant(articleCacheDocument, storeNo));
+					articleVariantList.add(transformArticleCacheDocumentToArticleVariant(articleCacheDocument, storeNo));
 				}catch (ArticleNotFoundException e) {
 
 				}
 
 		}
-    	return newArticleVariantList;
+    	return articleVariantList;
     }
 	private ArticleVariant transformArticleCacheDocumentToArticleVariant(ArticleCacheIhdsTree articleCacheDocument,
 			                                                             int storeNo) throws ArticleNotFoundException{
