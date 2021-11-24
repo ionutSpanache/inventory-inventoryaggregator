@@ -12,6 +12,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -131,7 +133,7 @@ public class ArticleCacheService {
 			articleFullDataList.add(
 					transformArticleCacheDocumentToArticleFullData(
 							articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
-							                                                storeNo));
+							                                                storeNo, null));
 		}
 		return articleFullDataList;
 	}
@@ -158,7 +160,7 @@ public class ArticleCacheService {
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 		return transformArticleCacheDocumentToArticleFullData(
 												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
-												storeNo);
+												storeNo, null);
 
 	}
 
@@ -219,52 +221,95 @@ public class ArticleCacheService {
 		return Optional.empty();
 	}
 
-	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
-			Long articleNumber,
-			Long variantNumber,
-			Long bundleNumber,
-			String countryCode,
-			String salesLine,
-			String languageCode,
-			Integer storeNo) throws Exception {
-		Documents articleUrlPathList = articleCacheClient.getArticleUrlPathByArtVarBundle(
-				articleNumber,
-				variantNumber,
-				bundleNumber,
-				countryCode,
-				salesLine,
-				languageCode
-		);
+  public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
+      Long articleNumber,
+      Long variantNumber,
+      Long bundleNumber,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo)
+      throws Exception {
+    Documents articleUrlPathList =
+        articleCacheClient.getArticleUrlPathByArtVarBundle(
+            articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode);
     if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
       return null;
     }
 
-		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
-		ArticleCacheIhdsTree articleCacheDocument = articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
+    String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+    ArticleCacheIhdsTree articleCacheDocument =
+        articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
 
-    if (articleCacheDocument != null
-        && articleCacheDocument.getTransaction() != null
-        && articleCacheDocument.getTransaction().getArticleCacheIncident() != null) {
-      Integer hierarchySequenceStoreNo =
-          articleCacheDocument
-              .getTransaction()
-              .getArticleCacheIncident()
-              .getHierarchySequenceStoreNo(storeNo);
-      if (hierarchySequenceStoreNo == null) {
-        return null;
-      }
-    } else {
+    if (articleCacheDocument == null
+        || articleCacheDocument.getTransaction() == null
+        || articleCacheDocument.getTransaction().getArticleCacheIncident() == null
+        || articleCacheDocument
+                .getTransaction()
+                .getArticleCacheIncident()
+                .getHierarchySequenceStoreNo(storeNo)
+            == null) {
       return null;
     }
 
-		return transformArticleCacheDocumentToArticleFullData(
-						articleCacheDocument,
-						storeNo);
-	}
+    IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
+        isTradeItemExcludedFromDiscounts(
+            countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
+    boolean isTradeItemExcludedFromDiscountsValue = false;
+    if (Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
+      if (isTradeItemExcludedFromDiscounts.getValidFrom() == null) {
+        isTradeItemExcludedFromDiscountsValue = true;
+      } else {
+        LocalDate validFrom =
+            isTradeItemExcludedFromDiscounts
+                .getValidFrom()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        if (LocalDate.now().isAfter(validFrom)) {
+          isTradeItemExcludedFromDiscountsValue = true;
+        }
+      }
+    }
+    return transformArticleCacheDocumentToArticleFullData(
+			articleCacheDocument, storeNo, isTradeItemExcludedFromDiscountsValue);
+  }
+
+  public IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts(
+      String countryCode,
+      Long articleNumber,
+      Long bundleNumber,
+      Long variantNumber,
+      String salesLine) {
+    Documents iduItemDerivedUrlList =
+        documentsService.getIduItemDerivedUrlByArtVarBundle(
+            countryCode,
+            net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId.builder()
+                .articleNumber(articleNumber)
+                .bundleNumber(bundleNumber)
+                .variantNumber(variantNumber)
+                .build(),
+            salesLine);
+    IduItemDerivedStandard iduItemDerivedStandard =
+        articleCacheClient.getIduItemDerivedStandardDocument(
+            iduItemDerivedUrlList.getArticleKeys().get(0));
+    if (iduItemDerivedStandard == null
+        || iduItemDerivedStandard.getContentIduItemDerivedStandard() == null
+        || iduItemDerivedStandard
+                .getContentIduItemDerivedStandard()
+                .getIsTradeItemExcludedFromDiscounts()
+            == null) {
+      return new IsTradeItemExcludedFromDiscounts();
+    }
+    return iduItemDerivedStandard
+        .getContentIduItemDerivedStandard()
+        .getIsTradeItemExcludedFromDiscounts();
+  }
 
 	private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData (
 																			ArticleCacheIhdsTree articleCacheDocument,
-			                                                                Integer storeNo) {
+			                                                                Integer storeNo,
+																			Boolean isTradeItemExcludedFromDiscounts) {
 		Integer hierarchySequenceStoreNo = articleCacheDocument.getTransaction().getArticleCacheIncident().getHierarchySequenceStoreNo(storeNo);
 		if(hierarchySequenceStoreNo == null){
 			throw new ArticleNotFoundException();
@@ -312,8 +357,8 @@ public class ArticleCacheService {
 				articleCacheDataGroup300.getArticleNoEmptiesSales(),
 				articleCacheReaderDigest.getBrandName(),
 				calculateMinimumRetailPrice(articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
-				articleCacheDataGroup200.getCountryOfOrigin()
-				);
+				articleCacheDataGroup200.getCountryOfOrigin(),
+				isTradeItemExcludedFromDiscounts);
 	}
 
   private String getPromotionIdAvailable(ArticleCacheDataGroup articleCacheDataGroup320) {

@@ -42,6 +42,7 @@ public class ArticleMasterData implements Serializable {
   private String brandName;
   private MinimumRetailPrice minimumRetailPrice;
   private String countryOfOrigin;
+  private Boolean isTradeItemExcludedFromDiscounts;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
