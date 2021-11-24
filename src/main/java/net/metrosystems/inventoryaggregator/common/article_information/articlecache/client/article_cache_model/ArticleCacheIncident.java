@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -233,6 +234,19 @@ public class ArticleCacheIncident implements Serializable{
 			return new ArticleCacheDataGroup();
 		}
 	}
+
+	public List<String> getPromotionIdListWithStore(int dataGroupId, int storeNo){
+		try {
+			return this.getArticleCacheDataGroup().stream()
+					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == dataGroupId))
+					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getHierarchySequenceStore() == storeNo))
+					.map(ArticleCacheDataGroup::getPromotionId)
+					.collect(Collectors.toList());
+		}catch(Exception e){
+			return Collections.emptyList();
+		}
+	}
+
 
 	public ArticleCacheDataGroup getArticleCacheDataGroupWithStoreRef(int dataGroupId, int storeNo){
 		try {

@@ -19,6 +19,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.*;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.common.promotions.acl.service.PromotionsAclService;
 import net.metrosystems.inventoryaggregator.multithreading.ArticleDataThreads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,14 +46,16 @@ public class ArticleCacheService {
 	@Autowired
 	private ArticleCacheAAAClient articleCacheClient;
 	private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
+    private final PromotionsAclService promotionsAclService;
 
 	private static final String PAKISTAN_COUNTRY_CODE = "PK";
 	private static final Double ZERO = 0.0;
 
 	@Autowired
-	public ArticleCacheService(ArticleDataThreads articleDataThreads, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient) {
+	public ArticleCacheService(ArticleDataThreads articleDataThreads, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient, PromotionsAclService promotionsAclService) {
 		this.articleDataThreads = articleDataThreads;
 		this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
+		this.promotionsAclService = promotionsAclService;
 	}
 
 	public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForEan(
@@ -322,59 +325,59 @@ public class ArticleCacheService {
 		ArticleCacheDataGroup articleCacheDataGroup325 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
 		ArticleCacheDataGroup articleCacheDataGroup200 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(200);
 
-		return new ArticleCacheFullData(
-				articleCacheReaderDigest.getMmsArtNo(),
-				articleCacheReaderDigest.getVariantNo(),
-				articleCacheReaderDigest.getBundleNo(),
-				articleCacheReaderDigest.getArticleDescription(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getBarcodeForBundle(),
-				articleCacheReaderDigest.getProducingSupplier(),
-				articleCacheDataGroup100.getPresentationMerchandiseGroup(),
-				getPromotionIdAvailable(articleCacheDataGroup320),
-				articleCacheDataGroup310.getSellingBundleContent(),
-				articleCacheDataGroup100.getWeightArticles(),
-				articleCacheReaderDigest.getSubsysNo(),
-				articleCacheDataGroup100.getVatPercent(),
-				articleCacheDataGroup320.getPieceNetSellPrice(),
-				articleCacheDataGroup320.getBundleNetSellPrice(),
-				articleCacheDataGroup320.getPromotionBundleNetPrice(),
-				articleCacheReaderDigest.getVariantText(),
-				articleCacheReaderDigest.getArticleType(),
-				articleCacheDataGroup325.getArticleClass(),
-				articleCacheDataGroup100.getFoodNonfoodIndicator(),
-				articleCacheDataGroup100.getPresentationMainMerchandiseGroup(),
-				articleCacheDataGroup100.getPresentationSubMerchandiseGroup(),
-				articleCacheDataGroup320.getAssignedStoreSupplier(),
-				articleCacheDataGroup325.getProcurementCd(),
-				articleCacheDataGroup320.getAssortmentCode(),
-				articleCacheDataGroup320.getBlockingCode(),
-				articleCacheDataGroup320.getActivationStatus(),
-				articleCacheDataGroup200.getExpiryDays(),
-				articleCacheDataGroup325.getPieceNetBuyingPrice(),
-				articleCacheDataGroup325.getBundleNetBuyingPrice(),
-				articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
-				articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
-				articleCacheDataGroup300.getArticleNoEmptiesSales(),
-				articleCacheReaderDigest.getBrandName(),
-				calculateMinimumRetailPrice(articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
-				articleCacheDataGroup200.getCountryOfOrigin(),
-				isTradeItemExcludedFromDiscounts);
+		List<String> promotionIdList  = articleCacheDocument.getTransaction().getArticleCacheIncident().getPromotionIdListWithStore(322, hierarchySequenceStoreNo);
+
+    return new ArticleCacheFullData(
+        articleCacheReaderDigest.getMmsArtNo(),
+        articleCacheReaderDigest.getVariantNo(),
+        articleCacheReaderDigest.getBundleNo(),
+        articleCacheReaderDigest.getArticleDescription(),
+        articleCacheDocument.getTransaction().getArticleCacheIncident().getBarcodeForBundle(),
+        articleCacheReaderDigest.getProducingSupplier(),
+        articleCacheDataGroup100.getPresentationMerchandiseGroup(),
+        CollectionUtils.isEmpty(promotionIdList)
+            ? null
+            : getPromotionIdAvailable(
+                articleCacheDocument, promotionIdList, storeNo),
+        articleCacheDataGroup310.getSellingBundleContent(),
+        articleCacheDataGroup100.getWeightArticles(),
+        articleCacheReaderDigest.getSubsysNo(),
+        articleCacheDataGroup100.getVatPercent(),
+        articleCacheDataGroup320.getPieceNetSellPrice(),
+        articleCacheDataGroup320.getBundleNetSellPrice(),
+        articleCacheDataGroup320.getPromotionBundleNetPrice(),
+        articleCacheReaderDigest.getVariantText(),
+        articleCacheReaderDigest.getArticleType(),
+        articleCacheDataGroup325.getArticleClass(),
+        articleCacheDataGroup100.getFoodNonfoodIndicator(),
+        articleCacheDataGroup100.getPresentationMainMerchandiseGroup(),
+        articleCacheDataGroup100.getPresentationSubMerchandiseGroup(),
+        articleCacheDataGroup320.getAssignedStoreSupplier(),
+        articleCacheDataGroup325.getProcurementCd(),
+        articleCacheDataGroup320.getAssortmentCode(),
+        articleCacheDataGroup320.getBlockingCode(),
+        articleCacheDataGroup320.getActivationStatus(),
+        articleCacheDataGroup200.getExpiryDays(),
+        articleCacheDataGroup325.getPieceNetBuyingPrice(),
+        articleCacheDataGroup325.getBundleNetBuyingPrice(),
+        articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
+        articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
+        articleCacheDataGroup300.getArticleNoEmptiesSales(),
+        articleCacheReaderDigest.getBrandName(),
+        calculateMinimumRetailPrice(
+            articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
+        articleCacheDataGroup200.getCountryOfOrigin(),
+		isTradeItemExcludedFromDiscounts);
 	}
 
-  private String getPromotionIdAvailable(ArticleCacheDataGroup articleCacheDataGroup320) {
+  private String getPromotionIdAvailable(
+      ArticleCacheIhdsTree articleCacheDocument, List<String> promotionIdList, Integer storeNo) {
 
-    if (articleCacheDataGroup320.getPromotionEnd() != null) {
-      LocalDate sysDate = LocalDate.now();
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-      LocalDate promotionEnd =
-          LocalDate.parse(articleCacheDataGroup320.getPromotionEnd(), formatter);
-
-      if (promotionEnd.isBefore(sysDate)) {
-        return null;
-      }
+    if (promotionIdList.size() > 1) {
+      return promotionsAclService.getActivePromotion(
+          articleCacheDocument, promotionIdList, storeNo);
     }
-
-    return articleCacheDataGroup320.getPromotionId();
+    return promotionIdList.get(0);
   }
 
 	private MinimumRetailPrice calculateMinimumRetailPrice(ArticleCacheIhdsTree articleCacheIhdsTree, Integer storeNumber, Integer sellingBundleContent) {
@@ -386,12 +389,12 @@ public class ArticleCacheService {
 					.getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100)
 					.getHasMinimumRetailPrice();
 
-			if (hasMinimumRetailPrice == true) {
+			if (hasMinimumRetailPrice) {
 				Double minimumRetailPriceForVatCalculation = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
 						.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> articleCacheDataGroup.getStoreNo() == storeNumber)
 						.findFirst()
-						.map(articleCacheDataGroup -> articleCacheDataGroup.getMinimumRetailPriceForVatCalculation())
+						.map(ArticleCacheDataGroup::getMinimumRetailPriceForVatCalculation)
 						.orElse(ZERO);
 				return MinimumRetailPrice.builder().indicator(Boolean.TRUE)
 						.value(minimumRetailPriceForVatCalculation * sellingBundleContent)
@@ -460,15 +463,15 @@ public class ArticleCacheService {
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
         ArticleId articleId = new ArticleId();
         String[] articleUrlPathObtaineArticleIdComponent = articleUrlPath.split("&");
-		for (int i = 0; i < articleUrlPathObtaineArticleIdComponent.length; i++) {
-			if (articleUrlPathObtaineArticleIdComponent[i].contains("bundleno")) {
-				articleId.setBundleNumber(Long.valueOf(articleUrlPathObtaineArticleIdComponent[i].substring(articleUrlPathObtaineArticleIdComponent[i].indexOf("=") + 1)));
+		for (String s : articleUrlPathObtaineArticleIdComponent) {
+			if (s.contains("bundleno")) {
+				articleId.setBundleNumber(Long.valueOf(s.substring(s.indexOf("=") + 1)));
 			}
-			if (articleUrlPathObtaineArticleIdComponent[i].contains("variantno")) {
-				articleId.setVariantNumber(Long.valueOf(articleUrlPathObtaineArticleIdComponent[i].substring(articleUrlPathObtaineArticleIdComponent[i].indexOf("=") + 1)));
+			if (s.contains("variantno")) {
+				articleId.setVariantNumber(Long.valueOf(s.substring(s.indexOf("=") + 1)));
 			}
-			if (articleUrlPathObtaineArticleIdComponent[i].contains("mmsartno")) {
-				articleId.setArticleNumber(Long.valueOf(articleUrlPathObtaineArticleIdComponent[i].substring(articleUrlPathObtaineArticleIdComponent[i].indexOf("=") + 1)));
+			if (s.contains("mmsartno")) {
+				articleId.setArticleNumber(Long.valueOf(s.substring(s.indexOf("=") + 1)));
 			}
 
 		}
@@ -496,28 +499,27 @@ public class ArticleCacheService {
 	private List<ArticleVariant> addArticleCacheDocumentToArticleVariantList(List<ArticleVariant> articleVariantList,
                                                                              ArticleCacheIhdsTree articleCacheDocument,
                                                                              int storeNo) {
-    	List<ArticleVariant> newArticleVariantList = articleVariantList;
-    	boolean variantAlreadyExists = false;
-    	if(!newArticleVariantList.isEmpty()) {
-        	for(int i=0; i<newArticleVariantList.size(); i++) {
-        		if(newArticleVariantList.get(i).getVariantNumber().equals(
-								articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest()
-																		.getVariantNo())){
-        			newArticleVariantList.get(i).getBundles().add(transformArticleCacheDocumentToArticleBundle(articleCacheDocument, storeNo));
-        			variantAlreadyExists = true;
-        		}
-        	}
+		boolean variantAlreadyExists = false;
+    	if(!articleVariantList.isEmpty()) {
+			for (ArticleVariant articleVariant : articleVariantList) {
+				if (articleVariant.getVariantNumber().equals(
+						articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest()
+								.getVariantNo())) {
+					articleVariant.getBundles().add(transformArticleCacheDocumentToArticleBundle(articleCacheDocument, storeNo));
+					variantAlreadyExists = true;
+				}
+			}
     	}
 
 		if(!variantAlreadyExists) {
     		try {
-					newArticleVariantList.add(transformArticleCacheDocumentToArticleVariant(articleCacheDocument, storeNo));
+					articleVariantList.add(transformArticleCacheDocumentToArticleVariant(articleCacheDocument, storeNo));
 				}catch (ArticleNotFoundException e) {
 
 				}
 
 		}
-    	return newArticleVariantList;
+    	return articleVariantList;
     }
 	private ArticleVariant transformArticleCacheDocumentToArticleVariant(ArticleCacheIhdsTree articleCacheDocument,
 			                                                             int storeNo) throws ArticleNotFoundException{
