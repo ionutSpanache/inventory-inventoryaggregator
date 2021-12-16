@@ -17,10 +17,10 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.*;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.common.promotions.acl.service.PromotionsAclService;
-import net.metrosystems.inventoryaggregator.multithreading.ArticleDataThreads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,8 +28,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -38,13 +40,8 @@ public class ArticleCacheService {
 	@Value("${ARTICLE_CACHE_STORE_EXCEPTIONS_PATH}")
 	private String articleCacheStoreExceptionsPath;
 
-	@Autowired
-	DocumentsService documentsService;
-
-	private final ArticleDataThreads articleDataThreads;
-
-	@Autowired
-	private ArticleCacheAAAClient articleCacheClient;
+	private final DocumentsService documentsService;
+	private final ArticleCacheAAAClient articleCacheClient;
 	private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
     private final PromotionsAclService promotionsAclService;
 
@@ -52,8 +49,9 @@ public class ArticleCacheService {
 	private static final Double ZERO = 0.0;
 
 	@Autowired
-	public ArticleCacheService(ArticleDataThreads articleDataThreads, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient, PromotionsAclService promotionsAclService) {
-		this.articleDataThreads = articleDataThreads;
+	public ArticleCacheService(DocumentsService documentsService, ArticleCacheAAAClient articleCacheClient, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient, PromotionsAclService promotionsAclService) {
+		this.documentsService = documentsService;
+		this.articleCacheClient = articleCacheClient;
 		this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
 		this.promotionsAclService = promotionsAclService;
 	}
@@ -125,22 +123,6 @@ public class ArticleCacheService {
 		return articleVariantBundleIdentifierList;
 	}
 
-	public List<ArticleCacheFullData> getArticleCacheFullDataByEan(String ean,
-                                                                   String countryCode, String salesLine, String languageCode, Integer storeNo) throws Exception {
-		Documents articleUrlPathList = articleCacheClient.getArticleUrlPathByEan(ean, countryCode, salesLine, languageCode);
-		if (articleUrlPathList.getArticleKeys().isEmpty()) {
-			throw new ArticleNotFoundException();
-		}
-		List<ArticleCacheFullData> articleFullDataList = new ArrayList<>();
-		for (String articleUrlPath : articleUrlPathList.getArticleKeys()) {
-			articleFullDataList.add(
-					transformArticleCacheDocumentToArticleFullData(
-							articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
-							                                                storeNo, null));
-		}
-		return articleFullDataList;
-	}
-
 	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
 			Long articleNumber,
 			Long variantNumber,
@@ -174,11 +156,11 @@ public class ArticleCacheService {
 		if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
 			return Optional.empty();
 		}
-
-		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 		try {
-			IduItemDerivedStandard iduItemDerivedStandard = articleCacheClient.getIduItemDerivedStandardDocument(articleUrlPath);
-			return Optional.of(iduItemDerivedStandard);
+			return articleUrlPathList.getArticleKeys().stream().map(articleCacheClient::getIduItemDerivedStandardDocument)
+							.filter(iduItemDerivedStandard -> iduItemDerivedStandard.getContentIduItemDerivedStandard().getVariantSortDescriptionV2() != null
+							&& iduItemDerivedStandard.getContentIduItemDerivedStandard().getMerchandiseArticleDescription() != null)
+							.findAny();
 		} catch (Exception e) {
 			return Optional.empty();
 		}
@@ -218,7 +200,7 @@ public class ArticleCacheService {
 				.findFirst();
 
 		if(response.isPresent()) {
-			return response.map(storeInformationGroup -> storeInformationGroup.getChannelDeliveryFlag());
+			return response.map(StoreInformationGroup::getChannelDeliveryFlag);
 		}
 
 		return Optional.empty();
@@ -385,7 +367,7 @@ public class ArticleCacheService {
 				.getArticleCacheDomain().getPlkz();
 
 		if (PAKISTAN_COUNTRY_CODE.equalsIgnoreCase(countryCode)) {
-			Boolean hasMinimumRetailPrice = articleCacheIhdsTree.getTransaction()
+			boolean hasMinimumRetailPrice = articleCacheIhdsTree.getTransaction()
 					.getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100)
 					.getHasMinimumRetailPrice();
 
@@ -437,167 +419,6 @@ public class ArticleCacheService {
 				.build();
 	}
 
-
-	public ArticleBasicData getArticleBasicDataByEan(String ean, String countryCode, String salesLine, String languageCode, int storeNo) throws Exception {
-		return processDocumentsReceivedFromArticleCache(
-				articleCacheClient.getArticleUrlPathByEan(ean, countryCode, salesLine, languageCode)
-				, storeNo);
-	}
-
-	public ArticleBasicData getArticleBasicDataByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine, String languageCode, int storeNo) throws Exception {
-		return processDocumentsReceivedFromArticleCache(
-				articleCacheClient.getArticleUrlPathByMmsArtNo(mmsArtNo, countryCode, salesLine, languageCode)
-				, storeNo);
-	}
-
-	public ArticleBasicData getArticleBasicDataBySubsysArtNo(Long subsysArtNo, String countryCode, String salesLine, String languageCode, int storeNo) throws Exception {
-		return processDocumentsReceivedFromArticleCache(
-				articleCacheClient.
-						getArticleUrlPathBySubsysArtNo(subsysArtNo, countryCode, salesLine, languageCode), storeNo);
-	}
-
-	private ArticleBasicData processDocumentsReceivedFromArticleCache(Documents articleUrlPathList, int storeNo) {
-    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-      throw new ArticleNotFoundException();
-    }
-		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
-        ArticleId articleId = new ArticleId();
-        String[] articleUrlPathObtaineArticleIdComponent = articleUrlPath.split("&");
-		for (String s : articleUrlPathObtaineArticleIdComponent) {
-			if (s.contains("bundleno")) {
-				articleId.setBundleNumber(Long.valueOf(s.substring(s.indexOf("=") + 1)));
-			}
-			if (s.contains("variantno")) {
-				articleId.setVariantNumber(Long.valueOf(s.substring(s.indexOf("=") + 1)));
-			}
-			if (s.contains("mmsartno")) {
-				articleId.setArticleNumber(Long.valueOf(s.substring(s.indexOf("=") + 1)));
-			}
-
-		}
-
-        ArticleCacheIhdsTree articleCacheDocument = articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
-        return transformArticleCacheDocumentToArticleBasicData(articleCacheDocument, storeNo, articleId);
-
-    }
-
-
-
-	private ArticleBasicData transformArticleCacheDocumentToArticleBasicData(ArticleCacheIhdsTree articleCacheDocument,
-                                                                             int storeNo, ArticleId articleId) {
-		return new ArticleBasicData(
-				articleCacheDocument.getTransaction().getId(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getMmsArtNo(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getArticleDescription(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getAssignedStoreSupplierTypeForArticle(storeNo),
-				//articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getMerchGroup(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getOwnBrand(),
-                Math.toIntExact(articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getProducingSupplier()),
-                articleId
-				);
-	}
-	private List<ArticleVariant> addArticleCacheDocumentToArticleVariantList(List<ArticleVariant> articleVariantList,
-                                                                             ArticleCacheIhdsTree articleCacheDocument,
-                                                                             int storeNo) {
-		boolean variantAlreadyExists = false;
-    	if(!articleVariantList.isEmpty()) {
-			for (ArticleVariant articleVariant : articleVariantList) {
-				if (articleVariant.getVariantNumber().equals(
-						articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest()
-								.getVariantNo())) {
-					articleVariant.getBundles().add(transformArticleCacheDocumentToArticleBundle(articleCacheDocument, storeNo));
-					variantAlreadyExists = true;
-				}
-			}
-    	}
-
-		if(!variantAlreadyExists) {
-    		try {
-					articleVariantList.add(transformArticleCacheDocumentToArticleVariant(articleCacheDocument, storeNo));
-				}catch (ArticleNotFoundException e) {
-
-				}
-
-		}
-    	return articleVariantList;
-    }
-	private ArticleVariant transformArticleCacheDocumentToArticleVariant(ArticleCacheIhdsTree articleCacheDocument,
-			                                                             int storeNo) throws ArticleNotFoundException{
-		Integer hierarchySequenceStoreNo = articleCacheDocument.getTransaction().getArticleCacheIncident().getHierarchySequenceStoreNo(storeNo);
-		if (hierarchySequenceStoreNo != null){
-			return new ArticleVariant(
-					articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getVariantNo(),
-					articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getVariantText(),
-					transformArticleCacheDocumentToArticleBundle(articleCacheDocument, storeNo));
-		}else {
-			throw new ArticleNotFoundException();
-		}
-
-	}
-
-	private ArticleBundle transformArticleCacheDocumentToArticleBundle(ArticleCacheIhdsTree articleCacheDocument,
-                                                                       int storeNo) {
-		Integer hierarchySequenceStoreNo = articleCacheDocument.getTransaction().getArticleCacheIncident().getHierarchySequenceStoreNo(storeNo);
-		Integer hierarchySequenceStoreNoForProcessing;
-		if (hierarchySequenceStoreNo == null) {
-			hierarchySequenceStoreNoForProcessing = -1;
-		}else {
-			hierarchySequenceStoreNoForProcessing = hierarchySequenceStoreNo;
-		}
-		return new ArticleBundle(
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getBundleNo(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getSubsysNo(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getBarcodeForBundle(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getMerchGroup(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getBundleProcurementCodeForStore(hierarchySequenceStoreNoForProcessing),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getBundleBlockingCodeForStore(hierarchySequenceStoreNoForProcessing),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getPromotionIdForStore(hierarchySequenceStoreNoForProcessing),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getSellingBundleIndicator(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getSellingBundleContent(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getPriceCheck(),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getStatusForStore(hierarchySequenceStoreNoForProcessing),
-				articleCacheDocument.getTransaction().getArticleCacheIncident().getWeightArticle(hierarchySequenceStoreNoForProcessing),
-				Math.toIntExact(articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest().getMerchGroupMain())
-				);
-	}
-
-	public List<ArticleVariant> getArticleVariantsByArticleNumber(ArticleBasicData articleMasterData, String countryCode, String salesLine, String languageCode, int storeNo) throws Exception {
-		List<ArticleVariant> articleVariantList = new ArrayList<>();
-		Documents articleCacheDocumentURLs = articleCacheClient.findArticleUrlPathByMmsArtNo(articleMasterData.getArticleNumber(), countryCode, salesLine, languageCode);
-        List<String> articleCacheDocumentURLsWithsearchedDBundleOnFirstPosition = new ArrayList<>();
-        articleCacheDocumentURLsWithsearchedDBundleOnFirstPosition.add(null);
-		for (String articleCacheDocumentURL : articleCacheDocumentURLs.getArticleKeys()
-        ) {
-			ArticleId articleId = documentsService.tranformDocumentInArticleId(articleCacheDocumentURL);
-			if (articleId.getArticleNumber().equals(articleMasterData.getArticleId().getArticleNumber())
-					&& articleId.getVariantNumber().equals(articleMasterData.getArticleId().getVariantNumber())
-					&& articleId.getBundleNumber().equals(articleMasterData.getArticleId().getBundleNumber())) {
-                articleCacheDocumentURLsWithsearchedDBundleOnFirstPosition.set(0, articleCacheDocumentURL);
-            } else {
-                articleCacheDocumentURLsWithsearchedDBundleOnFirstPosition.add(articleCacheDocumentURL);
-            }
-
-            //todo: check if this approach has better performance
-		}
-        //todo: check if this approach has better performance
-        //todo:check here error for art 931988 001 001 in list are 5 but here 2 or 3 are readded
-
-		for (ArticleCacheIhdsTree articleCacheDocument : articleDataThreads.getArticleCacheDocuments(articleCacheDocumentURLsWithsearchedDBundleOnFirstPosition)) {
-
-            articleVariantList = addArticleCacheDocumentToArticleVariantList(articleVariantList, articleCacheDocument, storeNo);
-        }
-
-		return articleVariantList;
-	}
-
-	private List<ArticleCacheIhdsTree> getArticleCacheDocumentsByURLs(List<String> articleCacheDocumentURLs) {
-		List<ArticleCacheIhdsTree> articleCacheDocuments = new ArrayList<>();
-		for (String articleCacheDocumentURL : articleCacheDocumentURLs) {
-			articleCacheDocuments.add(articleCacheClient.getArticleCacheDocumentByURL(articleCacheDocumentURL));
-		}
-		return articleCacheDocuments;
-	}
-
 	public ArticleCacheStoreExceptionsIhdsTree getArticleCacheStoreExceptions(
 			Long articleNumber,
 			Long variantNumber,
@@ -609,7 +430,7 @@ public class ArticleCacheService {
 		String articleUrlPath = String.format(articleCacheStoreExceptionsPath,
 				countryCode.toLowerCase(), bundleNumber, salesLine.toLowerCase(), "en", articleNumber, storeNo, variantNumber);
 		//todo: change "en" to country code
-		System.out.println("articleUrlPath: " + articleUrlPath);
+		log.debug("articleUrlPath: " + articleUrlPath);
 		return articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
 	}
 
