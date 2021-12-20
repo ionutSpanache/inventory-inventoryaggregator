@@ -3,9 +3,12 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
+import java.io.Serializable;
 
 @XmlRootElement(name = "merchandiseArticleDescription")
-public class MerchandiseArticleDescription {
+public class MerchandiseArticleDescription implements Serializable {
+
+    private static final long serialVersionUID = 213963540204750744L;
 
     private String language;
     private String description;
