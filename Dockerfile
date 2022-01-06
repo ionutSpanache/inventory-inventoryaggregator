@@ -30,6 +30,7 @@ CMD [ "sh", "-c", "java \
 -XX:MinRAMPercentage=50.0 \
 -XX:MaxRAMPercentage=80.0 \
 -Djava.security.egd=file:/dev/./urandom \
+-Dlog4j2.formatMsgNoLookups=True \
 -Ddd.agent.host=${DRP_CF_KUBERNETES_HOST_IP} \
 -Ddd.service=${DRP_EV_DD_SOLUTION}.${DRP_CF_VERTICAL}.${DRP_CF_SERVICE} \
 -Ddd.env=${DRP_CF_STAGE} \
