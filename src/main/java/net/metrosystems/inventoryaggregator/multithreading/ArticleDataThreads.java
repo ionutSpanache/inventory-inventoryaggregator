@@ -2,6 +2,8 @@ package net.metrosystems.inventoryaggregator.multithreading;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclArticleStoreMasterDataService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 
+@Slf4j
 @Service
 public class ArticleDataThreads {
 
@@ -189,7 +192,7 @@ public class ArticleDataThreads {
 
 		// Actions to be performed in case of error
 		}catch(Exception e) {
-			System.out.println(e.getMessage());
+			log.error(e.getMessage(), e);
 		}
 
         // Return article data enhanced with Acl ordering data

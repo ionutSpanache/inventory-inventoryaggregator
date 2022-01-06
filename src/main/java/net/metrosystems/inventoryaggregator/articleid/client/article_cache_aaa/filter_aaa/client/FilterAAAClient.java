@@ -30,7 +30,6 @@ public class FilterAAAClient {
                 .query(configArticleCacheAAA.getGeneralQueryParam())
                 .buildAndExpand()
                 .encode();
-        System.out.println("FilterAAAClient.getFilteredDocuments uriComponents:" + uriComponents.toUri().toString());
         //todo add suport for multi page response.
         String filterAsString;
         try {
@@ -38,7 +37,6 @@ public class FilterAAAClient {
         } catch (JsonProcessingException e) {
             throw new Exception(e);
         }
-        System.out.println("FilterAAAClient.getFilteredDocuments filterAsString");
         Documents documents = (Documents) restTemplateCustom.postForObject(uriComponents.toUri().toString(), filterAsString, Documents.class, true);
         if (documents != null && !CollectionUtils.isEmpty(documents.getArticleKeys()))
             documents
@@ -57,7 +55,6 @@ public class FilterAAAClient {
                 .query(configArticleCacheAAA.getGeneralQueryParam())
                 .buildAndExpand()
                 .encode();
-        log.info("FilterAAAClient.getFilteredDocuments ISU_MASTER uriComponents:" + uriComponents.toUri().toString());
         //todo add suport for multi page response.
         String filterAsString = null;
         try {
@@ -65,7 +62,6 @@ public class FilterAAAClient {
         } catch (JsonProcessingException e) {
             log.error("ISU_ITEM_MASTER error when receiving data");
         }
-        System.out.println("FilterAAAClient.getFilteredDocuments filterAsString");
         Documents documents = (Documents) restTemplateCustom.postForObject(uriComponents.toUri().toString(), filterAsString, Documents.class, true);
         if (documents != null && !CollectionUtils.isEmpty(documents.getArticleKeys()))
             documents
@@ -84,7 +80,6 @@ public class FilterAAAClient {
                 .query(configArticleCacheAAA.getGeneralQueryParam())
                 .buildAndExpand()
                 .encode();
-        log.info("FilterAAAClient.getFilteredDocuments ISU_ITEM_STORE_MERCHANDISE uriComponents:" + uriComponents.toUri().toString());
         //todo add suport for multi page response.
         String filterAsString = null;
         try {
@@ -92,7 +87,6 @@ public class FilterAAAClient {
         } catch (JsonProcessingException e) {
             log.error("ISU_ITEM_MASTER error when receiving data");
         }
-        System.out.println("FilterAAAClient.getFilteredDocuments filterAsString");
         Documents documents = (Documents) restTemplateCustom.postForObject(uriComponents.toUri().toString(), filterAsString, Documents.class, true);
         if (documents != null && !CollectionUtils.isEmpty(documents.getArticleKeys()))
             documents
@@ -111,7 +105,6 @@ public class FilterAAAClient {
                 .query(configArticleCacheAAA.getGeneralQueryParam())
                 .buildAndExpand()
                 .encode();
-        log.info("FilterAAAClient.getFilteredDocuments IDU_ITEM_DERIVED_STANDARD uriComponents:" + uriComponents.toUri().toString());
         //todo add suport for multi page response.
         String filterAsString = null;
         try {
@@ -119,7 +112,6 @@ public class FilterAAAClient {
         } catch (JsonProcessingException e) {
             log.error("ISU_ITEM_MASTER error when receiving data");
         }
-        System.out.println("FilterAAAClient.getFilteredDocuments filterAsString");
         Documents documents = (Documents) restTemplateCustom.postForObject(uriComponents.toUri().toString(), filterAsString, Documents.class, true);
         if (documents != null && !CollectionUtils.isEmpty(documents.getArticleKeys()))
             documents
@@ -138,7 +130,6 @@ public class FilterAAAClient {
             .query(configArticleCacheAAA.getGeneralQueryParam())
             .buildAndExpand()
             .encode();
-        System.out.println("FilterAAAClient.getFilteredDocuments uriComponents:" + uriComponents.toUri().toString());
         //todo add suport for multi page response.
         String filterAsString;
         try {
@@ -146,7 +137,6 @@ public class FilterAAAClient {
         } catch (JsonProcessingException e) {
             throw new Exception(e);
         }
-        System.out.println("FilterAAAClient.getFilteredDocuments filterAsString");
         return (Documents) restTemplateCustom.postForObject(uriComponents.toUri().toString(), filterAsString, Documents.class, true);
     }
 
@@ -157,7 +147,6 @@ public class FilterAAAClient {
                 .query(configArticleCacheAAA.getGeneralQueryParam() + configArticleCacheAAA.getFrom())
                 .buildAndExpand(nextPage)
                 .encode();
-        System.out.println("FilterAAAClient.getFilteredDocuments next page uriComponents:" + uriComponents.toUri().toString());
         String filterAsString;
         try {
             filterAsString = ObjectMapperCustom.getMapper().writeValueAsString(filter);

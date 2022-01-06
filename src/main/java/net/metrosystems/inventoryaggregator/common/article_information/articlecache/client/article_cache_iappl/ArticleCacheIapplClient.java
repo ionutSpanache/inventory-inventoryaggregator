@@ -124,7 +124,6 @@ public class ArticleCacheIapplClient //implements ArticleCacheClient
     }
 
     private String getForArticleCacheURL(String articleUrl) {
-        System.out.println("ArticleCacheIapplClient.getForArticleCacheURL URL: " + articleUrl);
         return restTemplateFilter.getForObject(
                 articleUrl,
                 String.class);

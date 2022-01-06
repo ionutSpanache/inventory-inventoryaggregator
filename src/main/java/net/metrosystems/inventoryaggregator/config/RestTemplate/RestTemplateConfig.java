@@ -37,8 +37,7 @@ public class RestTemplateConfig {
   @Bean
   public RestTemplate restTemplate() {
     return new RestTemplateBuilder().requestFactory(this::clientHttpRequestFactory)
-                                    .errorHandler(new CustomClientErrorHandler())
-                                    .interceptors(new CustomClientHttpRequestInterceptor()).build();
+                                    .errorHandler(new CustomClientErrorHandler()).build();
   }
 
   @Bean

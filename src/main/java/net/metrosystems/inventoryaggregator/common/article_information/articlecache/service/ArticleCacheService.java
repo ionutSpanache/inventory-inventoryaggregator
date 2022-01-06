@@ -430,7 +430,6 @@ public class ArticleCacheService {
 		String articleUrlPath = String.format(articleCacheStoreExceptionsPath,
 				countryCode.toLowerCase(), bundleNumber, salesLine.toLowerCase(), "en", articleNumber, storeNo, variantNumber);
 		//todo: change "en" to country code
-		log.debug("articleUrlPath: " + articleUrlPath);
 		return articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
 	}
 

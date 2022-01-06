@@ -1,12 +1,15 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
 import java.util.concurrent.Callable;
+
+import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclArticleStoreMasterDataService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
 
+@Slf4j
 public class AclArticleStoreMasterDataServiceExecutableTask implements Callable<ArticleVariant>{
 
 	private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
@@ -87,13 +90,13 @@ public class AclArticleStoreMasterDataServiceExecutableTask implements Callable<
 					try {
 					 articleData.setDepartmentNumber(Long.valueOf(articleStoreMasterData.getDepartmentNumber()));
 					}catch(Exception e) {
-					 System.out.println(e);
+					 log.error(e.getMessage(), e);
 					}
 					articleBundle.setPriorityAssortmentCode(articleStoreMasterData.getPriorityAssortmentCode());
 					articleVariant.getBundles().set(bundleIndex, articleBundle);
 				}
 			}catch (Exception e) {
-				System.out.println("expeption "+e);
+				log.error(e.getMessage(), e);
 			}
 			bundleIndex++;
 		}
@@ -106,7 +109,7 @@ public class AclArticleStoreMasterDataServiceExecutableTask implements Callable<
 			processAclArticleStoreMasterData();
 			return this.articleVariant;
 		} catch(Exception e) {
-			System.out.println("expeption "+e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}

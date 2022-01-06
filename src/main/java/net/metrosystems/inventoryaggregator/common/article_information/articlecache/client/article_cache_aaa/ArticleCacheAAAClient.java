@@ -94,33 +94,18 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
 
   @Override
   public ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath) {
-    System.out.println(
-        "ArticleCacheAAAClient.getArticleCacheDocumentByURL url:"
-            + articleCacheServiceHost
-            + "/"
-            + articleUrlPath);
     return getForArticleCacheObject(
         articleCacheServiceHost + "/" + articleUrlPath, ArticleCacheIhdsTree.class);
   }
 
   @Override
   public IsuItemMaster getProductLifeCycleData(String articleUrlPath) {
-    log.info(
-            "ArticleCacheAAAClient.getArticleCacheDocumentByURL url:"
-                    + articleCacheServiceHost
-                    + "/"
-                    + articleUrlPath);
     return getForArticleCacheObject(
             articleCacheServiceHost + "/" + articleUrlPath, IsuItemMaster.class);
   }
 
   @Override
   public IsuItemStoreMerchandise getChannelDeliveryFlagDocument(String articleUrlPath) {
-    log.info(
-            "ArticleCacheAAAClient.getArticleCacheDocumentByURL url:"
-                    + articleCacheServiceHost
-                    + "/"
-                    + articleUrlPath);
     return getForArticleCacheObject(
             articleCacheServiceHost + "/" + articleUrlPath, IsuItemStoreMerchandise.class);
   }
@@ -154,11 +139,6 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
 
   @Override
   public IduItemDerivedStandard getIduItemDerivedStandardDocument(String articlePath) {
-     log.info(
-            "ArticleCacheAAAClient.getArticleCacheDocumentByURL url:"
-                    + articleCacheServiceHost
-                    + "/"
-                    + articlePath);
     return getForArticleCacheObject(
             articleCacheServiceHost + "/" + articlePath, IduItemDerivedStandard.class);
   }

@@ -32,7 +32,6 @@ public class BasicAuthInterceptor implements ClientHttpRequestInterceptor {
             request.getHeaders().addIfAbsent(HttpHeaders.ACCEPT_ENCODING, "gzip");
         }
 
-        System.out.println("TraceInformationRestTemplateAgentInterceptor.intercept:" + request.getURI().toURL().toString());
         return execution.execute(request, body);
     }
 }
