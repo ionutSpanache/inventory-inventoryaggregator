@@ -275,20 +275,32 @@ public class ArticleCacheService {
                 .variantNumber(variantNumber)
                 .build(),
             salesLine);
-    IduItemDerivedStandard iduItemDerivedStandard =
-        articleCacheClient.getIduItemDerivedStandardDocument(
-            iduItemDerivedUrlList.getArticleKeys().get(0));
-    if (iduItemDerivedStandard == null
-        || iduItemDerivedStandard.getContentIduItemDerivedStandard() == null
-        || iduItemDerivedStandard
-                .getContentIduItemDerivedStandard()
-                .getIsTradeItemExcludedFromDiscounts()
-            == null) {
-      return new IsTradeItemExcludedFromDiscounts();
-    }
-    return iduItemDerivedStandard
-        .getContentIduItemDerivedStandard()
-        .getIsTradeItemExcludedFromDiscounts();
+    IsTradeItemExcludedFromDiscounts result = new IsTradeItemExcludedFromDiscounts();
+    iduItemDerivedUrlList
+        .getArticleKeys()
+        .forEach(
+            articleKey -> {
+              IduItemDerivedStandard iduItemDerivedStandard =
+                  articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
+              if (iduItemDerivedStandard != null
+                  && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
+                IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
+                    iduItemDerivedStandard
+                        .getContentIduItemDerivedStandard()
+                        .getIsTradeItemExcludedFromDiscounts();
+                if (isTradeItemExcludedFromDiscounts != null
+                    && Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
+                  result.setValue(true);
+                  if (result.getValidFrom() == null
+                      || isTradeItemExcludedFromDiscounts
+                          .getValidFrom()
+                          .after(result.getValidFrom())) {
+                    result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
+                  }
+                }
+              }
+            });
+    return result;
   }
 
 	private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData (
