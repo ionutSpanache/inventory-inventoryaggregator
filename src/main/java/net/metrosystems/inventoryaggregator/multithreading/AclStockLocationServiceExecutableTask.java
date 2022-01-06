@@ -1,11 +1,6 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
@@ -13,6 +8,13 @@ import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclB
 import net.metrosystems.inventoryaggregator.common.stock_location.acl.service.AclStockService;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+
+@Slf4j
 public class AclStockLocationServiceExecutableTask implements Callable<ArticleVariant> {
 
 	AclStockService aclStockService;   // autowired AclOrderingService object to call the ACL ordering Web Service
@@ -21,8 +23,6 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 	Integer storeNo;                                   // store number to be used in the request to the ACL ordering Web Service
 	Long articleNumber;                                // article number to be used in the request to the ACL ordering Web Service
 	ArticleVariant articleVariant;                     // article variant number to be enhanced with ACL ordering Data
-
-	private static final Logger logger = Logger.getLogger("AclStockLocationServiceExecutableTask");  // handler for logging messages
 
 	// Public constructor that sets the attributes for the call to ACL ordering Web Service
 	public AclStockLocationServiceExecutableTask(AclStockService aclStockService,
@@ -75,14 +75,14 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 	public ArticleVariant call() throws Exception{
 		List<AclBundleStockLocation> aclBundleStockLocations = new ArrayList<>();
 		try {
-			logger.info("Thread " + this.getIdAsString() + " has started");
+			log.info("Thread " + this.getIdAsString() + " has started");
 			aclBundleStockLocations = aclStockService.getAclBundleStockLocations(
 					countryCode, salesLine, storeNo,
 					this.articleNumber,	articleVariant.getVariantNumber());
 			processAclStockLocationDataIntoArticleVariant(aclBundleStockLocations);
 			return this.articleVariant;
 		} catch(Exception e) {
-			logger.info("Thread " + this.getIdAsString() + " error:" + e.getMessage());
+			log.error("Thread {} error: {}", this.getIdAsString(), e.getMessage());
 			return null;
 		}
 	}

@@ -1,14 +1,13 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
-import java.util.concurrent.Callable;
-import java.util.logging.Logger;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 
+import java.util.concurrent.Callable;
+
 public class ArticleCacheDocumentServiceTask implements Callable<ArticleCacheIhdsTree> {
 
-	private static final Logger logger = Logger.getLogger("ArticleCacheDocumentServiceExecutableTask"); // handler for logging messages
 	private final ArticleCacheClient articleCacheClient;
 	private final String articleCacheDocumentURL;
 
@@ -29,7 +28,6 @@ public class ArticleCacheDocumentServiceTask implements Callable<ArticleCacheIhd
 	@Override
 	public ArticleCacheIhdsTree call() throws Exception{
 		try {
-			logger.info("Thread " + this.getIdAsString() + " has started");
 			return articleCacheClient.getArticleCacheDocumentByURL(articleCacheDocumentURL);
 		} catch(Exception e) {
 			throw new ArticleNotFoundException();
