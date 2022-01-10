@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.*;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -12,12 +13,17 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement(name="DataGroup")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ArticleCacheStoreExceptionsDataGroup {
-	
-	/*Data Group 100*/
+
+	/*Common*/
 	@XmlAttribute(name="id")
 	private int id;
 	@XmlAttribute(name="name")
 	private String name;
+	@XmlElement(name="VALID_FROM")
+	private Date validFrom;
+	@XmlElement(name="VALID_TO")
+	private Date validTo;
+	/*Data Group 100*/
 	@XmlElement(name="NET_SALES_PRICE_PER_BUNDLE")
 	private Double netSalesPricePerBundle;
 	@XmlElement(name="NET_SALES_PRICE_PER_PIECE")

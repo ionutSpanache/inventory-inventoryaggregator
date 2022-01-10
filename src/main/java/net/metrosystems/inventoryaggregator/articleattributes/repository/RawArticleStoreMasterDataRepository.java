@@ -157,6 +157,8 @@ public class RawArticleStoreMasterDataRepository {
             articleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerPiece())
         .storeBundleGrossSellPrice(
             articleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerBundle())
+        .storePriceValidFrom(articleCacheStoreExceptionsDataGroup100.getValidFrom())
+        .storePromotionValidTo(articleCacheStoreExceptionsDataGroup100.getValidTo())
         .storePromotionPieceNetPrice(
             articleCacheStoreExceptionsDataGroup200.getPromotionNetSalesPricePerPiece())
         .storePromotionBundleNetPrice(
@@ -165,13 +167,16 @@ public class RawArticleStoreMasterDataRepository {
             articleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerPiece())
         .storePromotionBundleGrossPrice(
             articleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerBundle())
+        .storePromotionValidFrom(articleCacheStoreExceptionsDataGroup200.getValidFrom())
+        .storePromotionValidTo(articleCacheStoreExceptionsDataGroup200.getValidTo())
         .leadTime(
             articleStoreMasterDataList == null || articleStoreMasterDataList.isEmpty()
                 ? null
                 : articleStoreMasterDataList.get(0).getLeadTime())
-        .orderProposalBlockingCode(CollectionUtils.isEmpty(articleStoreMasterDataList)
-                    ? null
-                    : articleStoreMasterDataList.get(0).getOrderProposalBlockingCode())
+        .orderProposalBlockingCode(
+            CollectionUtils.isEmpty(articleStoreMasterDataList)
+                ? null
+                : articleStoreMasterDataList.get(0).getOrderProposalBlockingCode())
         .build();
   }
 
@@ -228,6 +233,8 @@ public class RawArticleStoreMasterDataRepository {
                 articleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerPiece())
             .storeBundleGrossSellPrice(
                 articleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerBundle())
+            .storePriceValidFrom(articleCacheStoreExceptionsDataGroup100.getValidFrom())
+            .storePromotionValidTo(articleCacheStoreExceptionsDataGroup100.getValidTo())
             .storePromotionPieceNetPrice(
                 articleCacheStoreExceptionsDataGroup200.getPromotionNetSalesPricePerPiece())
             .storePromotionBundleNetPrice(
@@ -236,6 +243,8 @@ public class RawArticleStoreMasterDataRepository {
                 articleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerPiece())
             .storePromotionBundleGrossPrice(
                 articleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerBundle())
+            .storePromotionValidFrom(articleCacheStoreExceptionsDataGroup200.getValidFrom())
+            .storePromotionValidTo(articleCacheStoreExceptionsDataGroup200.getValidTo())
             .leadTime(null)
             .build();
 
