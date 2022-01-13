@@ -330,6 +330,10 @@ public class ArticleCacheService {
 
 		GradeCodeReferenceFruitsVegetables result = new GradeCodeReferenceFruitsVegetables();
 
+    if(iduItemDerivedUrlList.getArticleKeys().isEmpty()){
+    	return result;
+		}
+
 		IduItemDerivedStandard iduItemDerivedStandard =
 				articleCacheClient.getIduItemDerivedStandardDocument(iduItemDerivedUrlList.getArticleKeys().get(0));
 
