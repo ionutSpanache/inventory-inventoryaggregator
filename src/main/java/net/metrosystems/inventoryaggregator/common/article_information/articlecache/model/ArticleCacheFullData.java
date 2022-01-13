@@ -48,4 +48,6 @@ public class ArticleCacheFullData {
     private MinimumRetailPrice minimumRetailPrice;
     private String countryOfOrigin;
     private Boolean isTradeItemExcludedFromDiscounts;
+    private String gradeCodeReferenceFruitsVegetables;
+
 }

@@ -228,7 +228,9 @@ public class ArticleMasterDataRepository {
           articleCacheFullData.getBrandName(),
           articleCacheFullData.getMinimumRetailPrice(),
           articleCacheFullData.getCountryOfOrigin(),
-          articleCacheFullData.getIsTradeItemExcludedFromDiscounts());
+          articleCacheFullData.getIsTradeItemExcludedFromDiscounts(),
+          articleCacheFullData.getGradeCodeReferenceFruitsVegetables()
+      );
     }
     return null;
   }
