@@ -15,6 +15,8 @@ public class ContentIduItemDerivedStandard implements Serializable {
 
     private IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts;
 
+    private GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables;
+
     public List<MerchandiseArticleDescription> getMerchandiseArticleDescription() {
         return merchandiseArticleDescription;
     }
@@ -35,6 +37,16 @@ public class ContentIduItemDerivedStandard implements Serializable {
 
     public IsTradeItemExcludedFromDiscounts getIsTradeItemExcludedFromDiscounts() {
         return isTradeItemExcludedFromDiscounts;
+    }
+
+    public GradeCodeReferenceFruitsVegetables getGradeCodeReferenceFruitsVegetables() {
+        return gradeCodeReferenceFruitsVegetables;
+    }
+
+    @XmlElement("gradeCodeReferenceFruitsVegetables")
+    public void setGradeCodeReferenceFruitsVegetables(
+        GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables) {
+        this.gradeCodeReferenceFruitsVegetables = gradeCodeReferenceFruitsVegetables;
     }
 
     @XmlElement("isTradeItemExcludedFromDiscounts")

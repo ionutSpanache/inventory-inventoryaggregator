@@ -11,6 +11,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.GradeCodeReferenceFruitsVegetables;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
@@ -143,9 +144,13 @@ public class ArticleCacheService {
       throw new ArticleNotFoundException();
     }
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+
+		GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables =
+				hasGradeCodeReferenceFruitsVegetables(countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
+
 		return transformArticleCacheDocumentToArticleFullData(
 												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
-												storeNo, null);
+												storeNo, null, gradeCodeReferenceFruitsVegetables.getValue());
 
 	}
 
@@ -256,8 +261,12 @@ public class ArticleCacheService {
         }
       }
     }
+
+		GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables =
+				hasGradeCodeReferenceFruitsVegetables(countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
+
     return transformArticleCacheDocumentToArticleFullData(
-			articleCacheDocument, storeNo, isTradeItemExcludedFromDiscountsValue);
+			articleCacheDocument, storeNo, isTradeItemExcludedFromDiscountsValue , gradeCodeReferenceFruitsVegetables.getValue());
   }
 
   public IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts(
@@ -303,10 +312,44 @@ public class ArticleCacheService {
     return result;
   }
 
+  public GradeCodeReferenceFruitsVegetables hasGradeCodeReferenceFruitsVegetables(
+      String countryCode,
+      Long articleNumber,
+      Long bundleNumber,
+      Long variantNumber,
+      String salesLine) {
+    Documents iduItemDerivedUrlList =
+        documentsService.getIduItemDerivedUrlByArtVarBundle(
+            countryCode,
+            net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId.builder()
+                .articleNumber(articleNumber)
+                .bundleNumber(bundleNumber)
+                .variantNumber(variantNumber)
+                .build(),
+            salesLine);
+
+		GradeCodeReferenceFruitsVegetables result = new GradeCodeReferenceFruitsVegetables();
+
+    if(iduItemDerivedUrlList.getArticleKeys().isEmpty()){
+    	return result;
+		}
+
+		IduItemDerivedStandard iduItemDerivedStandard =
+				articleCacheClient.getIduItemDerivedStandardDocument(iduItemDerivedUrlList.getArticleKeys().get(0));
+
+		if(iduItemDerivedStandard != null
+				&& iduItemDerivedStandard.getContentIduItemDerivedStandard() != null
+				&& iduItemDerivedStandard.getContentIduItemDerivedStandard().getGradeCodeReferenceFruitsVegetables() != null ){
+			result = iduItemDerivedStandard.getContentIduItemDerivedStandard().getGradeCodeReferenceFruitsVegetables();
+		}
+
+		return result;
+	}
+
 	private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData (
 																			ArticleCacheIhdsTree articleCacheDocument,
 			                                                                Integer storeNo,
-																			Boolean isTradeItemExcludedFromDiscounts) {
+																			Boolean isTradeItemExcludedFromDiscounts , String gradeCodeReferenceFruitsVegetables) {
 		Integer hierarchySequenceStoreNo = articleCacheDocument.getTransaction().getArticleCacheIncident().getHierarchySequenceStoreNo(storeNo);
 		if(hierarchySequenceStoreNo == null){
 			throw new ArticleNotFoundException();
@@ -361,7 +404,8 @@ public class ArticleCacheService {
         calculateMinimumRetailPrice(
             articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
         articleCacheDataGroup200.getCountryOfOrigin(),
-		isTradeItemExcludedFromDiscounts);
+				isTradeItemExcludedFromDiscounts,
+				gradeCodeReferenceFruitsVegetables);
 	}
 
   private String getPromotionIdAvailable(

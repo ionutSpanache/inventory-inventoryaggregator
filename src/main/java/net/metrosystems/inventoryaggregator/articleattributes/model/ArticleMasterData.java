@@ -43,6 +43,7 @@ public class ArticleMasterData implements Serializable {
   private MinimumRetailPrice minimumRetailPrice;
   private String countryOfOrigin;
   private Boolean isTradeItemExcludedFromDiscounts;
+  private String gradeCodeReferenceFruitsVegetables;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -80,6 +81,7 @@ public class ArticleMasterData implements Serializable {
             ", pieceNetNetBuyingPrice=" + pieceNetNetBuyingPrice +
             ", bundleNetNetBuyingPrice=" + bundleNetNetBuyingPrice +
             ", articleNoEmptiesSales=" + articleNoEmptiesSales +
+            ", gradeCodeReferenceFruitsVegetables=" + gradeCodeReferenceFruitsVegetables +
             ", brandName='" + brandName + '\'' +
             '}';
   }
