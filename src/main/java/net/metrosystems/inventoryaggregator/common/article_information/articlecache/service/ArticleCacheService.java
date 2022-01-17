@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -445,4 +446,34 @@ public class ArticleCacheService {
 		return articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
 	}
 
+  public List<Integer> getActiveStoresByByArtVarBundle(
+      String countryCode, String salesLine, String languageCode, ArticleId articleId)
+      throws Exception {
+
+    List<Integer> activeStoresList;
+
+    Documents articleUrlPathList =
+        articleCacheClient.getArticleUrlPathByArtVarBundle(
+            articleId.getArticleNumber(),
+            articleId.getVariantNumber(),
+            articleId.getBundleNumber(),
+            countryCode,
+            salesLine,
+            languageCode);
+    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+      throw new ArticleNotFoundException();
+    }
+    String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+    ArticleCacheIhdsTree articleCacheIhdsTree =
+        articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
+
+    activeStoresList =
+        articleCacheIhdsTree.getTransaction().getArticleCacheIncident().getArticleCacheDataGroup()
+            .stream()
+            .filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
+            .map(activeStores -> activeStores.getHierarchySequenceStore()%1000)
+            .collect(Collectors.toList());
+
+    return activeStoresList;
+  }
 }

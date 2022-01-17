@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.metrics.annotation.Timed;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
@@ -97,6 +98,37 @@ public class ArticleIdController {
         }
         return ResponseEntity.ok(articleIds);
     }
+
+  @AddTimer
+  @AddLogs
+  @GetMapping(
+      value =
+          "/countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/articlenumber/{articleNumber}/variant/{variant}/bundlenumber/{bundleNumber}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<Integer>> getActiveStoresByByArtVarBundle(
+      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
+      @TagField(name = "languageCode") @PathVariable("languageCode") String languageCode,
+      @PathVariable("articleNumber") Long articleNumber,
+      @PathVariable("variant") Long variant,
+      @PathVariable("bundleNumber") Long bundleNumber)
+      throws Exception {
+
+    ArticleId articleId =
+        ArticleId.builder()
+            .articleNumber(articleNumber)
+            .variantNumber(variant)
+            .bundleNumber(bundleNumber)
+            .build();
+
+    List<Integer> activeStoresList =
+        articleIdService.getActiveStoresByByArtVarBundle(
+            countryCode, salesLine, languageCode, articleId);
+    if (CollectionUtils.isEmpty(activeStoresList)) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(activeStoresList);
+  }
 
     @ExceptionHandler(ArticleNotFoundException.class)
     public final ResponseEntity<String> handleUserNotFoundException(ArticleNotFoundException ex, WebRequest request) {
