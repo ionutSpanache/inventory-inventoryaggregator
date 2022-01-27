@@ -25,6 +25,8 @@
 		<metrics.version>0.5.1.RELEASE</metrics.version>
 		<micrometer.version>1.5.1</micrometer.version>
 		<micrometer.statsd.version>1.5.1</micrometer.statsd.version>
+		<log4j2.version>2.17.1</log4j2.version>
+        <logback.version>1.2.10</logback.version>
 	</properties>
 
 	<dependencies>
