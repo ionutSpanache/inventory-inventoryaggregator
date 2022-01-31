@@ -515,7 +515,7 @@ public class ArticleCacheService {
         articleCacheIhdsTree.getTransaction().getArticleCacheIncident().getArticleCacheDataGroup()
             .stream()
             .filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
-            .map(activeStores -> activeStores.getHierarchySequenceStore()%1000)
+            .map(ArticleCacheDataGroup::getStoreNo)
             .collect(Collectors.toList());
 
     return activeStoresList;
