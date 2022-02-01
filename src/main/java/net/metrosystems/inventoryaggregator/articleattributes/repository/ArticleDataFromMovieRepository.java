@@ -117,7 +117,10 @@ public class ArticleDataFromMovieRepository {
         movieAdapter.getParkedStock(),
         movieAdapter.getTotalSaleQuantity(),
         movieAdapter.getTotalGoodsReceivingQuantity(),
-        movieAdapter.getTotalStockCorrectionQuantity());
+        movieAdapter.getTotalStockCorrectionQuantity(),
+        movieAdapter.getPickedStock(),
+        movieAdapter.getConfirmedStock(),
+        movieAdapter.getMariStock());
   }
 
   private List<ArticlePlannedDeliveryDate> transformMovieAdapterToArticlePlannedDeliveryDateList(

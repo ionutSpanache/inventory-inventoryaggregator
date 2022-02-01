@@ -43,7 +43,7 @@ public class MovieService {
               + stockDetails.getStockSummary().getReservation());
     }
     if (stockDetails.getOpenMovement() != null) {
-      for (Integer i = 0; i < stockDetails.getOpenMovement().size(); i++) {
+      for (int i = 0; i < stockDetails.getOpenMovement().size(); i++) {
         if (stockDetails.getOpenMovement().get(i).getReason().equals("IST")) {
           openInterstoreQuantity = stockDetails.getOpenMovement().get(i).getQuantity();
         }
@@ -58,7 +58,7 @@ public class MovieService {
       String lastGRDateTemp = stockDetails.getSystemStock().get(0).getLastGRDate();
       String lastSaleDateTemp = stockDetails.getSystemStock().get(0).getLastSalesDate();
       String lastSCDDateTemp = stockDetails.getSystemStock().get(0).getLastSCDate();
-      for (Integer i = 1; i < stockDetails.getSystemStock().size(); i++) {
+      for (int i = 1; i < stockDetails.getSystemStock().size(); i++) {
         if (Integer.parseInt(lastGRDateTemp)
             > Integer.parseInt(stockDetails.getSystemStock().get(i).getLastGRDate())) {
           lastGRDateTemp = stockDetails.getSystemStock().get(i).getLastGRDate();
@@ -110,10 +110,26 @@ public class MovieService {
     }
     movieAdapter.setParkedStock(stockDetails.getParkedStock());
 
-    if(stockDetails.getMovementDetails() != null && stockDetails.getMovementDetails().getSystemStock() != null) {
-      movieAdapter.setTotalSaleQuantity(stockDetails.getMovementDetails().getSystemStock().getSALES());
-      movieAdapter.setTotalGoodsReceivingQuantity(stockDetails.getMovementDetails().getSystemStock().getGR());
-      movieAdapter.setTotalStockCorrectionQuantity(stockDetails.getMovementDetails().getSystemStock().getSC());
+    if (stockDetails.getMovementDetails() != null
+        && stockDetails.getMovementDetails().getSystemStock() != null) {
+      movieAdapter.setTotalSaleQuantity(
+          stockDetails.getMovementDetails().getSystemStock().getSALES());
+      movieAdapter.setTotalGoodsReceivingQuantity(
+          stockDetails.getMovementDetails().getSystemStock().getGR());
+      movieAdapter.setTotalStockCorrectionQuantity(
+          stockDetails.getMovementDetails().getSystemStock().getSC());
+    }
+
+    if (stockDetails.getReservation() != null) {
+      stockDetails.getReservation().forEach(reservation -> {
+        if ("COD picked".equals(reservation.getReservationType())) {
+          movieAdapter.setPickedStock(reservation.getQuantity());
+        } else if ("COD confirmed".equals(reservation.getReservationType())) {
+          movieAdapter.setConfirmedStock(reservation.getQuantity());
+        } else if ("MMS".equals(reservation.getReservationType())) {
+          movieAdapter.setMariStock(reservation.getQuantity());
+        }
+      });
     }
 
     return movieAdapter;
