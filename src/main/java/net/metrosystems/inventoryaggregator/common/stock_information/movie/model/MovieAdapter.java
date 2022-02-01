@@ -38,4 +38,7 @@ public class MovieAdapter {
   private Float totalSaleQuantity;
   private Float totalGoodsReceivingQuantity;
   private Float totalStockCorrectionQuantity;
+  private Float pickedStock;
+  private Float confirmedStock;
+  private Float mariStock;
 }
