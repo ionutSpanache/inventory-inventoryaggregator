@@ -117,6 +117,7 @@ public class MovieClient {
       dataGroupsList.add(new MovieDataGroups("PARK"));
     }
     dataGroupsList.add(new MovieDataGroups("MODE", LocalDate.now()));
+    dataGroupsList.add(new MovieDataGroups("RESV"));
 
     MovieRequestBody movieRequest = new MovieRequestBody();
     movieRequest.setConsumer("MSTORE");
