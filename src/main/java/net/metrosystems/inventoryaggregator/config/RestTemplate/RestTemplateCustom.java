@@ -6,6 +6,8 @@ import java.util.List;
 import lombok.Data;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -20,10 +22,14 @@ public class RestTemplateCustom {
 
     private ConfigArticleCacheAAA configArticleCacheAAA;
 
+    private ClientHttpRequestFactory clientHttpRequestFactory;
+
     @Autowired
-    public RestTemplateCustom(ConfigArticleCacheAAA configArticleCacheAAA, RestTemplate restTemplate) {
+    public RestTemplateCustom(ConfigArticleCacheAAA configArticleCacheAAA, RestTemplate restTemplate,
+                              @Qualifier("httpClientRequestFactory") ClientHttpRequestFactory clientHttpRequestFactory) {
         this.restTemplate = restTemplate;
         this.configArticleCacheAAA = configArticleCacheAAA;
+        this.clientHttpRequestFactory = clientHttpRequestFactory;
         addInterceptorToRestTemplate();
     }
 
@@ -35,6 +41,7 @@ public class RestTemplateCustom {
         interceptors.add(new TraceInformationRestTemplateAgentInterceptor());
         interceptors.add(new BasicAuthInterceptor(configArticleCacheAAA));
         this.restTemplate.setInterceptors(interceptors);
+        this.restTemplate.setRequestFactory(clientHttpRequestFactory);
     }
 
     public Object postForObject(String url, Object newValue, Class<?> returnType, Boolean sendDecodedURL) {
