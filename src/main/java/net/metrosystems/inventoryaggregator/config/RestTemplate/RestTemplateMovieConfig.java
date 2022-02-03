@@ -32,7 +32,10 @@ public class RestTemplateMovieConfig {
     @Bean(name = "httpClientRequestFactory")
     public ClientHttpRequestFactory clientFactory(@Qualifier("httpClientWithRetry") HttpClient httpClient) {
 
-        return new HttpComponentsClientHttpRequestFactory(httpClient);
+        HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory =
+                new HttpComponentsClientHttpRequestFactory(httpClient);
+        httpComponentsClientHttpRequestFactory.setConnectTimeout(5000);
+        return httpComponentsClientHttpRequestFactory;
     }
 
     @Bean("httpClientWithRetry")
