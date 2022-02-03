@@ -35,6 +35,7 @@ public class RestTemplateMovieConfig {
         HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory =
                 new HttpComponentsClientHttpRequestFactory(httpClient);
         httpComponentsClientHttpRequestFactory.setConnectTimeout(5000);
+        httpComponentsClientHttpRequestFactory.setReadTimeout(5000);
         return httpComponentsClientHttpRequestFactory;
     }
 
