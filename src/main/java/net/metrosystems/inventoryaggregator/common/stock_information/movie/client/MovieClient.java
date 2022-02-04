@@ -3,15 +3,20 @@ package net.metrosystems.inventoryaggregator.common.stock_information.movie.clie
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.AclArticleStockLocation;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,9 +35,12 @@ public class MovieClient {
   @Value("${MOVIE_STOCK_PATH_FOR_VARIANT}")
   private String movieStockPathForVariant;
 
+  private WebClient webClient;
+
   @Autowired
-  public  MovieClient(/*@Qualifier("restTemplateMovie")*/ RestTemplate restTemplate) {
+  public  MovieClient(/*@Qualifier("restTemplateMovie")*/ RestTemplate restTemplate,WebClient webClient) {
     this.restTemplate = restTemplate;
+    this.webClient = webClient;
   }
 
   public List<StockDetails> getStockDetailsForArticleVariant(
@@ -46,7 +54,13 @@ public class MovieClient {
             mmsArtNo,
             variantNo);
     try {
-      return restTemplate.getForObject(urlInUse, StockDetailsResponse.class).getStockDetails();
+//      return restTemplate.getForObject(urlInUse, StockDetailsResponse.class).getStockDetails();
+      return webClient.get()
+              .uri(urlInUse)
+              .retrieve()
+              .bodyToMono(StockDetailsResponse.class)
+              .block()
+              .getStockDetails();
     } catch (Exception e) {
       log.error("Error while calling MOVIE input{} exception{}", urlInUse, e);
       return null;
@@ -135,12 +149,27 @@ public class MovieClient {
     try {
       jsonStringMovie = mapper.writeValueAsString(movieRequest);
       HttpEntity<String> request = new HttpEntity<>(jsonStringMovie, headers);
-      StockDetailsResponse response = restTemplate.postForObject(urlInUse, request, StockDetailsResponse.class);
+//      StockDetailsResponse response = restTemplate.postForObject(urlInUse, request, StockDetailsResponse.class);
+      StockDetailsResponse response = webClient.post()
+              .uri(urlInUse)
+              .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
+              .bodyValue(movieRequest)
+              .retrieve()
+              .onStatus(this::isErrorResponse, clientResponse -> log(clientResponse, "Movie stock details - api call unsuccessful  : status %d"))
+              .bodyToMono(StockDetailsResponse.class)
+              .block();
+
       return response == null ? Collections.emptyList() : response.getStockDetails();
     } catch (Exception e) {
       log.error("Error while calling MOVIE input{} exception{}", jsonStringMovie, e);
       return null;
     }
   }
-
+  private boolean isErrorResponse(HttpStatus httpStatus) {
+    return  !httpStatus.is2xxSuccessful();
+  }
+  private Mono<? extends Throwable> log(ClientResponse clientResponse, String message) {
+    log.error(message, clientResponse.statusCode().value());
+    return Mono.empty();
+  }
 }
