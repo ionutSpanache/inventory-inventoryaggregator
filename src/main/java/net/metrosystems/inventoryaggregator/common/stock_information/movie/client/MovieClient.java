@@ -31,7 +31,7 @@ public class MovieClient {
   private String movieStockPathForVariant;
 
   @Autowired
-  public  MovieClient(@Qualifier("restTemplateMovie") RestTemplate restTemplate) {
+  public  MovieClient(/*@Qualifier("restTemplateMovie")*/ RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
   }
 
