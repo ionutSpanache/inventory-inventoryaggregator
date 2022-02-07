@@ -195,42 +195,46 @@ public class ArticleMasterDataRepository {
   private ArticleMasterData transformArticleCacheFullToArticleMasterData(
       ArticleCacheFullData articleCacheFullData) {
     if (articleCacheFullData != null) {
-      return new ArticleMasterData(
-          articleCacheFullData.getArticleDescription(),
-          articleCacheFullData.getBarcode(),
-          articleCacheFullData.getCommercialSupplier(),
-          articleCacheFullData.getPresentationMerchandiseGroup(),
-          articleCacheFullData.getPromotionId(),
-          articleCacheFullData.getSellingBundleContent(),
-          articleCacheFullData.getWeightArticle(),
-          articleCacheFullData.getSubsysArticleNumber(),
-          articleCacheFullData.getVatPercent(),
-          articleCacheFullData.getPieceNetSellPrice(),
-          articleCacheFullData.getBundleNetSellPrice(),
-          articleCacheFullData.getPromotionBundleNetPrice(),
-          articleCacheFullData.getVariantDescription(),
-          articleCacheFullData.getArticleType(),
-          articleCacheFullData.getArticleClass(),
-          articleCacheFullData.getFoodNonfoodIndicator(),
-          articleCacheFullData.getPresentationMainMerchandiseGroup(),
-          articleCacheFullData.getPresentationSubMerchandiseGroup(),
-          articleCacheFullData.getSupplierNumber(),
-          articleCacheFullData.getProcurementCode(),
-          articleCacheFullData.getAssortmentCode(),
-          articleCacheFullData.getBlockingCode(),
-          articleCacheFullData.getActivationStatus(),
-          articleCacheFullData.getExpiryDays(),
-          articleCacheFullData.getPieceNetBuyingPrice(),
-          articleCacheFullData.getBundleNetBuyingPrice(),
-          articleCacheFullData.getPieceNetNetBuyingPrice(),
-          articleCacheFullData.getBundleNetNetBuyingPrice(),
-          articleCacheFullData.getArticleNoEmptiesSales(),
-          articleCacheFullData.getBrandName(),
-          articleCacheFullData.getMinimumRetailPrice(),
-          articleCacheFullData.getCountryOfOrigin(),
-          articleCacheFullData.getIsTradeItemExcludedFromDiscounts(),
-          articleCacheFullData.getGradeCodeReferenceFruitsVegetables()
-      );
+      return new ArticleMasterData()
+          .setArticleDescription(articleCacheFullData.getArticleDescription())
+          .setBarcode(articleCacheFullData.getBarcode())
+          .setCommercialSupplier(articleCacheFullData.getCommercialSupplier())
+          .setPresentationMerchandiseGroup(articleCacheFullData.getPresentationMerchandiseGroup())
+          .setPromotionId(articleCacheFullData.getPromotionId())
+          .setSellingBundleContent(articleCacheFullData.getSellingBundleContent())
+          .setWeightArticle(articleCacheFullData.getWeightArticle())
+          .setSubsystemArticleNumber(articleCacheFullData.getSubsysArticleNumber())
+          .setVatPercent(articleCacheFullData.getVatPercent())
+          .setPieceNetSellPrice(articleCacheFullData.getPieceNetSellPrice())
+          .setBundleNetSellPrice(articleCacheFullData.getBundleNetSellPrice())
+          .setPromotionBundleNetPrice(articleCacheFullData.getPromotionBundleNetPrice())
+          .setVariantDescription(articleCacheFullData.getVariantDescription())
+          .setArticleType(articleCacheFullData.getArticleType())
+          .setArticleClass(articleCacheFullData.getArticleClass())
+          .setFoodNonfoodIndicator(articleCacheFullData.getFoodNonfoodIndicator())
+          .setPresentationMainMerchandiseGroup(
+              articleCacheFullData.getPresentationMainMerchandiseGroup())
+          .setPresentationSubMerchandiseGroup(
+              articleCacheFullData.getPresentationSubMerchandiseGroup())
+          .setSupplierNumber(articleCacheFullData.getSupplierNumber())
+          .setProcurementCode(articleCacheFullData.getProcurementCode())
+          .setAssortmentCode(articleCacheFullData.getAssortmentCode())
+          .setBlockingCode(articleCacheFullData.getBlockingCode())
+          .setActivationStatus(articleCacheFullData.getActivationStatus())
+          .setExpiryDays(articleCacheFullData.getExpiryDays())
+          .setPieceNetBuyingPrice(articleCacheFullData.getPieceNetBuyingPrice())
+          .setBundleNetBuyingPrice(articleCacheFullData.getBundleNetBuyingPrice())
+          .setPieceNetNetBuyingPrice(articleCacheFullData.getPieceNetNetBuyingPrice())
+          .setBundleNetNetBuyingPrice(articleCacheFullData.getBundleNetNetBuyingPrice())
+          .setArticleNoEmptiesSales(articleCacheFullData.getArticleNoEmptiesSales())
+          .setBrandName(articleCacheFullData.getBrandName())
+          .setMinimumRetailPrice(articleCacheFullData.getMinimumRetailPrice())
+          .setCountryOfOrigin(articleCacheFullData.getCountryOfOrigin())
+          .setIsTradeItemExcludedFromDiscounts(
+              articleCacheFullData.getIsTradeItemExcludedFromDiscounts())
+          .setGradeCodeReferenceFruitsVegetables(
+              articleCacheFullData.getGradeCodeReferenceFruitsVegetables())
+          .setPackageFactor(articleCacheFullData.getPackageFactor());
     }
     return null;
   }

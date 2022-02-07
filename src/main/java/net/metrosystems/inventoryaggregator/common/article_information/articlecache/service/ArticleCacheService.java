@@ -405,8 +405,9 @@ public class ArticleCacheService {
         calculateMinimumRetailPrice(
             articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
         articleCacheDataGroup200.getCountryOfOrigin(),
-				isTradeItemExcludedFromDiscounts,
-				gradeCodeReferenceFruitsVegetables);
+        isTradeItemExcludedFromDiscounts,
+        gradeCodeReferenceFruitsVegetables,
+        articleCacheDataGroup200.getPackageFactor());
 	}
 
   private String getPromotionIdAvailable(

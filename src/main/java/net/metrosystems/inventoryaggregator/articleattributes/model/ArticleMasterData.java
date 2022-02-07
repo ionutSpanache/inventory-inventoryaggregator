@@ -16,6 +16,7 @@ public class ArticleMasterData implements Serializable {
   private Integer presentationMerchandiseGroup;
   private String promotionId;
   private Integer sellingBundleContent;
+  private Integer packageFactor;
   private Double weightArticle;
   private Long subsystemArticleNumber;
   private Double vatPercent;
@@ -58,6 +59,7 @@ public class ArticleMasterData implements Serializable {
             ", presentationMerchandiseGroup=" + presentationMerchandiseGroup +
             ", promotionId='" + promotionId + '\'' +
             ", sellingBundleContent=" + sellingBundleContent +
+            ", packageFactor='" + packageFactor + '\'' +
             ", weightArticle=" + weightArticle +
             ", subsystemArticleNumber=" + subsystemArticleNumber +
             ", vatPercent=" + vatPercent +
