@@ -49,5 +49,6 @@ public class ArticleCacheFullData {
     private String countryOfOrigin;
     private Boolean isTradeItemExcludedFromDiscounts;
     private String gradeCodeReferenceFruitsVegetables;
+    private Integer packageFactor;
 
 }

@@ -170,6 +170,17 @@ public class ArticleCacheDataGroup {
     this.countryOfOrigin = countryOfOrigin;
   }
 
+  private Integer packageFactor;
+
+  public Integer getPackageFactor() {
+    return packageFactor;
+  }
+
+  @XmlElement(name = "PACKAGEFACTOR")
+  public void setPackageFactor(Integer packageFactor) {
+    this.packageFactor = packageFactor;
+  }
+
   /*Data Group 300*/
   private Long articleNoEmptiesSales;
 

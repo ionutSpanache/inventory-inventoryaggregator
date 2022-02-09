@@ -42,6 +42,8 @@ public class ArticleCacheStoreExceptionsDataGroup {
 	private Double promotionGrossSalesPricePerBundle;
 	@XmlElement(name="PROMOTION_GROSS_SALES_PRICE_PER_PIECE")
 	private Double promotionGrossSalesPricePerPiece;
+	@XmlElement(name="PACKAGEFACTOR")
+	private Integer packageFactor;
 
 	/*Data Group 300*/
 	@XmlElement(name="SALES_BLOCKING_CODE")
