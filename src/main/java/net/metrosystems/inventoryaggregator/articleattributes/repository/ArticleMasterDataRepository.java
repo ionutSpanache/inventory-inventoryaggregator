@@ -1,14 +1,11 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
@@ -17,6 +14,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
@@ -234,7 +238,9 @@ public class ArticleMasterDataRepository {
               articleCacheFullData.getIsTradeItemExcludedFromDiscounts())
           .setGradeCodeReferenceFruitsVegetables(
               articleCacheFullData.getGradeCodeReferenceFruitsVegetables())
-          .setPackageFactor(articleCacheFullData.getPackageFactor());
+          .setPackageFactor(articleCacheFullData.getPackageFactor())
+          .setAlcoholClass(articleCacheFullData.getAlcoholClass());
+
     }
     return null;
   }

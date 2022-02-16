@@ -407,7 +407,8 @@ public class ArticleCacheService {
         articleCacheDataGroup200.getCountryOfOrigin(),
         isTradeItemExcludedFromDiscounts,
         gradeCodeReferenceFruitsVegetables,
-        articleCacheDataGroup200.getPackageFactor());
+        articleCacheDataGroup200.getPackageFactor(),
+		articleCacheDataGroup100.getAlcoholClass());
 	}
 
   private String getPromotionIdAvailable(
