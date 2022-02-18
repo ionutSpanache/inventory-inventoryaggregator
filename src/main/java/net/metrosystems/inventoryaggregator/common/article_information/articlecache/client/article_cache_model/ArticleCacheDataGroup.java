@@ -1,11 +1,12 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
 @XmlRootElement(name = "DataGroup")
 @AllArgsConstructor
@@ -111,6 +112,17 @@ public class ArticleCacheDataGroup {
 
   public Boolean getHasMinimumRetailPrice() {
     return  hasMinimumRetailPrice;
+  }
+
+  private String alcoholClass;
+
+  public String getAlcoholClass() {
+    return alcoholClass;
+  }
+
+  @XmlElement(name = "ALCOHOLCLASS")
+  public void setAlcoholClass(String alcoholClass) {
+    this.alcoholClass = alcoholClass;
   }
 
 
@@ -521,8 +533,11 @@ public class ArticleCacheDataGroup {
         + ", pieceNetNetBuyingPrice='"
         + pieceNetNetBuyingPrice
         + '\''
-        + ", bundleNetNetBuyingPrice='"
-        + bundleNetNetBuyingPrice
+        + ", packageFactor='"
+        + packageFactor
+        + '\''
+        + ", alcoholClass='"
+        + alcoholClass
         + '\''
         + '}';
   }

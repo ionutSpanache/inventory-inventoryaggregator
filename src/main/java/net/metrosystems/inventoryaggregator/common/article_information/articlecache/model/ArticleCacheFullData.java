@@ -50,5 +50,6 @@ public class ArticleCacheFullData {
     private Boolean isTradeItemExcludedFromDiscounts;
     private String gradeCodeReferenceFruitsVegetables;
     private Integer packageFactor;
+    private String alcoholClass;
 
 }

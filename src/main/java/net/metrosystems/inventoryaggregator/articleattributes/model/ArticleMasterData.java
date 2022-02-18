@@ -1,9 +1,10 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -45,6 +46,7 @@ public class ArticleMasterData implements Serializable {
   private String countryOfOrigin;
   private Boolean isTradeItemExcludedFromDiscounts;
   private String gradeCodeReferenceFruitsVegetables;
+  private String alcoholClass;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -85,6 +87,7 @@ public class ArticleMasterData implements Serializable {
             ", articleNoEmptiesSales=" + articleNoEmptiesSales +
             ", gradeCodeReferenceFruitsVegetables=" + gradeCodeReferenceFruitsVegetables +
             ", brandName='" + brandName + '\'' +
+            ", alcoholClass='" + alcoholClass + '\'' +
             '}';
   }
 }

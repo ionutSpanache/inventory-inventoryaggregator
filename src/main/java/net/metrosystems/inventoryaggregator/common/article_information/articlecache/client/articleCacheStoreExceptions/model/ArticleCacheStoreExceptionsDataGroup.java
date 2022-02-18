@@ -32,6 +32,8 @@ public class ArticleCacheStoreExceptionsDataGroup {
 	private Double grossSalesPricePerBundle;
 	@XmlElement(name="GROSS_SALES_PRICE_PER_PIECE")
 	private Double grossSalesPricePerPiece;
+	@XmlElement(name="ALCOHOLCLASS")
+	private String alcoholClass;
 
 	/*Data Group 200*/
 	@XmlElement(name="PROMOTION_NET_SALES_PRICE_PER_BUNDLE")
