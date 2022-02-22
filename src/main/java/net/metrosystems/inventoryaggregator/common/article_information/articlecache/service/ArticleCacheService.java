@@ -29,10 +29,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,6 +39,9 @@ public class ArticleCacheService {
 	@Value("${ARTICLE_CACHE_STORE_EXCEPTIONS_PATH}")
 	private String articleCacheStoreExceptionsPath;
 
+	@Value("${app.stage}")
+	private String k8sEnvironment;
+
 	private final DocumentsService documentsService;
 	private final ArticleCacheAAAClient articleCacheClient;
 	private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
@@ -49,6 +49,23 @@ public class ArticleCacheService {
 
 	private static final String PAKISTAN_COUNTRY_CODE = "PK";
 	private static final Double ZERO = 0.0;
+
+	private static final String IHDS_TREE = "erp_ihds_tree";
+	private static final String BUNDLE_NO = "bundleno";
+	private static final String MMS_ARTNO = "mmsartno";
+	private static final String VARIANT_NO = "variantno";
+	private static final String COMPANY = "company";
+	private static final String ENVIRONMENT = "environment";
+	private static final String ARTICLE_CACHE_PP2_ENVIRONMENT = "pp2";
+	private static final String ARTICLE_CACHE_PP1_ENVIRONMENT = "pp1";
+	private static final String ARTICLE_CACHE_PROD_ENVIRONMENT = "prod";
+	private static final String K8S_DEV_ENVIRONMENT = "dev";
+	private static final String K8S_PP_ENVIRONMENT = "pp";
+	private static final String LOCAL_ENVIRONMENT = "local";
+	private static final String LANGUAGE = "language";
+
+
+	private static final Set<String> COUNTRY_CODES  = Set.of("IN", "CZ", "SK");
 
 	@Autowired
 	public ArticleCacheService(DocumentsService documentsService, ArticleCacheAAAClient articleCacheClient, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient, PromotionsAclService promotionsAclService) {
@@ -212,6 +229,38 @@ public class ArticleCacheService {
 		return Optional.empty();
 	}
 
+	private String buildIhdsTreeUrl(String countryCode, String salesLine, String languageCode, Long articleNumber, Long variantNumber,
+									Long bundleNumber) {
+
+
+		return  "/documents/" + countryCode.toLowerCase() +
+				     "/"  + IHDS_TREE +
+				     "?" + BUNDLE_NO + "=" + bundleNumber +
+				     "&" + COMPANY   + "=" + salesLine.toLowerCase() +
+				     "&" + ENVIRONMENT + "=" + getEnvironment(countryCode) +
+				     "&" + LANGUAGE + "=" + languageCode.toLowerCase() +
+				     "&" + MMS_ARTNO + "=" + articleNumber +
+				     "&" + VARIANT_NO + "=" + variantNumber;
+	}
+
+
+	private String getEnvironment(String countryCode) {
+
+		if (K8S_DEV_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment) ||
+				K8S_PP_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment) ||
+				LOCAL_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment)) {
+
+			if (COUNTRY_CODES.contains(countryCode)) {
+				return ARTICLE_CACHE_PP2_ENVIRONMENT;
+			} else {
+				return ARTICLE_CACHE_PP1_ENVIRONMENT;
+			}
+		} else {
+			return ARTICLE_CACHE_PROD_ENVIRONMENT;
+		}
+
+	}
+
   public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
       Long articleNumber,
       Long variantNumber,
@@ -219,18 +268,16 @@ public class ArticleCacheService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
-      throws Exception {
-    Documents articleUrlPathList =
-        articleCacheClient.getArticleUrlPathByArtVarBundle(
-            articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode);
-    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+      Integer storeNo) {
+
+	  String articleUrl = buildIhdsTreeUrl(countryCode,salesLine, languageCode, articleNumber, variantNumber, bundleNumber);
+
+    if (articleUrl == null) {
       return null;
     }
 
-    String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
     ArticleCacheIhdsTree articleCacheDocument =
-        articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
+        articleCacheClient.getArticleCacheDocumentByURL(articleUrl);
 
     if (articleCacheDocument == null
         || articleCacheDocument.getTransaction() == null
