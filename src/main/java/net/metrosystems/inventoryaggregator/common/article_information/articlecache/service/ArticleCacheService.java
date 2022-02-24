@@ -268,16 +268,18 @@ public class ArticleCacheService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo) {
+      Integer storeNo) throws Exception {
 
-	  String articleUrl = buildIhdsTreeUrl(countryCode,salesLine, languageCode, articleNumber, variantNumber, bundleNumber);
-      log.info("#SEARCH#" + articleUrl);
-    if (articleUrl == null) {
-      return null;
-    }
+	  Documents articleUrlPathList =
+			  articleCacheClient.getArticleUrlPathByArtVarBundle(
+					  articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode);
+	  if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+		  return null;
+	  }
 
-    ArticleCacheIhdsTree articleCacheDocument =
-        articleCacheClient.getArticleCacheDocumentByURL(articleUrl);
+	  String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+	  ArticleCacheIhdsTree articleCacheDocument =
+			  articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
 
     if (articleCacheDocument == null
         || articleCacheDocument.getTransaction() == null
