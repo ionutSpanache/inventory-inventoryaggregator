@@ -271,7 +271,7 @@ public class ArticleCacheService {
       Integer storeNo) {
 
 	  String articleUrl = buildIhdsTreeUrl(countryCode,salesLine, languageCode, articleNumber, variantNumber, bundleNumber);
-
+      log.info("#SEARCH#" + articleUrl);
     if (articleUrl == null) {
       return null;
     }
