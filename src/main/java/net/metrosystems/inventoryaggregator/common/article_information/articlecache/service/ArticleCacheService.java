@@ -164,7 +164,7 @@ public class ArticleCacheService {
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 
 		GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables =
-				hasGradeCodeReferenceFruitsVegetables(countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
+				hasGradeCodeReferenceFruitsVegetables(articleUrlPath);
 
 		return transformArticleCacheDocumentToArticleFullData(
 												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
@@ -292,9 +292,11 @@ public class ArticleCacheService {
       return null;
     }
 
-    IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
-        isTradeItemExcludedFromDiscounts(
-            countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
+	  List<String> articleKeysForDerivedStandard = getArticleKeysForDerivedStandardDocument(countryCode, articleNumber, bundleNumber,
+			  variantNumber, salesLine);
+
+	  IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
+			  isTradeItemExcludedFromDiscounts(articleKeysForDerivedStandard);
     boolean isTradeItemExcludedFromDiscountsValue = false;
     if (Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
       if (isTradeItemExcludedFromDiscounts.getValidFrom() == null) {
@@ -313,30 +315,29 @@ public class ArticleCacheService {
     }
 
 		GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables =
-				hasGradeCodeReferenceFruitsVegetables(countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
+				hasGradeCodeReferenceFruitsVegetables(articleKeysForDerivedStandard.get(0));
 
     return transformArticleCacheDocumentToArticleFullData(
 			articleCacheDocument, storeNo, isTradeItemExcludedFromDiscountsValue , gradeCodeReferenceFruitsVegetables.getValue());
   }
 
-  public IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts(
-      String countryCode,
-      Long articleNumber,
-      Long bundleNumber,
-      Long variantNumber,
-      String salesLine) {
-    Documents iduItemDerivedUrlList =
-        documentsService.getIduItemDerivedUrlByArtVarBundle(
-            countryCode,
-            net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId.builder()
-                .articleNumber(articleNumber)
-                .bundleNumber(bundleNumber)
-                .variantNumber(variantNumber)
-                .build(),
-            salesLine);
+	public List<String> getArticleKeysForDerivedStandardDocument(String countryCode, Long articleNumber,
+																 Long bundleNumber, Long variantNumber, String salesLine) {
+
+		return documentsService.getIduItemDerivedUrlByArtVarBundle(
+				countryCode,
+				net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId.builder()
+						.articleNumber(articleNumber)
+						.bundleNumber(bundleNumber)
+						.variantNumber(variantNumber)
+						.build(),
+				salesLine).getArticleKeys();
+	}
+
+  public IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts(List<String> articleKeys) {
+
     IsTradeItemExcludedFromDiscounts result = new IsTradeItemExcludedFromDiscounts();
-    iduItemDerivedUrlList
-        .getArticleKeys()
+    articleKeys
         .forEach(
             articleKey -> {
               IduItemDerivedStandard iduItemDerivedStandard =
@@ -362,30 +363,12 @@ public class ArticleCacheService {
     return result;
   }
 
-  public GradeCodeReferenceFruitsVegetables hasGradeCodeReferenceFruitsVegetables(
-      String countryCode,
-      Long articleNumber,
-      Long bundleNumber,
-      Long variantNumber,
-      String salesLine) {
-    Documents iduItemDerivedUrlList =
-        documentsService.getIduItemDerivedUrlByArtVarBundle(
-            countryCode,
-            net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId.builder()
-                .articleNumber(articleNumber)
-                .bundleNumber(bundleNumber)
-                .variantNumber(variantNumber)
-                .build(),
-            salesLine);
+  public GradeCodeReferenceFruitsVegetables hasGradeCodeReferenceFruitsVegetables(String articleKey) {
 
 		GradeCodeReferenceFruitsVegetables result = new GradeCodeReferenceFruitsVegetables();
 
-    if(iduItemDerivedUrlList.getArticleKeys().isEmpty()){
-    	return result;
-		}
-
 		IduItemDerivedStandard iduItemDerivedStandard =
-				articleCacheClient.getIduItemDerivedStandardDocument(iduItemDerivedUrlList.getArticleKeys().get(0));
+				articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
 
 		if(iduItemDerivedStandard != null
 				&& iduItemDerivedStandard.getContentIduItemDerivedStandard() != null

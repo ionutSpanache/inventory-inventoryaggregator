@@ -1,34 +1,21 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.*;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleComponentForArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.RawArticleStoreMasterDataForArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBundleStockLocationRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleComponentRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.*;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.*;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -58,13 +45,11 @@ public class ArticleListDetailsService {
     return articleIdList.stream()
         .map(
             articleId -> {
+              List<String> articleKeys = articleCacheService.getArticleKeysForDerivedStandardDocument(countryCode,
+                      articleId.getArticleNumber(), articleId.getBundleNumber(), articleId.getVariantNumber(), salesLine);
+
               IsTradeItemExcludedFromDiscounts isExcluded =
-                  articleCacheService.isTradeItemExcludedFromDiscounts(
-                      countryCode,
-                      articleId.getArticleNumber(),
-                      articleId.getBundleNumber(),
-                      articleId.getVariantNumber(),
-                      salesLine);
+                      articleCacheService.isTradeItemExcludedFromDiscounts(articleKeys);
               return RawIsTradeItemExcludedFromDiscounts.builder()
                   .value(isExcluded.getValue())
                   .validFrom(isExcluded.getValidFrom())
