@@ -239,7 +239,8 @@ public class ArticleMasterDataRepository {
           .setGradeCodeReferenceFruitsVegetables(
               articleCacheFullData.getGradeCodeReferenceFruitsVegetables())
           .setPackageFactor(articleCacheFullData.getPackageFactor())
-          .setAlcoholClass(articleCacheFullData.getAlcoholClass());
+          .setAlcoholClass(articleCacheFullData.getAlcoholClass())
+          .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator());
 
     }
     return null;

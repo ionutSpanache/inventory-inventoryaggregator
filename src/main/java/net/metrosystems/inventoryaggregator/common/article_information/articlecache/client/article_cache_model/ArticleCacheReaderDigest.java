@@ -178,6 +178,15 @@ public class ArticleCacheReaderDigest {
 	public void setMainSalesBarcode(String mainSalesBarcode) {
 		this.mainSalesBarcode = mainSalesBarcode;
 	}
+
+	private Long traceabilityIndicator;
+	public Long getTraceabilityIndicator() {
+		return traceabilityIndicator;
+	}
+	@XmlElement(name="traceabilityIndicator")
+	public void setTraceabilityIndicator(Long traceabilityIndicator) {
+		this.traceabilityIndicator = traceabilityIndicator;
+	}
 	
 	public ArticleCacheReaderDigest() {
 		
@@ -187,7 +196,7 @@ public class ArticleCacheReaderDigest {
 			String articleDescription, String brandName, String indicatorFoodNonFood, long categoryManagementArea,
 			String variantText, long mmsArtNo, long variantNo, long bundleNo, long subsysNo, Integer producingSupplier,
 			long articleType, List<String> salesBarcode, List<Long> assignedStoreSupplier, long blockingCode,
-			String mainSalesBarcode) {
+			String mainSalesBarcode, long traceabilityIndicator) {
 		this.purchaseArea = purchaseArea;
 		this.merchGroup = merchGroup;
 		this.merchGroupSub = merchGroupSub;
@@ -207,6 +216,7 @@ public class ArticleCacheReaderDigest {
 		this.assignedStoreSupplier = assignedStoreSupplier;
 		this.blockingCode = blockingCode;
 		this.mainSalesBarcode = mainSalesBarcode;
+		this.traceabilityIndicator = traceabilityIndicator;
 	}
 
 	@Override
@@ -218,6 +228,7 @@ public class ArticleCacheReaderDigest {
 				+ mmsArtNo + ", variantNo=" + variantNo + ", bundleNo=" + bundleNo + ", subsysNo=" + subsysNo
 				+ ", producingSupplier=" + producingSupplier + ", articleType=" + articleType + ", salesBarcode="
 				+ salesBarcode + ", assignedStoreSupplier=" + assignedStoreSupplier + ", blockingCode=" + blockingCode
+				+ ", traceabilityIndicator=" + traceabilityIndicator
 				+ "]";
 	}
 }
