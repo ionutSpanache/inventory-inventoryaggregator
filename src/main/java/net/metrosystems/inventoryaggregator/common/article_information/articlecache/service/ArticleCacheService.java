@@ -320,11 +320,14 @@ public class ArticleCacheService {
       }
     }
 
-		GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables =
-				hasGradeCodeReferenceFruitsVegetables(articleKeysForDerivedStandard.get(0));
+	  String gradeCodeReferenceFruitsVegetables = null;
+	  if (!CollectionUtils.isEmpty(articleKeysForDerivedStandard)) {
+		  gradeCodeReferenceFruitsVegetables =
+				  hasGradeCodeReferenceFruitsVegetables(articleKeysForDerivedStandard.get(0)).getValue();
+	  }
 
     return transformArticleCacheDocumentToArticleFullData(
-			articleCacheDocument, storeNo, isTradeItemExcludedFromDiscountsValue , gradeCodeReferenceFruitsVegetables.getValue());
+			articleCacheDocument, storeNo, isTradeItemExcludedFromDiscountsValue , gradeCodeReferenceFruitsVegetables);
   }
 
 	public List<String> getArticleKeysForDerivedStandardDocument(String countryCode, Long articleNumber,
