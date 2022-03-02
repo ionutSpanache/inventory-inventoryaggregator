@@ -163,12 +163,18 @@ public class ArticleCacheService {
     }
 		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 
-		GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables =
-				hasGradeCodeReferenceFruitsVegetables(articleUrlPath);
+		List<String> articleKeys =
+			getArticleKeysForDerivedStandardDocument(
+				countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
+		String gradeCodeReferenceFruitsVegetablesValue = null;
+		if (articleKeys != null && !articleKeys.isEmpty()) {
+		  gradeCodeReferenceFruitsVegetablesValue =
+			  hasGradeCodeReferenceFruitsVegetables(articleKeys.get(0)).getValue();
+		}
 
 		return transformArticleCacheDocumentToArticleFullData(
 												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
-												storeNo, null, gradeCodeReferenceFruitsVegetables.getValue());
+												storeNo, null, gradeCodeReferenceFruitsVegetablesValue);
 
 	}
 
