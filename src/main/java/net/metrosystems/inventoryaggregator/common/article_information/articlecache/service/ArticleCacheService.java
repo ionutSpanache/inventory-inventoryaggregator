@@ -446,7 +446,8 @@ public class ArticleCacheService {
         isTradeItemExcludedFromDiscounts,
         gradeCodeReferenceFruitsVegetables,
         articleCacheDataGroup200.getPackageFactor(),
-		articleCacheDataGroup100.getAlcoholClass());
+		articleCacheDataGroup100.getAlcoholClass(),
+		articleCacheReaderDigest.getTraceabilityIndicator());
 	}
 
   private String getPromotionIdAvailable(

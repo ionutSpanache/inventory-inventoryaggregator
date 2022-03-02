@@ -51,5 +51,6 @@ public class ArticleCacheFullData {
     private String gradeCodeReferenceFruitsVegetables;
     private Integer packageFactor;
     private String alcoholClass;
+    private Long traceabilityIndicator;
 
 }

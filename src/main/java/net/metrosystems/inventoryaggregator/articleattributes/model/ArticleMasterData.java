@@ -47,6 +47,7 @@ public class ArticleMasterData implements Serializable {
   private Boolean isTradeItemExcludedFromDiscounts;
   private String gradeCodeReferenceFruitsVegetables;
   private String alcoholClass;
+  private Long traceabilityIndicator;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -88,6 +89,7 @@ public class ArticleMasterData implements Serializable {
             ", gradeCodeReferenceFruitsVegetables=" + gradeCodeReferenceFruitsVegetables +
             ", brandName='" + brandName + '\'' +
             ", alcoholClass='" + alcoholClass + '\'' +
+            ", traceabilityIndicator='" + traceabilityIndicator + '\'' +
             '}';
   }
 }
