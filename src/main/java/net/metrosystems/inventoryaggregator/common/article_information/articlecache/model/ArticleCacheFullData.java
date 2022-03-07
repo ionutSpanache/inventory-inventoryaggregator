@@ -52,5 +52,5 @@ public class ArticleCacheFullData {
     private Integer packageFactor;
     private String alcoholClass;
     private Long traceabilityIndicator;
-
+    private Integer coreAssortmentIndicator;
 }
