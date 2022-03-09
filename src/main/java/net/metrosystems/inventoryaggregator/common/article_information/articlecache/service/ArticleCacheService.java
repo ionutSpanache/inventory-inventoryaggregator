@@ -416,8 +416,7 @@ public class ArticleCacheService {
         articleCacheDataGroup100.getPresentationMerchandiseGroup(),
         CollectionUtils.isEmpty(promotionIdList)
             ? null
-            : getPromotionIdAvailable(
-                articleCacheDocument, promotionIdList, storeNo),
+            : getPromotionIdAvailable(articleCacheDocument, promotionIdList, storeNo),
         articleCacheDataGroup310.getSellingBundleContent(),
         articleCacheDataGroup100.getWeightArticles(),
         articleCacheReaderDigest.getSubsysNo(),
@@ -449,8 +448,11 @@ public class ArticleCacheService {
         isTradeItemExcludedFromDiscounts,
         gradeCodeReferenceFruitsVegetables,
         articleCacheDataGroup200.getPackageFactor(),
-		articleCacheDataGroup100.getAlcoholClass(),
-		articleCacheReaderDigest.getTraceabilityIndicator());
+        articleCacheDataGroup100.getAlcoholClass(),
+        articleCacheReaderDigest.getTraceabilityIndicator(),
+        articleCacheDataGroup320.getCoreAssortmentIndicator() != null
+            ? articleCacheDataGroup320.getCoreAssortmentIndicator()
+            : 0);
 	}
 
   private String getPromotionIdAvailable(

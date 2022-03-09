@@ -48,6 +48,7 @@ public class ArticleMasterData implements Serializable {
   private String gradeCodeReferenceFruitsVegetables;
   private String alcoholClass;
   private Long traceabilityIndicator;
+  private Integer coreAssortmentIndicator;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -62,7 +63,7 @@ public class ArticleMasterData implements Serializable {
             ", presentationMerchandiseGroup=" + presentationMerchandiseGroup +
             ", promotionId='" + promotionId + '\'' +
             ", sellingBundleContent=" + sellingBundleContent +
-            ", packageFactor='" + packageFactor + '\'' +
+            ", packageFactor=" + packageFactor +
             ", weightArticle=" + weightArticle +
             ", subsystemArticleNumber=" + subsystemArticleNumber +
             ", vatPercent=" + vatPercent +
@@ -77,7 +78,7 @@ public class ArticleMasterData implements Serializable {
             ", presentationSubMerchandiseGroup=" + presentationSubMerchandiseGroup +
             ", supplierNumber=" + supplierNumber +
             ", procurementCode=" + procurementCode +
-            ", assortmentCode=" + assortmentCode +
+            ", assortmentCode='" + assortmentCode + '\'' +
             ", blockingCode=" + blockingCode +
             ", activationStatus=" + activationStatus +
             ", expiryDays=" + expiryDays +
@@ -86,10 +87,14 @@ public class ArticleMasterData implements Serializable {
             ", pieceNetNetBuyingPrice=" + pieceNetNetBuyingPrice +
             ", bundleNetNetBuyingPrice=" + bundleNetNetBuyingPrice +
             ", articleNoEmptiesSales=" + articleNoEmptiesSales +
-            ", gradeCodeReferenceFruitsVegetables=" + gradeCodeReferenceFruitsVegetables +
             ", brandName='" + brandName + '\'' +
+            ", minimumRetailPrice=" + minimumRetailPrice +
+            ", countryOfOrigin='" + countryOfOrigin + '\'' +
+            ", isTradeItemExcludedFromDiscounts=" + isTradeItemExcludedFromDiscounts +
+            ", gradeCodeReferenceFruitsVegetables='" + gradeCodeReferenceFruitsVegetables + '\'' +
             ", alcoholClass='" + alcoholClass + '\'' +
-            ", traceabilityIndicator='" + traceabilityIndicator + '\'' +
+            ", traceabilityIndicator=" + traceabilityIndicator +
+            ", coreAssortmentIndicator=" + coreAssortmentIndicator +
             '}';
   }
 }
