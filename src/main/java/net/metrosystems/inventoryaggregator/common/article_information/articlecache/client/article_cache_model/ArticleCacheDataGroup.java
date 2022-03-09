@@ -462,83 +462,61 @@ public class ArticleCacheDataGroup {
     this.bundleNetNetBuyingPrice = bundleNetNetBuyingPrice;
   }
 
+  private Integer coreAssortmentIndicator;
+
+  public Integer getCoreAssortmentIndicator() {
+    return coreAssortmentIndicator;
+  }
+
+  @XmlElement(name = "COREASSORTMENTINDICATOR")
+  public void setCoreAssortmentIndicator(Integer coreAssortmentIndicator) {
+    this.coreAssortmentIndicator = coreAssortmentIndicator;
+  }
+
   @Override
   public String toString() {
-    return "ArticleCacheDataGroup{"
-        + "id="
-        + id
-        + ", ownBrandId='"
-        + ownBrandId
-        + '\''
-        + ", vatPercent="
-        + vatPercent
-        + ", weightArticles="
-        + weightArticles
-        + ", foodNonfoodIndicator='"
-        + foodNonfoodIndicator
-        + '\''
-        + ", presentationMainMerchandiseGroup="
-        + presentationMainMerchandiseGroup
-        + ", presentationMerchandiseGroup="
-        + presentationMerchandiseGroup
-        + ", presentationSubMerchandiseGroup="
-        + presentationSubMerchandiseGroup
-        + ", singleItemSalesBarcode="
-        + singleItemSalesBarcode
-        + ", salesBundleIndicator="
-        + salesBundleIndicator
-        + ", sellingBundleContent="
-        + sellingBundleContent
-        + ", priceCheckCodeMccSalesLine="
-        + priceCheckCodeMccSalesLine
-        + ", assignedStoreSupplier="
-        + assignedStoreSupplier
-        + ", assignedStoreSupplierType='"
-        + assignedStoreSupplierType
-        + '\''
-        + ", hierarchySequenceStore="
-        + hierarchySequenceStore
-        + ", activationStatus="
-        + activationStatus
-        + ", blockingCode="
-        + blockingCode
-        + ", assortmentCode="
-        + assortmentCode
-        + ", isWeightArticle="
-        + isWeightArticle
-        + ", storeNo="
-        + storeNo
-        + ", pieceNetSellPrice="
-        + pieceNetSellPrice
-        + ", bundleNetSellPrice="
-        + bundleNetSellPrice
-        + ", promotionBundleNetPrice="
-        + promotionBundleNetPrice
-        + ", hierarchySequenceStoreRef="
-        + hierarchySequenceStoreRef
-        + ", procurementCd="
-        + procurementCd
-        + ", promotionId='"
-        + promotionId
-        + '\''
-        + ", articleClass='"
-        + articleClass
-        + '\''
-        + ", pieceNetBuyingPrice='"
-        + pieceNetBuyingPrice
-        + '\''
-        + ", bundleNetBuyingPrice='"
-        + bundleNetBuyingPrice
-        + '\''
-        + ", pieceNetNetBuyingPrice='"
-        + pieceNetNetBuyingPrice
-        + '\''
-        + ", packageFactor='"
-        + packageFactor
-        + '\''
-        + ", alcoholClass='"
-        + alcoholClass
-        + '\''
-        + '}';
+    return "ArticleCacheDataGroup{" +
+            "id=" + id +
+            ", ownBrandId='" + ownBrandId + '\'' +
+            ", vatPercent=" + vatPercent +
+            ", weightArticles=" + weightArticles +
+            ", foodNonfoodIndicator='" + foodNonfoodIndicator + '\'' +
+            ", presentationMainMerchandiseGroup=" + presentationMainMerchandiseGroup +
+            ", presentationMerchandiseGroup=" + presentationMerchandiseGroup +
+            ", presentationSubMerchandiseGroup=" + presentationSubMerchandiseGroup +
+            ", hasMinimumRetailPrice=" + hasMinimumRetailPrice +
+            ", alcoholClass='" + alcoholClass + '\'' +
+            ", singleItemSalesBarcode=" + singleItemSalesBarcode +
+            ", generalSupplierName='" + generalSupplierName + '\'' +
+            ", salesBundleIndicator=" + salesBundleIndicator +
+            ", expiryDays=" + expiryDays +
+            ", countryOfOrigin='" + countryOfOrigin + '\'' +
+            ", packageFactor=" + packageFactor +
+            ", articleNoEmptiesSales=" + articleNoEmptiesSales +
+            ", sellingBundleContent=" + sellingBundleContent +
+            ", priceCheckCodeMccSalesLine=" + priceCheckCodeMccSalesLine +
+            ", assignedStoreSupplier=" + assignedStoreSupplier +
+            ", assignedStoreSupplierType='" + assignedStoreSupplierType + '\'' +
+            ", hierarchySequenceStore=" + hierarchySequenceStore +
+            ", activationStatus=" + activationStatus +
+            ", blockingCode=" + blockingCode +
+            ", assortmentCode='" + assortmentCode + '\'' +
+            ", isWeightArticle=" + isWeightArticle +
+            ", storeNo=" + storeNo +
+            ", pieceNetSellPrice=" + pieceNetSellPrice +
+            ", bundleNetSellPrice=" + bundleNetSellPrice +
+            ", promotionBundleNetPrice=" + promotionBundleNetPrice +
+            ", minimumRetailPriceForVatCalculation=" + minimumRetailPriceForVatCalculation +
+            ", hierarchySequenceStoreRef=" + hierarchySequenceStoreRef +
+            ", procurementCd=" + procurementCd +
+            ", promotionId='" + promotionId + '\'' +
+            ", promotionEnd='" + promotionEnd + '\'' +
+            ", articleClass='" + articleClass + '\'' +
+            ", pieceNetBuyingPrice=" + pieceNetBuyingPrice +
+            ", bundleNetBuyingPrice=" + bundleNetBuyingPrice +
+            ", pieceNetNetBuyingPrice=" + pieceNetNetBuyingPrice +
+            ", bundleNetNetBuyingPrice=" + bundleNetNetBuyingPrice +
+            ", coreAssortmentIndicator=" + coreAssortmentIndicator +
+            '}';
   }
 }

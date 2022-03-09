@@ -240,8 +240,8 @@ public class ArticleMasterDataRepository {
               articleCacheFullData.getGradeCodeReferenceFruitsVegetables())
           .setPackageFactor(articleCacheFullData.getPackageFactor())
           .setAlcoholClass(articleCacheFullData.getAlcoholClass())
-          .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator());
-
+          .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator())
+          .setCoreAssortmentIndicator(articleCacheFullData.getCoreAssortmentIndicator());
     }
     return null;
   }
