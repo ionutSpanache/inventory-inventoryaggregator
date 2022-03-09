@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.net.SocketException;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -25,6 +26,11 @@ public class HttpClientRetryHandlerConfig {
                 log.warn("Maximum retries {} reached", retryCount);
                 return false;
             }
+
+            if(exception instanceof SocketException) {
+                return  false;
+            }
+
             if (exception instanceof Exception) {
                 log.warn("Retry {}", executionCount);
                 try {
