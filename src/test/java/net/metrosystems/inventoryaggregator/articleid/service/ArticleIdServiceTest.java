@@ -1,15 +1,13 @@
 package net.metrosystems.inventoryaggregator.articleid.service;
 
+import net.metrosystems.inventoryaggregator.articleid.service.it.ITTestDefinition;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
-@Ignore
+@ITTestDefinition
 class ArticleIdServiceTest {
 
-
     @Test
-    public void getArticleIdByBarcode() {
+    void getArticleIdByBarcode() {
 
     }
 }
