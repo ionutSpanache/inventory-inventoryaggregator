@@ -223,6 +223,7 @@ public class ArticleCacheService {
 	}
 
 	private Optional<String> mapToDeliveryFlagForStore(IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
+		if (isuItemStoreMerchandise == null) return Optional.empty();
 		Optional<StoreInformationGroup> response = isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
 				== null ? Optional.empty() : isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
 				.stream().filter(storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
