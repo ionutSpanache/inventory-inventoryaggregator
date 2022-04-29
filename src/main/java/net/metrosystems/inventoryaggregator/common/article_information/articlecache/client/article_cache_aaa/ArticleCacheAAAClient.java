@@ -11,7 +11,6 @@ import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.d
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -99,12 +98,6 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   }
 
   @Override
-  public IsuItemMaster getProductLifeCycleData(String articleUrlPath) {
-    return getForArticleCacheObject(
-            articleCacheServiceHost + "/" + articleUrlPath, IsuItemMaster.class);
-  }
-
-  @Override
   public IsuItemStoreMerchandise getChannelDeliveryFlagDocument(String articleUrlPath) {
     return getForArticleCacheObject(
             articleCacheServiceHost + "/" + articleUrlPath, IsuItemStoreMerchandise.class);
@@ -141,6 +134,17 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   public IduItemDerivedStandard getIduItemDerivedStandardDocument(String articlePath) {
     return getForArticleCacheObject(
             articleCacheServiceHost + "/" + articlePath, IduItemDerivedStandard.class);
+  }
+
+  @Override
+  public List<IduItemDerivedStandard> getMultipleIduItemDerivedStandardDocument(List<String> articlePaths) {
+    List<IduItemDerivedStandard> iduItemDerivedStandards = new ArrayList<>();
+    articlePaths.forEach(articlePath ->
+        iduItemDerivedStandards.add(getForArticleCacheObject(
+            articleCacheServiceHost + "/" + articlePath, IduItemDerivedStandard.class))
+    );
+
+    return iduItemDerivedStandards;
   }
 
   private <T> T getForArticleCacheObject(String articleUrl, Class<T> responseType) {

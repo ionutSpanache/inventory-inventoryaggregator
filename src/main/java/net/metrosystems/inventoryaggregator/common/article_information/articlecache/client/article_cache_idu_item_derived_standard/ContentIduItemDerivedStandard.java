@@ -4,6 +4,7 @@ import com.sun.xml.txw2.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.List;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.AssortmentClusterSpecificationV2;
 
 @XmlRootElement(name = "content")
 public class ContentIduItemDerivedStandard implements Serializable {
@@ -16,6 +17,8 @@ public class ContentIduItemDerivedStandard implements Serializable {
     private IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts;
 
     private GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables;
+
+    private AssortmentClusterSpecificationV2 assortmentClusterSpecificationV2;
 
     public List<MerchandiseArticleDescription> getMerchandiseArticleDescription() {
         return merchandiseArticleDescription;
@@ -52,5 +55,15 @@ public class ContentIduItemDerivedStandard implements Serializable {
     @XmlElement("isTradeItemExcludedFromDiscounts")
     public void setIsTradeItemExcludedFromDiscounts(IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts) {
         this.isTradeItemExcludedFromDiscounts = isTradeItemExcludedFromDiscounts;
+    }
+
+
+    public AssortmentClusterSpecificationV2 getAssortmentClusterSpecificationV2() {
+        return assortmentClusterSpecificationV2;
+    }
+
+    @javax.xml.bind.annotation.XmlElement(name = "assortmentClusterSpecificationV2")
+    public void setAssortmentClusterSpecificationV2(AssortmentClusterSpecificationV2 assortmentClusterSpecificationV2) {
+        this.assortmentClusterSpecificationV2 = assortmentClusterSpecificationV2;
     }
 }
