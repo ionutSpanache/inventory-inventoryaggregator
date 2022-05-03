@@ -1,5 +1,13 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
@@ -14,7 +22,6 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.GradeCodeReferenceFruitsVegetables;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.IsuItemMaster;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
@@ -26,11 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -196,14 +198,26 @@ public class ArticleCacheService {
 	}
 
 	public ProductLifeCycleData getArticleProductLifeCycleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
-		Documents articleUrlPathList = articleCacheClient.getProductLifeCycleDocumentUrl(countryCode, articleId);
+		Documents articleUrlPathList = articleCacheClient.getMultiLanguageDocumentUrl(countryCode, articleId);
 
 		if (articleUrlPathList == null || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
 			return new ProductLifeCycleData();
 		}
-		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
-		return mapToProductLifeCycleData(
-				articleCacheClient.getProductLifeCycleData(articleUrlPath));
+		List<String> articleUrlPath = articleUrlPathList.getArticleKeys();
+
+		List<IduItemDerivedStandard> iduItemDerivedStandardList = articleCacheClient.getMultipleIduItemDerivedStandardDocument(articleUrlPath);
+
+		if(iduItemDerivedStandardList.isEmpty())
+			return null;
+
+		Optional<IduItemDerivedStandard> documentWithProductLifecycle = iduItemDerivedStandardList.stream()
+				.filter(iduItemDerivedStandard -> iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2() != null )
+				.findFirst();
+
+		if(documentWithProductLifecycle.isEmpty())
+			return null;
+
+		return mapToProductLifeCycleData(documentWithProductLifecycle.get());
 
 	}
 
@@ -493,29 +507,27 @@ public class ArticleCacheService {
 		return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
 	}
 
-	private ProductLifeCycleData mapToProductLifeCycleData(IsuItemMaster isuItemMaster) {
-		if(isuItemMaster.getContent().getAssortmentClusterSpecification()  == null)
-			return null;
+	private ProductLifeCycleData mapToProductLifeCycleData(IduItemDerivedStandard iduItemDerivedStandard) {
 
-		Long presencePeriodEndWeek = isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2() == null ? null :
-				isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
-						.getPresencePeriodEndWeek();
+		Long presencePeriodEndWeek = iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3() == null ? null :
+				iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3()
+						.getPresencePeriodEndWeekV2();
 
-		Long presencePeriodEndYear = isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2() == null ? null :
-				isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
-						.getPresencePeriodEndYear();
+		Long presencePeriodEndYear = iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3() == null ? null :
+				iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3()
+						.getPresencePeriodEndYearV2();
 
-		Long presencePeriodStartWeek = isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2() == null ? null :
-				isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
-						.getPresencePeriodStartWeek();
+		Long presencePeriodStartWeek = iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3() == null ? null :
+				iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3()
+						.getPresencePeriodStartWeekV2();
 
-		Long presencePeriodStartYear = isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2() == null ? null :
-				isuItemMaster.getContent().getAssortmentClusterSpecification().getPresencePeriodV2()
-						.getPresencePeriodStartYear();
+		Long presencePeriodStartYear = iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3() == null ? null :
+				iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3()
+						.getPresencePeriodStartYearV2();
 
 		return  ProductLifeCycleData
 				.builder()
-				.assortmentCluster(isuItemMaster.getContent().getAssortmentClusterSpecification().getAssortmentCluster())
+				.assortmentCluster(iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getAssortmentClusterV2())
 				.presencePeriodEndWeek(presencePeriodEndWeek)
 				.presencePeriodEndYear(presencePeriodEndYear)
 				.presencePeriodStartWeek(presencePeriodStartWeek)
