@@ -12,6 +12,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -95,6 +96,12 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   public ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath) {
     return getForArticleCacheObject(
         articleCacheServiceHost + "/" + articleUrlPath, ArticleCacheIhdsTree.class);
+  }
+
+  @Override
+  public PromotionArticle getPromotionArticle(String articleUrlPath) {
+    return getForArticleCacheObject(
+            articleCacheServiceHost + "/" + articleUrlPath, PromotionArticle.class);
   }
 
   @Override

@@ -2,10 +2,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleForArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
@@ -70,6 +67,55 @@ public class ArticleMasterDataRepository {
         ProductLifeCycleData productLifeCycleData = getLifeCycleData(countryCode, articleId);
 
         return CompletableFuture.completedFuture(productLifeCycleData);
+    }
+
+    @Async("asyncExecutor")
+    public CompletableFuture<PromotionArticleData> getPromotionArticleData(
+            String countryCode,Integer storeId, ArticleId articleId) {
+        PromotionArticleData promotionArticleData = getPromotionArticle(countryCode, storeId, articleId);
+
+        return CompletableFuture.completedFuture(promotionArticleData);
+    }
+
+    private PromotionArticleData getPromotionArticle(String countryCode,Integer storeId, ArticleId articleId) {
+
+      return  articleCacheService.getPromotionArticleData(countryCode, articleId, storeId);
+    }
+
+    @Async("asyncExecutor")
+    public CompletableFuture<List<PromotionArticleDataForArticleId>>
+    getPromotionDataArticlesForArticleIds(
+            List<ArticleId> articleIdList,
+            String countryCode,
+            Integer storeId)
+            throws Exception {
+        List<PromotionArticleDataForArticleId> promotionArticleDataList =
+                forkJoinPoolCustom
+                        .submit(
+                                () ->
+                                        articleIdList.parallelStream()
+                                                .map(
+                                                        articleId -> {
+                                                            PromotionArticleData promotionArticleData;
+                                                            try {
+                                                                promotionArticleData =
+                                                                        getPromotionArticle(countryCode, storeId, articleId);
+                                                            } catch (Exception e) {
+                                                                log.error(
+                                                                        "ArticleMasterDataRepository.getArticleMasterDataForArticleIdList error: {}",
+                                                                        e.getMessage(),
+                                                                        e);
+                                                                return null;
+                                                            }
+                                                            return PromotionArticleDataForArticleId.builder()
+                                                                    .articleId(articleId)
+                                                                    .promotionArticleData(promotionArticleData)
+                                                                    .build();
+                                                        })
+                                                .filter(Objects::nonNull)
+                                                .collect(Collectors.toList()))
+                        .get();
+        return CompletableFuture.completedFuture(promotionArticleDataList);
     }
 
     @Async("asyncExecutor")
