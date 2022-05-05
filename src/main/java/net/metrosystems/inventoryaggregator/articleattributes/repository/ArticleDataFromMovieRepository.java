@@ -20,6 +20,8 @@ import java.util.concurrent.CompletableFuture;
 public class ArticleDataFromMovieRepository {
   private final MovieService movieService;
 
+  private static final String MOVIE_EMPTY_DATE = "--";
+
   @Autowired
   public ArticleDataFromMovieRepository(MovieService movieService) {
     this.movieService = movieService;
@@ -96,9 +98,9 @@ public class ArticleDataFromMovieRepository {
   private StockInformation transformMovieAdapterToArticleStockData(MovieAdapter movieAdapter) {
     return new StockInformation(
         movieAdapter.getAvailableStock(),
-        movieAdapter.getLastGoodReceivingDate(),
-        movieAdapter.getLastStockCorrectionDate(),
-        movieAdapter.getLastSalesDate(),
+        handleMovieEmptyDate(movieAdapter.getLastGoodReceivingDate()),
+        handleMovieEmptyDate(movieAdapter.getLastStockCorrectionDate()),
+        handleMovieEmptyDate(movieAdapter.getLastSalesDate()),
         movieAdapter.getReservedStock(),
         movieAdapter.getStock(),
         movieAdapter.getStockMarkDown(),
@@ -151,5 +153,9 @@ public class ArticleDataFromMovieRepository {
         movieOpenOrder.getQuantity(),
         movieOpenOrder.getDeliveryDate(),
         movieOpenOrder.getOrderDate());
+  }
+
+  private String handleMovieEmptyDate(String dateAsString) {
+    return MOVIE_EMPTY_DATE.equals(dateAsString) ? null : dateAsString;
   }
 }
