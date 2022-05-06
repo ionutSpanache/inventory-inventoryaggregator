@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
@@ -25,6 +26,8 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticle;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticleDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
@@ -218,6 +221,44 @@ public class ArticleCacheService {
 			return null;
 
 		return mapToProductLifeCycleData(documentWithProductLifecycle.get());
+
+	}
+
+	public PromotionArticleData getPromotionArticleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
+														Integer storeId) {
+
+		String documentUrl = "documents/" + countryCode.toLowerCase() + "/promotion-article" +
+				"?bundleno=" + articleId.getBundleNumber() + "&company=mcc"
+				+ "&environment=" + getEnvironment(countryCode) + "&mmsartno=" + articleId.getArticleNumber()
+				+ "&storeno=" + storeId + "&variantno=" + articleId.getVariantNumber();
+
+		PromotionArticleData promotionArticleData = PromotionArticleData.builder().build();
+
+		try {
+		   promotionArticleData = mapToPromotionArticleData(
+					articleCacheClient.getPromotionArticle(documentUrl));
+		}catch (Exception ex) {
+			log.error("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl);
+		}
+
+		return  promotionArticleData;
+	}
+
+	private PromotionArticleData mapToPromotionArticleData(PromotionArticle promotionArticle) {
+
+		Optional<PromotionArticleDataGroup> data = promotionArticle.getPromotionArticleTransaction().getPromotionArticleIncident()
+				.getPromotionArticleDataGroups().stream().filter(promotionArticleDataGroup ->
+						promotionArticleDataGroup.getId().equalsIgnoreCase("110"))
+				.findFirst();
+
+		PromotionArticleData promotionArticleData = PromotionArticleData.builder().build();
+
+		if (data.isPresent()) {
+			promotionArticleData.setPromotionId(data.get().getPromotionId());
+			promotionArticleData.setPromotionNetSalesPricePerBundle(data.get().getPromotionNetSalesPricePerBundle());
+		}
+
+		return promotionArticleData;
 
 	}
 

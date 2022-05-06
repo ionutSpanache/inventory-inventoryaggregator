@@ -9,6 +9,7 @@ import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.d
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticle;
 
 public interface ArticleCacheClient {
 
@@ -38,5 +39,8 @@ public interface ArticleCacheClient {
 	IduItemDerivedStandard getIduItemDerivedStandardDocument(String articlePath);
 
 	List<IduItemDerivedStandard> getMultipleIduItemDerivedStandardDocument(List<String> articlePath);
+
+
+	PromotionArticle getPromotionArticle(String articleUrlPath);
 
 }

@@ -9,23 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructure;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructureList;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
-import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.LanguageData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
-import net.metrosystems.inventoryaggregator.articleattributes.model.MultiLanguageData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
-import net.metrosystems.inventoryaggregator.articleattributes.model.VariantDescription;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBundleStockLocationRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
@@ -331,14 +315,23 @@ public class ArticleDetailsService {
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard = articleMasterDataRepository.getMultiLanguageData(
             countryCode, articleId);
 
+    CompletableFuture<PromotionArticleData> promotionArticleData = articleMasterDataRepository.getPromotionArticleData(countryCode,
+            storeNo, articleId);
+
     CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie,
-        articleStockLocationList, articleLocationList, productLifeCycleData, maximumRetailPrice, iduItemDerivedStandard);
+        articleStockLocationList, articleLocationList, productLifeCycleData, maximumRetailPrice, iduItemDerivedStandard,
+            promotionArticleData);
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
     if (articleDataFromMovie.get() != null) {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
+    }
+
+    if (promotionArticleData.get().getPromotionNetSalesPricePerBundle() != null) {
+      rawArticleStoreMasterData.get().setStorePromotionBundleNetPrice(promotionArticleData
+              .get().getPromotionNetSalesPricePerBundle());
     }
 
     RawArticleData rawArticleData = RawArticleData.builder().articleId(articleId)
