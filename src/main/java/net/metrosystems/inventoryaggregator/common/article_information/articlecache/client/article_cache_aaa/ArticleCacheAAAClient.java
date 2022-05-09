@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.stereotype.Component;
@@ -158,7 +159,7 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
     try {
       return restTemplateArticleCache.getForObject(articleUrl, responseType);
     } catch (Exception e) {
-      log.error(
+      log.debug(
           "ArticleCacheAAAClient.getForArticleCacheObject - error on GET api call: message {}",
           e.getMessage(),
           e);
