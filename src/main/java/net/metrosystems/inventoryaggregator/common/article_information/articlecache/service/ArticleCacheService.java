@@ -238,7 +238,7 @@ public class ArticleCacheService {
 		   promotionArticleData = mapToPromotionArticleData(
 					articleCacheClient.getPromotionArticle(documentUrl));
 		}catch (Exception ex) {
-			log.error("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl);
+			log.debug("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl);
 		}
 
 		return  promotionArticleData;
