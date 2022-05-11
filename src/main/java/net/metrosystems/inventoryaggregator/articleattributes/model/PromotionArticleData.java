@@ -15,4 +15,5 @@ public class PromotionArticleData implements Serializable {
 
     private String promotionId;
     private Double promotionNetSalesPricePerBundle;
+    private Boolean isActive;
 }

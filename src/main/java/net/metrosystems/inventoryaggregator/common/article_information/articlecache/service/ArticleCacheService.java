@@ -2,6 +2,7 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -254,8 +255,15 @@ public class ArticleCacheService {
 		PromotionArticleData promotionArticleData = PromotionArticleData.builder().build();
 
 		if (data.isPresent()) {
-			promotionArticleData.setPromotionId(data.get().getPromotionId());
-			promotionArticleData.setPromotionNetSalesPricePerBundle(data.get().getPromotionNetSalesPricePerBundle());
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+			if (data.get().getPromotionActiveEndDate() != null
+					&& (LocalDate.now().compareTo(LocalDate.now().parse(data.get().getPromotionActiveEndDate(), formatter))) <=0) {
+
+				promotionArticleData.setIsActive(true);
+				promotionArticleData.setPromotionId(data.get().getPromotionId());
+				promotionArticleData.setPromotionNetSalesPricePerBundle(data.get().getPromotionNetSalesPricePerBundle());
+			}
 		}
 
 		return promotionArticleData;

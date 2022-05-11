@@ -10,6 +10,17 @@ public class PromotionArticleDataGroup {
     private String id;
     private Double promotionNetSalesPricePerBundle;
 
+    public String getPromotionActiveEndDate() {
+        return promotionActiveEndDate;
+    }
+
+    @XmlElement(name = "PROMOTION_END")
+    public void setPromotionActiveEndDate(String promotionActiveEndDate) {
+        this.promotionActiveEndDate = promotionActiveEndDate;
+    }
+
+    private String promotionActiveEndDate;
+
     public String getPromotionId() {
         return promotionId;
     }

@@ -329,7 +329,9 @@ public class ArticleDetailsService {
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
     }
 
-    if (promotionArticleData.get().getPromotionNetSalesPricePerBundle() != null) {
+    if (promotionArticleData.get().getPromotionNetSalesPricePerBundle() != null
+            && (promotionArticleData.get() != null &&
+            promotionArticleData.get().getIsActive())) {
       rawArticleStoreMasterData.get().setStorePromotionBundleNetPrice(promotionArticleData
               .get().getPromotionNetSalesPricePerBundle());
     }

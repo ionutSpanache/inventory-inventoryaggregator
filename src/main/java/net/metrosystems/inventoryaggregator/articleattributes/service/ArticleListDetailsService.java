@@ -278,7 +278,9 @@ public class ArticleListDetailsService {
                                     ProductLifeCycleData.builder().build() : articleComponent.getProductLifeCycleData()));
 
     Map<ArticleId, PromotionArticleData> promotionArticleDataMap =
-            promotionArticles.get().stream()
+            promotionArticles.get().stream().filter(promotionArticleDataForArticleId ->
+                            (promotionArticleDataForArticleId.getPromotionArticleData().getIsActive() != null &&
+                                    promotionArticleDataForArticleId.getPromotionArticleData().getIsActive()))
                     .collect(
                             Collectors.toMap(
                                     PromotionArticleDataForArticleId::getArticleId,
