@@ -231,7 +231,8 @@ public class ArticleListDetailsService {
             .collect(
                 Collectors.toMap(
                     ArticleComponentForArticleId::getArticleId,
-                    articleComponent -> articleComponent));
+                    articleComponent -> articleComponent,
+                    (oldValue, newValue) -> oldValue));
     List<ArticleMasterDataForArticleId> result = articleMasterDataForArticleId.get();
 
     Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap =
@@ -250,31 +251,40 @@ public class ArticleListDetailsService {
             .collect(
                 Collectors.toMap(
                     RawArticleStoreMasterDataForArticleId::getArticleId,
-                    rawArticleStoreMasterDataForArticleId ->
-                        rawArticleStoreMasterDataForArticleId));
+                    rawArticleStoreMasterDataForArticleId -> rawArticleStoreMasterDataForArticleId,
+                    (oldValue, newValue) -> oldValue));
     Map<ArticleId, StockData> stockDataFromMovieMap =
         stockDataFromMovie.get().stream()
-            .collect(Collectors.toMap(StockData::getArticleId, stockData -> stockData));
+            .collect(
+                Collectors.toMap(
+                    StockData::getArticleId,
+                    stockData -> stockData,
+                    (oldValue, newValue) -> oldValue));
     Map<ArticleId, ArticleIdStockLocation> articleStockLocationListMap =
         articleStockLocationList.get().stream()
             .collect(
                 Collectors.toMap(
                     ArticleIdStockLocation::getArticleId,
-                    articleIdStockLocation -> articleIdStockLocation));
+                    articleIdStockLocation -> articleIdStockLocation,
+                    (oldValue, newValue) -> oldValue));
     Map<ArticleId, ArticleLocationForArticleId> articleLocationListMap =
         articleLocationList.get().stream()
             .collect(
                 Collectors.toMap(
                     ArticleLocationForArticleId::getArticleId,
-                    articleLocationForArticleId -> articleLocationForArticleId));
+                    articleLocationForArticleId -> articleLocationForArticleId,
+                    (oldValue, newValue) -> oldValue));
 
     Map<ArticleId, ProductLifeCycleData> productLifeCycleMap =
-            lifeCycleDataList.get().stream()
-                    .collect(
-                            Collectors.toMap(
-                                    ProductLifeCycleForArticleId::getArticleId,
-                                    articleComponent -> articleComponent.getProductLifeCycleData() == null ?
-                                    ProductLifeCycleData.builder().build() : articleComponent.getProductLifeCycleData()));
+        lifeCycleDataList.get().stream()
+            .collect(
+                Collectors.toMap(
+                    ProductLifeCycleForArticleId::getArticleId,
+                    articleComponent ->
+                        articleComponent.getProductLifeCycleData() == null
+                            ? ProductLifeCycleData.builder().build()
+                            : articleComponent.getProductLifeCycleData(),
+                    (oldValue, newValue) -> oldValue));
 
 //    Map<ArticleId, PromotionArticleData> promotionArticleDataMap =
 //            promotionArticles.get().stream().filter(promotionArticleDataForArticleId ->
