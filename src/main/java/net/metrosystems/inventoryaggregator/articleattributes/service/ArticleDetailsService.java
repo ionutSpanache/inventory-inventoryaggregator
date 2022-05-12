@@ -315,12 +315,11 @@ public class ArticleDetailsService {
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard = articleMasterDataRepository.getMultiLanguageData(
             countryCode, articleId);
 
-    CompletableFuture<PromotionArticleData> promotionArticleData = articleMasterDataRepository.getPromotionArticleData(countryCode,
-            storeNo, articleId);
+//    CompletableFuture<PromotionArticleData> promotionArticleData = articleMasterDataRepository.getPromotionArticleData(countryCode,
+//            storeNo, articleId);
 
     CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie,
-        articleStockLocationList, articleLocationList, productLifeCycleData, maximumRetailPrice, iduItemDerivedStandard,
-            promotionArticleData);
+        articleStockLocationList, articleLocationList, productLifeCycleData, maximumRetailPrice, iduItemDerivedStandard);
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
@@ -329,12 +328,12 @@ public class ArticleDetailsService {
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
     }
 
-    if (promotionArticleData.get().getPromotionNetSalesPricePerBundle() != null
-            && (promotionArticleData.get() != null &&
-            promotionArticleData.get().getIsActive())) {
-      rawArticleStoreMasterData.get().setStorePromotionBundleNetPrice(promotionArticleData
-              .get().getPromotionNetSalesPricePerBundle());
-    }
+//    if (promotionArticleData.get().getPromotionNetSalesPricePerBundle() != null
+//            && (promotionArticleData.get() != null &&
+//            promotionArticleData.get().getIsActive())) {
+//      rawArticleStoreMasterData.get().setStorePromotionBundleNetPrice(promotionArticleData
+//              .get().getPromotionNetSalesPricePerBundle());
+//    }
 
     RawArticleData rawArticleData = RawArticleData.builder().articleId(articleId)
                                                   .articleMasterData(articleMasterData.get())

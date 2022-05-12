@@ -202,20 +202,20 @@ public class ArticleListDetailsService {
           e);
     }
 
-    CompletableFuture<List<PromotionArticleDataForArticleId>>  promotionArticles =
-            new CompletableFuture<>();
-    try {
-      promotionArticles =
-              articleMasterDataRepository.getPromotionDataArticlesForArticleIds(
-                      articleIdList, countryCode, storeNo);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-              "ArticleListDetailsService.getProductLifeCycleData - getProductLyfeCycleData - error: {}",
-              e.getMessage(),
-              e);
-    }
+//    CompletableFuture<List<PromotionArticleDataForArticleId>>  promotionArticles =
+//            new CompletableFuture<>();
+//    try {
+//      promotionArticles =
+//              articleMasterDataRepository.getPromotionDataArticlesForArticleIds(
+//                      articleIdList, countryCode, storeNo);
+//    } catch (ArticleNotFoundException ex) {
+//      throw new ArticleNotFoundException();
+//    } catch (Exception e) {
+//      log.error(
+//              "ArticleListDetailsService.getProductLifeCycleData - getProductLyfeCycleData - error: {}",
+//              e.getMessage(),
+//              e);
+//    }
 
     CompletableFuture.allOf(
         articleComponentForArticleId,
@@ -224,8 +224,7 @@ public class ArticleListDetailsService {
         stockDataFromMovie,
         articleStockLocationList,
         articleLocationList,
-        lifeCycleDataList,
-        promotionArticles);
+        lifeCycleDataList);
 
     Map<ArticleId, ArticleComponentForArticleId> articleComponentForArticleIdMap =
         articleComponentForArticleId.get().stream()
@@ -277,24 +276,24 @@ public class ArticleListDetailsService {
                                     articleComponent -> articleComponent.getProductLifeCycleData() == null ?
                                     ProductLifeCycleData.builder().build() : articleComponent.getProductLifeCycleData()));
 
-    Map<ArticleId, PromotionArticleData> promotionArticleDataMap =
-            promotionArticles.get().stream().filter(promotionArticleDataForArticleId ->
-                            (promotionArticleDataForArticleId.getPromotionArticleData().getIsActive() != null &&
-                                    promotionArticleDataForArticleId.getPromotionArticleData().getIsActive()))
-                    .collect(
-                            Collectors.toMap(
-                                    PromotionArticleDataForArticleId::getArticleId,
-                                    articleComponent -> articleComponent.getPromotionArticleData().getPromotionNetSalesPricePerBundle() == null ?
-                                            PromotionArticleData.builder().build() : articleComponent.getPromotionArticleData()));
+//    Map<ArticleId, PromotionArticleData> promotionArticleDataMap =
+//            promotionArticles.get().stream().filter(promotionArticleDataForArticleId ->
+//                            (promotionArticleDataForArticleId.getPromotionArticleData().getIsActive() != null &&
+//                                    promotionArticleDataForArticleId.getPromotionArticleData().getIsActive()))
+//                    .collect(
+//                            Collectors.toMap(
+//                                    PromotionArticleDataForArticleId::getArticleId,
+//                                    articleComponent -> articleComponent.getPromotionArticleData().getPromotionNetSalesPricePerBundle() == null ?
+//                                            PromotionArticleData.builder().build() : articleComponent.getPromotionArticleData()));
 
 
-    rawArticleStoreMasterDataMap.entrySet().stream().forEach(entry -> {
-      PromotionArticleData promotionArticleData = promotionArticleDataMap.get(entry.getKey());
-
-      if (promotionArticleData != null && promotionArticleData.getPromotionNetSalesPricePerBundle() != null) {
-        entry.getValue().getRawArticleStoreMasterData().setStorePromotionBundleNetPrice(promotionArticleData.getPromotionNetSalesPricePerBundle());
-      }
-    });
+//    rawArticleStoreMasterDataMap.entrySet().stream().forEach(entry -> {
+//      PromotionArticleData promotionArticleData = promotionArticleDataMap.get(entry.getKey());
+//
+//      if (promotionArticleData != null && promotionArticleData.getPromotionNetSalesPricePerBundle() != null) {
+//        entry.getValue().getRawArticleStoreMasterData().setStorePromotionBundleNetPrice(promotionArticleData.getPromotionNetSalesPricePerBundle());
+//      }
+//    });
 
     rawArticleDataList.forEach(
         rawArticleData -> {
