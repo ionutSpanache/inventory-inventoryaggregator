@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.controller;
 
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclArticleStoreMasterDataService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
@@ -56,8 +57,16 @@ public class ArticleStoreMasterDataController {
 			@PathVariable("artNo")Integer artNo,
             @PathVariable("varNo")Integer varNo,
             @PathVariable("bundleNo")Integer bundleNo ) {
-        
-		List<ArticleStoreMasterData> articleStoreMasterDataList = aclArticleStoreMasterDataService.getArticleStoreMasterDataByArtVarBundle(countryCode, salesLine, storeNo, artNo,varNo,bundleNo);
+
+		List<ArticleId> articleIdList = List.of(
+				ArticleId.builder()
+						.articleNumber(Long.valueOf(artNo))
+						.bundleNumber(Long.valueOf(varNo))
+						.variantNumber(Long.valueOf(bundleNo))
+						.build());
+
+		List<ArticleStoreMasterData> articleStoreMasterDataList =
+				aclArticleStoreMasterDataService.getArticleStoreMasterDataByArtVarBundle(countryCode, salesLine, storeNo, articleIdList);
         if(articleStoreMasterDataList == null) {		
 	     return ResponseEntity.notFound().build();
         }

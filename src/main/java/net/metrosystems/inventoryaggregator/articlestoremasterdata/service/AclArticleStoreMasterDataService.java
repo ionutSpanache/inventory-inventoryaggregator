@@ -33,15 +33,21 @@ public class AclArticleStoreMasterDataService {
    }
 
    public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(String countryCode, String salesLine, Integer storeNo,
-		                                                                    Integer articleNumber, Integer variantNumber, Integer bundleNumber){
+		                                                                    List<ArticleId> articleIdList){
 
-    return aclArticleStoreMasterDataClient.getArticleStoreMasterDataByArtVarBundle(countryCode, salesLine, storeNo, articleNumber, variantNumber, bundleNumber);
+    return aclArticleStoreMasterDataClient.getArticleStoreMasterDataByArtVarBundle(countryCode, salesLine, storeNo, articleIdList);
 
    }
 
    public ArticleStoreMasterData getArticleStoreMasterData(String countryCode, String salesLine, Integer storeNo,
            Integer articleNumber, Integer variantNumber, Integer bundleNumber) {
-	   List<ArticleStoreMasterData> articleStoreMasterDataList = getArticleStoreMasterDataByArtVarBundle(countryCode,salesLine, storeNo,articleNumber,variantNumber, bundleNumber);
+
+	   List<ArticleStoreMasterData> articleStoreMasterDataList = getArticleStoreMasterDataByArtVarBundle(countryCode,salesLine, storeNo,
+				 List.of(ArticleId.builder()
+						 .articleNumber(Long.valueOf(articleNumber))
+						 .variantNumber(Long.valueOf(variantNumber))
+						 .bundleNumber(Long.valueOf(bundleNumber))
+						 .build()));
 
 	   for (ArticleStoreMasterData articleStoreMasterData : articleStoreMasterDataList) {
 		 if  (articleStoreMasterData.getArticleNumber().intValue() == articleNumber.intValue() &&

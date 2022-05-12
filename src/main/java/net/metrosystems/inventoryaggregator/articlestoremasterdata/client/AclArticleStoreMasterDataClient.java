@@ -1,25 +1,24 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.client;
 
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.client.model.ArticleStoreMasterDataACLResponse;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -35,8 +34,8 @@ public class AclArticleStoreMasterDataClient {
   private String aclArticleMasterDataPathByEan;
   @Value("${ACL_STORE_MASTER_DATA_PATH_BY_SUBSYS}")
   private String aclArticleMasterDataPathBySubsys;
-  @Value("${ACL_STORE_MASTER_DATA_PATH_BY_ART_VAR_BUNDLE}")
-  private String aclArticleMasterDataPathByArtVarBundle;
+  @Value("${ACL_STORE_MASTER_DATA_PATH_ARTICLES_BY_ART_VAR_BUNDLE}")
+  private String aclArticlesMasterDataPathByArtVarBundle;
   @Value("${ACL_MAXIMUM_RETAIL_PRICE_PATH}")
   private String maximumRetailPricePath;
 
@@ -68,24 +67,15 @@ public class AclArticleStoreMasterDataClient {
     return getArticleStoreMasterData(uriComponents);
   }
 
-  public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(String countryCode,
-																			  String salesLine,
-                                                                              Integer storeNo,
-																			  Integer articleNumber,
-																			  Integer variantNumber,
-																			  Integer bundleNumber) {
-	  UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
-					  aclArticleMasterDataHost + aclArticleMasterDataPathByArtVarBundle)
-					  .buildAndExpand(countryCode.toUpperCase(),
-									  salesLine.toUpperCase(),
-									  storeNo,
-									  articleNumber,
-									  variantNumber,
-									  bundleNumber);
+  public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
+      String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList ) {
+    UriComponents uriComponents =
+        UriComponentsBuilder.fromHttpUrl(
+                aclArticleMasterDataHost + aclArticlesMasterDataPathByArtVarBundle)
+            .buildAndExpand(countryCode.toUpperCase(), salesLine.toUpperCase(), storeNo);
 
-    return getArticleStoreMasterData(uriComponents);
+    return getArticlesFromStoreMasterData(uriComponents,articleIdList);
   }
-
 
   private List<ArticleStoreMasterData> getArticleStoreMasterData(UriComponents uriComponents) {
     return webClient.get()
@@ -99,6 +89,19 @@ public class AclArticleStoreMasterDataClient {
               return Mono.just(Collections.emptyList());
             })
             .block();
+  }
+
+
+  private List<ArticleStoreMasterData> getArticlesFromStoreMasterData(UriComponents uriComponents, List<ArticleId> articleIdList) {
+    return webClient.post()
+            .uri(uriComponents.toString())
+        .bodyValue(articleIdList)
+        .retrieve()
+        .onStatus(this::isErrorResponse, clientResponse ->
+            log(clientResponse, "ArticleStoreMasterData - getArticlesFromStoreMasterData - api call unsuccessful  : status %d"))
+        .bodyToFlux(ArticleStoreMasterData.class)
+        .collectList()
+        .block();
   }
 
   public MaximumRetailPrice getMaximumRetailPrice(
@@ -121,5 +124,14 @@ public class AclArticleStoreMasterDataClient {
             })
             .block();
 
+  }
+
+  private boolean isErrorResponse(HttpStatus httpStatus) {
+    return  !httpStatus.is2xxSuccessful();
+  }
+
+  private Mono<? extends Throwable> log(ClientResponse clientResponse, String message) {
+    log.error(message, clientResponse.statusCode().value());
+    return Mono.empty();
   }
 }
