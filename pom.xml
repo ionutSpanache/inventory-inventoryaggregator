@@ -196,6 +196,11 @@
             <version>2.2.2.RELEASE</version>
         </dependency>
 
+		<dependency>
+			<groupId>net.metrosystems.common</groupId>
+			<artifactId>spring-boot-starter-inventory-api-error</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
