@@ -410,29 +410,32 @@ public class ArticleCacheService {
   public IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts(List<String> articleKeys) {
 
     IsTradeItemExcludedFromDiscounts result = new IsTradeItemExcludedFromDiscounts();
-    articleKeys
-        .forEach(
-            articleKey -> {
-              IduItemDerivedStandard iduItemDerivedStandard =
-                  articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
-              if (iduItemDerivedStandard != null
-                  && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
-                IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
-                    iduItemDerivedStandard
-                        .getContentIduItemDerivedStandard()
-                        .getIsTradeItemExcludedFromDiscounts();
-                if (isTradeItemExcludedFromDiscounts != null
-                    && Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
-                  result.setValue(true);
-                  if (result.getValidFrom() == null
-                      || isTradeItemExcludedFromDiscounts
-                          .getValidFrom()
-                          .after(result.getValidFrom())) {
-                    result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
-                  }
-                }
-              }
-            });
+
+	if(!CollectionUtils.isEmpty(articleKeys)) {
+		articleKeys
+				.forEach(
+						articleKey -> {
+							IduItemDerivedStandard iduItemDerivedStandard =
+									articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
+							if (iduItemDerivedStandard != null
+									&& iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
+								IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
+										iduItemDerivedStandard
+												.getContentIduItemDerivedStandard()
+												.getIsTradeItemExcludedFromDiscounts();
+								if (isTradeItemExcludedFromDiscounts != null
+										&& Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
+									result.setValue(true);
+									if (result.getValidFrom() == null
+											|| isTradeItemExcludedFromDiscounts
+											.getValidFrom()
+											.after(result.getValidFrom())) {
+										result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
+									}
+								}
+							}
+						});
+	}
     return result;
   }
 
@@ -534,11 +537,11 @@ public class ArticleCacheService {
 				.getArticleCacheDomain().getPlkz();
 
 		if (PAKISTAN_COUNTRY_CODE.equalsIgnoreCase(countryCode)) {
-			boolean hasMinimumRetailPrice = articleCacheIhdsTree.getTransaction()
+			Boolean hasMinimumRetailPrice = articleCacheIhdsTree.getTransaction()
 					.getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100)
 					.getHasMinimumRetailPrice();
 
-			if (hasMinimumRetailPrice) {
+			if (hasMinimumRetailPrice !=null && hasMinimumRetailPrice) {
 				Double minimumRetailPriceForVatCalculation = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
 						.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> articleCacheDataGroup.getStoreNo() == storeNumber)
