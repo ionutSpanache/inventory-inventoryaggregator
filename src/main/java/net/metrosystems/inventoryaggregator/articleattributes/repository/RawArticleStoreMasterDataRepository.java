@@ -64,20 +64,21 @@ public class RawArticleStoreMasterDataRepository {
     List<ArticleStoreMasterData> articleStoreMasterDataList =
         aclArticleStoreMasterDataService.getArticleStoreMasterDataByArtVarBundle(
             countryCode, salesLine, storeNo, articleIdList);
-    if (CollectionUtils.isEmpty(articleStoreMasterDataList))
-      return CompletableFuture.completedFuture(Collections.emptyMap());
+    if (CollectionUtils.isEmpty(articleStoreMasterDataList)) {
+        return CompletableFuture.completedFuture(Collections.emptyMap());
+    }
 
-    return CompletableFuture.completedFuture(
-        articleStoreMasterDataList.stream()
-            .collect(
-                Collectors.toMap(
-                    key ->
-                        ArticleId.builder()
-                            .articleNumber(Long.valueOf(key.getArticleNumber()))
-                            .variantNumber(Long.valueOf(key.getVariantNumber()))
-                            .bundleNumber(Long.valueOf(key.getBundleNumber()))
-                            .build(),
-                    value -> value)));
+        return CompletableFuture.completedFuture(
+                articleStoreMasterDataList.stream().filter(Objects::nonNull)
+                        .collect(
+                                Collectors.toMap(
+                                        key ->
+                                                ArticleId.builder()
+                                                        .articleNumber(Long.valueOf(key.getArticleNumber()))
+                                                        .variantNumber(Long.valueOf(key.getVariantNumber()))
+                                                        .bundleNumber(Long.valueOf(key.getBundleNumber()))
+                                                        .build(),
+                                        value -> value)));
   }
 
   public Map<ArticleId, RawArticleStoreMasterData> getSynchronouslyRawArticleStoreMasterData(
