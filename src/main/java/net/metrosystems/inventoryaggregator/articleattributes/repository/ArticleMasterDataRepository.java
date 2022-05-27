@@ -3,7 +3,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.*;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleMasterDataForArticleId;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
@@ -12,10 +12,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
@@ -25,6 +24,7 @@ import java.util.stream.Collectors;
 public class ArticleMasterDataRepository {
 
   private final ArticleCacheService articleCacheService;
+  private final DocumentsService documentsService;
 
   @Qualifier("ForkJoinCustomPool")
   private final ForkJoinPool forkJoinPoolCustom;
@@ -61,13 +61,14 @@ public class ArticleMasterDataRepository {
         return CompletableFuture.completedFuture(multiLanguageData);
     }
 
-    @Async("asyncExecutor")
-    public CompletableFuture<ProductLifeCycleData> getProductLifeCycleData(
-            String countryCode, ArticleId articleId) {
-        ProductLifeCycleData productLifeCycleData = getLifeCycleData(countryCode, articleId);
+  @Async("asyncExecutor")
+  public CompletableFuture<List<IduItemDerivedStandard>> getIduItemDerivedStandardsAsync(
+      String countryCode, ArticleId articleId) {
+    List<IduItemDerivedStandard> iduItemDerivedStandards =
+        getIduItemDerivedStandards(countryCode, articleId);
 
-        return CompletableFuture.completedFuture(productLifeCycleData);
-    }
+    return CompletableFuture.completedFuture(iduItemDerivedStandards);
+  }
 
     @Async("asyncExecutor")
     public CompletableFuture<PromotionArticleData> getPromotionArticleData(
@@ -128,7 +129,7 @@ public class ArticleMasterDataRepository {
     }
 
   @Async("asyncExecutor")
-  public CompletableFuture<List<ArticleMasterDataForArticleId>>
+  public CompletableFuture<Map<ArticleId, ArticleMasterData>>
       getArticleMasterDataForArticleIdList(
           List<ArticleId> articleIdList,
           String countryCode,
@@ -136,84 +137,63 @@ public class ArticleMasterDataRepository {
           String languageCode,
           Integer storeNo)
           throws Exception {
-    List<ArticleMasterDataForArticleId> articleMasterDataForArticleIds =
-        forkJoinPoolCustom
-            .submit(
-                () ->
-                    articleIdList.parallelStream()
-                        .map(
-                            articleId -> {
-                              ArticleCacheFullData articleCacheFullData;
-                              try {
-                                articleCacheFullData =
-                                    articleCacheService
-                                        .getArticleCacheFullDataByArtVarBundleForArticleId(
-                                            articleId.getArticleNumber(),
-                                            articleId.getVariantNumber(),
-                                            articleId.getBundleNumber(),
-                                            countryCode,
-                                            salesLine,
-                                            languageCode,
-                                            storeNo);
-                              } catch (Exception e) {
-                                log.error(
-                                    "ArticleMasterDataRepository.getArticleMasterDataForArticleIdList error: {}",
-                                    e.getMessage(),
-                                    e);
-                                return null;
-                              }
-                              return ArticleMasterDataForArticleId.builder()
-                                  .articleId(articleId)
-                                  .articleMasterData(
-                                      transformArticleCacheFullToArticleMasterData(
-                                          articleCacheFullData))
-                                  .build();
-                            })
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList()))
-            .get();
-    return CompletableFuture.completedFuture(articleMasterDataForArticleIds);
+    Map<ArticleId, ArticleMasterData> result = new ConcurrentHashMap<>();
+    Map<ArticleId, String> articlesDocumentUrlMap =
+            documentsService.getDocumentsForMultipleArticles(countryCode, salesLine, languageCode, articleIdList);
+    forkJoinPoolCustom
+        .submit(
+            () ->
+                articleIdList.parallelStream()
+                    .forEach(
+                        articleId -> {
+                          ArticleCacheFullData articleCacheFullData = null;
+                          try {
+                            articleCacheFullData =
+                                articleCacheService
+                                    .getArticleCacheFullDataByArtVarBundleForArticleId(
+                                        storeNo,
+                                        articlesDocumentUrlMap.get(articleId));
+                          } catch (Exception e) {
+                            log.error(
+                                "ArticleMasterDataRepository.getArticleCacheFullDataByArtVarBundleForArticleId error: {}",
+                                e.getMessage(),
+                                e);
+                          }
+                          if (articleCacheFullData != null)
+                            result.put(
+                                articleId,
+                                transformArticleCacheFullToArticleMasterData(articleCacheFullData));
+                        }))
+        .get();
+    return CompletableFuture.completedFuture(result);
   }
 
-    @Async("asyncExecutor")
-    public CompletableFuture<List<ProductLifeCycleForArticleId>>
-    getProductLifeCycleForArticleIds(
-            List<ArticleId> articleIdList,
-            String countryCode)
-            throws Exception {
-        List<ProductLifeCycleForArticleId> productLifeCycleForArticleIds =
-                forkJoinPoolCustom
-                        .submit(
-                                () ->
-                                        articleIdList.parallelStream()
-                                                .map(
-                                                        articleId -> {
-                                                            ProductLifeCycleData productLifeCycleData;
-                                                            try {
-                                                                productLifeCycleData =
-                                                                        getLifeCycleData(countryCode, articleId);
-                                                            } catch (Exception e) {
-                                                                log.error(
-                                                                        "ArticleMasterDataRepository.getArticleMasterDataForArticleIdList error: {}",
-                                                                        e.getMessage(),
-                                                                        e);
-                                                                return null;
-                                                            }
-                                                            return ProductLifeCycleForArticleId.builder()
-                                                                    .articleId(articleId)
-                                                                    .productLifeCycleData(productLifeCycleData)
-                                                                    .build();
-                                                        })
-                                                .filter(Objects::nonNull)
-                                                .collect(Collectors.toList()))
-                        .get();
-        return CompletableFuture.completedFuture(productLifeCycleForArticleIds);
-    }
+  @Async("asyncExecutor")
+  public CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> getIduItemDerivedStandards(
+      List<ArticleId> articleIdList, String countryCode) throws Exception {
+    Map<ArticleId, List<IduItemDerivedStandard>> response = new HashMap<>();
+    forkJoinPoolCustom
+        .submit(
+            () ->
+                articleIdList.parallelStream()
+                    .forEach(
+                        articleId -> {
+                          try {
+                            response.put(articleId, getIduItemDerivedStandards(countryCode, articleId));
+                          } catch (Exception e) {
+                            log.error(
+                                "ArticleMasterDataRepository.getIduItemDerivedStandards error: {}",
+                                e.getMessage(),
+                                e);
+                          }
+                        }))
+        .get();
+    return CompletableFuture.completedFuture(response);
+  }
 
+  private List<IduItemDerivedStandard> getIduItemDerivedStandards(String countryCode, ArticleId articleId) {
 
-  private ProductLifeCycleData getLifeCycleData(String countryCode, ArticleId articleId) {
-
-      return  articleCacheService.getArticleProductLifeCycleData(countryCode, articleId);
+      return  articleCacheService.getIduItemDerivedStandards(countryCode, articleId);
   }
 
     private Optional<String> getDeliveryFlag(String countryCode, ArticleId articleId, Integer storeNumber) {

@@ -83,4 +83,12 @@ public class FilterAAAService {
                         documentsService.
                                 getDocumentsBySubsysArticleNumber(countryCode, salesLine, languageCode, subsysArticleNumber), storeNo);
     }
+
+    public FilterKey initializeFilterKey(String countryCode, String salesLine) {
+        FilterKey filterKey = new FilterKey();
+        filterKey.setSubFilterKeys(new ArrayList<>());
+        filterKey.setCountry(countryCode.toLowerCase());
+        filterKey.setSalesLine(salesLine.toLowerCase());
+        return filterKey;
+    }
 }
