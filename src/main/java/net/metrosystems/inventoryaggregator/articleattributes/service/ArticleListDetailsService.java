@@ -313,7 +313,9 @@ public class ArticleListDetailsService {
         rawArticleData -> {
           rawArticleData.setArticleMasterData(
                   articleMasterDataForArticleIdMap.get(rawArticleData.getArticleId()));
-          rawArticleData.setArticleStoreMasterData(rawArticleStoreMasterDataMap.get(rawArticleData.getArticleId()));
+          rawArticleData.setArticleStoreMasterData(
+                  rawArticleStoreMasterDataMap
+                          .getOrDefault(rawArticleData.getArticleId(), RawArticleStoreMasterData.builder().build()));
           rawArticleData.setStockDetails(
               Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
                   .map(StockData::getArticleStockData)
