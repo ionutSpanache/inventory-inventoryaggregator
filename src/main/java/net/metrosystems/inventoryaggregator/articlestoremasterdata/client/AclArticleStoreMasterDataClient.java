@@ -93,13 +93,20 @@ public class AclArticleStoreMasterDataClient {
 
 
   private List<ArticleStoreMasterData> getArticlesFromStoreMasterData(UriComponents uriComponents, List<ArticleId> articleIdList) {
-    return webClient.post()
-            .uri(uriComponents.toString())
+    return webClient
+        .post()
+        .uri(uriComponents.toString())
         .bodyValue(articleIdList)
         .retrieve()
-        .onStatus(this::isErrorResponse, clientResponse ->
-            log(clientResponse, "ArticleStoreMasterData - getArticlesFromStoreMasterData - api call unsuccessful  : status %d"))
         .bodyToFlux(ArticleStoreMasterData.class)
+        .onErrorResume(
+            error -> {
+              log.error(
+                  "ArticleStoreMasterData - getArticlesFromStoreMasterData - api call unsuccessful {}",
+                  error.getMessage(),
+                  error);
+              return Flux.empty();
+            })
         .collectList()
         .block();
   }
