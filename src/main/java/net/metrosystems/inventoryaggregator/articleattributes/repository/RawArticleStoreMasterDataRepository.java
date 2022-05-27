@@ -70,6 +70,12 @@ public class RawArticleStoreMasterDataRepository {
 
     return CompletableFuture.completedFuture(
         articleStoreMasterDataList.stream()
+            .filter(
+                articleStoreMasterData ->
+                    articleStoreMasterData != null
+                        && articleStoreMasterData.getArticleNumber() != null
+                        && articleStoreMasterData.getVariantNumber() != null
+                        && articleStoreMasterData.getBundleNumber() != null)
             .collect(
                 Collectors.toMap(
                     key ->
