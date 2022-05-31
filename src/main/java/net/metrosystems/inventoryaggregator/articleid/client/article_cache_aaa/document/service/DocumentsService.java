@@ -261,6 +261,7 @@ public class DocumentsService {
       List<net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId> articleIdList)
       throws Exception {
 
+    if (CollectionUtils.isEmpty(articleIdList)) return Collections.emptyMap();
     Filter filter = new Filter().setFilterKeys(new ArrayList<>());
     articleIdList.forEach(articleId -> {
       FilterKey filterKey = filterAAAService.initializeFilterKey(countryCode, salesLine);
@@ -290,6 +291,8 @@ public class DocumentsService {
 
     Documents documents =
         this.getDocumentsNextpage(filterAAAClient.getFilteredDocuments(filter), filter);
+    if (documents == null || CollectionUtils.isEmpty(documents.getArticleKeys()))
+      return Collections.emptyMap();
     return documents.getArticleKeys().stream()
         .collect(
             Collectors.toMap(
