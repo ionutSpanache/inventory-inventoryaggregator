@@ -1,19 +1,19 @@
 #Base build image with maven and DDAgent
-FROM registry.metroscales.io/inventory/mstore-alpine-jre11:latest
+#FROM registry.metroscales.io/inventory/mstore-alpine-jre11:latest
 
 #Base build image with maven and DDAgent
-#FROM adoptopenjdk/openjdk15
+FROM adoptopenjdk/openjdk15
 
 
-#ENV LANG en_GB.UTF-8
+ENV LANG en_GB.UTF-8
 
-#WORKDIR /opt
+WORKDIR /opt
 
 
 ### Download datatog agent library
-#RUN apt update
-#RUN apt-get install -y wget
-#RUN wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer
+RUN apt update
+RUN apt-get install -y wget
+RUN wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer
 
 LABEL maintainer="cristiangabriel.jena@metrosystems.net"
 
@@ -25,10 +25,7 @@ ADD  /target/inventoryaggregator.jar /app.jar
 
 CMD [ "sh", "-c", "java \
 -jar \
--XX:+UseShenandoahGC \
--XX:+UnlockExperimentalVMOptions \
--XX:ShenandoahUncommitDelay=5000 \
--XX:ShenandoahGuaranteedGCInterval=50000 \
+-XX:+UseG1GC \
 -XX:+UseStringDeduplication \
 -XX:MinRAMPercentage=50.0 \
 -XX:MaxRAMPercentage=80.0 \
