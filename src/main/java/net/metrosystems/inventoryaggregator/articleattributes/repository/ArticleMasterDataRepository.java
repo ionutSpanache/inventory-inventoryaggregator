@@ -233,6 +233,7 @@ public class ArticleMasterDataRepository {
           .setPromotionId(articleCacheFullData.getPromotionId())
           .setSellingBundleContent(articleCacheFullData.getSellingBundleContent())
           .setWeightArticle(articleCacheFullData.getWeightArticle())
+          .setNetWeight(articleCacheFullData.getNetWeight())
           .setSubsystemArticleNumber(articleCacheFullData.getSubsysArticleNumber())
           .setVatPercent(articleCacheFullData.getVatPercent())
           .setPieceNetSellPrice(articleCacheFullData.getPieceNetSellPrice())

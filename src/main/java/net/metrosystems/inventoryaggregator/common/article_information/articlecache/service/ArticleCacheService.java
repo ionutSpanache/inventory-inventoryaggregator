@@ -455,6 +455,7 @@ public class ArticleCacheService {
             : getPromotionIdAvailable(articleCacheDocument, promotionIdList, storeNo),
         articleCacheDataGroup310.getSellingBundleContent(),
         articleCacheDataGroup100.getWeightArticles(),
+		articleCacheDataGroup200.getNetWeight(),
         articleCacheReaderDigest.getSubsysNo(),
         articleCacheDataGroup100.getVatPercent(),
         articleCacheDataGroup320.getPieceNetSellPrice(),
