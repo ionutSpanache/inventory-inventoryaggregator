@@ -138,6 +138,17 @@ public class ArticleCacheDataGroup {
     this.singleItemSalesBarcode = singleItemSalesBarcode;
   }
 
+  private Double netWeight;
+
+  public Double getNetWeight() {
+    return netWeight;
+  }
+
+  @XmlElement(name = "NETPIECEWEIGHT")
+  public void setNetWeight(Double netWeight) {
+    this.netWeight = netWeight;
+  }
+
   private String generalSupplierName;
 
   public String getGeneralSupplierName() {

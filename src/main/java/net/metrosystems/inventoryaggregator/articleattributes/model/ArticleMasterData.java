@@ -19,6 +19,7 @@ public class ArticleMasterData implements Serializable {
   private Integer sellingBundleContent;
   private Integer packageFactor;
   private Double weightArticle;
+  private Double netWeight;
   private Long subsystemArticleNumber;
   private Double vatPercent;
   private double pieceNetSellPrice;
