@@ -32,7 +32,7 @@ public class AsyncConfiguration {
   @Bean(name = "ForkJoinCustomPool")
   @Scope("singleton")
   public ForkJoinPool createForkJoinPool() {
-    return new ForkJoinPool(100, CustomForkJoinWorkerThread::new, null, false);
+    return new ForkJoinPool(150, CustomForkJoinWorkerThread::new, null, false);
   }
 
 }

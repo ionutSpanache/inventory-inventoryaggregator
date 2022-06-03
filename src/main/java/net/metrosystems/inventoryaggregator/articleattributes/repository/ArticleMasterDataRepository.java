@@ -3,6 +3,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -171,15 +173,24 @@ public class ArticleMasterDataRepository {
   @Async("asyncExecutor")
   public CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> getIduItemDerivedStandards(
       List<ArticleId> articleIdList, String countryCode) throws Exception {
-    Map<ArticleId, List<IduItemDerivedStandard>> response = new HashMap<>();
+
+    Documents documents =
+        documentsService.getIduItemDerivedUrlForMultipleArticles(countryCode, articleIdList, null);
+
+    if (documents == null || CollectionUtils.isEmpty(documents.getArticleKeys()))
+      return CompletableFuture.completedFuture(Collections.emptyMap());
+
+    List<IduItemDerivedStandard> iduItemDerivedStandardList = new ArrayList<>();
+
     forkJoinPoolCustom
         .submit(
             () ->
-                articleIdList.parallelStream()
+                documents.getArticleKeys().parallelStream()
                     .forEach(
-                        articleId -> {
+                        documentUrl -> {
                           try {
-                            response.put(articleId, getIduItemDerivedStandards(countryCode, articleId));
+                            iduItemDerivedStandardList.add(
+                                articleCacheService.getIduItemDerivedStandard(documentUrl));
                           } catch (Exception e) {
                             log.error(
                                 "ArticleMasterDataRepository.getIduItemDerivedStandards error: {}",
@@ -188,7 +199,17 @@ public class ArticleMasterDataRepository {
                           }
                         }))
         .get();
-    return CompletableFuture.completedFuture(response);
+
+    return CompletableFuture.completedFuture(
+        iduItemDerivedStandardList.stream()
+            .collect(
+                Collectors.groupingBy(
+                    iduItemDerivedStandard ->
+                        ArticleId.builder()
+                            .articleNumber(iduItemDerivedStandard.getDomain().getArticleNumber())
+                            .variantNumber(iduItemDerivedStandard.getDomain().getVariantNumber())
+                            .bundleNumber(iduItemDerivedStandard.getDomain().getBundleNumber())
+                            .build())));
   }
 
   private List<IduItemDerivedStandard> getIduItemDerivedStandards(String countryCode, ArticleId articleId) {

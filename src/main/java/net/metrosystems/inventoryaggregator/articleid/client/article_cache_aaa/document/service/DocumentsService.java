@@ -390,4 +390,65 @@ public class DocumentsService {
                     articleId.getVariantNumber(), articleId.getBundleNumber()));
     return articleComponent;
   }
+
+  public Documents getIduItemDerivedUrlForMultipleArticles(
+      String countryCode,
+      List<net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId> articleIdList,
+      String company) {
+
+    if (CollectionUtils.isEmpty(articleIdList)) return null;
+    List<FilterKeyIduItemDerivedStandard> filterKeyIduItemDerivedStandardList = new ArrayList<>();
+    articleIdList.stream()
+        .filter(
+            articleId ->
+                articleId.getArticleNumber() != null
+                    && articleId.getVariantNumber() != null
+                    && articleId.getBundleNumber() != null)
+        .forEach(
+            articleId -> {
+              List<SubFilterKey> subFilterKeys = new ArrayList<>();
+              subFilterKeys.add(
+                  SubFilterKey.builder()
+                      .key(KeysWithTypes.articleNumber.getCode())
+                      .type(KeysWithTypes.articleNumber.getType())
+                      .query(String.valueOf(articleId.getArticleNumber()))
+                      .build());
+
+              subFilterKeys.add(
+                  SubFilterKey.builder()
+                      .key(KeysWithTypes.variantNumber.getCode())
+                      .type(KeysWithTypes.variantNumber.getType())
+                      .query(String.valueOf(articleId.getVariantNumber()))
+                      .build());
+
+              subFilterKeys.add(
+                  SubFilterKey.builder()
+                      .key(KeysWithTypes.bundleNumber.getCode())
+                      .type(KeysWithTypes.bundleNumber.getType())
+                      .query(String.valueOf(articleId.getBundleNumber()))
+                      .build());
+
+              if (company != null) {
+                subFilterKeys.add(
+                    SubFilterKey.builder()
+                        .key(KeysWithTypes.company.getCode())
+                        .type(KeysWithTypes.company.getType())
+                        .query(company)
+                        .build());
+              }
+              filterKeyIduItemDerivedStandardList.add(
+                  FilterKeyIduItemDerivedStandard.builder()
+                      .subFilterKeys(subFilterKeys)
+                      .country(countryCode)
+                      .build());
+            });
+
+    FilterIduItemDerivedStandard filterIduItemDerivedStandard =
+        FilterIduItemDerivedStandard.builder()
+            .filterKeys(filterKeyIduItemDerivedStandardList)
+            .build();
+
+    return filterAAAClient.getFilteredDocumentsForIduItemDerivedStandard(
+        filterIduItemDerivedStandard);
+  }
 }

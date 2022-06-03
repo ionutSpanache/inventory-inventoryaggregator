@@ -11,6 +11,8 @@ public class IduItemDerivedStandard implements Serializable {
 
     private References references;
 
+    private Domain domain;
+
     public ContentIduItemDerivedStandard getContentIduItemDerivedStandard() {
         return contentIduItemDerivedStandard;
     }
@@ -29,5 +31,12 @@ public class IduItemDerivedStandard implements Serializable {
         return references;
     }
 
+    public Domain getDomain() {
+        return domain;
+    }
 
+    @XmlElement(name = "domain")
+    public void setDomain(Domain domain) {
+        this.domain = domain;
+    }
 }

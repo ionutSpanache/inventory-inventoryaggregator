@@ -246,14 +246,11 @@ public class ArticleListDetailsService {
         articleLocationList,
         iduItemDerivedStandards);
 
-    Map<ArticleId, ArticleComponent> articleComponentForArticleIdMap = articleComponentForArticleId.get();
-
     for (Map.Entry<ArticleId, ArticleMasterData> entry :
         articleMasterDataForArticleId.get().entrySet()) {
       articleCacheService.enhanceArticleMasterData(
           entry.getValue(), iduItemDerivedStandards.get().get(entry.getKey()));
     }
-    Map<ArticleId, ArticleMasterData> articleMasterDataForArticleIdMap = articleMasterDataForArticleId.get();
 
     Map<ArticleId, RawArticleStoreMasterData> rawArticleStoreMasterDataMap =
         rawArticleStoreMasterDataRepository.getArticleIdRawArticleStoreMasterDataMap(
@@ -288,7 +285,8 @@ public class ArticleListDetailsService {
                     Map.Entry::getKey,
                     entry ->
                         Optional.ofNullable(
-                            articleCacheService.buildProductLifeCycleData(entry.getValue())).orElse(new ProductLifeCycleData())));
+                                articleCacheService.buildProductLifeCycleData(entry.getValue()))
+                            .orElse(new ProductLifeCycleData())));
 
 //    Map<ArticleId, PromotionArticleData> promotionArticleDataMap =
 //            promotionArticles.get().stream().filter(promotionArticleDataForArticleId ->
@@ -309,10 +307,9 @@ public class ArticleListDetailsService {
 //      }
 //    });
 
-    rawArticleDataList.forEach(
-        rawArticleData -> {
+    for (RawArticleData rawArticleData : rawArticleDataList) {
           rawArticleData.setArticleMasterData(
-                  articleMasterDataForArticleIdMap.get(rawArticleData.getArticleId()));
+                  articleMasterDataForArticleId.get().get(rawArticleData.getArticleId()));
           rawArticleData.setArticleStoreMasterData(
                   rawArticleStoreMasterDataMap
                           .getOrDefault(rawArticleData.getArticleId(), RawArticleStoreMasterData.builder().build()));
@@ -333,10 +330,10 @@ public class ArticleListDetailsService {
                   .map(ArticleLocationForArticleId::getArticleLocation)
                   .orElse(null));
           rawArticleData.setArticleComponent(
-                  articleComponentForArticleIdMap.get(rawArticleData.getArticleId()));
+                  articleComponentForArticleId.get().get(rawArticleData.getArticleId()));
           rawArticleData.setProductLifeCycleData(
-                  productLifeCycleMap.get(rawArticleData.getArticleId()));
+                  productLifeCycleMap.getOrDefault(rawArticleData.getArticleId(), new ProductLifeCycleData()));
 
-        });
+        }
   }
 }

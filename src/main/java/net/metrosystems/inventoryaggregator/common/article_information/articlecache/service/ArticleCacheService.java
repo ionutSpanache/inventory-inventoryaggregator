@@ -217,6 +217,13 @@ public class ArticleCacheService {
     return articleCacheClient.getMultipleIduItemDerivedStandardDocument(articleUrlPath);
   }
 
+  public IduItemDerivedStandard getIduItemDerivedStandard(String documentUrl) {
+
+    if (documentUrl == null) return null;
+
+    return articleCacheClient.getIduItemDerivedStandardDocument(documentUrl);
+  }
+
   public ProductLifeCycleData buildProductLifeCycleData(
       List<IduItemDerivedStandard> iduItemDerivedStandardList) {
     if (CollectionUtils.isEmpty(iduItemDerivedStandardList)) return null;
