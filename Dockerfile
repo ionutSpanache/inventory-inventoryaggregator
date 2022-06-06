@@ -27,6 +27,7 @@ CMD [ "sh", "-c", "java \
 -XX:+UnlockExperimentalVMOptions \
 -XX:+UseShenandoahGC \
 -XX:+ShenandoahUncommit \
+-XX:ShenandoahGCHeuristics=compact \
 -XX:+UseStringDeduplication \
 -XX:MinRAMPercentage=50.0 \
 -XX:MaxRAMPercentage=80.0 \
