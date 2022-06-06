@@ -26,8 +26,6 @@ CMD [ "sh", "-c", "java \
 -jar \
 -XX:+UnlockExperimentalVMOptions \
 -XX:+UseShenandoahGC \
--XX:+ShenandoahUncommit \
--XX:ShenandoahGCHeuristics=compact \
 -XX:ShenandoahUncommitDelay=5000 \
 -XX:ShenandoahGuaranteedGCInterval=50000 \
 -XX:+UseStringDeduplication \
