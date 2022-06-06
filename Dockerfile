@@ -28,6 +28,8 @@ CMD [ "sh", "-c", "java \
 -XX:+UseShenandoahGC \
 -XX:+ShenandoahUncommit \
 -XX:ShenandoahGCHeuristics=compact \
+-XX:ShenandoahUncommitDelay=5000 \
+-XX:ShenandoahGuaranteedGCInterval=50000 \
 -XX:+UseStringDeduplication \
 -XX:MinRAMPercentage=50.0 \
 -XX:MaxRAMPercentage=80.0 \
