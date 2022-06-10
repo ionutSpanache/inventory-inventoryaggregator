@@ -3,6 +3,7 @@ package net.metrosystems.inventoryaggregator.config;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +18,8 @@ class RestApiErrorMessageConfig {
     ErrorAttributes errorAttributes(@Value("${spring.application.name}") final String applicationName) {
         return new DefaultErrorAttributes() {
             @Override
-            public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
-                Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
+            public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions errorAttributeOptions) {
+                Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, errorAttributeOptions);
                 errorAttributes.put("message", "Check " + applicationName + "'s logs!");
                 return errorAttributes;
             }
