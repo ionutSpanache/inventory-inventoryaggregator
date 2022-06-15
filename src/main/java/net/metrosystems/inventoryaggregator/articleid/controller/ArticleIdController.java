@@ -130,9 +130,4 @@ public class ArticleIdController {
     return ResponseEntity.ok(activeStoresList);
   }
 
-    @ExceptionHandler(ArticleNotFoundException.class)
-    public final ResponseEntity<String> handleUserNotFoundException(ArticleNotFoundException ex, WebRequest request) {
-        return ResponseEntity.notFound().build();
-    }
-
 }

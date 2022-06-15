@@ -72,9 +72,5 @@ public class ArticleStoreMasterDataController {
         }
        return ResponseEntity.ok(articleStoreMasterDataList);		
     }
-	
-	@ExceptionHandler(ArticleNotFoundException.class)
-	public final ResponseEntity<String> handleUserNotFoundException(ArticleNotFoundException ex, WebRequest request) {		      
-		return ResponseEntity.notFound().build();
-	}
+
 }
