@@ -4,7 +4,6 @@
 #Base build image with maven and DDAgent
 FROM adoptopenjdk/openjdk15
 
-
 ENV LANG en_GB.UTF-8
 
 WORKDIR /opt
@@ -25,7 +24,10 @@ ADD  /target/inventoryaggregator.jar /app.jar
 
 CMD [ "sh", "-c", "java \
 -jar \
--XX:+UseG1GC \
+-XX:+UnlockExperimentalVMOptions \
+-XX:+UseShenandoahGC \
+-XX:ShenandoahGCHeuristics=compact \
+-XX:ConcGCThreads=40 \
 -XX:+UseStringDeduplication \
 -XX:MinRAMPercentage=50.0 \
 -XX:MaxRAMPercentage=80.0 \

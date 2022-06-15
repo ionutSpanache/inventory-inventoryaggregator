@@ -22,6 +22,7 @@ public class ArticleCacheFullData {
     private String promotionId;
     private Integer sellingBundleContent;
     private Double weightArticle;
+    private Double netWeight;
     private Long subsysArticleNumber;
     private Double vatPercent;
     private double pieceNetSellPrice;

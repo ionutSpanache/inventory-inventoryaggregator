@@ -3,21 +3,22 @@ package net.metrosystems.inventoryaggregator.articleattributes.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.*;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.*;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -98,7 +99,7 @@ public class ArticleListDetailsService {
       List<RawArticleData> rawArticleDataList)
       throws ExecutionException, InterruptedException {
 
-    CompletableFuture<List<ArticleComponentForArticleId>> articleComponentForArticleId =
+    CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
         new CompletableFuture<>();
     try {
       articleComponentForArticleId =
@@ -113,7 +114,7 @@ public class ArticleListDetailsService {
           e);
     }
 
-    CompletableFuture<List<ArticleMasterDataForArticleId>> articleMasterDataForArticleId =
+    CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         new CompletableFuture<>();
     try {
       articleMasterDataForArticleId =
@@ -128,17 +129,16 @@ public class ArticleListDetailsService {
           e);
     }
 
-    CompletableFuture<List<ProductLifeCycleForArticleId>>  lifeCycleDataList =
+    CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>>  iduItemDerivedStandards =
             new CompletableFuture<>();
     try {
-      lifeCycleDataList =
-              articleMasterDataRepository.getProductLifeCycleForArticleIds(
-                      articleIdList, countryCode);
+      iduItemDerivedStandards =
+          articleMasterDataRepository.getIduItemDerivedStandards(articleIdList, countryCode);
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
-              "ArticleListDetailsService.getProductLifeCycleData - getProductLyfeCycleData - error: {}",
+              "ArticleListDetailsService.buildRawArticleDataList - getIduItemDerivedStandards - error: {}",
               e.getMessage(),
               e);
     }
@@ -244,27 +244,13 @@ public class ArticleListDetailsService {
         stockDataFromMovie,
         articleStockLocationList,
         articleLocationList,
-        lifeCycleDataList);
+        iduItemDerivedStandards);
 
-    Map<ArticleId, ArticleComponentForArticleId> articleComponentForArticleIdMap =
-        articleComponentForArticleId.get().stream()
-            .collect(
-                Collectors.toMap(
-                    ArticleComponentForArticleId::getArticleId,
-                    articleComponent -> articleComponent,
-                    (oldValue, newValue) -> oldValue));
-    List<ArticleMasterDataForArticleId> result = articleMasterDataForArticleId.get();
-
-    Map<ArticleId, ArticleMasterDataForArticleId> articleMasterDataForArticleIdMap =
-        !CollectionUtils.isEmpty(result)
-            ? Stream.ofNullable(result)
-                .flatMap(Collection::stream)
-                .collect(
-                    Collectors.toMap(
-                        ArticleMasterDataForArticleId::getArticleId,
-                        articleMasterData -> articleMasterData,
-                        (oldValue, newValue) -> oldValue))
-            : Collections.emptyMap();
+    for (Map.Entry<ArticleId, ArticleMasterData> entry :
+        articleMasterDataForArticleId.get().entrySet()) {
+      articleCacheService.enhanceArticleMasterData(
+          entry.getValue(), iduItemDerivedStandards.get().get(entry.getKey()));
+    }
 
     Map<ArticleId, RawArticleStoreMasterData> rawArticleStoreMasterDataMap =
         rawArticleStoreMasterDataRepository.getArticleIdRawArticleStoreMasterDataMap(
@@ -293,15 +279,14 @@ public class ArticleListDetailsService {
                     (oldValue, newValue) -> oldValue));
 
     Map<ArticleId, ProductLifeCycleData> productLifeCycleMap =
-        lifeCycleDataList.get().stream()
+        iduItemDerivedStandards.get().entrySet().stream()
             .collect(
                 Collectors.toMap(
-                    ProductLifeCycleForArticleId::getArticleId,
-                    articleComponent ->
-                        articleComponent.getProductLifeCycleData() == null
-                            ? ProductLifeCycleData.builder().build()
-                            : articleComponent.getProductLifeCycleData(),
-                    (oldValue, newValue) -> oldValue));
+                    Map.Entry::getKey,
+                    entry ->
+                        Optional.ofNullable(
+                                articleCacheService.buildProductLifeCycleData(entry.getValue()))
+                            .orElse(new ProductLifeCycleData())));
 
 //    Map<ArticleId, PromotionArticleData> promotionArticleDataMap =
 //            promotionArticles.get().stream().filter(promotionArticleDataForArticleId ->
@@ -322,14 +307,12 @@ public class ArticleListDetailsService {
 //      }
 //    });
 
-    rawArticleDataList.forEach(
-        rawArticleData -> {
+    for (RawArticleData rawArticleData : rawArticleDataList) {
           rawArticleData.setArticleMasterData(
-              Optional.ofNullable(
-                      articleMasterDataForArticleIdMap.get(rawArticleData.getArticleId()))
-                  .map(ArticleMasterDataForArticleId::getArticleMasterData)
-                  .orElse(null));
-          rawArticleData.setArticleStoreMasterData(rawArticleStoreMasterDataMap.get(rawArticleData.getArticleId()));
+                  articleMasterDataForArticleId.get().get(rawArticleData.getArticleId()));
+          rawArticleData.setArticleStoreMasterData(
+                  rawArticleStoreMasterDataMap
+                          .getOrDefault(rawArticleData.getArticleId(), RawArticleStoreMasterData.builder().build()));
           rawArticleData.setStockDetails(
               Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
                   .map(StockData::getArticleStockData)
@@ -347,15 +330,10 @@ public class ArticleListDetailsService {
                   .map(ArticleLocationForArticleId::getArticleLocation)
                   .orElse(null));
           rawArticleData.setArticleComponent(
-              Optional.ofNullable(
-                      articleComponentForArticleIdMap.get(rawArticleData.getArticleId()))
-                  .map(ArticleComponentForArticleId::getArticleComponent)
-                  .orElse(null));
+                  articleComponentForArticleId.get().get(rawArticleData.getArticleId()));
           rawArticleData.setProductLifeCycleData(
-                  Optional.ofNullable(
-                          productLifeCycleMap.get(rawArticleData.getArticleId()))
-                          .orElse(null));
+                  productLifeCycleMap.getOrDefault(rawArticleData.getArticleId(), new ProductLifeCycleData()));
 
-        });
+        }
   }
 }

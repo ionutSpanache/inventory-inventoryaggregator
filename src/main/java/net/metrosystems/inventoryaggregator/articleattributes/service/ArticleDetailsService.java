@@ -303,8 +303,8 @@ public class ArticleDetailsService {
           e.getMessage(), e);
     }
 
-    CompletableFuture<ProductLifeCycleData> productLifeCycleData =
-            articleMasterDataRepository.getProductLifeCycleData(countryCode, articleId);
+    CompletableFuture<List<IduItemDerivedStandard>> iduDerivedStandardsList =
+            articleMasterDataRepository.getIduItemDerivedStandardsAsync(countryCode, articleId);
 
     CompletableFuture<MaximumRetailPrice> maximumRetailPrice =
             rawArticleStoreMasterDataRepository.getMaximumRetailPrice(countryCode, salesLine, storeNo, articleId);
@@ -319,7 +319,7 @@ public class ArticleDetailsService {
 //            storeNo, articleId);
 
     CompletableFuture.allOf(articleMasterData, rawArticleStoreMasterData, articleDataFromMovie,
-        articleStockLocationList, articleLocationList, productLifeCycleData, maximumRetailPrice, iduItemDerivedStandard);
+        articleStockLocationList, articleLocationList, iduDerivedStandardsList, maximumRetailPrice, iduItemDerivedStandard);
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
@@ -344,7 +344,7 @@ public class ArticleDetailsService {
                                                   .stockLocations(articleStockLocationList.get())
                                                   .articleLocation(articleLocationList.get())
                                                   .articleComponent(articleComponent)
-                                                  .productLifeCycleData(productLifeCycleData.get())
+                                                  .productLifeCycleData(articleCacheService.buildProductLifeCycleData(iduDerivedStandardsList.get()))
                                                   .maximumRetailPrice(maximumRetailPrice.get())
                                                   .channelDeliveryFlag(channelDeliveryFlag.get())
                                                   .minimumRetailPrice(articleMasterData.get().getMinimumRetailPrice())

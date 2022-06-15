@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
@@ -201,29 +202,45 @@ public class ArticleCacheService {
 		}
 	}
 
-	public ProductLifeCycleData getArticleProductLifeCycleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
-		Documents articleUrlPathList = articleCacheClient.getMultiLanguageDocumentUrl(countryCode, articleId);
+  public List<IduItemDerivedStandard> getIduItemDerivedStandards(
+      String countryCode,
+      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
+    Documents articleUrlPathList =
+        articleCacheClient.getMultiLanguageDocumentUrl(countryCode, articleId);
 
-		if (articleUrlPathList == null || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-			return new ProductLifeCycleData();
-		}
-		List<String> articleUrlPath = articleUrlPathList.getArticleKeys();
+    if (articleUrlPathList == null
+        || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+      return Collections.emptyList();
+    }
+    List<String> articleUrlPath = articleUrlPathList.getArticleKeys();
 
-		List<IduItemDerivedStandard> iduItemDerivedStandardList = articleCacheClient.getMultipleIduItemDerivedStandardDocument(articleUrlPath);
+    return articleCacheClient.getMultipleIduItemDerivedStandardDocument(articleUrlPath);
+  }
 
-		if(iduItemDerivedStandardList.isEmpty())
-			return null;
+  public IduItemDerivedStandard getIduItemDerivedStandard(String documentUrl) {
 
-		Optional<IduItemDerivedStandard> documentWithProductLifecycle = iduItemDerivedStandardList.stream()
-				.filter(iduItemDerivedStandard -> iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2() != null )
-				.findFirst();
+    if (documentUrl == null) return null;
 
-		if(documentWithProductLifecycle.isEmpty())
-			return null;
+    return articleCacheClient.getIduItemDerivedStandardDocument(documentUrl);
+  }
 
-		return mapToProductLifeCycleData(documentWithProductLifecycle.get());
+  public ProductLifeCycleData buildProductLifeCycleData(
+      List<IduItemDerivedStandard> iduItemDerivedStandardList) {
+    if (CollectionUtils.isEmpty(iduItemDerivedStandardList)) return null;
+    Optional<IduItemDerivedStandard> documentWithProductLifecycle =
+        iduItemDerivedStandardList.stream()
+            .filter(
+                iduItemDerivedStandard ->
+                    iduItemDerivedStandard
+                            .getContentIduItemDerivedStandard()
+                            .getAssortmentClusterSpecificationV2()
+                        != null)
+            .findFirst();
 
-	}
+    if (documentWithProductLifecycle.isEmpty()) return null;
+
+    return mapToProductLifeCycleData(documentWithProductLifecycle.get());
+  }
 
 	public PromotionArticleData getPromotionArticleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
 														Integer storeId) {
@@ -332,24 +349,11 @@ public class ArticleCacheService {
 	}
 
   public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
-      Long articleNumber,
-      Long variantNumber,
-      Long bundleNumber,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo) throws Exception {
+      Integer storeNo, String documentUrl) {
 
-	  Documents articleUrlPathList =
-			  articleCacheClient.getArticleUrlPathByArtVarBundle(
-					  articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode);
-	  if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-		  return null;
-	  }
-
-	  String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
-	  ArticleCacheIhdsTree articleCacheDocument =
-			  articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
+    if (documentUrl == null) return null;
+    ArticleCacheIhdsTree articleCacheDocument =
+        articleCacheClient.getArticleCacheDocumentByURL(documentUrl);
 
     if (articleCacheDocument == null
         || articleCacheDocument.getTransaction() == null
@@ -362,36 +366,8 @@ public class ArticleCacheService {
       return null;
     }
 
-	  List<String> articleKeysForDerivedStandard = getArticleKeysForDerivedStandardDocument(countryCode, articleNumber, bundleNumber,
-			  variantNumber, salesLine);
-
-	  IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
-			  isTradeItemExcludedFromDiscounts(articleKeysForDerivedStandard);
-    boolean isTradeItemExcludedFromDiscountsValue = false;
-    if (Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
-      if (isTradeItemExcludedFromDiscounts.getValidFrom() == null) {
-        isTradeItemExcludedFromDiscountsValue = true;
-      } else {
-        LocalDate validFrom =
-            isTradeItemExcludedFromDiscounts
-                .getValidFrom()
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-        if (LocalDate.now().isAfter(validFrom)) {
-          isTradeItemExcludedFromDiscountsValue = true;
-        }
-      }
-    }
-
-	  String gradeCodeReferenceFruitsVegetables = null;
-	  if (!CollectionUtils.isEmpty(articleKeysForDerivedStandard)) {
-		  gradeCodeReferenceFruitsVegetables =
-				  hasGradeCodeReferenceFruitsVegetables(articleKeysForDerivedStandard.get(0)).getValue();
-	  }
-
     return transformArticleCacheDocumentToArticleFullData(
-			articleCacheDocument, storeNo, isTradeItemExcludedFromDiscountsValue , gradeCodeReferenceFruitsVegetables);
+        articleCacheDocument, storeNo, null, null);
   }
 
 	public List<String> getArticleKeysForDerivedStandardDocument(String countryCode, Long articleNumber,
@@ -486,6 +462,7 @@ public class ArticleCacheService {
             : getPromotionIdAvailable(articleCacheDocument, promotionIdList, storeNo),
         articleCacheDataGroup310.getSellingBundleContent(),
         articleCacheDataGroup100.getWeightArticles(),
+		articleCacheDataGroup200.getNetWeight(),
         articleCacheReaderDigest.getSubsysNo(),
         articleCacheDataGroup100.getVatPercent(),
         articleCacheDataGroup320.getPieceNetSellPrice(),
@@ -631,4 +608,75 @@ public class ArticleCacheService {
 
     return activeStoresList;
   }
+
+  public void enhanceArticleMasterData(
+      ArticleMasterData articleMasterData, List<IduItemDerivedStandard> iduItemDerivedStandards) {
+    if (articleMasterData == null || CollectionUtils.isEmpty(iduItemDerivedStandards)) return;
+    articleMasterData
+        .setIsTradeItemExcludedFromDiscounts(
+            getIsTradeItemExcludedFromDiscounts(iduItemDerivedStandards))
+        .setGradeCodeReferenceFruitsVegetables(
+            getGradeCodeReferenceFruitsVegetables(iduItemDerivedStandards));
+  }
+
+  public String getGradeCodeReferenceFruitsVegetables(
+      List<IduItemDerivedStandard> iduItemDerivedStandards) {
+
+    if (CollectionUtils.isEmpty(iduItemDerivedStandards)) return null;
+
+    for (IduItemDerivedStandard iduItemDerivedStandard : iduItemDerivedStandards) {
+      if (iduItemDerivedStandard != null
+          && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null
+          && iduItemDerivedStandard
+                  .getContentIduItemDerivedStandard()
+                  .getGradeCodeReferenceFruitsVegetables()
+              != null) {
+        return iduItemDerivedStandard
+            .getContentIduItemDerivedStandard()
+            .getGradeCodeReferenceFruitsVegetables()
+            .getValue();
+      }
+    }
+    return null;
+  }
+
+	public Boolean getIsTradeItemExcludedFromDiscounts(List<IduItemDerivedStandard> iduItemDerivedStandards) {
+
+		if (CollectionUtils.isEmpty(iduItemDerivedStandards)) return false;
+		IsTradeItemExcludedFromDiscounts result = new IsTradeItemExcludedFromDiscounts();
+
+		for (IduItemDerivedStandard iduItemDerivedStandard : iduItemDerivedStandards) {
+			if (iduItemDerivedStandard != null
+					&& iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
+				IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
+						iduItemDerivedStandard
+								.getContentIduItemDerivedStandard()
+								.getIsTradeItemExcludedFromDiscounts();
+				if (isTradeItemExcludedFromDiscounts != null
+						&& Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
+					result.setValue(true);
+					if (result.getValidFrom() == null
+							|| isTradeItemExcludedFromDiscounts
+							.getValidFrom()
+							.after(result.getValidFrom())) {
+						result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
+					}
+				}
+			}
+		}
+		if (Boolean.TRUE.equals(result.getValue())) {
+			if (result.getValidFrom() == null) {
+				return true;
+			} else {
+				LocalDate validFrom =
+						result
+								.getValidFrom()
+								.toInstant()
+								.atZone(ZoneId.systemDefault())
+								.toLocalDate();
+				return LocalDate.now().isAfter(validFrom);
+			}
+		}
+		return false;
+	}
 }

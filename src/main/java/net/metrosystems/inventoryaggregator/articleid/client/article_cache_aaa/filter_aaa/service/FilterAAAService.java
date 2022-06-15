@@ -7,6 +7,7 @@ import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.f
 import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,8 @@ public class FilterAAAService {
 
     public SubFilterKey addSubFilterKey(KeysWithTypes key, String value, String languageCode) {
         SubFilterKey subFilterKey = new SubFilterKey();
-        subFilterKey.setLanguage(languageCode.toLowerCase());
+        if(StringUtils.isEmpty(languageCode))
+            subFilterKey.setLanguage(languageCode.toLowerCase());
         subFilterKey.setKey(key.getCode());
         subFilterKey.setType(key.getType());
         subFilterKey.setQuery(value);
@@ -82,5 +84,20 @@ public class FilterAAAService {
                 transformDocumentListInArticleIdList(
                         documentsService.
                                 getDocumentsBySubsysArticleNumber(countryCode, salesLine, languageCode, subsysArticleNumber), storeNo);
+    }
+
+    public FilterKey initializeFilterKey(String countryCode, String salesLine) {
+        FilterKey filterKey = new FilterKey();
+        filterKey.setSubFilterKeys(new ArrayList<>());
+        filterKey.setCountry(countryCode.toLowerCase());
+        filterKey.setSalesLine(salesLine.toLowerCase());
+        return filterKey;
+    }
+
+    public FilterKey initializeFilterKey(String countryCode) {
+        FilterKey filterKey = new FilterKey();
+        filterKey.setSubFilterKeys(new ArrayList<>());
+        filterKey.setCountry(countryCode.toLowerCase());
+        return filterKey;
     }
 }

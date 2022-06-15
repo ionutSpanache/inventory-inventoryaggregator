@@ -64,9 +64,4 @@ public class ArticleMasterDataController {
 				countryCode, salesLine, languageCode, storeNo));
 	}
 
-	@ExceptionHandler(ArticleNotFoundException.class)
-	public final ResponseEntity<String> handleUserNotFoundException(ArticleNotFoundException ex, WebRequest request) {
-		return ResponseEntity.noContent().build();
-	}
-
 }

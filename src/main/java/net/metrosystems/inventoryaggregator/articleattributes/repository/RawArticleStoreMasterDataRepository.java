@@ -64,11 +64,18 @@ public class RawArticleStoreMasterDataRepository {
     List<ArticleStoreMasterData> articleStoreMasterDataList =
         aclArticleStoreMasterDataService.getArticleStoreMasterDataByArtVarBundle(
             countryCode, salesLine, storeNo, articleIdList);
-    if (CollectionUtils.isEmpty(articleStoreMasterDataList))
-      return CompletableFuture.completedFuture(Collections.emptyMap());
+    if (CollectionUtils.isEmpty(articleStoreMasterDataList)) {
+        return CompletableFuture.completedFuture(Collections.emptyMap());
+    }
 
     return CompletableFuture.completedFuture(
         articleStoreMasterDataList.stream()
+            .filter(
+                articleStoreMasterData ->
+                    articleStoreMasterData != null
+                        && articleStoreMasterData.getArticleNumber() != null
+                        && articleStoreMasterData.getVariantNumber() != null
+                        && articleStoreMasterData.getBundleNumber() != null)
             .collect(
                 Collectors.toMap(
                     key ->
