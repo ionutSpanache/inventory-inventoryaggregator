@@ -4,13 +4,13 @@
     <servers>
         <server>
             <id>msys.artifactory.central</id>
-            <username>svcci@metrosystems.net</username>
-            <password>metro2017.12345</password>
+            <username>${ARTIFACTORY_USERNAME_REF}</username>
+            <password>${ARTIFACTORY_PASSWORD_REF}</password>
         </server>
         <server>
             <id>msys.artifactory.snapshots</id>
-            <username>svcci@metrosystems.net</username>
-            <password>metro2017.12345</password>
+            <username>${ARTIFACTORY_USERNAME_REF}</username>
+            <password>${ARTIFACTORY_PASSWORD_REF}</password>
         </server>
     </servers>
 	<profiles>
