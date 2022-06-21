@@ -10,6 +10,7 @@ public class Domain implements Serializable {
     private Long articleNumber;
     private Long variantNumber;
     private Long bundleNumber;
+    private Long storeSubsystemArticleNumber;
 
     public Long getArticleNumber() {
         return articleNumber;
@@ -36,5 +37,14 @@ public class Domain implements Serializable {
     @XmlElement("bundleNumber")
     public void setBundleNumber(Long bundleNumber) {
         this.bundleNumber = bundleNumber;
+    }
+
+    public Long getStoreSubsystemArticleNumber() {
+        return storeSubsystemArticleNumber;
+    }
+
+    @XmlElement("bundleNumber")
+    public void setStoreSubsystemArticleNumber(Long storeSubsystemArticleNumber) {
+        this.storeSubsystemArticleNumber = storeSubsystemArticleNumber;
     }
 }
