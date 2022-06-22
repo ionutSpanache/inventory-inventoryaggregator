@@ -1,7 +1,7 @@
 package net.metrosystems.inventoryaggregator.articleid.client;
 
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.service.FilterAAAService;
-import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
 package net.metrosystems.inventoryaggregator.common.promotions.acl.service;
 
-import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.common.promotions.acl.client.PromotionsAclClient;

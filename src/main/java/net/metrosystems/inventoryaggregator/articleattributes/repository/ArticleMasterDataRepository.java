@@ -217,39 +217,6 @@ public class ArticleMasterDataRepository {
     return articleCacheService.getIduItemDerivedStandards(countryCode, articleId);
   }
 
-  public List<IduItemDerivedStandard> getIduItemDerivedStandardsBySubsytemArticleNumbers(
-      String countryCode, String salesline, List<Long> subsystemArticleNumbers)
-      throws ExecutionException, InterruptedException {
-
-    Documents documents =
-        documentsService.getIduItemDerivedUrlForMultipleSubsytemArticleNumbers(
-            countryCode, salesline, subsystemArticleNumbers);
-
-    if (documents == null || CollectionUtils.isEmpty(documents.getArticleKeys()))
-      return Collections.emptyList();
-    List<IduItemDerivedStandard> iduItemDerivedStandardList = new ArrayList<>();
-
-    forkJoinPoolCustom
-        .submit(
-            () ->
-                documents.getArticleKeys().parallelStream()
-                    .forEach(
-                        documentUrl -> {
-                          try {
-                            iduItemDerivedStandardList.add(
-                                articleCacheService.getIduItemDerivedStandard(documentUrl));
-                          } catch (Exception e) {
-                            log.error(
-                                "ArticleMasterDataRepository.getIduItemDerivedStandards error: {}",
-                                e.getMessage(),
-                                e);
-                          }
-                        }))
-        .get();
-
-    return iduItemDerivedStandardList;
-  }
-
   private Optional<String> getDeliveryFlag(
       String countryCode, ArticleId articleId, Integer storeNumber) {
 
