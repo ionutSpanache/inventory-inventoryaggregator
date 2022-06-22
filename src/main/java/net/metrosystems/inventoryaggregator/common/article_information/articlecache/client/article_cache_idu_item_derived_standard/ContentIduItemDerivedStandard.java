@@ -20,6 +20,8 @@ public class ContentIduItemDerivedStandard implements Serializable {
 
     private AssortmentClusterSpecificationV2 assortmentClusterSpecificationV2;
 
+    private Boolean isTradeItemAVariableUnit;
+
     public List<MerchandiseArticleDescription> getMerchandiseArticleDescription() {
         return merchandiseArticleDescription;
     }
@@ -66,4 +68,17 @@ public class ContentIduItemDerivedStandard implements Serializable {
     public void setAssortmentClusterSpecificationV2(AssortmentClusterSpecificationV2 assortmentClusterSpecificationV2) {
         this.assortmentClusterSpecificationV2 = assortmentClusterSpecificationV2;
     }
+
+    @XmlElement("isTradeItemAVariableUnit")
+    public void setIsTradeItemAVariableUnit(Boolean isTradeItemAVariableUnit){
+        this.isTradeItemAVariableUnit = isTradeItemAVariableUnit;
+    }
+
+    public double getWeightArticle(){
+        if(Boolean.TRUE.equals(isTradeItemAVariableUnit)){
+            return 1;
+        }
+        return 0;
+    }
+
 }

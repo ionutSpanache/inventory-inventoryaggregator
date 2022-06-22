@@ -9,6 +9,7 @@ public enum KeysWithTypes {
     articleNumber("articleNumber", "string"),
     variantNumber("variantNumber", "string"),
     bundleNumber("bundleNumber", "string"),
+    storeSubsystemArticleNumber("storeSubsystemArticleNumber", "string"),
     company("company", "string");
     private final String code;
     private final String type;
