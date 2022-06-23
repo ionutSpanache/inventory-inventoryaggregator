@@ -2,8 +2,8 @@ package net.metrosystems.inventoryaggregator.articleid.service;
 
 
 import lombok.extern.slf4j.Slf4j;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.ArticleIdClient;
-import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

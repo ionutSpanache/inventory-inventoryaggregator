@@ -1,7 +1,7 @@
 package net.metrosystems.inventoryaggregator.common.promotions.acl.client;
 
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

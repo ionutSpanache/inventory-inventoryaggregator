@@ -80,18 +80,18 @@ public class ArticleMasterDataController {
   @AddTimer
   @AddLogs
   @PostMapping(
-      value = "/articlemasterdata/subsystemArticleNumbers",
+      value = "/articlemasterdata/countryCode/{countryCode}/salesLine/{salesLine}/storeNumber/{storeNumber}/articleIds/languageCode/{languageCode}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getArticleMasterDataListByArtVarBundle(
       @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
       @PathVariable("languageCode") String languageCode,
-      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-      @RequestBody List<Long> subsystemArticleNumbers)
+      @TagField(name = "storeNumber") @PathVariable("storeNumber") Integer storeNo,
+      @RequestBody List<ArticleId> articleIds)
       throws Exception {
     return ResponseEntity.ok(
         articleDetailsService.getArticleMasterDataListBySubsystemArticleNumbers(
-            subsystemArticleNumbers, countryCode, salesLine, languageCode, storeNo));
+            articleIds, countryCode, salesLine, languageCode, storeNo));
   }
 }

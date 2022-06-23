@@ -6,11 +6,11 @@ import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client.FilterAAAClient;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.*;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.service.FilterAAAService;
-import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,43 +167,6 @@ public class DocumentsService {
         filterIduItemDerivedStandard);
   }
 
-  public Documents getIduItemDerivedUrlByStoreSubsystemArticleNumber(
-      String countryCode, String company, String storeSubsystemArticleNumber) {
-
-    SubFilterKey storeSubsystemArticleNumberKey =
-        SubFilterKey.builder()
-            .key(KeysWithTypes.storeSubsystemArticleNumber.getCode())
-            .type(KeysWithTypes.storeSubsystemArticleNumber.getType())
-            .query(String.valueOf(storeSubsystemArticleNumber))
-            .build();
-
-    List<SubFilterKey> subFilterKeys;
-    if (company != null) {
-      SubFilterKey companySubFilterKey =
-          SubFilterKey.builder()
-              .key(KeysWithTypes.company.getCode())
-              .type(KeysWithTypes.company.getType())
-              .query(company)
-              .build();
-      subFilterKeys = List.of(storeSubsystemArticleNumberKey, companySubFilterKey);
-    } else {
-      subFilterKeys = List.of(storeSubsystemArticleNumberKey);
-    }
-
-    FilterKeyIduItemDerivedStandard filterKeyIduItemDerivedStandard =
-        FilterKeyIduItemDerivedStandard.builder()
-            .subFilterKeys(subFilterKeys)
-            .country(countryCode)
-            .build();
-
-    FilterIduItemDerivedStandard filterIduItemDerivedStandard =
-        FilterIduItemDerivedStandard.builder()
-            .filterKeys(List.of(filterKeyIduItemDerivedStandard))
-            .build();
-
-    return filterAAAClient.getFilteredDocumentsForIduItemDerivedStandard(
-        filterIduItemDerivedStandard);
-  }
 
   public Documents getIsuItemStoreMerchandiseByArtVarBundle(
       String countryCode,
@@ -495,48 +458,6 @@ public class DocumentsService {
                         .key(KeysWithTypes.company.getCode())
                         .type(KeysWithTypes.company.getType())
                         .query(company)
-                        .build());
-              }
-              filterKeyIduItemDerivedStandardList.add(
-                  FilterKeyIduItemDerivedStandard.builder()
-                      .subFilterKeys(subFilterKeys)
-                      .country(countryCode)
-                      .build());
-            });
-
-    FilterIduItemDerivedStandard filterIduItemDerivedStandard =
-        FilterIduItemDerivedStandard.builder()
-            .filterKeys(filterKeyIduItemDerivedStandardList)
-            .build();
-
-    return filterAAAClient.getFilteredDocumentsForIduItemDerivedStandard(
-        filterIduItemDerivedStandard);
-  }
-
-  public Documents getIduItemDerivedUrlForMultipleSubsytemArticleNumbers(
-      String countryCode, String salesline, List<Long> subsystemArticleNumbers) {
-
-    if (CollectionUtils.isEmpty(subsystemArticleNumbers)) {
-      return null;
-    }
-    List<FilterKeyIduItemDerivedStandard> filterKeyIduItemDerivedStandardList = new ArrayList<>();
-    subsystemArticleNumbers.stream()
-        .forEach(
-            subsystemArticleNumber -> {
-              List<SubFilterKey> subFilterKeys = new ArrayList<>();
-              subFilterKeys.add(
-                  SubFilterKey.builder()
-                      .key(KeysWithTypes.storeSubsystemArticleNumber.getCode())
-                      .type(KeysWithTypes.storeSubsystemArticleNumber.getType())
-                      .query(String.valueOf(subsystemArticleNumber))
-                      .build());
-
-              if (salesline != null) {
-                subFilterKeys.add(
-                    SubFilterKey.builder()
-                        .key(KeysWithTypes.company.getCode())
-                        .type(KeysWithTypes.company.getType())
-                        .query(salesline)
                         .build());
               }
               filterKeyIduItemDerivedStandardList.add(

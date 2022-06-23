@@ -592,26 +592,23 @@ public class ArticleDetailsService {
   }
 
   public List<RawArticleData> getArticleMasterDataListBySubsystemArticleNumbers(
-      List<Long> subsystemArticleNumbers,
+      List<ArticleId> articleIds,
       String countryCode,
       String salesLine,
       String languageCode,
       Integer storeNo)
       throws Exception {
-    List<IduItemDerivedStandard> iduItemDerivedStandardsBySubsytemArticleNumbers =
-        articleMasterDataRepository.getIduItemDerivedStandardsBySubsytemArticleNumbers(
-            countryCode, salesLine, subsystemArticleNumbers);
 
-    List<RawArticleData> rawArticleDataList = new ArrayList<>();
-    iduItemDerivedStandardsBySubsytemArticleNumbers.parallelStream()
-        .forEach(
-            iduItemDerivedStandard -> {
-              ArticleId articleId =
-                  ArticleId.builder()
-                      .articleNumber(iduItemDerivedStandard.getDomain().getArticleNumber())
-                      .variantNumber(iduItemDerivedStandard.getDomain().getVariantNumber())
-                      .bundleNumber(iduItemDerivedStandard.getDomain().getBundleNumber())
-                      .build();
+        articleMasterDataRepository.getIduItemDerivedStandards(articleIds, countryCode);
+
+    Map<ArticleId, List<IduItemDerivedStandard>> iduItemDerivedStandardList = articleMasterDataRepository.getIduItemDerivedStandards(
+        articleIds, countryCode).get();
+
+
+    return iduItemDerivedStandardList.keySet().parallelStream()
+        .map(
+            articleId -> {
+              IduItemDerivedStandard iduItemDerivedStandard = iduItemDerivedStandardList.get(articleId).get(0);
               String lang = languageCode.toLowerCase();
               ArticleMasterData articleMasterData =
                   getArticleMasterDataFromIduDerived(iduItemDerivedStandard, lang);
@@ -620,10 +617,8 @@ public class ArticleDetailsService {
                       .articleId(articleId)
                       .articleMasterData(articleMasterData)
                       .build();
-              rawArticleDataList.add(rawArticleData);
-            });
-
-    return rawArticleDataList;
+              return rawArticleData;
+            }).collect(Collectors.toList());
   }
 
   private ArticleMasterData getArticleMasterDataFromIduDerived(

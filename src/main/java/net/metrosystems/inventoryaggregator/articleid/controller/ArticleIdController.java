@@ -1,9 +1,8 @@
 package net.metrosystems.inventoryaggregator.articleid.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleid.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.service.ArticleIdService;
-import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.metrics.annotation.Timed;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
