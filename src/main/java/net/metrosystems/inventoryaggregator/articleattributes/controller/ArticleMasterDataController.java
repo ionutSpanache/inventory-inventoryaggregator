@@ -80,7 +80,7 @@ public class ArticleMasterDataController {
   @AddTimer
   @AddLogs
   @PostMapping(
-      value = "/articlemasterdata/articleIds/languageCode/{languageCode}",
+      value = "/articlemasterdata/articleIds",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getArticleMasterDataListByArtVarBundle(
