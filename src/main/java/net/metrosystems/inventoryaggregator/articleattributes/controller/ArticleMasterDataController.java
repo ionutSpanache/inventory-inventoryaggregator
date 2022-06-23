@@ -87,7 +87,7 @@ public class ArticleMasterDataController {
       @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
       @PathVariable("languageCode") String languageCode,
-      @TagField(name = "storeNumber") @PathVariable("storeNumber") Integer storeNo,
+      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
       @RequestBody List<ArticleId> articleIds)
       throws Exception {
     return ResponseEntity.ok(
