@@ -24,10 +24,7 @@ ADD  /target/inventoryaggregator.jar /app.jar
 
 CMD [ "sh", "-c", "java \
 -jar \
--XX:+UnlockExperimentalVMOptions \
--XX:+UseShenandoahGC \
--XX:ShenandoahGCHeuristics=compact \
--XX:ConcGCThreads=40 \
+-XX:+UseG1GC \
 -XX:+UseStringDeduplication \
 -XX:MinRAMPercentage=50.0 \
 -XX:MaxRAMPercentage=80.0 \
