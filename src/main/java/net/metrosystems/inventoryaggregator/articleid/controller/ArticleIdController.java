@@ -2,6 +2,7 @@ package net.metrosystems.inventoryaggregator.articleid.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleid.service.ArticleIdService;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
@@ -14,6 +15,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @Timed("ArticleId")
@@ -23,9 +27,12 @@ public class ArticleIdController {
 
     private final ArticleIdService articleIdService;
 
+    private final ArticleMasterDataRepository articleMasterDataRepository;
+
     @Autowired
-    public ArticleIdController(ArticleIdService articleIdService) {
+    public ArticleIdController(ArticleIdService articleIdService, ArticleMasterDataRepository articleMasterDataRepository) {
         this.articleIdService = articleIdService;
+        this.articleMasterDataRepository = articleMasterDataRepository;
     }
 
     @AddTimer
@@ -127,5 +134,27 @@ public class ArticleIdController {
     }
     return ResponseEntity.ok(activeStoresList);
   }
+
+    @AddTimer
+    @AddLogs
+    @PostMapping(
+            value =
+                    "/countries/{countryCode}/salesline/{salesLine}/languages/{languageCode}/storeNumber/{storeNumber}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Set<ArticleId>> getActiveArticlesForStore(
+            @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+            @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
+            @TagField(name = "languageCode") @PathVariable("languageCode") String languageCode,
+            @TagField(name = "storeNumber") @PathVariable("storeNumber") Integer storeNumber,
+            @RequestBody List<ArticleId> articleIdList) throws Exception {
+
+        Set<ArticleId> activeArticles =
+                articleMasterDataRepository.getArticleMasterDataForArticleIdList(
+                                articleIdList, countryCode, salesLine, languageCode, storeNumber)
+                        .get()
+                        .keySet();
+
+        return ResponseEntity.ok(activeArticles);
+    }
 
 }
