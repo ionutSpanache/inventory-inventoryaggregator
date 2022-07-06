@@ -15,8 +15,6 @@ on:
         required: true
 env:
   SOPS_VERSION: 3.6.1
-  ARTIFACTORY_PASSWORD_REF: ${{ secrets.ARTIFACTORY_PASSWORD }}
-  ARTIFACTORY_USERNAME_REF: ${{ secrets.ARTIFACTORY_USERNAME }}
   release: ${{ github.event.inputs.release }}
   stage: ${{ github.event.inputs.stage }}
   datacenter: ${{ github.event.inputs.datacenter }}
