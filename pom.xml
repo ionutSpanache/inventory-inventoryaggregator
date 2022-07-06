@@ -294,4 +294,21 @@
 		</profile>
 	</profiles>
 
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>msys.artifactory.central</id>
+			<name>libs-release</name>
+			<url>https://artifactory.metrosystems.net/artifactory/libs-release</url>
+		</repository>
+		<repository>
+			<snapshots/>
+			<id>msys.artifactory.snapshots</id>
+			<name>libs-snapshot</name>
+			<url>https://artifactory.metrosystems.net/artifactory/libs-snapshot</url>
+		</repository>
+	</repositories>
+
 </project>
