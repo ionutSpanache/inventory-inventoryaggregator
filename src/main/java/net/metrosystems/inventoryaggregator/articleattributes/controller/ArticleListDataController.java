@@ -2,6 +2,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.controller;
 
 import java.util.List;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -39,11 +41,12 @@ public class ArticleListDataController {
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
       @PathVariable("languageCode") String languageCode,
       @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
+      @RequestParam("dataType") Optional<List<String>> dataTypeList,
       @RequestBody List<ArticleId> articleIdList)
       throws Exception {
       return ResponseEntity.ok(
           articleListDetailsService.getArticleDataListByArticleVariantBundle(
-              articleIdList, countryCode, salesLine, languageCode, storeNo));
+              articleIdList, countryCode, salesLine, languageCode, storeNo,dataTypeList));
   }
 
   @AddTimer

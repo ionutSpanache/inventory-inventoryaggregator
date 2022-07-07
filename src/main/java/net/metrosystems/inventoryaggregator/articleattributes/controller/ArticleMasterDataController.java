@@ -80,7 +80,6 @@ public class ArticleMasterDataController {
   @AddTimer
   @AddLogs
   @PostMapping(
-      value = "/articlemasterdata/articleids",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getArticleMasterDataListByArtVarBundle(
@@ -91,7 +90,7 @@ public class ArticleMasterDataController {
       @RequestBody List<ArticleId> articleIds)
       throws Exception {
     return ResponseEntity.ok(
-        articleDetailsService.getArticleMasterDataListBySubsystemArticleNumbers(
+        articleDetailsService.getArticleMasterDataListByArticleIds(
             articleIds, countryCode, salesLine, languageCode, storeNo));
   }
 }
