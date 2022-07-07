@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: inventory-inventoryaggregator
 spec:
-  replicas: 2
+  replicas: 3
   template:
     spec:
       containers:
