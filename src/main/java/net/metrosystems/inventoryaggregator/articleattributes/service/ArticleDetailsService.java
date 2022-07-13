@@ -591,7 +591,7 @@ public class ArticleDetailsService {
     return rawArticleMasterData;
   }
 
-  public List<RawArticleData> getArticleMasterDataListBySubsystemArticleNumbers(
+  public List<RawArticleData> getArticleMasterDataListByArticleIds(
       List<ArticleId> articleIds,
       String countryCode,
       String salesLine,
@@ -599,7 +599,6 @@ public class ArticleDetailsService {
       Integer storeNo)
       throws Exception {
 
-        articleMasterDataRepository.getIduItemDerivedStandards(articleIds, countryCode);
 
     Map<ArticleId, List<IduItemDerivedStandard>> iduItemDerivedStandardList = articleMasterDataRepository.getIduItemDerivedStandards(
         articleIds, countryCode).get();
