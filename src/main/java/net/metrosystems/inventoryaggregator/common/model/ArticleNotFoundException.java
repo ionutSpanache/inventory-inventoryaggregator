@@ -11,6 +11,6 @@ public class ArticleNotFoundException extends ApiErrorAwareRuntimeException {
 
 	@Override
 	public HttpStatus getHttpStatus() {
-		return HttpStatus.NO_CONTENT;
+		return HttpStatus.BAD_REQUEST;
 	}
 }
