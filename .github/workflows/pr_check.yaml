@@ -1,9 +1,8 @@
 name: PR Check
 
 on:
-  push:
-    branches-ignore:
-      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   build-sonar-testing:
@@ -34,15 +33,8 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: Cache Maven packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
       - name: Build and analyze
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=inventory-inventoryaggregator
+          SONAR_TOKEN: ${{ secrets.sonar_token }}
+          SONAR_HOST_URL: https://sonarqube.metrosystems.net
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=${{ github.event.repository.name }} -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }} -Dsonar.pullrequest.key=${{ github.event.number }} -Dsonar.pullrequest.branch=${{ github.event.pull_request.head.ref }}
