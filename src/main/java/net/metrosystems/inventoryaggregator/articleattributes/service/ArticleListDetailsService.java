@@ -1,24 +1,9 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.DataType;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawIsTradeItemExcludedFromDiscounts;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
@@ -33,7 +18,13 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -387,5 +378,17 @@ public class ArticleListDetailsService {
           productLifeCycleMap.getOrDefault(
               rawArticleData.getArticleId(), new ProductLifeCycleData()));
     }
+  }
+
+  @SneakyThrows
+  public List<PromotionArticleDataForArticleId> getFuturePromotionsForArticleIds(
+      List<ArticleId> articleIds, StoreId storeId) {
+    if (articleIds == null || articleIds.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return articleMasterDataRepository
+            .getPromotionDataArticlesForArticleIds(
+                articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
+            .get();
   }
 }

@@ -7,47 +7,68 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "DataGroup")
 public class PromotionArticleDataGroup {
 
-    private String id;
-    private Double promotionNetSalesPricePerBundle;
+  private String id;
+  private Double promotionNetSalesPricePerBundle;
 
-    public String getPromotionActiveEndDate() {
-        return promotionActiveEndDate;
-    }
+  public String getPromotionActiveEndDate() {
+    return promotionActiveEndDate;
+  }
 
-    @XmlElement(name = "PROMOTION_END")
-    public void setPromotionActiveEndDate(String promotionActiveEndDate) {
-        this.promotionActiveEndDate = promotionActiveEndDate;
-    }
+  @XmlElement(name = "PROMOTION_END")
+  public void setPromotionActiveEndDate(String promotionActiveEndDate) {
+    this.promotionActiveEndDate = promotionActiveEndDate;
+  }
 
-    private String promotionActiveEndDate;
+  private String promotionActiveEndDate;
 
-    public String getPromotionId() {
-        return promotionId;
-    }
+  public String getPromotionId() {
+    return promotionId;
+  }
 
-    @XmlElement(name = "PROMOTION_ID")
-    public void setPromotionId(String promotionId) {
-        this.promotionId = promotionId;
-    }
+  @XmlElement(name = "PROMOTION_ID")
+  public void setPromotionId(String promotionId) {
+    this.promotionId = promotionId;
+  }
 
-    private String promotionId;
+  private String promotionId;
 
-    public Double getPromotionNetSalesPricePerBundle() {
-        return promotionNetSalesPricePerBundle;
-    }
+  public Double getPromotionNetSalesPricePerBundle() {
+    return promotionNetSalesPricePerBundle;
+  }
 
-    @XmlElement(name = "PROMOTION_NET_SALES_PRICE_PER_BUNDLE")
-    public void setPromotionNetSalesPricePerBundle(Double promotionNetSalesPricePerBundle) {
-        this.promotionNetSalesPricePerBundle = promotionNetSalesPricePerBundle;
-    }
+  @XmlElement(name = "PROMOTION_NET_SALES_PRICE_PER_BUNDLE")
+  public void setPromotionNetSalesPricePerBundle(Double promotionNetSalesPricePerBundle) {
+    this.promotionNetSalesPricePerBundle = promotionNetSalesPricePerBundle;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    @XmlAttribute(name = "id")
-    public void setId(String id) {
-        this.id = id;
-    }
+  @XmlAttribute(name = "id")
+  public void setId(String id) {
+    this.id = id;
+  }
 
+  private Double promotionNetSalesPricePerPiece;
+
+  public Double getPromotionNetSalesPricePerPiece() {
+    return promotionNetSalesPricePerPiece;
+  }
+
+  @XmlElement(name = "PROMOTION_NET_SALES_PRICE_PER_PIECE")
+  public void setPromotionNetSalesPricePerPiece(Double promotionNetSalesPricePerPiece) {
+    this.promotionNetSalesPricePerPiece = promotionNetSalesPricePerPiece;
+  }
+
+  private String promotionActiveStartDate;
+
+  public String getPromotionActiveStartDate() {
+    return promotionActiveStartDate;
+  }
+
+  @XmlElement(name = "PROMOTION_START")
+  public void setPromotionActiveStartDate(String promotionActiveStartDate) {
+    this.promotionActiveStartDate = promotionActiveStartDate;
+  }
 }

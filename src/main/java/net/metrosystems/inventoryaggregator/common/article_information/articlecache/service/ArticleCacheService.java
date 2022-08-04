@@ -1,14 +1,5 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
@@ -38,6 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -242,7 +239,7 @@ public class ArticleCacheService {
     return mapToProductLifeCycleData(documentWithProductLifecycle.get());
   }
 
-	public PromotionArticleData getPromotionArticleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
+	public List<PromotionArticleData> getPromotionArticleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
 														Integer storeId) {
 
 		String documentUrl = "documents/" + countryCode.toLowerCase() + "/promotion-article" +
@@ -250,42 +247,48 @@ public class ArticleCacheService {
 				+ "&environment=" + getEnvironment(countryCode) + "&mmsartno=" + articleId.getArticleNumber()
 				+ "&storeno=" + storeId + "&variantno=" + articleId.getVariantNumber();
 
-		PromotionArticleData promotionArticleData = PromotionArticleData.builder().build();
+    List<PromotionArticleData> promotionArticleData = new ArrayList<>();
 
-		try {
-		   promotionArticleData = mapToPromotionArticleData(
-					articleCacheClient.getPromotionArticle(documentUrl));
-		}catch (Exception ex) {
-			log.debug("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl);
-		}
+    try {
+      promotionArticleData =
+          mapToPromotionArticleData(articleCacheClient.getPromotionArticle(documentUrl));
+    } catch (Exception ex) {
+      log.error("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl, ex);
+    }
 
-		return  promotionArticleData;
-	}
+    return promotionArticleData;
+  }
 
-	private PromotionArticleData mapToPromotionArticleData(PromotionArticle promotionArticle) {
+  private List<PromotionArticleData> mapToPromotionArticleData(PromotionArticle promotionArticle) {
 
-		Optional<PromotionArticleDataGroup> data = promotionArticle.getPromotionArticleTransaction().getPromotionArticleIncident()
-				.getPromotionArticleDataGroups().stream().filter(promotionArticleDataGroup ->
-						promotionArticleDataGroup.getId().equalsIgnoreCase("110"))
-				.findFirst();
+    List<PromotionArticleDataGroup> data =
+        promotionArticle
+            .getPromotionArticleTransaction()
+            .getPromotionArticleIncident()
+            .getPromotionArticleDataGroups()
+            .stream()
+            .filter(
+                promotionArticleDataGroup ->
+                    promotionArticleDataGroup.getId().equalsIgnoreCase("110"))
+            .collect(Collectors.toList());
 
-		PromotionArticleData promotionArticleData = PromotionArticleData.builder().build();
+    List<PromotionArticleData> promotions = new ArrayList<>();
 
-		if (data.isPresent()) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-			if (data.get().getPromotionActiveEndDate() != null
-					&& (LocalDate.now().compareTo(LocalDate.now().parse(data.get().getPromotionActiveEndDate(), formatter))) <=0) {
-
-				promotionArticleData.setIsActive(true);
-				promotionArticleData.setPromotionId(data.get().getPromotionId());
-				promotionArticleData.setPromotionNetSalesPricePerBundle(data.get().getPromotionNetSalesPricePerBundle());
-			}
-		}
-
-		return promotionArticleData;
-
-	}
+    if (!data.isEmpty()) {
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+      data.forEach(
+          t ->
+              promotions.add(
+                  PromotionArticleData.builder()
+                      .promotionId(t.getPromotionId())
+                      .promotionNetSalesPricePerBundle(t.getPromotionNetSalesPricePerBundle())
+                      .promotionNetSalesPricePerPiece(t.getPromotionNetSalesPricePerPiece())
+                      .promotionStart(LocalDate.parse(t.getPromotionActiveStartDate(), formatter))
+                      .promotionEnd(LocalDate.parse(t.getPromotionActiveEndDate(), formatter))
+                      .build()));
+    }
+    return promotions;
+  }
 
 	public Optional<String> getChannelDeliveryFlag(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
 												   Integer storeNumber) {

@@ -1,6 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
-import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.*;
@@ -18,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
@@ -73,16 +73,13 @@ public class ArticleMasterDataRepository {
     return CompletableFuture.completedFuture(iduItemDerivedStandards);
   }
 
-  @Async("asyncExecutor")
-  public CompletableFuture<PromotionArticleData> getPromotionArticleData(
-      String countryCode, Integer storeId, ArticleId articleId) {
-    PromotionArticleData promotionArticleData =
-        getPromotionArticle(countryCode, storeId, articleId);
+//  @Async("asyncExecutor")
+//  public CompletableFuture<PromotionArticleData> getPromotionArticleData(
+//      String countryCode, Integer storeId, ArticleId articleId) {
+//    return CompletableFuture.completedFuture(getPromotionArticle(countryCode, storeId, articleId));
+//  }
 
-    return CompletableFuture.completedFuture(promotionArticleData);
-  }
-
-  private PromotionArticleData getPromotionArticle(
+  private List<PromotionArticleData> getPromotionArticle(
       String countryCode, Integer storeId, ArticleId articleId) {
 
     return articleCacheService.getPromotionArticleData(countryCode, articleId, storeId);
@@ -91,7 +88,8 @@ public class ArticleMasterDataRepository {
   @Async("asyncExecutor")
   public CompletableFuture<List<PromotionArticleDataForArticleId>>
       getPromotionDataArticlesForArticleIds(
-          List<ArticleId> articleIdList, String countryCode, Integer storeId) throws Exception {
+          List<ArticleId> articleIdList, String countryCode, Integer storeId)
+          throws ExecutionException, InterruptedException {
     List<PromotionArticleDataForArticleId> promotionArticleDataList =
         forkJoinPoolCustom
             .submit(
@@ -99,17 +97,9 @@ public class ArticleMasterDataRepository {
                     articleIdList.parallelStream()
                         .map(
                             articleId -> {
-                              PromotionArticleData promotionArticleData;
-                              try {
-                                promotionArticleData =
-                                    getPromotionArticle(countryCode, storeId, articleId);
-                              } catch (Exception e) {
-                                log.error(
-                                    "ArticleMasterDataRepository.getArticleMasterDataForArticleIdList error: {}",
-                                    e.getMessage(),
-                                    e);
-                                return null;
-                              }
+                              List<PromotionArticleData> promotionArticleData;
+                              promotionArticleData =
+                                  getPromotionArticle(countryCode, storeId, articleId);
                               return PromotionArticleDataForArticleId.builder()
                                   .articleId(articleId)
                                   .promotionArticleData(promotionArticleData)

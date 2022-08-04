@@ -2,39 +2,12 @@ name: PR Check
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   build-sonar-testing:
-    name: Maven build and SonarQube testing
-    runs-on: [self-hosted, Linux, metro-network]
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: 11
-          distribution: "adopt"
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.3
-        with:
-          maven-version: 3.8.2
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-      - name: Cache SonarQube packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Build and analyze
-        env:
-          SONAR_TOKEN: ${{ secrets.sonar_token }}
-          SONAR_HOST_URL: https://sonarqube.metrosystems.net
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=${{ github.event.repository.name }} -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }} -Dsonar.pullrequest.key=${{ github.event.number }} -Dsonar.pullrequest.branch=${{ github.event.pull_request.head.ref }}
+    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/PR_Check_reusable.yaml@master
+    with:
+      sonar_projectKey: inventory-inventoryaggregator
+    secrets:
+      sonar_token: ${{ secrets.SONAR_TOKEN }}
