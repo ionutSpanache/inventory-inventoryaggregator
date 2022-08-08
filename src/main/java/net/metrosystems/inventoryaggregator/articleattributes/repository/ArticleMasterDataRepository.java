@@ -279,7 +279,8 @@ public class ArticleMasterDataRepository {
           .setPackageFactor(articleCacheFullData.getPackageFactor())
           .setAlcoholClass(articleCacheFullData.getAlcoholClass())
           .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator())
-          .setCoreAssortmentIndicator(articleCacheFullData.getCoreAssortmentIndicator());
+          .setCoreAssortmentIndicator(articleCacheFullData.getCoreAssortmentIndicator())
+          .setAssignedStoreSupplierType(articleCacheFullData.getAssignedStoreSupplierType());
     }
     return null;
   }
