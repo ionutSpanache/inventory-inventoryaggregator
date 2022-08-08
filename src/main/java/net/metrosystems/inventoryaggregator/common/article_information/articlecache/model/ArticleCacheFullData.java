@@ -54,4 +54,5 @@ public class ArticleCacheFullData {
     private String alcoholClass;
     private Long traceabilityIndicator;
     private Integer coreAssortmentIndicator;
+    private String assignedStoreSupplierType;
 }

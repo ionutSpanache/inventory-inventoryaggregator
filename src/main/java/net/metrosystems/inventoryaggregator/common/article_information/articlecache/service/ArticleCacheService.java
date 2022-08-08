@@ -499,7 +499,8 @@ public class ArticleCacheService {
         articleCacheReaderDigest.getTraceabilityIndicator(),
         articleCacheDataGroup320.getCoreAssortmentIndicator() != null
             ? articleCacheDataGroup320.getCoreAssortmentIndicator()
-            : 0);
+            : 0,
+				articleCacheDataGroup320.getAssignedStoreSupplierType());
 	}
 
   private String getPromotionIdAvailable(
