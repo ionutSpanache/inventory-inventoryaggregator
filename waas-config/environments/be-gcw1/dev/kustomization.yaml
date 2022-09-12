@@ -1,9 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: inventory-dev
+namespace: inventory-gke-dev
 resources:
 - ../../../base
-- ingress.yaml
+- service.yaml
 generators:
 - generator.yaml
 configMapGenerator:

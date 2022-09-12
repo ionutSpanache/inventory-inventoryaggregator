@@ -4,6 +4,7 @@ namespace: inventory-prod
 resources:
 - ../../../base
 - ingress.yaml
+- service.yaml
 generators:
 - generator.yaml
 configMapGenerator:

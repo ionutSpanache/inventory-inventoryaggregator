@@ -1,20 +1,6 @@
 #Base build image with maven and DDAgent
-#FROM registry.metroscales.io/inventory/mstore-alpine-jre11:latest
-
-#Base build image with maven and DDAgent
-FROM adoptopenjdk/openjdk15
-
-ENV LANG en_GB.UTF-8
-
-WORKDIR /opt
-
-
-### Download datatog agent library
-RUN apt update
-RUN apt-get install -y wget
-RUN wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer
-
-LABEL maintainer="cristiangabriel.jena@metrosystems.net"
+FROM registry.metroscales.io/inventory/mstore-alpine-jdk11:latest
+LABEL maintainer="andrei.meran@metro-external.digital"
 
 ARG CACHEBUST
 

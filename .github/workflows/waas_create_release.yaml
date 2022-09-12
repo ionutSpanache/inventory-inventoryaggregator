@@ -111,7 +111,7 @@ jobs:
           echo "::error ::WaaS: build: skaffold build and push failed"
           exit 20
         fi
-    deploy-gke-dev:
+  deploy-gke-dev:
     needs: [build]
     environment: gke-dev
     runs-on: [self-hosted, Linux, metro-network]
@@ -177,7 +177,7 @@ jobs:
         --master-authorized-networks $CIDRS_OLD
   deploy-gke-pp:
     needs: [deploy-gke-dev]
-    environment: pp-be-gcw1
+    environment: gke-pp
     runs-on: [self-hosted, Linux, metro-network]
     steps:
     - name: Checkout code
