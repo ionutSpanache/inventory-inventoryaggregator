@@ -1,4 +1,3 @@
-# waas-version: b0fbb0b - 2021-08-05 - 1628149395
 name: Build & Release
 on:
   push:
@@ -10,13 +9,18 @@ on:
       - ".github/waas.yaml"
       - ".github/secret-management.yaml"
 env:
+  SKAFFOLD_BUILD_ARTIFACT: skaffold_build_artifact.json
   SOPS_VERSION: 3.6.1
+  _GKE_LOCATION: europe-west1
+  _GKE_DEV_CLUSTER: inventory-development-qq
+  _GKE_DEV_PROJECT: cf-inventory-development-qq
+  _GKE_PP_CLUSTER: inventory-pp
+  _GKE_PP_PROJECT: cf-inventory-pp-h3
 jobs:
   build:
     runs-on: [self-hosted, Linux, metro-network]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
       with:
         ref: master
     - name: Set up JDK 11
@@ -28,7 +32,18 @@ jobs:
       uses: stCarolas/setup-maven@v4.3
       with:
         maven-version: 3.8.2
+    - name: Check structure updates
+      uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          src:
+            - 'src/**'
+          pom:
+            - 'pom.xml'
+    # run only if files under src or pom.xml were changed
     - name: Cache SonarQube packages
+      if: steps.filter.outputs.src == 'true' || steps.filter.outputs.pom == 'true'
       uses: actions/cache@v1
       with:
           path: ~/.sonar/cache
@@ -39,19 +54,25 @@ jobs:
       with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2      
+          restore-keys: ${{ runner.os }}-m2
+    # run only if files under src or pom.xml were changed
     - name: Build and analyze
+      if: steps.filter.outputs.src == 'true' || steps.filter.outputs.pom == 'true'
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=inventory-inventoryaggregator
-    - name: Setup tools used by WaaS
+    # run only if files under src and pom.xml were not changed
+    - name: Build with Maven without analyze
+      if: steps.filter.outputs.src == 'false' && steps.filter.outputs.pom == 'false'
+      run: mvn --batch-mode --update-snapshots verify
+    - name: Setup tools
       uses: metro-digital/setup-tools-for-waas@v0.x
       with:
         version: 'waas/v1alpha4'
-    - name: Decrypt secrets to get docker login credentials
-      id: decrypt_docker_secrets
+    - name: Decrypt common secrets of all environments
+      id: common_secrets
       uses: metro-digital/sops-decrypt@v0.x
       with:
         version: ${{ env.SOPS_VERSION }}
@@ -60,25 +81,19 @@ jobs:
         output_type: json
     - name: Login to container registry
       run: |
-        set +e
-        set -o pipefail
         username=$(echo $connection_string | cut -d: -f2 | cut -d/ -f3)
         password=$(echo $connection_string | cut -d@ -f1 | cut -d: -f3)
         hostname=$(echo $connection_string | cut -d@ -f2 | cut -d/ -f1)
-        echo "Login to docker registry $hostname"
         echo -n "$password" | docker login "$hostname" -u "$username" --password-stdin
-        if [ $? -ne 0 ]; then
-          echo "::error ::WaaS: build: login to docker registry failed"
-          exit 10
-        fi
       env:
-        connection_string: ${{ fromJson(steps.decrypt_docker_secrets.outputs.data).DRP_PF_DOCKER_1 }}
+        connection_string: ${{ fromJson(steps.common_secrets.outputs.data).DRP_PF_DOCKER_1 }}
     - name: Check if docker image exist in container registry
       id: check_for_existing_docker_image
       run: |
         set +e
         set -o pipefail
         image=$(skaffold --default-repo=registry.metroscales.io/inventory build -q --dry-run | jq -r ".builds[0].tag")
+        echo "::set-output name=image_tag::$image"
         if [ $? -ne 0 ]; then
           echo "::error ::WaaS: build: check for docker image: skaffold build failed"
           exit 15
@@ -96,15 +111,23 @@ jobs:
           echo "::error ::WaaS: build: skaffold build and push failed"
           exit 20
         fi
-  deploy-dev-be-gcw1:
+    deploy-gke-dev:
     needs: [build]
-    environment: dev-be-gcw1
+    environment: gke-dev
     runs-on: [self-hosted, Linux, metro-network]
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
         fetch-depth: 1
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GKE_DEPLOYMENT_SA_DEV }}'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v0'
+    - name: 'Use gcloud CLI'
+      run: 'gcloud info'
     - name: Setup tools used by WaaS
       uses: metro-digital/setup-tools-for-waas@v0.x
       with:
@@ -114,15 +137,18 @@ jobs:
       uses: crazy-max/ghaction-import-gpg@v3
       with:
         gpg-private-key: ${{ secrets.GPG_KEY }}
-    - name: Setup kubectl config for dev-be-gcw1
-      uses: metro-digital/oidc-set-context@v0.x
-      with:
-        oidc_url: ${{ secrets.IDAM_OIDC_URL }}
-        oidc_username: ${{ secrets.PRODUCT_INVENTORY_TU_ID }}
-        oidc_password: ${{ secrets.PRODUCT_INVENTORY_TU_SECRET }}
-        k8s_url: ${{ secrets.K8S_DEV_BE_GCW1_CLUSTER_URL || secrets.K8S_DEV_CLUSTER_URL }}
-        k8s_namespace: 'inventory-dev'
-        k8s_skip_tls_verify: true
+    - name: Update master authorized networks
+      run: |
+        apt install dnsutils -y
+        dig +short myip.opendns.com @resolver1.opendns.com > _EXT-IP
+        gcloud container clusters describe $_GKE_DEV_CLUSTER --project=$_GKE_DEV_PROJECT --zone=europe-west1 | grep cidrBlock: | awk '{gsub("  - cidrBlock: ", "");print}' | tee master-auth-ranges master-auth-ranges-new && echo $(cat _EXT-IP)/32 >> master-auth-ranges-new && tr '\n' ',' < master-auth-ranges-new > master-auth-test && truncate -s -1 master-auth-test && CIDRS=$(cat master-auth-test)
+        gcloud container clusters update $_GKE_DEV_CLUSTER --project=$_GKE_DEV_PROJECT --region=$_GKE_LOCATION \
+        --enable-master-authorized-networks \
+        --master-authorized-networks $CIDRS
+    - uses: azure/setup-kubectl@v3
+      id: install
+    - name: Setup context
+      run: gcloud container clusters get-credentials $_GKE_DEV_CLUSTER --region europe-west1 --project $_GKE_DEV_PROJECT
     - name: Get repository information (to put in K8S deployment)
       uses: octokit/request-action@v2.x
       id: repo_information
@@ -130,7 +156,7 @@ jobs:
         route: GET /repos/${{ github.repository }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Deploy to dev-be-gcw1
+    - name: Deploy to gke-dev
       run: |
         set +e
         set -o pipefail
@@ -142,8 +168,15 @@ jobs:
           echo "::error ::WaaS: deploy: skaffold deploy failed"
           exit 40
         fi
-  deploy-pp-be-gcw1:
-    needs: [deploy-dev-be-gcw1]
+    - name: Revert master authorized networks
+      id: revert_master_auth
+      run: |
+        tr '\n' ',' < master-auth-ranges > master-auth-old && truncate -s -1 master-auth-old && CIDRS_OLD=$(cat master-auth-old)
+        gcloud container clusters update $_GKE_DEV_CLUSTER --project=$_GKE_DEV_PROJECT --region=$_GKE_LOCATION \
+        --enable-master-authorized-networks \
+        --master-authorized-networks $CIDRS_OLD
+  deploy-gke-pp:
+    needs: [deploy-gke-dev]
     environment: pp-be-gcw1
     runs-on: [self-hosted, Linux, metro-network]
     steps:
@@ -151,6 +184,14 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 1
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GKE_DEPLOYMENT_SA_PP }}'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v0'
+    - name: 'Use gcloud CLI'
+      run: 'gcloud info'
     - name: Setup tools used by WaaS
       uses: metro-digital/setup-tools-for-waas@v0.x
       with:
@@ -160,15 +201,18 @@ jobs:
       uses: crazy-max/ghaction-import-gpg@v3
       with:
         gpg-private-key: ${{ secrets.GPG_KEY }}
-    - name: Setup kubectl config for pp-be-gcw1
-      uses: metro-digital/oidc-set-context@v0.x
-      with:
-        oidc_url: ${{ secrets.IDAM_OIDC_URL }}
-        oidc_username: ${{ secrets.PRODUCT_INVENTORY_TU_ID }}
-        oidc_password: ${{ secrets.PRODUCT_INVENTORY_TU_SECRET }}
-        k8s_url: ${{ secrets.K8S_PP_BE_GCW1_CLUSTER_URL || secrets.K8S_PP_CLUSTER_URL }}
-        k8s_namespace: 'inventory-pp'
-        k8s_skip_tls_verify: true
+    - name: Update master authorized networks
+      run: |
+        apt install dnsutils -y
+        dig +short myip.opendns.com @resolver1.opendns.com > _EXT-IP
+        gcloud container clusters describe $_GKE_PP_CLUSTER --project=$_GKE_PP_PROJECT --zone=europe-west1 | grep cidrBlock: | awk '{gsub("  - cidrBlock: ", "");print}' | tee master-auth-ranges master-auth-ranges-new && echo $(cat _EXT-IP)/32 >> master-auth-ranges-new && tr '\n' ',' < master-auth-ranges-new > master-auth-test && truncate -s -1 master-auth-test && CIDRS=$(cat master-auth-test)
+        gcloud container clusters update $_GKE_PP_CLUSTER --project=$_GKE_PP_PROJECT --region=$_GKE_LOCATION \
+        --enable-master-authorized-networks \
+        --master-authorized-networks $CIDRS
+    - uses: azure/setup-kubectl@v3
+      id: install
+    - name: Setup context
+      run: gcloud container clusters get-credentials $_GKE_PP_CLUSTER --region europe-west1 --project $_GKE_PP_PROJECT
     - name: Get repository information (to put in K8S deployment)
       uses: octokit/request-action@v2.x
       id: repo_information
@@ -176,7 +220,7 @@ jobs:
         route: GET /repos/${{ github.repository }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Deploy to pp-be-gcw1
+    - name: Deploy to gke-pp
       run: |
         set +e
         set -o pipefail
@@ -188,17 +232,23 @@ jobs:
           echo "::error ::WaaS: deploy: skaffold deploy failed"
           exit 40
         fi
+    - name: Revert master authorized networks
+      id: revert_master_auth
+      run: |
+        tr '\n' ',' < master-auth-ranges > master-auth-old && truncate -s -1 master-auth-old && CIDRS_OLD=$(cat master-auth-old)
+        gcloud container clusters update $_GKE_PP_CLUSTER --project=$_GKE_PP_PROJECT --region=$_GKE_LOCATION \
+        --enable-master-authorized-networks \
+        --master-authorized-networks $CIDRS_OLD
   release:
-    needs: [deploy-pp-be-gcw1]
+    needs: [deploy-gke-pp]
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Generate default release tag
+    - uses: actions/checkout@v2
+    - name: Generate default tag
       run: |
         tag="build-`date +"%Y%m%d"`-${{ github.run_number }}"
         echo "TAG=$tag" >> $GITHUB_ENV
-    - name: Override default release tag (if a git tag is set)
+    - name: Set git tag
       if: startsWith(github.ref, 'refs/tags/')
       run: |
         echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
@@ -235,5 +285,5 @@ jobs:
           WaaS workflow failed for ${{ github.repository }}:
           Commit message: ${{ github.event.head_commit.message }}
           Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        to: 'alin.ciubotariu01@metrosystems.net, george.dumitrascu@metrosystems.net, cristiangabriel.jena@metrosystems.net'
+        to: 'andrei.meran@metro-external.digital, cosmin.drula@metro.digital'
         from: do-not-reply@metrosystems.net
