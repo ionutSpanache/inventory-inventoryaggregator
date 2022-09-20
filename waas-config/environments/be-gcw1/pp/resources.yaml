@@ -10,9 +10,8 @@ spec:
       - name: inventoryaggregator
         resources:
           limits:
-            cpu: "2"
-            memory: 2Gi
+            cpu: "3"
+            memory: 4.5Gi
           requests:
-            cpu: 300m
-            memory: 500Mi
-
+            cpu: "0.1"
+            memory: 1.2Gi
