@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +20,5 @@ public class PromotionArticleData implements Serializable {
   private Double promotionNetSalesPricePerPiece;
   private LocalDate promotionStart;
   private LocalDate promotionEnd;
+  @JsonIgnore private Boolean valid;
 }

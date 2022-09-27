@@ -2,7 +2,10 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
@@ -73,11 +76,12 @@ public class ArticleMasterDataRepository {
     return CompletableFuture.completedFuture(iduItemDerivedStandards);
   }
 
-//  @Async("asyncExecutor")
-//  public CompletableFuture<PromotionArticleData> getPromotionArticleData(
-//      String countryCode, Integer storeId, ArticleId articleId) {
-//    return CompletableFuture.completedFuture(getPromotionArticle(countryCode, storeId, articleId));
-//  }
+  //  @Async("asyncExecutor")
+  //  public CompletableFuture<PromotionArticleData> getPromotionArticleData(
+  //      String countryCode, Integer storeId, ArticleId articleId) {
+  //    return CompletableFuture.completedFuture(getPromotionArticle(countryCode, storeId,
+  // articleId));
+  //  }
 
   private List<PromotionArticleData> getPromotionArticle(
       String countryCode, Integer storeId, ArticleId articleId) {
@@ -99,7 +103,9 @@ public class ArticleMasterDataRepository {
                             articleId -> {
                               List<PromotionArticleData> promotionArticleData;
                               promotionArticleData =
-                                  getPromotionArticle(countryCode, storeId, articleId);
+                                  getPromotionArticle(countryCode, storeId, articleId).stream()
+                                      .filter(t -> Boolean.TRUE.equals(t.getValid()))
+                                      .collect(Collectors.toList());
                               return PromotionArticleDataForArticleId.builder()
                                   .articleId(articleId)
                                   .promotionArticleData(promotionArticleData)
