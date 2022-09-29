@@ -239,6 +239,17 @@ public class ArticleCacheDataGroup {
     this.priceCheckCodeMccSalesLine = priceCheckCodeMccSalesLine;
   }
 
+  private Integer inOutIndicator;
+
+  public Integer getInOutIndicator() {
+    return sellingBundleContent;
+  }
+
+  @XmlElement(name = "INOUTINDICATORMCCSALESLINE")
+  public void setInOutIndicator(Integer inOutIndicator) {
+    this.inOutIndicator = inOutIndicator;
+  }
+
   /*Data Group 320*/
   private Integer assignedStoreSupplier;
 
