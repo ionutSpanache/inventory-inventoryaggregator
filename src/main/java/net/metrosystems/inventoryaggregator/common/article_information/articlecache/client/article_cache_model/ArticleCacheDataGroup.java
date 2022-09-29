@@ -242,7 +242,7 @@ public class ArticleCacheDataGroup {
   private Integer inOutIndicator;
 
   public Integer getInOutIndicator() {
-    return sellingBundleContent;
+    return inOutIndicator;
   }
 
   @XmlElement(name = "INOUTINDICATORMCCSALESLINE")
