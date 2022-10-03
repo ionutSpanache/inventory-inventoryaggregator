@@ -1,11 +1,7 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
@@ -40,164 +36,163 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleCacheService {
 
-	@Value("${ARTICLE_CACHE_STORE_EXCEPTIONS_PATH}")
-	private String articleCacheStoreExceptionsPath;
+  @Value("${ARTICLE_CACHE_STORE_EXCEPTIONS_PATH}")
+  private String articleCacheStoreExceptionsPath;
 
-	@Value("${app.stage}")
-	private String k8sEnvironment;
+  @Value("${app.stage}")
+  private String k8sEnvironment;
 
-	private final DocumentsService documentsService;
-	private final ArticleCacheAAAClient articleCacheClient;
-	private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
-    private final PromotionsAclService promotionsAclService;
+  private final DocumentsService documentsService;
+  private final ArticleCacheAAAClient articleCacheClient;
+  private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
+  private final PromotionsAclService promotionsAclService;
 
-	private static final String PAKISTAN_COUNTRY_CODE = "PK";
-	private static final Double ZERO = 0.0;
+  private static final String PAKISTAN_COUNTRY_CODE = "PK";
+  private static final Double ZERO = 0.0;
 
-	private static final String IHDS_TREE = "erp_ihds_tree";
-	private static final String BUNDLE_NO = "bundleno";
-	private static final String MMS_ARTNO = "mmsartno";
-	private static final String VARIANT_NO = "variantno";
-	private static final String COMPANY = "company";
-	private static final String ENVIRONMENT = "environment";
-	private static final String ARTICLE_CACHE_PP2_ENVIRONMENT = "pp2";
-	private static final String ARTICLE_CACHE_PP1_ENVIRONMENT = "pp1";
-	private static final String ARTICLE_CACHE_PROD_ENVIRONMENT = "prod";
-	private static final String K8S_DEV_ENVIRONMENT = "dev";
-	private static final String K8S_PP_ENVIRONMENT = "pp";
-	private static final String LOCAL_ENVIRONMENT = "local";
-	private static final String LANGUAGE = "language";
+  private static final String IHDS_TREE = "erp_ihds_tree";
+  private static final String BUNDLE_NO = "bundleno";
+  private static final String MMS_ARTNO = "mmsartno";
+  private static final String VARIANT_NO = "variantno";
+  private static final String COMPANY = "company";
+  private static final String ENVIRONMENT = "environment";
+  private static final String ARTICLE_CACHE_PP2_ENVIRONMENT = "pp2";
+  private static final String ARTICLE_CACHE_PP1_ENVIRONMENT = "pp1";
+  private static final String ARTICLE_CACHE_PROD_ENVIRONMENT = "prod";
+  private static final String K8S_DEV_ENVIRONMENT = "dev";
+  private static final String K8S_PP_ENVIRONMENT = "pp";
+  private static final String LOCAL_ENVIRONMENT = "local";
+  private static final String LANGUAGE = "language";
 
+  private static final Set<String> COUNTRY_CODES = Set.of("IN", "CZ", "SK");
 
-	private static final Set<String> COUNTRY_CODES  = Set.of("IN", "CZ", "SK");
+  @Autowired
+  public ArticleCacheService(
+      DocumentsService documentsService,
+      ArticleCacheAAAClient articleCacheClient,
+      ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient,
+      PromotionsAclService promotionsAclService) {
+    this.documentsService = documentsService;
+    this.articleCacheClient = articleCacheClient;
+    this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
+    this.promotionsAclService = promotionsAclService;
+  }
 
-	@Autowired
-	public ArticleCacheService(DocumentsService documentsService, ArticleCacheAAAClient articleCacheClient, ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient, PromotionsAclService promotionsAclService) {
-		this.documentsService = documentsService;
-		this.articleCacheClient = articleCacheClient;
-		this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
-		this.promotionsAclService = promotionsAclService;
-	}
+  public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForEan(
+      String ean, String countryCode, String salesLine, String languageCode) throws Exception {
+    return getArticleVariantBundleIdentifierListFromFilterUrl(
+        articleCacheClient.getArticleUrlPathByEan(ean, countryCode, salesLine, languageCode));
+  }
 
-	public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForEan(
-			String ean,
-			String countryCode,
-			String salesLine,
-			String languageCode) throws Exception {
-		return getArticleVariantBundleIdentifierListFromFilterUrl(articleCacheClient.getArticleUrlPathByEan(ean, countryCode, salesLine, languageCode));
+  public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForSubsys(
+      Long subsysArtNo, String countryCode, String salesLine, String languageCode)
+      throws Exception {
+    return getArticleVariantBundleIdentifierListFromFilterUrl(
+        articleCacheClient.getArticleUrlPathBySubsysArtNo(
+            subsysArtNo, countryCode, salesLine, languageCode));
+  }
 
-	}
+  public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForArticleVariantBundle(
+      Long articleNumber,
+      Long variantNumber,
+      Long bundleNumber,
+      String countryCode,
+      String salesLine,
+      String languageCode)
+      throws Exception {
+    return getArticleVariantBundleIdentifierListFromFilterUrl(
+        articleCacheClient.getArticleUrlPathByArtVarBundle(
+            articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode));
+  }
 
-	public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForSubsys(
-			Long subsysArtNo,
-			String countryCode,
-			String salesLine,
-			String languageCode) throws Exception {
-		return getArticleVariantBundleIdentifierListFromFilterUrl(
-				articleCacheClient.getArticleUrlPathBySubsysArtNo(subsysArtNo, countryCode, salesLine, languageCode)
-		);
+  public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForArticleNumber(
+      Long articleNumber, String countryCode, String salesLine, String languageCode)
+      throws Exception {
 
-	}
+    return getArticleVariantBundleIdentifierListFromFilterUrl(
+        articleCacheClient.getArticleUrlPathByMmsArtNo(
+            articleNumber, countryCode, salesLine, languageCode));
+  }
 
-	public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForArticleVariantBundle(
-			Long articleNumber,
-			Long variantNumber,
-			Long bundleNumber,
-			String countryCode,
-			String salesLine,
-			String languageCode
-	) throws Exception {
-		return getArticleVariantBundleIdentifierListFromFilterUrl(
-				articleCacheClient.getArticleUrlPathByArtVarBundle(articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode)
-		);
-
-	}
-
-	public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForArticleNumber(
-			Long articleNumber,
-			String countryCode,
-			String salesLine,
-			String languageCode
-	) throws Exception {
-
-		return getArticleVariantBundleIdentifierListFromFilterUrl(
-				articleCacheClient.getArticleUrlPathByMmsArtNo(articleNumber, countryCode, salesLine, languageCode)
-		);
-
-	}
-
-	private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(Documents filterUrlString) {
-    if (filterUrlString == null
-        || CollectionUtils.isEmpty(filterUrlString.getArticleKeys())) {
+  private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(
+      Documents filterUrlString) {
+    if (filterUrlString == null || CollectionUtils.isEmpty(filterUrlString.getArticleKeys())) {
       return Collections.emptyList();
     }
 
-		List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList =
-				new ArrayList<>();
-		for (String articleUrlPath : filterUrlString.getArticleKeys()) {
-			ArticleId articleId = documentsService.tranformDocumentInArticleId(articleUrlPath);
-			ArticleVariantBundleIdentifier articleVariantBundleIdentifier = new ArticleVariantBundleIdentifier();
-			articleVariantBundleIdentifier.setArticleNumber(articleId.getArticleNumber());
-			articleVariantBundleIdentifier.setVariantNumber(articleId.getVariantNumber());
-			articleVariantBundleIdentifier.setBundleNumber(articleId.getBundleNumber());
-			articleVariantBundleIdentifierList.add(articleVariantBundleIdentifier);
-		}
+    List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList = new ArrayList<>();
+    for (String articleUrlPath : filterUrlString.getArticleKeys()) {
+      ArticleId articleId = documentsService.tranformDocumentInArticleId(articleUrlPath);
+      ArticleVariantBundleIdentifier articleVariantBundleIdentifier =
+          new ArticleVariantBundleIdentifier();
+      articleVariantBundleIdentifier.setArticleNumber(articleId.getArticleNumber());
+      articleVariantBundleIdentifier.setVariantNumber(articleId.getVariantNumber());
+      articleVariantBundleIdentifier.setBundleNumber(articleId.getBundleNumber());
+      articleVariantBundleIdentifierList.add(articleVariantBundleIdentifier);
+    }
 
-		return articleVariantBundleIdentifierList;
-	}
+    return articleVariantBundleIdentifierList;
+  }
 
-	public ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
-			Long articleNumber,
-			Long variantNumber,
-			Long bundleNumber,
-			String countryCode,
-			String salesLine,
-			String languageCode,
-			Integer storeNo) throws Exception {
-		Documents articleUrlPathList = articleCacheClient.getArticleUrlPathByArtVarBundle(
-																articleNumber,
-																variantNumber,
-																bundleNumber,
-																countryCode,
-				salesLine,
-																languageCode
-																);
+  public ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
+      Long articleNumber,
+      Long variantNumber,
+      Long bundleNumber,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo)
+      throws Exception {
+    Documents articleUrlPathList =
+        articleCacheClient.getArticleUrlPathByArtVarBundle(
+            articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode);
     if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
       throw new ArticleNotFoundException();
     }
-		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+    String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 
-		List<String> articleKeys =
-			getArticleKeysForDerivedStandardDocument(
-				countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
-		String gradeCodeReferenceFruitsVegetablesValue = null;
-		if (articleKeys != null && !articleKeys.isEmpty()) {
-		  gradeCodeReferenceFruitsVegetablesValue =
-			  hasGradeCodeReferenceFruitsVegetables(articleKeys.get(0)).getValue();
-		}
+    List<String> articleKeys =
+        getArticleKeysForDerivedStandardDocument(
+            countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
+    String gradeCodeReferenceFruitsVegetablesValue = null;
+    if (articleKeys != null && !articleKeys.isEmpty()) {
+      gradeCodeReferenceFruitsVegetablesValue =
+          hasGradeCodeReferenceFruitsVegetables(articleKeys.get(0)).getValue();
+    }
 
-		return transformArticleCacheDocumentToArticleFullData(
-												articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
-												storeNo, null, gradeCodeReferenceFruitsVegetablesValue);
+    return transformArticleCacheDocumentToArticleFullData(
+        articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
+        storeNo,
+        null,
+        gradeCodeReferenceFruitsVegetablesValue);
+  }
 
-	}
-
-	public Optional<IduItemDerivedStandard> getMultiLanguageDataByArtVarBundle(
-			String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
-		Documents articleUrlPathList = articleCacheClient.getMultiLanguageDocumentUrl(
-				countryCode, articleId);
-		if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-			return Optional.empty();
-		}
-		try {
-			return articleUrlPathList.getArticleKeys().stream().map(articleCacheClient::getIduItemDerivedStandardDocument)
-							.filter(iduItemDerivedStandard -> iduItemDerivedStandard.getContentIduItemDerivedStandard().getVariantSortDescriptionV2() != null
-							&& iduItemDerivedStandard.getContentIduItemDerivedStandard().getMerchandiseArticleDescription() != null)
-							.findAny();
-		} catch (Exception e) {
-			return Optional.empty();
-		}
-	}
+  public Optional<IduItemDerivedStandard> getMultiLanguageDataByArtVarBundle(
+      String countryCode,
+      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
+    Documents articleUrlPathList =
+        articleCacheClient.getMultiLanguageDocumentUrl(countryCode, articleId);
+    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+      return Optional.empty();
+    }
+    try {
+      return articleUrlPathList.getArticleKeys().stream()
+          .map(articleCacheClient::getIduItemDerivedStandardDocument)
+          .filter(
+              iduItemDerivedStandard ->
+                  iduItemDerivedStandard
+                              .getContentIduItemDerivedStandard()
+                              .getVariantSortDescriptionV2()
+                          != null
+                      && iduItemDerivedStandard
+                              .getContentIduItemDerivedStandard()
+                              .getMerchandiseArticleDescription()
+                          != null)
+          .findAny();
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
 
   public List<IduItemDerivedStandard> getIduItemDerivedStandards(
       String countryCode,
@@ -239,13 +234,26 @@ public class ArticleCacheService {
     return mapToProductLifeCycleData(documentWithProductLifecycle.get());
   }
 
-	public List<PromotionArticleData> getPromotionArticleData(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
-														Integer storeId) {
+  public List<PromotionArticleData> getPromotionArticleData(
+      String countryCode,
+      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
+      Integer storeId) {
 
-		String documentUrl = "documents/" + countryCode.toLowerCase() + "/promotion-article" +
-				"?bundleno=" + articleId.getBundleNumber() + "&company=mcc"
-				+ "&environment=" + getEnvironment(countryCode) + "&mmsartno=" + articleId.getArticleNumber()
-				+ "&storeno=" + storeId + "&variantno=" + articleId.getVariantNumber();
+    String documentUrl =
+        "documents/"
+            + countryCode.toLowerCase()
+            + "/promotion-article"
+            + "?bundleno="
+            + articleId.getBundleNumber()
+            + "&company=mcc"
+            + "&environment="
+            + getEnvironment(countryCode)
+            + "&mmsartno="
+            + articleId.getArticleNumber()
+            + "&storeno="
+            + storeId
+            + "&variantno="
+            + articleId.getVariantNumber();
 
     List<PromotionArticleData> promotionArticleData = new ArrayList<>();
 
@@ -285,71 +293,106 @@ public class ArticleCacheService {
                       .promotionNetSalesPricePerPiece(t.getPromotionNetSalesPricePerPiece())
                       .promotionStart(LocalDate.parse(t.getPromotionActiveStartDate(), formatter))
                       .promotionEnd(LocalDate.parse(t.getPromotionActiveEndDate(), formatter))
+                      .valid(t.getValidity())
                       .build()));
     }
     return promotions;
   }
 
-	public Optional<String> getChannelDeliveryFlag(String countryCode, net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
-												   Integer storeNumber) {
-		Documents articleUrlPathList = articleCacheClient.getChannelDeliveryFlagUrl(countryCode, articleId);
+  public Optional<String> getChannelDeliveryFlag(
+      String countryCode,
+      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
+      Integer storeNumber) {
+    Documents articleUrlPathList =
+        articleCacheClient.getChannelDeliveryFlagUrl(countryCode, articleId);
 
-		if (articleUrlPathList == null || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-			return Optional.empty();
-		}
-		String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+    if (articleUrlPathList == null
+        || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
+      return Optional.empty();
+    }
+    String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 
-		IsuItemStoreMerchandise isuItemStoreMerchandise = articleCacheClient.getChannelDeliveryFlagDocument(articleUrlPath);
+    IsuItemStoreMerchandise isuItemStoreMerchandise =
+        articleCacheClient.getChannelDeliveryFlagDocument(articleUrlPath);
 
-		return mapToDeliveryFlagForStore(isuItemStoreMerchandise, storeNumber);
+    return mapToDeliveryFlagForStore(isuItemStoreMerchandise, storeNumber);
+  }
 
-	}
+  private Optional<String> mapToDeliveryFlagForStore(
+      IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
+    if (isuItemStoreMerchandise == null) return Optional.empty();
+    Optional<StoreInformationGroup> response =
+        isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
+                == null
+            ? Optional.empty()
+            : isuItemStoreMerchandise
+                .getContentIsuItemStoreMerchandise()
+                .getStoreInformationGroups()
+                .stream()
+                .filter(
+                    storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
+                .findFirst();
 
-	private Optional<String> mapToDeliveryFlagForStore(IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
-		if (isuItemStoreMerchandise == null) return Optional.empty();
-		Optional<StoreInformationGroup> response = isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
-				== null ? Optional.empty() : isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
-				.stream().filter(storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
-				.findFirst();
+    if (response.isPresent()) {
+      return response.map(StoreInformationGroup::getChannelDeliveryFlag);
+    }
 
-		if(response.isPresent()) {
-			return response.map(StoreInformationGroup::getChannelDeliveryFlag);
-		}
+    return Optional.empty();
+  }
 
-		return Optional.empty();
-	}
+  private String buildIhdsTreeUrl(
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Long articleNumber,
+      Long variantNumber,
+      Long bundleNumber) {
 
-	private String buildIhdsTreeUrl(String countryCode, String salesLine, String languageCode, Long articleNumber, Long variantNumber,
-									Long bundleNumber) {
+    return "/documents/"
+        + countryCode.toLowerCase()
+        + "/"
+        + IHDS_TREE
+        + "?"
+        + BUNDLE_NO
+        + "="
+        + bundleNumber
+        + "&"
+        + COMPANY
+        + "="
+        + salesLine.toLowerCase()
+        + "&"
+        + ENVIRONMENT
+        + "="
+        + getEnvironment(countryCode)
+        + "&"
+        + LANGUAGE
+        + "="
+        + languageCode.toLowerCase()
+        + "&"
+        + MMS_ARTNO
+        + "="
+        + articleNumber
+        + "&"
+        + VARIANT_NO
+        + "="
+        + variantNumber;
+  }
 
+  private String getEnvironment(String countryCode) {
 
-		return  "/documents/" + countryCode.toLowerCase() +
-				     "/"  + IHDS_TREE +
-				     "?" + BUNDLE_NO + "=" + bundleNumber +
-				     "&" + COMPANY   + "=" + salesLine.toLowerCase() +
-				     "&" + ENVIRONMENT + "=" + getEnvironment(countryCode) +
-				     "&" + LANGUAGE + "=" + languageCode.toLowerCase() +
-				     "&" + MMS_ARTNO + "=" + articleNumber +
-				     "&" + VARIANT_NO + "=" + variantNumber;
-	}
+    if (K8S_DEV_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment)
+        || K8S_PP_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment)
+        || LOCAL_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment)) {
 
-
-	private String getEnvironment(String countryCode) {
-
-		if (K8S_DEV_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment) ||
-				K8S_PP_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment) ||
-				LOCAL_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment)) {
-
-			if (COUNTRY_CODES.contains(countryCode)) {
-				return ARTICLE_CACHE_PP2_ENVIRONMENT;
-			} else {
-				return ARTICLE_CACHE_PP1_ENVIRONMENT;
-			}
-		} else {
-			return ARTICLE_CACHE_PROD_ENVIRONMENT;
-		}
-
-	}
+      if (COUNTRY_CODES.contains(countryCode)) {
+        return ARTICLE_CACHE_PP2_ENVIRONMENT;
+      } else {
+        return ARTICLE_CACHE_PP1_ENVIRONMENT;
+      }
+    } else {
+      return ARTICLE_CACHE_PROD_ENVIRONMENT;
+    }
+  }
 
   public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
       Integer storeNo, String documentUrl) {
@@ -373,84 +416,134 @@ public class ArticleCacheService {
         articleCacheDocument, storeNo, null, null);
   }
 
-	public List<String> getArticleKeysForDerivedStandardDocument(String countryCode, Long articleNumber,
-																 Long bundleNumber, Long variantNumber, String salesLine) {
+  public List<String> getArticleKeysForDerivedStandardDocument(
+      String countryCode,
+      Long articleNumber,
+      Long bundleNumber,
+      Long variantNumber,
+      String salesLine) {
 
-		return documentsService.getIduItemDerivedUrlByArtVarBundle(
-				countryCode,
-				net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId.builder()
-						.articleNumber(articleNumber)
-						.bundleNumber(bundleNumber)
-						.variantNumber(variantNumber)
-						.build(),
-				salesLine).getArticleKeys();
-	}
+    return documentsService
+        .getIduItemDerivedUrlByArtVarBundle(
+            countryCode,
+            net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId.builder()
+                .articleNumber(articleNumber)
+                .bundleNumber(bundleNumber)
+                .variantNumber(variantNumber)
+                .build(),
+            salesLine)
+        .getArticleKeys();
+  }
 
-  public IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts(List<String> articleKeys) {
+  public IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts(
+      List<String> articleKeys) {
 
     IsTradeItemExcludedFromDiscounts result = new IsTradeItemExcludedFromDiscounts();
 
-	if(!CollectionUtils.isEmpty(articleKeys)) {
-		articleKeys
-				.forEach(
-						articleKey -> {
-							IduItemDerivedStandard iduItemDerivedStandard =
-									articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
-							if (iduItemDerivedStandard != null
-									&& iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
-								IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
-										iduItemDerivedStandard
-												.getContentIduItemDerivedStandard()
-												.getIsTradeItemExcludedFromDiscounts();
-								if (isTradeItemExcludedFromDiscounts != null
-										&& Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
-									result.setValue(true);
-									if (result.getValidFrom() == null
-											|| isTradeItemExcludedFromDiscounts
-											.getValidFrom()
-											.after(result.getValidFrom())) {
-										result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
-									}
-								}
-							}
-						});
-	}
+    if (!CollectionUtils.isEmpty(articleKeys)) {
+      articleKeys.forEach(
+          articleKey -> {
+            IduItemDerivedStandard iduItemDerivedStandard =
+                articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
+            if (iduItemDerivedStandard != null
+                && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
+              IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
+                  iduItemDerivedStandard
+                      .getContentIduItemDerivedStandard()
+                      .getIsTradeItemExcludedFromDiscounts();
+              if (isTradeItemExcludedFromDiscounts != null
+                  && Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
+                result.setValue(true);
+                if (result.getValidFrom() == null
+                    || isTradeItemExcludedFromDiscounts
+                        .getValidFrom()
+                        .after(result.getValidFrom())) {
+                  result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
+                }
+              }
+            }
+          });
+    }
     return result;
   }
 
-  public GradeCodeReferenceFruitsVegetables hasGradeCodeReferenceFruitsVegetables(String articleKey) {
+  public GradeCodeReferenceFruitsVegetables hasGradeCodeReferenceFruitsVegetables(
+      String articleKey) {
 
-		GradeCodeReferenceFruitsVegetables result = new GradeCodeReferenceFruitsVegetables();
+    GradeCodeReferenceFruitsVegetables result = new GradeCodeReferenceFruitsVegetables();
 
-		IduItemDerivedStandard iduItemDerivedStandard =
-				articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
+    IduItemDerivedStandard iduItemDerivedStandard =
+        articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
 
-		if(iduItemDerivedStandard != null
-				&& iduItemDerivedStandard.getContentIduItemDerivedStandard() != null
-				&& iduItemDerivedStandard.getContentIduItemDerivedStandard().getGradeCodeReferenceFruitsVegetables() != null ){
-			result = iduItemDerivedStandard.getContentIduItemDerivedStandard().getGradeCodeReferenceFruitsVegetables();
-		}
+    if (iduItemDerivedStandard != null
+        && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null
+        && iduItemDerivedStandard
+                .getContentIduItemDerivedStandard()
+                .getGradeCodeReferenceFruitsVegetables()
+            != null) {
+      result =
+          iduItemDerivedStandard
+              .getContentIduItemDerivedStandard()
+              .getGradeCodeReferenceFruitsVegetables();
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData (
-																			ArticleCacheIhdsTree articleCacheDocument,
-			                                                                Integer storeNo,
-																			Boolean isTradeItemExcludedFromDiscounts , String gradeCodeReferenceFruitsVegetables) {
-		Integer hierarchySequenceStoreNo = articleCacheDocument.getTransaction().getArticleCacheIncident().getHierarchySequenceStoreNo(storeNo);
-		if(hierarchySequenceStoreNo == null){
-			throw new ArticleNotFoundException();
-		}
-		ArticleCacheReaderDigest articleCacheReaderDigest = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheReaderDigest();
-		ArticleCacheDataGroup articleCacheDataGroup100 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100);
-		ArticleCacheDataGroup articleCacheDataGroup300 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(300);
-		ArticleCacheDataGroup articleCacheDataGroup310 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(310);
-		ArticleCacheDataGroup articleCacheDataGroup320 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
-		ArticleCacheDataGroup articleCacheDataGroup325 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
-		ArticleCacheDataGroup articleCacheDataGroup200 = articleCacheDocument.getTransaction().getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(200);
+  private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData(
+      ArticleCacheIhdsTree articleCacheDocument,
+      Integer storeNo,
+      Boolean isTradeItemExcludedFromDiscounts,
+      String gradeCodeReferenceFruitsVegetables) {
+    Integer hierarchySequenceStoreNo =
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getHierarchySequenceStoreNo(storeNo);
+    if (hierarchySequenceStoreNo == null) {
+      throw new ArticleNotFoundException();
+    }
+    ArticleCacheReaderDigest articleCacheReaderDigest =
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheReaderDigest();
+    ArticleCacheDataGroup articleCacheDataGroup100 =
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithoutStore(100);
+    ArticleCacheDataGroup articleCacheDataGroup300 =
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithoutStore(300);
+    ArticleCacheDataGroup articleCacheDataGroup310 =
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithoutStore(310);
+    ArticleCacheDataGroup articleCacheDataGroup320 =
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
+    ArticleCacheDataGroup articleCacheDataGroup325 =
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
+    ArticleCacheDataGroup articleCacheDataGroup200 =
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithoutStore(200);
 
-		List<String> promotionIdList  = articleCacheDocument.getTransaction().getArticleCacheIncident().getPromotionIdListWithStore(322, hierarchySequenceStoreNo);
+    List<String> promotionIdList =
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getPromotionIdListWithStore(322, hierarchySequenceStoreNo);
 
     return new ArticleCacheFullData(
         articleCacheReaderDigest.getMmsArtNo(),
@@ -465,7 +558,7 @@ public class ArticleCacheService {
             : getPromotionIdAvailable(articleCacheDocument, promotionIdList, storeNo),
         articleCacheDataGroup310.getSellingBundleContent(),
         articleCacheDataGroup100.getWeightArticles(),
-		articleCacheDataGroup200.getNetWeight(),
+        articleCacheDataGroup200.getNetWeight(),
         articleCacheReaderDigest.getSubsysNo(),
         articleCacheDataGroup100.getVatPercent(),
         articleCacheDataGroup320.getPieceNetSellPrice(),
@@ -501,7 +594,7 @@ public class ArticleCacheService {
             ? articleCacheDataGroup320.getCoreAssortmentIndicator()
             : 0,
 				articleCacheDataGroup320.getAssignedStoreSupplierType(),
-		articleCacheDataGroup310.getInOutIndicator());
+ 		    articleCacheDataGroup310.getInOutIndicator());
 	}
 
   private String getPromotionIdAvailable(
@@ -514,74 +607,137 @@ public class ArticleCacheService {
     return promotionIdList.get(0);
   }
 
-	private MinimumRetailPrice calculateMinimumRetailPrice(ArticleCacheIhdsTree articleCacheIhdsTree, Integer storeNumber, Integer sellingBundleContent) {
-		String countryCode = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
-				.getArticleCacheDomain().getPlkz();
+  private MinimumRetailPrice calculateMinimumRetailPrice(
+      ArticleCacheIhdsTree articleCacheIhdsTree,
+      Integer storeNumber,
+      Integer sellingBundleContent) {
+    String countryCode =
+        articleCacheIhdsTree
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDomain()
+            .getPlkz();
 
-		if (PAKISTAN_COUNTRY_CODE.equalsIgnoreCase(countryCode)) {
-			Boolean hasMinimumRetailPrice = articleCacheIhdsTree.getTransaction()
-					.getArticleCacheIncident().getArticleCacheDataGroupWithoutStore(100)
-					.getHasMinimumRetailPrice();
+    if (PAKISTAN_COUNTRY_CODE.equalsIgnoreCase(countryCode)) {
+      Boolean hasMinimumRetailPrice =
+          articleCacheIhdsTree
+              .getTransaction()
+              .getArticleCacheIncident()
+              .getArticleCacheDataGroupWithoutStore(100)
+              .getHasMinimumRetailPrice();
 
-			if (hasMinimumRetailPrice !=null && hasMinimumRetailPrice) {
-				Double minimumRetailPriceForVatCalculation = articleCacheIhdsTree.getTransaction().getArticleCacheIncident()
-						.getArticleCacheDataGroup().stream()
-						.filter(articleCacheDataGroup -> articleCacheDataGroup.getStoreNo() == storeNumber)
-						.findFirst()
-						.map(ArticleCacheDataGroup::getMinimumRetailPriceForVatCalculation)
-						.orElse(ZERO);
-				return MinimumRetailPrice.builder().indicator(Boolean.TRUE)
-						.value(minimumRetailPriceForVatCalculation * sellingBundleContent)
-						.build();
-			}
+      if (hasMinimumRetailPrice != null && hasMinimumRetailPrice) {
+        Double minimumRetailPriceForVatCalculation =
+            articleCacheIhdsTree
+                .getTransaction()
+                .getArticleCacheIncident()
+                .getArticleCacheDataGroup()
+                .stream()
+                .filter(articleCacheDataGroup -> articleCacheDataGroup.getStoreNo() == storeNumber)
+                .findFirst()
+                .map(ArticleCacheDataGroup::getMinimumRetailPriceForVatCalculation)
+                .orElse(ZERO);
+        return MinimumRetailPrice.builder()
+            .indicator(Boolean.TRUE)
+            .value(minimumRetailPriceForVatCalculation * sellingBundleContent)
+            .build();
+      }
 
-			return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
-		}
+      return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
+    }
 
-		return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
-	}
+    return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
+  }
 
-	private ProductLifeCycleData mapToProductLifeCycleData(IduItemDerivedStandard iduItemDerivedStandard) {
+  private ProductLifeCycleData mapToProductLifeCycleData(
+      IduItemDerivedStandard iduItemDerivedStandard) {
 
-		Long presencePeriodEndWeek = iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3() == null ? null :
-				iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3()
-						.getPresencePeriodEndWeekV2();
+    Long presencePeriodEndWeek =
+        iduItemDerivedStandard
+                    .getContentIduItemDerivedStandard()
+                    .getAssortmentClusterSpecificationV2()
+                    .getPresencePeriodV3()
+                == null
+            ? null
+            : iduItemDerivedStandard
+                .getContentIduItemDerivedStandard()
+                .getAssortmentClusterSpecificationV2()
+                .getPresencePeriodV3()
+                .getPresencePeriodEndWeekV2();
 
-		Long presencePeriodEndYear = iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3() == null ? null :
-				iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3()
-						.getPresencePeriodEndYearV2();
+    Long presencePeriodEndYear =
+        iduItemDerivedStandard
+                    .getContentIduItemDerivedStandard()
+                    .getAssortmentClusterSpecificationV2()
+                    .getPresencePeriodV3()
+                == null
+            ? null
+            : iduItemDerivedStandard
+                .getContentIduItemDerivedStandard()
+                .getAssortmentClusterSpecificationV2()
+                .getPresencePeriodV3()
+                .getPresencePeriodEndYearV2();
 
-		Long presencePeriodStartWeek = iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3() == null ? null :
-				iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3()
-						.getPresencePeriodStartWeekV2();
+    Long presencePeriodStartWeek =
+        iduItemDerivedStandard
+                    .getContentIduItemDerivedStandard()
+                    .getAssortmentClusterSpecificationV2()
+                    .getPresencePeriodV3()
+                == null
+            ? null
+            : iduItemDerivedStandard
+                .getContentIduItemDerivedStandard()
+                .getAssortmentClusterSpecificationV2()
+                .getPresencePeriodV3()
+                .getPresencePeriodStartWeekV2();
 
-		Long presencePeriodStartYear = iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3() == null ? null :
-				iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getPresencePeriodV3()
-						.getPresencePeriodStartYearV2();
+    Long presencePeriodStartYear =
+        iduItemDerivedStandard
+                    .getContentIduItemDerivedStandard()
+                    .getAssortmentClusterSpecificationV2()
+                    .getPresencePeriodV3()
+                == null
+            ? null
+            : iduItemDerivedStandard
+                .getContentIduItemDerivedStandard()
+                .getAssortmentClusterSpecificationV2()
+                .getPresencePeriodV3()
+                .getPresencePeriodStartYearV2();
 
-		return  ProductLifeCycleData
-				.builder()
-				.assortmentCluster(iduItemDerivedStandard.getContentIduItemDerivedStandard().getAssortmentClusterSpecificationV2().getAssortmentClusterV2())
-				.presencePeriodEndWeek(presencePeriodEndWeek)
-				.presencePeriodEndYear(presencePeriodEndYear)
-				.presencePeriodStartWeek(presencePeriodStartWeek)
-				.presencePeriodStartYear(presencePeriodStartYear)
-				.build();
-	}
+    return ProductLifeCycleData.builder()
+        .assortmentCluster(
+            iduItemDerivedStandard
+                .getContentIduItemDerivedStandard()
+                .getAssortmentClusterSpecificationV2()
+                .getAssortmentClusterV2())
+        .presencePeriodEndWeek(presencePeriodEndWeek)
+        .presencePeriodEndYear(presencePeriodEndYear)
+        .presencePeriodStartWeek(presencePeriodStartWeek)
+        .presencePeriodStartYear(presencePeriodStartYear)
+        .build();
+  }
 
-	public ArticleCacheStoreExceptionsIhdsTree getArticleCacheStoreExceptions(
-			Long articleNumber,
-			Long variantNumber,
-			Long bundleNumber,
-			String countryCode,
-			String salesLine,
-			Integer storeNo) {
+  public ArticleCacheStoreExceptionsIhdsTree getArticleCacheStoreExceptions(
+      Long articleNumber,
+      Long variantNumber,
+      Long bundleNumber,
+      String countryCode,
+      String salesLine,
+      Integer storeNo) {
 
-		String articleUrlPath = String.format(articleCacheStoreExceptionsPath,
-				countryCode.toLowerCase(), bundleNumber, salesLine.toLowerCase(), "en", articleNumber, storeNo, variantNumber);
-		//todo: change "en" to country code
-		return articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
-	}
+    String articleUrlPath =
+        String.format(
+            articleCacheStoreExceptionsPath,
+            countryCode.toLowerCase(),
+            bundleNumber,
+            salesLine.toLowerCase(),
+            "en",
+            articleNumber,
+            storeNo,
+            variantNumber);
+    // todo: change "en" to country code
+    return articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
+  }
 
   public List<Integer> getActiveStoresByByArtVarBundle(
       String countryCode, String salesLine, String languageCode, ArticleId articleId)
@@ -605,7 +761,10 @@ public class ArticleCacheService {
         articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
 
     activeStoresList =
-        articleCacheIhdsTree.getTransaction().getArticleCacheIncident().getArticleCacheDataGroup()
+        articleCacheIhdsTree
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroup()
             .stream()
             .filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
             .map(ArticleCacheDataGroup::getStoreNo)
@@ -645,43 +804,38 @@ public class ArticleCacheService {
     return null;
   }
 
-	public Boolean getIsTradeItemExcludedFromDiscounts(List<IduItemDerivedStandard> iduItemDerivedStandards) {
+  public Boolean getIsTradeItemExcludedFromDiscounts(
+      List<IduItemDerivedStandard> iduItemDerivedStandards) {
 
-		if (CollectionUtils.isEmpty(iduItemDerivedStandards)) return false;
-		IsTradeItemExcludedFromDiscounts result = new IsTradeItemExcludedFromDiscounts();
+    if (CollectionUtils.isEmpty(iduItemDerivedStandards)) return false;
+    IsTradeItemExcludedFromDiscounts result = new IsTradeItemExcludedFromDiscounts();
 
-		for (IduItemDerivedStandard iduItemDerivedStandard : iduItemDerivedStandards) {
-			if (iduItemDerivedStandard != null
-					&& iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
-				IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
-						iduItemDerivedStandard
-								.getContentIduItemDerivedStandard()
-								.getIsTradeItemExcludedFromDiscounts();
-				if (isTradeItemExcludedFromDiscounts != null
-						&& Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
-					result.setValue(true);
-					if (result.getValidFrom() == null
-							|| isTradeItemExcludedFromDiscounts
-							.getValidFrom()
-							.after(result.getValidFrom())) {
-						result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
-					}
-				}
-			}
-		}
-		if (Boolean.TRUE.equals(result.getValue())) {
-			if (result.getValidFrom() == null) {
-				return true;
-			} else {
-				LocalDate validFrom =
-						result
-								.getValidFrom()
-								.toInstant()
-								.atZone(ZoneId.systemDefault())
-								.toLocalDate();
-				return LocalDate.now().isAfter(validFrom);
-			}
-		}
-		return false;
-	}
+    for (IduItemDerivedStandard iduItemDerivedStandard : iduItemDerivedStandards) {
+      if (iduItemDerivedStandard != null
+          && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
+        IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
+            iduItemDerivedStandard
+                .getContentIduItemDerivedStandard()
+                .getIsTradeItemExcludedFromDiscounts();
+        if (isTradeItemExcludedFromDiscounts != null
+            && Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
+          result.setValue(true);
+          if (result.getValidFrom() == null
+              || isTradeItemExcludedFromDiscounts.getValidFrom().after(result.getValidFrom())) {
+            result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
+          }
+        }
+      }
+    }
+    if (Boolean.TRUE.equals(result.getValue())) {
+      if (result.getValidFrom() == null) {
+        return true;
+      } else {
+        LocalDate validFrom =
+            result.getValidFrom().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return LocalDate.now().isAfter(validFrom);
+      }
+    }
+    return false;
+  }
 }

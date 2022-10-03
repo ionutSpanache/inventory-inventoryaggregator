@@ -306,9 +306,11 @@
 				<sonar.exclusions>
 					src/main/java/net/metrosystems/inventoryaggregator/InventoryAggregatorApplication.java,
 					src/main/java/net/metrosystems/inventoryaggregator/**/model/*.java
+					**/PromotionArticleDataGroup.java
 				</sonar.exclusions>
 				<sonar.coverage.exclusions>
 					**/model/*.java
+					**/PromotionArticleDataGroup.java
 				</sonar.coverage.exclusions>
 			</properties>
 		</profile>

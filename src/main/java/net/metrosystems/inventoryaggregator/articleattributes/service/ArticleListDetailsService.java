@@ -7,11 +7,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBundleStockLocationRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleComponentRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.*;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
@@ -139,7 +135,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_MASTER_DATA.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_MASTER_DATA.getDataType())) {
       try {
         articleMasterDataForArticleId =
             articleMasterDataRepository.getArticleMasterDataForArticleIdList(
@@ -156,7 +153,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> iduItemDerivedStandards =
         CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.IDU_ITEM_DERIVED_STANDARDS.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.IDU_ITEM_DERIVED_STANDARDS.getDataType())) {
       try {
         iduItemDerivedStandards =
             articleMasterDataRepository.getIduItemDerivedStandards(articleIdList, countryCode);
@@ -172,7 +170,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl =
         CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_STORE_MASTER.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_STORE_MASTER.getDataType())) {
       try {
         articleStoreMasterFromAcl =
             rawArticleStoreMasterDataRepository.getArticleStoreMasterFromAcl(
@@ -190,7 +189,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
         articleStoreExceptionsFromAC = CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_STORE_EXCEPTIONS.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_STORE_EXCEPTIONS.getDataType())) {
       try {
         articleStoreExceptionsFromAC =
             rawArticleStoreMasterDataRepository.getArticleIdArticleCacheStoreExceptionIhdsTree(
@@ -226,7 +226,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
         CompletableFuture.completedFuture(Collections.emptyList());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
       try {
         articleStockLocationList =
             aclBundleStockLocationRepository.getStockLocationsForArticleList(
@@ -243,7 +244,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList =
         CompletableFuture.completedFuture(Collections.emptyList());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_LOCATION.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_LOCATION.getDataType())) {
       try {
         articleLocationList =
             aclBundleStockLocationRepository.getArticleLocationForArticleList(
@@ -387,8 +389,8 @@ public class ArticleListDetailsService {
       return Collections.emptyList();
     }
     return articleMasterDataRepository
-            .getPromotionDataArticlesForArticleIds(
-                articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
-            .get();
+        .getPromotionDataArticlesForArticleIds(
+            articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
+        .get();
   }
 }
