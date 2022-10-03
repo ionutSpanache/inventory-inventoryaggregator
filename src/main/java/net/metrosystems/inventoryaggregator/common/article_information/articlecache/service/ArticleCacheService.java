@@ -593,8 +593,9 @@ public class ArticleCacheService {
         articleCacheDataGroup320.getCoreAssortmentIndicator() != null
             ? articleCacheDataGroup320.getCoreAssortmentIndicator()
             : 0,
-        articleCacheDataGroup320.getAssignedStoreSupplierType());
-  }
+				articleCacheDataGroup320.getAssignedStoreSupplierType(),
+ 		    articleCacheDataGroup310.getInOutIndicator());
+	}
 
   private String getPromotionIdAvailable(
       ArticleCacheIhdsTree articleCacheDocument, List<String> promotionIdList, Integer storeNo) {

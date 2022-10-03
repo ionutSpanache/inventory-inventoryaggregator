@@ -53,6 +53,7 @@ public class ArticleMasterData implements Serializable {
   private Long traceabilityIndicator;
   private Integer coreAssortmentIndicator;
   private String assignedStoreSupplierType;
+  private Integer inOutIndicator;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -69,6 +70,7 @@ public class ArticleMasterData implements Serializable {
             ", sellingBundleContent=" + sellingBundleContent +
             ", packageFactor=" + packageFactor +
             ", weightArticle=" + weightArticle +
+            ", netWeight=" + netWeight +
             ", subsystemArticleNumber=" + subsystemArticleNumber +
             ", vatPercent=" + vatPercent +
             ", pieceNetSellPrice=" + pieceNetSellPrice +
@@ -99,7 +101,8 @@ public class ArticleMasterData implements Serializable {
             ", alcoholClass='" + alcoholClass + '\'' +
             ", traceabilityIndicator=" + traceabilityIndicator +
             ", coreAssortmentIndicator=" + coreAssortmentIndicator +
-            ", assignedStoreSupplierType=" + assignedStoreSupplierType +
+            ", assignedStoreSupplierType='" + assignedStoreSupplierType + '\'' +
+            ", inOutIndicator=" + inOutIndicator +
             '}';
   }
 }
