@@ -1,9 +1,26 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.DataType;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawIsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
@@ -21,11 +38,6 @@ import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundExceptio
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -37,6 +49,7 @@ public class ArticleListDetailsService {
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
   private final ArticleComponentRepository articleComponentRepository;
   private final ArticleCacheService articleCacheService;
+  private final RawArticleDataListService rawArticleDataListService;
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       List<ArticleId> articleIdList,
@@ -44,10 +57,11 @@ public class ArticleListDetailsService {
       String salesLine,
       String languageCode,
       Integer storeNo,
-      Optional<List<String>> dataTypeList)
+      Optional<List<String>> dataTypeList,
+      Optional<Boolean> dataSource)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+        articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList, dataSource);
   }
 
   public List<RawIsTradeItemExcludedFromDiscounts> isTradeItemExcludedFromDiscounts(
@@ -82,7 +96,8 @@ public class ArticleListDetailsService {
       String salesLine,
       String languageCode,
       Integer storeNo,
-      Optional<List<String>> dataTypeList)
+      Optional<List<String>> dataTypeList,
+      Optional<Boolean> dataSource)
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
@@ -97,15 +112,25 @@ public class ArticleListDetailsService {
                 e);
           }
         });
-
-    buildRawArticleDataList(
-        articleIdList,
-        countryCode,
-        salesLine,
-        languageCode,
-        storeNo,
-        rawArticleDataList,
-        dataTypeList);
+    if (dataSource.isPresent() && dataSource.get()) {
+      rawArticleDataListService.buildRawArticleDataList(
+          articleIdList,
+          countryCode,
+          salesLine,
+          languageCode,
+          storeNo,
+          rawArticleDataList,
+          dataTypeList);
+    } else {
+      buildRawArticleDataList(
+          articleIdList,
+          countryCode,
+          salesLine,
+          languageCode,
+          storeNo,
+          rawArticleDataList,
+          dataTypeList);
+    }
     return rawArticleDataList;
   }
 
@@ -139,7 +164,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_MASTER_DATA.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_MASTER_DATA.getDataType())) {
       try {
         articleMasterDataForArticleId =
             articleMasterDataRepository.getArticleMasterDataForArticleIdList(
@@ -156,7 +182,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> iduItemDerivedStandards =
         CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.IDU_ITEM_DERIVED_STANDARDS.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.IDU_ITEM_DERIVED_STANDARDS.getDataType())) {
       try {
         iduItemDerivedStandards =
             articleMasterDataRepository.getIduItemDerivedStandards(articleIdList, countryCode);
@@ -172,7 +199,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl =
         CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_STORE_MASTER.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_STORE_MASTER.getDataType())) {
       try {
         articleStoreMasterFromAcl =
             rawArticleStoreMasterDataRepository.getArticleStoreMasterFromAcl(
@@ -190,7 +218,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
         articleStoreExceptionsFromAC = CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_STORE_EXCEPTIONS.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_STORE_EXCEPTIONS.getDataType())) {
       try {
         articleStoreExceptionsFromAC =
             rawArticleStoreMasterDataRepository.getArticleIdArticleCacheStoreExceptionIhdsTree(
@@ -226,7 +255,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
         CompletableFuture.completedFuture(Collections.emptyList());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
       try {
         articleStockLocationList =
             aclBundleStockLocationRepository.getStockLocationsForArticleList(
@@ -243,7 +273,8 @@ public class ArticleListDetailsService {
 
     CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList =
         CompletableFuture.completedFuture(Collections.emptyList());
-    if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.ARTICLE_LOCATION.getDataType())) {
+    if (dataTypeList.isEmpty()
+        || dataTypeList.get().contains(DataType.ARTICLE_LOCATION.getDataType())) {
       try {
         articleLocationList =
             aclBundleStockLocationRepository.getArticleLocationForArticleList(
@@ -387,8 +418,8 @@ public class ArticleListDetailsService {
       return Collections.emptyList();
     }
     return articleMasterDataRepository
-            .getPromotionDataArticlesForArticleIds(
-                articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
-            .get();
+        .getPromotionDataArticlesForArticleIds(
+            articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
+        .get();
   }
 }
