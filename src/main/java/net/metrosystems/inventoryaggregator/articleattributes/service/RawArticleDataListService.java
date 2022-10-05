@@ -124,6 +124,7 @@ public class RawArticleDataListService {
             "ArticleListDetailsService.buildRawArticleDataList - articleStoreExceptionsFromAC - error: {}",
             e.getMessage(),
             e);
+        Thread.currentThread().interrupt();
       }
     }
 
@@ -256,15 +257,12 @@ public class RawArticleDataListService {
   }
 
   private ProductLifeCycleData buildProductLifeCycleData(ArticleMasterData articleMasterData) {
-    ProductLifeCycleData productLifeCycleData =
-        ProductLifeCycleData.builder()
-            .assortmentCluster(articleMasterData.getAssortmentCluster())
-            .presencePeriodEndWeek(articleMasterData.getPresencePeriodEndWeek())
-            .presencePeriodEndYear(articleMasterData.getPresencePeriodEndYear())
-            .presencePeriodStartWeek(articleMasterData.getPresencePeriodStartWeek())
-            .presencePeriodStartYear(articleMasterData.getPresencePeriodStartYear())
-            .build();
-
-    return productLifeCycleData;
+    return ProductLifeCycleData.builder()
+        .assortmentCluster(articleMasterData.getAssortmentCluster())
+        .presencePeriodEndWeek(articleMasterData.getPresencePeriodEndWeek())
+        .presencePeriodEndYear(articleMasterData.getPresencePeriodEndYear())
+        .presencePeriodStartWeek(articleMasterData.getPresencePeriodStartWeek())
+        .presencePeriodStartYear(articleMasterData.getPresencePeriodStartYear())
+        .build();
   }
 }
