@@ -55,4 +55,5 @@ public class ArticleCacheFullData {
     private Long traceabilityIndicator;
     private Integer coreAssortmentIndicator;
     private String assignedStoreSupplierType;
+    private Integer inOutIndicator;
 }

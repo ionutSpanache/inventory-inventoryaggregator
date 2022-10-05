@@ -1,28 +1,26 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article;
 
+import lombok.Getter;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "DataGroup")
+@Getter
 public class PromotionArticleDataGroup {
 
   private String id;
   private Double promotionNetSalesPricePerBundle;
-
-  public String getPromotionActiveEndDate() {
-    return promotionActiveEndDate;
-  }
+  private String promotionActiveEndDate;
+  private String promotionId;
+  private Double promotionNetSalesPricePerPiece;
+  private String promotionActiveStartDate;
+  private Boolean validity;
 
   @XmlElement(name = "PROMOTION_END")
   public void setPromotionActiveEndDate(String promotionActiveEndDate) {
     this.promotionActiveEndDate = promotionActiveEndDate;
-  }
-
-  private String promotionActiveEndDate;
-
-  public String getPromotionId() {
-    return promotionId;
   }
 
   @XmlElement(name = "PROMOTION_ID")
@@ -30,19 +28,9 @@ public class PromotionArticleDataGroup {
     this.promotionId = promotionId;
   }
 
-  private String promotionId;
-
-  public Double getPromotionNetSalesPricePerBundle() {
-    return promotionNetSalesPricePerBundle;
-  }
-
   @XmlElement(name = "PROMOTION_NET_SALES_PRICE_PER_BUNDLE")
   public void setPromotionNetSalesPricePerBundle(Double promotionNetSalesPricePerBundle) {
     this.promotionNetSalesPricePerBundle = promotionNetSalesPricePerBundle;
-  }
-
-  public String getId() {
-    return id;
   }
 
   @XmlAttribute(name = "id")
@@ -50,25 +38,18 @@ public class PromotionArticleDataGroup {
     this.id = id;
   }
 
-  private Double promotionNetSalesPricePerPiece;
-
-  public Double getPromotionNetSalesPricePerPiece() {
-    return promotionNetSalesPricePerPiece;
-  }
-
   @XmlElement(name = "PROMOTION_NET_SALES_PRICE_PER_PIECE")
   public void setPromotionNetSalesPricePerPiece(Double promotionNetSalesPricePerPiece) {
     this.promotionNetSalesPricePerPiece = promotionNetSalesPricePerPiece;
   }
 
-  private String promotionActiveStartDate;
-
-  public String getPromotionActiveStartDate() {
-    return promotionActiveStartDate;
-  }
-
   @XmlElement(name = "PROMOTION_START")
   public void setPromotionActiveStartDate(String promotionActiveStartDate) {
     this.promotionActiveStartDate = promotionActiveStartDate;
+  }
+
+  @XmlElement(name = "VALIDITY")
+  public void setValidity(Boolean validity) {
+    this.validity = validity;
   }
 }
