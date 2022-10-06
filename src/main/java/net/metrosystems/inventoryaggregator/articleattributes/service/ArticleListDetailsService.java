@@ -1,9 +1,26 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.DataType;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawIsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
@@ -17,11 +34,6 @@ import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundExceptio
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -33,6 +45,7 @@ public class ArticleListDetailsService {
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
   private final ArticleComponentRepository articleComponentRepository;
   private final ArticleCacheService articleCacheService;
+  private final RawArticleDataListService rawArticleDataListService;
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       List<ArticleId> articleIdList,
@@ -40,10 +53,11 @@ public class ArticleListDetailsService {
       String salesLine,
       String languageCode,
       Integer storeNo,
-      Optional<List<String>> dataTypeList)
+      Optional<List<String>> dataTypeList,
+      Optional<Boolean> dataSource)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+        articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList, dataSource);
   }
 
   public List<RawIsTradeItemExcludedFromDiscounts> isTradeItemExcludedFromDiscounts(
@@ -78,7 +92,8 @@ public class ArticleListDetailsService {
       String salesLine,
       String languageCode,
       Integer storeNo,
-      Optional<List<String>> dataTypeList)
+      Optional<List<String>> dataTypeList,
+      Optional<Boolean> dataSource)
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
@@ -93,15 +108,25 @@ public class ArticleListDetailsService {
                 e);
           }
         });
-
-    buildRawArticleDataList(
-        articleIdList,
-        countryCode,
-        salesLine,
-        languageCode,
-        storeNo,
-        rawArticleDataList,
-        dataTypeList);
+    if (dataSource.isPresent() && dataSource.get()) {
+      rawArticleDataListService.buildRawArticleDataList(
+          articleIdList,
+          countryCode,
+          salesLine,
+          languageCode,
+          storeNo,
+          rawArticleDataList,
+          dataTypeList);
+    } else {
+      buildRawArticleDataList(
+          articleIdList,
+          countryCode,
+          salesLine,
+          languageCode,
+          storeNo,
+          rawArticleDataList,
+          dataTypeList);
+    }
     return rawArticleDataList;
   }
 

@@ -39,11 +39,12 @@ public class ArticleListDataController {
       @PathVariable("languageCode") String languageCode,
       @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
       @RequestParam("dataType") Optional<List<String>> dataTypeList,
+      @RequestParam("dataSource") Optional<Boolean> dataSource,
       @RequestBody List<ArticleId> articleIdList)
       throws Exception {
       return ResponseEntity.ok(
           articleListDetailsService.getArticleDataListByArticleVariantBundle(
-              articleIdList, countryCode, salesLine, languageCode, storeNo,dataTypeList));
+              articleIdList, countryCode, salesLine, languageCode, storeNo,dataTypeList, dataSource));
   }
 
   @AddTimer
