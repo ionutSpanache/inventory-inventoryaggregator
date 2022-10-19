@@ -9,8 +9,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 @ITTestDefinition
-class LivenessProbTest {
-
+class LivenessProbeTest {
 
     @Autowired
     TestRestTemplate restTemplate;
