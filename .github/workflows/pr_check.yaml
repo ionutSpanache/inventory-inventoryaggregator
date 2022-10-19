@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-sonar-testing:
-    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/PR_Check_reusable_java17.yaml@master
+    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/PR_Check_reusable.yaml@master
     with:
       sonar_projectKey: inventory-inventoryaggregator
     secrets:

@@ -23,11 +23,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         ref: master
-    - name: Set up JDK 17
+    - name: Set up JDK 11
       uses: actions/setup-java@v2
       with:
-        java-version: '17'
-        distribution: 'zulu'
+        java-version: '11'
+        distribution: 'adopt'
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4.3
       with:
@@ -63,6 +63,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=inventory-inventoryaggregator
+    # run only if files under src and pom.xml were not changed
+    - name: Build with Maven without analyze
+      if: steps.filter.outputs.src == 'false' && steps.filter.outputs.pom == 'false'
+      run: mvn --batch-mode --update-snapshots verify
     - name: Setup tools
       uses: metro-digital/setup-tools-for-waas@v0.x
       with:
