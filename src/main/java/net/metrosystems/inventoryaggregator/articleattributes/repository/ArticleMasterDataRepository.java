@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 @Repository
@@ -33,7 +33,7 @@ public class ArticleMasterDataRepository {
   private final DocumentsService documentsService;
 
   @Qualifier("ForkJoinCustomPool")
-  private final ForkJoinPool forkJoinPoolCustom;
+  private final ExecutorService forkJoinPoolCustom;
 
   @Async("asyncExecutor")
   public CompletableFuture<ArticleMasterData> getArticleMasterData(
