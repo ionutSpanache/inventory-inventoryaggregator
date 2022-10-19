@@ -3,13 +3,14 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.RawArticleStoreMasterDataForArticleId;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclArticleStoreMasterDataService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsDataGroup;
@@ -31,7 +32,7 @@ public class RawArticleStoreMasterDataRepository {
   private static final String INDIA_COUNTRY_CODE = "IN";
 
   @Qualifier("ForkJoinCustomPool")
-  private final ExecutorService forkJoinPoolCustom;
+  private final ForkJoinPool forkJoinPoolCustom;
 
   @Async("asyncExecutor")
   public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(ArticleId articleId, String countryCode,

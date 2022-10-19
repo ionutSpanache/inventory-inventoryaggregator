@@ -13,21 +13,20 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.4</version>
+        <version>2.3.12.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>17</java.version>
-		<springdoc.version>1.6.11</springdoc.version>
+		<java.version>11</java.version>
+		<springdoc.version>1.5.12</springdoc.version>
 		<metrics.version>0.5.1.RELEASE</metrics.version>
-		<logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
-		<spring-boot-starter-inventory-api-error.version>0.0.2-SNAPSHOT
-		</spring-boot-starter-inventory-api-error.version>
-		<spring-cloud-starter-sleuth.version>3.1.4</spring-cloud-starter-sleuth.version>
-		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+		<micrometer.version>1.7.9</micrometer.version>
+		<micrometer.statsd.version>1.5.1</micrometer.statsd.version>
+		<log4j2.version>2.17.1</log4j2.version>
+        <logback.version>1.2.10</logback.version>
 	</properties>
 
 	<dependencies>
@@ -68,6 +67,7 @@
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-core</artifactId>
+			<version>3.3.10.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -83,21 +83,28 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.3.6.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
 
 		<dependency>
 			<groupId>net.logstash.logback</groupId>
 			<artifactId>logstash-logback-encoder</artifactId>
-			<version>${logstash-logback-encoder.version}</version>
+			<version>5.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.4</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -105,16 +112,31 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
+<!--			<version>2.2.7.RELEASE</version>-->
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>-->
+<!--			<version>2.2.7.RELEASE</version>-->
+<!--		</dependency>-->
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-jwt</artifactId>
+			<version>1.1.0.RELEASE</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.retry/spring-retry -->
         <dependency>
           <groupId>org.springframework.retry</groupId>
           <artifactId>spring-retry</artifactId>
+          <version>1.2.4.RELEASE</version>
         </dependency>
 		<dependency>
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.1</version>
+
 		</dependency>
 
 
@@ -122,6 +144,7 @@
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -131,10 +154,12 @@
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
+			<version>1.9.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
+			<version>3.9</version>
 		</dependency>
 		<!--metrics-->
 		<dependency>
@@ -150,10 +175,12 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-core</artifactId>
+			<version>${micrometer.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-statsd</artifactId>
+			<version>${micrometer.statsd.version}</version>
 		</dependency>
 		<!--metrics end-->
 
@@ -161,28 +188,37 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+            <version>2.2.6.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-sleuth</artifactId>
-            <version>${spring-cloud-starter-sleuth.version}</version>
+            <version>2.2.2.RELEASE</version>
         </dependency>
 
 		<dependency>
 			<groupId>net.metrosystems.common</groupId>
 			<artifactId>spring-boot-starter-inventory-api-error</artifactId>
-			<version>${spring-boot-starter-inventory-api-error.version}</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 
 		<!--> Test Dependencies<-->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.6.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
+            <version>3.4.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -195,12 +231,18 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!--SonarQube-->
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.7.0.1746</version>
+			</plugin>
 
 			<!--SonarQube with Spring Boot 2 settings-->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco-maven-plugin.version}</version>
+				<version>0.8.5</version>
 				<executions>
 					<execution>
 						<id>pre-test</id>
@@ -228,12 +270,22 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M5</version>
 				<configuration>
 					<!--suppress UnresolvedMavenProperty -->
 					<argLine>${jacocoArgLine}</argLine>
 					<reportsDirectory>${project.test.result.directory}/surefire</reportsDirectory>
 				</configuration>
 			</plugin>
+			<!--SonarQube with Spring Boot 2 settings-->
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 

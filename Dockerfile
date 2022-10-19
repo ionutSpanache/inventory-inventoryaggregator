@@ -1,5 +1,5 @@
 #Base build image with maven and DDAgent
-FROM registry.metroscales.io/inventory/mstore-alpine-jre17:latest
+FROM registry.metroscales.io/inventory/mstore-alpine-jdk11:latest
 LABEL maintainer="andrei.meran@metro-external.digital"
 
 ARG CACHEBUST
