@@ -14,6 +14,7 @@ import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.f
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -24,8 +25,10 @@ public class DocumentsService {
   @Autowired
   FilterAAAClient filterAAAClient;
   @Autowired
+  @Lazy //TODO: resolve circular dependency
   FilterAAAService filterAAAService;
   @Autowired
+  @Lazy //TODO: resolve circular dependency
   private ArticleCacheAAAClient articleCacheClient;
 
   public ArticleId tranformDocumentInArticleId(String document) {
