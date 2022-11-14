@@ -6,6 +6,7 @@ metadata:
   labels:
     service: inventory-inventoryaggregator
   name: inventory-inventoryaggregator-internal-lb
+  networking.gke.io/internal-load-balancer-allow-global-access: "true"
   namespace: inventory-gke-dev
 spec:
   allocateLoadBalancerNodePorts: true
@@ -35,3 +36,4 @@ spec:
     service: inventoryaggregator
   sessionAffinity: None
   type: LoadBalancer
+  loadBalancerIP: 10.32.9.56

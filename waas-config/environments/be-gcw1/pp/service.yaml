@@ -3,6 +3,7 @@ kind: Service
 metadata:
   annotations:
     networking.gke.io/load-balancer-type: Internal
+    networking.gke.io/internal-load-balancer-allow-global-access: "true"
   labels:
     service: inventory-inventoryaggregator
   name: inventory-inventoryaggregator-internal-lb
@@ -35,3 +36,4 @@ spec:
     service: inventoryaggregator
   sessionAffinity: None
   type: LoadBalancer
+  loadBalancerIP: 10.32.24.106
