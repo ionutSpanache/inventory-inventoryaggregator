@@ -3,10 +3,10 @@ kind: Service
 metadata:
   annotations:
     networking.gke.io/load-balancer-type: Internal
+    networking.gke.io/internal-load-balancer-allow-global-access: "true"
   labels:
     service: inventory-inventoryaggregator
   name: inventory-inventoryaggregator-internal-lb
-  networking.gke.io/internal-load-balancer-allow-global-access: "true"
   namespace: inventory-gke-dev
 spec:
   allocateLoadBalancerNodePorts: true
