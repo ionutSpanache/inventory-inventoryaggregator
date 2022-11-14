@@ -63,6 +63,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=inventory-inventoryaggregator
+    - name: Build with Maven without analyze
+      if: steps.filter.outputs.src == 'false' && steps.filter.outputs.pom == 'false'
+      run: mvn --batch-mode --update-snapshots verify  
     - name: Setup tools
       uses: metro-digital/setup-tools-for-waas@v0.x
       with:
