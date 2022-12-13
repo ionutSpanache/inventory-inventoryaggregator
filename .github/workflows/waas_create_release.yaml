@@ -144,10 +144,11 @@ jobs:
         gcloud container clusters update $_GKE_DEV_CLUSTER --project=$_GKE_DEV_PROJECT --region=$_GKE_LOCATION \
         --enable-master-authorized-networks \
         --master-authorized-networks $CIDRS
-    - uses: azure/setup-kubectl@v3
-      id: install
-    - name: Setup context
-      run: gcloud container clusters get-credentials $_GKE_DEV_CLUSTER --region europe-west1 --project $_GKE_DEV_PROJECT
+    - id: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v1'
+      with:
+        cluster_name: '${{ env._GKE_DEV_CLUSTER }}'
+        location: '${{ env._GKE_LOCATION }}'
     - name: Get repository information (to put in K8S deployment)
       uses: octokit/request-action@v2.x
       id: repo_information
@@ -208,10 +209,11 @@ jobs:
         gcloud container clusters update $_GKE_PP_CLUSTER --project=$_GKE_PP_PROJECT --region=$_GKE_LOCATION \
         --enable-master-authorized-networks \
         --master-authorized-networks $CIDRS
-    - uses: azure/setup-kubectl@v3
-      id: install
-    - name: Setup context
-      run: gcloud container clusters get-credentials $_GKE_PP_CLUSTER --region europe-west1 --project $_GKE_PP_PROJECT
+    - id: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v1'
+      with:
+        cluster_name: '${{ env._GKE_PP_CLUSTER }}'
+        location: '${{ env._GKE_LOCATION }}'
     - name: Get repository information (to put in K8S deployment)
       uses: octokit/request-action@v2.x
       id: repo_information
