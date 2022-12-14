@@ -18,7 +18,9 @@ public class PromotionArticleDataGroup {
   private Double promotionNetSalesPricePerPiece;
   private String promotionActiveStartDate;
   private Boolean validity;
-  private List<String> descriptions;
+
+  private List<PromotionDescription> descriptions;
+
 
   @XmlElement(name = "PROMOTION_END")
   public void setPromotionActiveEndDate(String promotionActiveEndDate) {
@@ -55,8 +57,7 @@ public class PromotionArticleDataGroup {
     this.validity = validity;
   }
 
-  @XmlElement(name = "PROMOTION_DESCRIPTION")
-  public void setDescriptions(List<String> descriptions) {
+  public void setDescriptions(List<PromotionDescription> descriptions) {
     this.descriptions = descriptions;
   }
 }
