@@ -1,11 +1,10 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article;
 
 import java.util.List;
-import lombok.Getter;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import lombok.Getter;
 
 @XmlRootElement(name = "DataGroup")
 @Getter
@@ -20,7 +19,6 @@ public class PromotionArticleDataGroup {
   private Boolean validity;
 
   private List<PromotionDescription> descriptions;
-
 
   @XmlElement(name = "PROMOTION_END")
   public void setPromotionActiveEndDate(String promotionActiveEndDate) {
@@ -57,6 +55,7 @@ public class PromotionArticleDataGroup {
     this.validity = validity;
   }
 
+  @XmlElement(name = "PROMOTION_DESCRIPTION")
   public void setDescriptions(List<PromotionDescription> descriptions) {
     this.descriptions = descriptions;
   }
