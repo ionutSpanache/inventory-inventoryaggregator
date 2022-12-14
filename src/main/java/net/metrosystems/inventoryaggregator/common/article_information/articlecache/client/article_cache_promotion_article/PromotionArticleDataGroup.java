@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article;
 
+import java.util.List;
 import lombok.Getter;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -17,6 +18,7 @@ public class PromotionArticleDataGroup {
   private Double promotionNetSalesPricePerPiece;
   private String promotionActiveStartDate;
   private Boolean validity;
+  private List<String> descriptions;
 
   @XmlElement(name = "PROMOTION_END")
   public void setPromotionActiveEndDate(String promotionActiveEndDate) {
@@ -51,5 +53,10 @@ public class PromotionArticleDataGroup {
   @XmlElement(name = "VALIDITY")
   public void setValidity(Boolean validity) {
     this.validity = validity;
+  }
+
+  @XmlElement(name = "PROMOTION_DESCRIPTION")
+  public void setDescriptions(List<String> descriptions) {
+    this.descriptions = descriptions;
   }
 }

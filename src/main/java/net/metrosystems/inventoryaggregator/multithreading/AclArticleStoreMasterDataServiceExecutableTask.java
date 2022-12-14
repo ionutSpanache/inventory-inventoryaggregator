@@ -75,7 +75,7 @@ public class AclArticleStoreMasterDataServiceExecutableTask implements Callable<
 	}
 
 	private void processAclArticleStoreMasterData() {
-		ArticleStoreMasterData articleStoreMasterData = new ArticleStoreMasterData();
+		ArticleStoreMasterData articleStoreMasterData;
 		int bundleIndex = 0;
 		for(ArticleBundle articleBundle : articleVariant.getBundles()) {
 			try {
@@ -103,9 +103,8 @@ public class AclArticleStoreMasterDataServiceExecutableTask implements Callable<
 	}
 
 	@Override
-	public ArticleVariant call() throws Exception{
+	public ArticleVariant call(){
 		try {
-			//logger.info("Thread " + this.getIdAsString() + " has started");
 			processAclArticleStoreMasterData();
 			return this.articleVariant;
 		} catch(Exception e) {

@@ -133,12 +133,4 @@ public class AclArticleStoreMasterDataClient {
 
   }
 
-  private boolean isErrorResponse(HttpStatus httpStatus) {
-    return  !httpStatus.is2xxSuccessful();
-  }
-
-  private Mono<? extends Throwable> log(ClientResponse clientResponse, String message) {
-    log.error(message, clientResponse.statusCode().value());
-    return Mono.empty();
-  }
 }

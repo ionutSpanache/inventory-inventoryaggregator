@@ -294,6 +294,7 @@ public class ArticleCacheService {
                       .promotionStart(LocalDate.parse(t.getPromotionActiveStartDate(), formatter))
                       .promotionEnd(LocalDate.parse(t.getPromotionActiveEndDate(), formatter))
                       .valid(t.getValidity())
+                      .descriptions(t.getDescriptions())
                       .build()));
     }
     return promotions;

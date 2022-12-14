@@ -23,8 +23,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -38,87 +36,88 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @EnableScheduling
 public class ApacheHttpClientConfig {
 
-    private HttpRequestRetryHandler retryHandler;
+  private HttpRequestRetryHandler retryHandler;
 
-    @Autowired
-    public  ApacheHttpClientConfig(HttpRequestRetryHandler retryHandler) {
-        this.retryHandler = retryHandler;
-    }
+  @Autowired
+  public ApacheHttpClientConfig(HttpRequestRetryHandler retryHandler) {
+    this.retryHandler = retryHandler;
+  }
 
-    @Bean
-    public PoolingHttpClientConnectionManager poolingConnectionManager() {
-      PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager();
+  @Bean
+  public PoolingHttpClientConnectionManager poolingConnectionManager() {
+    PoolingHttpClientConnectionManager poolingConnectionManager =
+        new PoolingHttpClientConnectionManager();
 
-      // set total amount of connections across all HTTP routes
-      poolingConnectionManager.setMaxTotal(MAX_TOTAL_CONNECTIONS);
+    // set total amount of connections across all HTTP routes
+    poolingConnectionManager.setMaxTotal(MAX_TOTAL_CONNECTIONS);
 
-      // set maximum amount of connections for each http route in pool
-      poolingConnectionManager.setDefaultMaxPerRoute(MAX_ROUTE_CONNECTIONS);
+    // set maximum amount of connections for each http route in pool
+    poolingConnectionManager.setDefaultMaxPerRoute(MAX_ROUTE_CONNECTIONS);
 
-      // increase the amounts of connections if host is localhost
-      HttpHost localhost = new HttpHost("http://localhost", 8080);
-      poolingConnectionManager.setMaxPerRoute(new HttpRoute(localhost), MAX_LOCALHOST_CONNECTIONS);
+    // increase the amounts of connections if host is localhost
+    HttpHost localhost = new HttpHost("http://localhost", 8080);
+    poolingConnectionManager.setMaxPerRoute(new HttpRoute(localhost), MAX_LOCALHOST_CONNECTIONS);
 
-      return poolingConnectionManager;
-    }
+    return poolingConnectionManager;
+  }
 
-    @Bean
-    public ConnectionKeepAliveStrategy connectionKeepAliveStrategy() {
-      return (httpResponse, httpContext) -> {
-        HeaderIterator headerIterator = httpResponse.headerIterator(HTTP.CONN_KEEP_ALIVE);
-        HeaderElementIterator elementIterator = new BasicHeaderElementIterator(headerIterator);
+  @Bean
+  public ConnectionKeepAliveStrategy connectionKeepAliveStrategy() {
+    return (httpResponse, httpContext) -> {
+      HeaderIterator headerIterator = httpResponse.headerIterator(HTTP.CONN_KEEP_ALIVE);
+      HeaderElementIterator elementIterator = new BasicHeaderElementIterator(headerIterator);
 
-        while (elementIterator.hasNext()) {
-          HeaderElement element = elementIterator.nextElement();
-          String param = element.getName();
-          String value = element.getValue();
-          if (value != null && param.equalsIgnoreCase("timeout")) {
-            return Long.parseLong(value) * 1000; // convert to ms
-          }
+      while (elementIterator.hasNext()) {
+        HeaderElement element = elementIterator.nextElement();
+        String param = element.getName();
+        String value = element.getValue();
+        if (value != null && param.equalsIgnoreCase("timeout")) {
+          return Long.parseLong(value) * 1000; // convert to ms
         }
+      }
 
-        return DEFAULT_KEEP_ALIVE_TIME;
-      };
-    }
+      return DEFAULT_KEEP_ALIVE_TIME;
+    };
+  }
 
-    @Bean
-    public Runnable idleConnectionMonitor(PoolingHttpClientConnectionManager pool) {
-      return new Runnable() {
-        @Override
-        @Scheduled(fixedDelay = 20000)
-        public void run() {
-          // only if connection pool is initialised
-          if (pool != null) {
-            pool.closeExpiredConnections();
-            pool.closeIdleConnections(IDLE_CONNECTION_WAIT_TIME, TimeUnit.MILLISECONDS);
-          }
+  @Bean
+  public Runnable idleConnectionMonitor(PoolingHttpClientConnectionManager pool) {
+    return new Runnable() {
+      @Override
+      @Scheduled(fixedDelay = 20000)
+      public void run() {
+        // only if connection pool is initialised
+        if (pool != null) {
+          pool.closeExpiredConnections();
+          pool.closeIdleConnections(IDLE_CONNECTION_WAIT_TIME, TimeUnit.MILLISECONDS);
         }
-      };
-    }
+      }
+    };
+  }
 
-    @Bean
-    @Qualifier("taskScheduleIdle")
-    public TaskScheduler taskScheduler() {
-      ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-      scheduler.setThreadNamePrefix("idleMonitor-");
-      scheduler.setPoolSize(5);
-      return scheduler;
-    }
+  @Bean
+  @Qualifier("taskScheduleIdle")
+  public TaskScheduler taskScheduler() {
+    ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+    scheduler.setThreadNamePrefix("idleMonitor-");
+    scheduler.setPoolSize(5);
+    return scheduler;
+  }
 
-    @Bean
-    public CloseableHttpClient httpClient() {
-      RequestConfig requestConfig = RequestConfig.custom()
-                                                 .setConnectTimeout(CONNECTION_TIMEOUT)
-                                                 .setConnectionRequestTimeout(REQUEST_TIMEOUT)
-                                                 .setSocketTimeout(SOCKET_TIMEOUT)
-                                                 .build();
+  @Bean
+  public CloseableHttpClient httpClient() {
+    RequestConfig requestConfig =
+        RequestConfig.custom()
+            .setConnectTimeout(CONNECTION_TIMEOUT)
+            .setConnectionRequestTimeout(REQUEST_TIMEOUT)
+            .setSocketTimeout(SOCKET_TIMEOUT)
+            .build();
 
-      return HttpClients.custom()
-                        .setDefaultRequestConfig(requestConfig)
-                        .setConnectionManager(poolingConnectionManager())
-                        .setKeepAliveStrategy(connectionKeepAliveStrategy())
-                        .setRetryHandler(retryHandler)
-                        .build();
-    }
-
+    return HttpClients.custom()
+        .setDefaultRequestConfig(requestConfig)
+        .setConnectionManager(poolingConnectionManager())
+        .setKeepAliveStrategy(connectionKeepAliveStrategy())
+        .setRetryHandler(retryHandler)
+        .build();
+  }
 }

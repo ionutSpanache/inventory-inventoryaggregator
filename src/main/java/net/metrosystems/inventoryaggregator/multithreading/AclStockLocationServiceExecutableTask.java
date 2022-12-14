@@ -135,7 +135,7 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 							aclBundleStockLocation.getLastChangeDate(),
 							aclBundleStockLocation.getSerialShippingContainerCode());
 					if (articleStockLocationList == null) {
-						articleStockLocationList = new ArrayList<ArticleStockLocation>(Arrays.asList(articleStockLocation));
+						articleStockLocationList = new ArrayList<>(Arrays.asList(articleStockLocation));
 					}else {
 						articleStockLocationList.add(articleStockLocation);
 					}

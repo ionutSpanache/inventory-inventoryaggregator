@@ -1,6 +1,7 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,4 +22,5 @@ public class PromotionArticleData implements Serializable {
   private LocalDate promotionStart;
   private LocalDate promotionEnd;
   @JsonIgnore private Boolean valid;
+  private List<String> descriptions;
 }

@@ -27,7 +27,7 @@ public class ArticleCacheIapplClient //implements ArticleCacheClient
     @Value("${ARTICLE_CACHE_FILTER_PATH}")
     private String articleCacheFilterPath;
 
-    private final String language = "&language=%s";
+    private static final String language = "&language=%s";
 
     private final RestTemplate restTemplateDocuments;
     private final RestTemplate restTemplateFilter;
