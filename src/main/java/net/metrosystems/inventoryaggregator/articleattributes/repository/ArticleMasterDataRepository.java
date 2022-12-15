@@ -83,10 +83,10 @@ public class ArticleMasterDataRepository {
   // articleId));
   //  }
 
-  private List<PromotionArticleData> getPromotionArticle(
-      String countryCode, Integer storeId, ArticleId articleId) {
+  public List<PromotionArticleData> getPromotionArticle(
+      String countryCode, Integer storeNumber, ArticleId articleId) {
 
-    return articleCacheService.getPromotionArticleData(countryCode, articleId, storeId);
+    return articleCacheService.getPromotionArticleData(countryCode, articleId, storeNumber);
   }
 
   @Async("asyncExecutor")
