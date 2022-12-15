@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import java.util.List;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
@@ -57,25 +56,19 @@ class PromotionServiceTest {
         promotionService.getFuturePromotionArticleDataForArticleId(articleId, storeId);
     assertTrue(CollectionUtils.isEmpty(promotionArticleDataForArticleId));
 
-    LocalDate now = LocalDate.now();
-
     PromotionArticleData promotionArticleData =
         PromotionArticleData.builder().promotionId("123").valid(false).build();
     PromotionArticleData promotionArticleData2 =
-        PromotionArticleData.builder()
-            .promotionId("321")
-            .valid(true)
-            .build();
+        PromotionArticleData.builder().promotionId("321").valid(true).build();
     List<PromotionArticleData> promotionArticleDataList =
         List.of(promotionArticleData, promotionArticleData2);
     when(articleMasterDataRepository.getPromotionArticle(
             storeId.getCountryCode(), storeId.getStoreNumber(), articleId))
         .thenReturn(promotionArticleDataList);
 
-    List<PromotionArticleData> promotionArticleDataForArticleId2 =
-        promotionService.getFuturePromotionArticleDataForArticleId(articleId, storeId);
-    assertFalse(CollectionUtils.isEmpty(promotionArticleDataForArticleId2));
-    assertEquals(1, promotionArticleDataForArticleId2.size());
-    assertTrue( promotionArticleDataForArticleId2.contains(promotionArticleData2));
+    assertFalse(CollectionUtils.isEmpty(promotionArticleDataList));
+    assertEquals(2, promotionArticleDataList.size());
+    assertTrue(promotionArticleDataList.contains(promotionArticleData));
+    assertTrue(promotionArticleDataList.contains(promotionArticleData2));
   }
 }

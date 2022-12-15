@@ -30,6 +30,6 @@ public class PromotionService {
     if (CollectionUtils.isEmpty(promotionArticle)) {
       return Collections.emptyList();
     }
-    return promotionArticle.stream().filter(t -> Boolean.TRUE == t.getValid()).toList();
+    return promotionArticle;
   }
 }
