@@ -237,7 +237,7 @@ public class ArticleCacheService {
   public List<PromotionArticleData> getPromotionArticleData(
       String countryCode,
       net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
-      Integer storeId) {
+      Integer storeNumber) {
 
     String documentUrl =
         "documents/"
@@ -251,7 +251,7 @@ public class ArticleCacheService {
             + "&mmsartno="
             + articleId.getArticleNumber()
             + "&storeno="
-            + storeId
+            + storeNumber
             + "&variantno="
             + articleId.getVariantNumber();
 
