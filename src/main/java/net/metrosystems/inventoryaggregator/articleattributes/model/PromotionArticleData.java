@@ -17,7 +17,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 @AllArgsConstructor
 public class PromotionArticleData implements Serializable {
 
-  @JsonIgnore private Boolean valid;
+  private Boolean valid;
   private Double promotionNetSalesPricePerBundle;
   private Double promotionNetSalesPricePerPiece;
   private List<PromotionDescription> descriptions;
