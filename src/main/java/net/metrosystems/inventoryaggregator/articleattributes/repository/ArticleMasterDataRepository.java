@@ -2,13 +2,11 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionDescription;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +30,8 @@ public class ArticleMasterDataRepository {
 
   private final ArticleCacheService articleCacheService;
   private final DocumentsService documentsService;
+
+  private final String DEFAULT_LANGUAGE_CODE = "EN";
 
   @Qualifier("ForkJoinCustomPool")
   private final ExecutorService forkJoinPoolCustom;
@@ -52,8 +53,9 @@ public class ArticleMasterDataRepository {
             salesLine,
             languageCode,
             storeNo);
+
     ArticleMasterData articleMasterData =
-        transformArticleCacheFullToArticleMasterData(articleCacheFullData);
+        transformArticleCacheFullToArticleMasterData(articleCacheFullData, countryCode, storeNo, languageCode, articleId);
 
     return CompletableFuture.completedFuture(articleMasterData);
   }
@@ -138,6 +140,7 @@ public class ArticleMasterDataRepository {
     Map<ArticleId, String> articlesDocumentUrlMap =
         documentsService.getDocumentsForMultipleArticles(
             countryCode, salesLine, languageCode, articleIdList);
+
     forkJoinPoolCustom
         .submit(
             () ->
@@ -159,7 +162,7 @@ public class ArticleMasterDataRepository {
                           if (articleCacheFullData != null)
                             result.put(
                                 articleId,
-                                transformArticleCacheFullToArticleMasterData(articleCacheFullData));
+                                transformArticleCacheFullToArticleMasterData(articleCacheFullData, countryCode, storeNo, languageCode, articleId));
                         }))
         .get();
     return CompletableFuture.completedFuture(result);
@@ -240,14 +243,26 @@ public class ArticleMasterDataRepository {
   }
 
   private ArticleMasterData transformArticleCacheFullToArticleMasterData(
-      ArticleCacheFullData articleCacheFullData) {
+      ArticleCacheFullData articleCacheFullData,
+      String countryCode,
+      Integer storeNumber,
+      String languageCode,
+      ArticleId articleId) {
+
     if (articleCacheFullData != null) {
+
+      SimplePromotionArticleData promotion =
+              getPromotion(countryCode, storeNumber, languageCode, articleId);
+
       return new ArticleMasterData()
           .setArticleDescription(articleCacheFullData.getArticleDescription())
           .setBarcode(articleCacheFullData.getBarcode())
           .setCommercialSupplier(articleCacheFullData.getCommercialSupplier())
           .setPresentationMerchandiseGroup(articleCacheFullData.getPresentationMerchandiseGroup())
-          .setPromotionId(articleCacheFullData.getPromotionId())
+          .setPromotionId(promotion.getPromotionId())
+          .setPromotionDescription(promotion.getPromotionDescription())
+          .setPromotionStartDate(promotion.getPromotionStart())
+          .setPromotionEndDate(promotion.getPromotionEnd())
           .setSellingBundleContent(articleCacheFullData.getSellingBundleContent())
           .setWeightArticle(articleCacheFullData.getWeightArticle())
           .setNetWeight(articleCacheFullData.getNetWeight())
@@ -287,8 +302,47 @@ public class ArticleMasterDataRepository {
           .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator())
           .setCoreAssortmentIndicator(articleCacheFullData.getCoreAssortmentIndicator())
           .setAssignedStoreSupplierType(articleCacheFullData.getAssignedStoreSupplierType())
-          .setInOutIndicator(articleCacheFullData.getInOutIndicator())    ;
+          .setInOutIndicator(articleCacheFullData.getInOutIndicator());
     }
     return null;
+  }
+
+  public SimplePromotionArticleData getPromotion(
+      String countryCode, Integer storeNumber, String languageCode, ArticleId articleId) {
+    PromotionArticleData promotionArticleData =
+        getPromotionArticle(countryCode, storeNumber, articleId).stream()
+            .filter(PromotionArticleData::getValid)
+            .filter(
+                promotion ->
+                    promotion.getPromotionStart().isBefore(LocalDate.now())
+                        && promotion.getPromotionEnd().isAfter(LocalDate.now()))
+            .min(Comparator.comparing(PromotionArticleData::getPromotionEnd))
+            .orElse(PromotionArticleData.builder().build());
+
+    Optional<PromotionDescription> promotionDescription = Optional.empty();
+
+    if(!CollectionUtils.isEmpty(promotionArticleData.getDescriptions())){
+      promotionDescription =
+          promotionArticleData.getDescriptions().stream()
+              .filter(promotionDesc -> (promotionDesc.getLanguage().equalsIgnoreCase(languageCode)))
+              .findFirst();
+
+      if (promotionDescription.isEmpty()) {
+
+        promotionDescription =
+            promotionArticleData.getDescriptions().stream()
+                .filter(
+                    promotionDesc ->
+                        (promotionDesc.getLanguage().equalsIgnoreCase(DEFAULT_LANGUAGE_CODE)))
+                .findFirst();
+      }
+    }
+
+    return SimplePromotionArticleData.builder()
+        .promotionId(promotionArticleData.getPromotionId())
+        .promotionDescription(promotionDescription.map(PromotionDescription::getDescription).orElse(null))
+        .promotionStart(promotionArticleData.getPromotionStart())
+        .promotionEnd(promotionArticleData.getPromotionEnd())
+        .build();
   }
 }

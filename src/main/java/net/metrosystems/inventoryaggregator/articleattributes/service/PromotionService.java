@@ -1,6 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,7 @@ public class PromotionService {
     this.articleMasterDataRepository = articleMasterDataRepository;
   }
 
-  public List<PromotionArticleData> getFuturePromotionArticleDataForArticleId(
+  public List<PromotionArticleData> getAllArticlePromotionsForArticleId(
       ArticleId articleId, StoreId storeId) {
 
     List<PromotionArticleData> promotionArticle =

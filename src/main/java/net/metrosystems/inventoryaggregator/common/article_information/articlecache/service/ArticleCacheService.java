@@ -20,7 +20,6 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
-import net.metrosystems.inventoryaggregator.common.promotions.acl.service.PromotionsAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,6 @@ public class ArticleCacheService {
   private final DocumentsService documentsService;
   private final ArticleCacheAAAClient articleCacheClient;
   private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
-  private final PromotionsAclService promotionsAclService;
 
   private static final String PAKISTAN_COUNTRY_CODE = "PK";
   private static final Double ZERO = 0.0;
@@ -70,12 +68,10 @@ public class ArticleCacheService {
   public ArticleCacheService(
       DocumentsService documentsService,
       ArticleCacheAAAClient articleCacheClient,
-      ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient,
-      PromotionsAclService promotionsAclService) {
+      ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient) {
     this.documentsService = documentsService;
     this.articleCacheClient = articleCacheClient;
     this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
-    this.promotionsAclService = promotionsAclService;
   }
 
   public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForEan(
@@ -540,12 +536,6 @@ public class ArticleCacheService {
             .getArticleCacheIncident()
             .getArticleCacheDataGroupWithoutStore(200);
 
-    List<String> promotionIdList =
-        articleCacheDocument
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getPromotionIdListWithStore(322, hierarchySequenceStoreNo);
-
     return new ArticleCacheFullData(
         articleCacheReaderDigest.getMmsArtNo(),
         articleCacheReaderDigest.getVariantNo(),
@@ -554,9 +544,6 @@ public class ArticleCacheService {
         articleCacheDocument.getTransaction().getArticleCacheIncident().getBarcodeForBundle(),
         articleCacheReaderDigest.getProducingSupplier(),
         articleCacheDataGroup100.getPresentationMerchandiseGroup(),
-        CollectionUtils.isEmpty(promotionIdList)
-            ? null
-            : getPromotionIdAvailable(articleCacheDocument, promotionIdList, storeNo),
         articleCacheDataGroup310.getSellingBundleContent(),
         articleCacheDataGroup100.getWeightArticles(),
         articleCacheDataGroup200.getNetWeight(),
@@ -597,16 +584,6 @@ public class ArticleCacheService {
 				articleCacheDataGroup320.getAssignedStoreSupplierType(),
  		    articleCacheDataGroup310.getInOutIndicator());
 	}
-
-  private String getPromotionIdAvailable(
-      ArticleCacheIhdsTree articleCacheDocument, List<String> promotionIdList, Integer storeNo) {
-
-    if (promotionIdList.size() > 1) {
-      return promotionsAclService.getActivePromotion(
-          articleCacheDocument, promotionIdList, storeNo);
-    }
-    return promotionIdList.get(0);
-  }
 
   private MinimumRetailPrice calculateMinimumRetailPrice(
       ArticleCacheIhdsTree articleCacheIhdsTree,

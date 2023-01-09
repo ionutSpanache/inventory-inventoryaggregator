@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -18,6 +19,9 @@ public class ArticleMasterData implements Serializable {
   private Integer commercialSupplier;
   private Integer presentationMerchandiseGroup;
   private String promotionId;
+  private String promotionDescription;
+  private LocalDate promotionStartDate;
+  private LocalDate promotionEndDate;
   private Integer sellingBundleContent;
   private Integer packageFactor;
   private Double weightArticle;
@@ -64,48 +68,4 @@ public class ArticleMasterData implements Serializable {
     return serialVersionUID;
   }
 
-  @Override
-  public String toString() {
-    return "ArticleMasterData{" +
-            "articleDescription='" + articleDescription + '\'' +
-            ", barcode='" + barcode + '\'' +
-            ", commercialSupplier=" + commercialSupplier +
-            ", presentationMerchandiseGroup=" + presentationMerchandiseGroup +
-            ", promotionId='" + promotionId + '\'' +
-            ", sellingBundleContent=" + sellingBundleContent +
-            ", packageFactor=" + packageFactor +
-            ", weightArticle=" + weightArticle +
-            ", subsystemArticleNumber=" + subsystemArticleNumber +
-            ", vatPercent=" + vatPercent +
-            ", pieceNetSellPrice=" + pieceNetSellPrice +
-            ", bundleNetSellPrice=" + bundleNetSellPrice +
-            ", promotionBundleNetPrice=" + promotionBundleNetPrice +
-            ", variantDescription='" + variantDescription + '\'' +
-            ", articleType=" + articleType +
-            ", articleClass='" + articleClass + '\'' +
-            ", foodNonfoodIndicator='" + foodNonfoodIndicator + '\'' +
-            ", presentationMainMerchandiseGroup=" + presentationMainMerchandiseGroup +
-            ", presentationSubMerchandiseGroup=" + presentationSubMerchandiseGroup +
-            ", supplierNumber=" + supplierNumber +
-            ", procurementCode=" + procurementCode +
-            ", assortmentCode='" + assortmentCode + '\'' +
-            ", blockingCode=" + blockingCode +
-            ", activationStatus=" + activationStatus +
-            ", expiryDays=" + expiryDays +
-            ", pieceNetBuyingPrice=" + pieceNetBuyingPrice +
-            ", bundleNetBuyingPrice=" + bundleNetBuyingPrice +
-            ", pieceNetNetBuyingPrice=" + pieceNetNetBuyingPrice +
-            ", bundleNetNetBuyingPrice=" + bundleNetNetBuyingPrice +
-            ", articleNoEmptiesSales=" + articleNoEmptiesSales +
-            ", brandName='" + brandName + '\'' +
-            ", minimumRetailPrice=" + minimumRetailPrice +
-            ", countryOfOrigin='" + countryOfOrigin + '\'' +
-            ", isTradeItemExcludedFromDiscounts=" + isTradeItemExcludedFromDiscounts +
-            ", gradeCodeReferenceFruitsVegetables='" + gradeCodeReferenceFruitsVegetables + '\'' +
-            ", alcoholClass='" + alcoholClass + '\'' +
-            ", traceabilityIndicator=" + traceabilityIndicator +
-            ", coreAssortmentIndicator=" + coreAssortmentIndicator +
-            ", assignedStoreSupplierType=" + assignedStoreSupplierType +
-            '}';
-  }
 }

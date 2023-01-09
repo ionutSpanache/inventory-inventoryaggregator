@@ -19,7 +19,6 @@ public class ArticleCacheFullData {
     private String barcode;
     private Integer commercialSupplier;
     private Integer presentationMerchandiseGroup;
-    private String promotionId;
     private Integer sellingBundleContent;
     private Double weightArticle;
     private Double netWeight;
