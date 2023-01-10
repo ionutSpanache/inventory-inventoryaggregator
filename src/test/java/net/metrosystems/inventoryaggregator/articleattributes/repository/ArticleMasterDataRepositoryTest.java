@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import static java.time.LocalDate.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 class ArticleMasterDataRepositoryTest {
@@ -36,7 +38,7 @@ class ArticleMasterDataRepositoryTest {
   private final String NETHERLANDS_LANGUAGE_CODE = "NL";
   private final String ROMANIA_LANGUAGE_CODE = "RO";
 
-  private final LocalDate CURRENT_DATE = LocalDate.now();
+  private final LocalDate CURRENT_DATE = now();
 
   @InjectMocks private ArticleMasterDataRepository articleMasterDataRepository;
 
@@ -69,7 +71,7 @@ class ArticleMasterDataRepositoryTest {
                     CURRENT_DATE.plusMonths(2))));
 
     SimplePromotionArticleData simplePromotionArticleData =
-        articleMasterDataRepository.getPromotion(
+        articleMasterDataRepository.getActivePromotionForToday(
             COUNTRY_CODE, 1, NETHERLANDS_LANGUAGE_CODE, generateArticleId(123L, 1L, 1L));
 
     assertEquals(
@@ -91,7 +93,7 @@ class ArticleMasterDataRepositoryTest {
                     true, null, CURRENT_DATE.minusMonths(5), CURRENT_DATE.plusMonths(2))));
 
     SimplePromotionArticleData simplePromotionArticleData =
-        articleMasterDataRepository.getPromotion(
+        articleMasterDataRepository.getActivePromotionForToday(
             COUNTRY_CODE, 1, NETHERLANDS_LANGUAGE_CODE, generateArticleId(123L, 1L, 1L));
 
     assertEquals(
@@ -113,10 +115,10 @@ class ArticleMasterDataRepositoryTest {
                     false, null, CURRENT_DATE.minusMonths(2), CURRENT_DATE.plusMonths(3))));
 
     SimplePromotionArticleData simplePromotionArticleData =
-        articleMasterDataRepository.getPromotion(
+        articleMasterDataRepository.getActivePromotionForToday(
             COUNTRY_CODE, 1, ROMANIA_LANGUAGE_CODE, generateArticleId(123L, 1L, 1L));
 
-    assertEquals(null, simplePromotionArticleData.getPromotionDescription());
+    assertNull(simplePromotionArticleData.getPromotionDescription());
     assertEquals(CURRENT_DATE.minusMonths(4), simplePromotionArticleData.getPromotionStart());
     assertEquals(CURRENT_DATE.plusMonths(1), simplePromotionArticleData.getPromotionEnd());
   }
@@ -134,12 +136,12 @@ class ArticleMasterDataRepositoryTest {
                     true, null, CURRENT_DATE.plusMonths(2), CURRENT_DATE.plusMonths(3))));
 
     SimplePromotionArticleData simplePromotionArticleData =
-        articleMasterDataRepository.getPromotion(
+        articleMasterDataRepository.getActivePromotionForToday(
             COUNTRY_CODE, 1, ROMANIA_LANGUAGE_CODE, generateArticleId(123L, 1L, 1L));
 
-    assertEquals(null, simplePromotionArticleData.getPromotionDescription());
-    assertEquals(null, simplePromotionArticleData.getPromotionStart());
-    assertEquals(null, simplePromotionArticleData.getPromotionEnd());
+    assertNull(simplePromotionArticleData.getPromotionDescription());
+    assertNull(simplePromotionArticleData.getPromotionStart());
+    assertNull(simplePromotionArticleData.getPromotionEnd());
   }
 
   private PromotionArticleData generatePromotion(

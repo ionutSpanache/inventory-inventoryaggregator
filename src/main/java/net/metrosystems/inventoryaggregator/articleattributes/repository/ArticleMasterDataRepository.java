@@ -23,6 +23,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
+import static java.time.LocalDate.now;
+
 @Repository
 @Slf4j
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class ArticleMasterDataRepository {
   private final ArticleCacheService articleCacheService;
   private final DocumentsService documentsService;
 
-  private final String DEFAULT_LANGUAGE_CODE = "EN";
+  private static final String DEFAULT_LANGUAGE_CODE = "EN";
 
   @Qualifier("ForkJoinCustomPool")
   private final ExecutorService forkJoinPoolCustom;
@@ -77,13 +79,6 @@ public class ArticleMasterDataRepository {
 
     return CompletableFuture.completedFuture(iduItemDerivedStandards);
   }
-
-  //  @Async("asyncExecutor")
-  //  public CompletableFuture<PromotionArticleData> getPromotionArticleData(
-  //      String countryCode, Integer storeId, ArticleId articleId) {
-  //    return CompletableFuture.completedFuture(getPromotionArticle(countryCode, storeId,
-  // articleId));
-  //  }
 
   public List<PromotionArticleData> getPromotionArticle(
       String countryCode, Integer storeNumber, ArticleId articleId) {
@@ -252,7 +247,7 @@ public class ArticleMasterDataRepository {
     if (articleCacheFullData != null) {
 
       SimplePromotionArticleData promotion =
-              getPromotion(countryCode, storeNumber, languageCode, articleId);
+              getActivePromotionForToday(countryCode, storeNumber, languageCode, articleId);
 
       return new ArticleMasterData()
           .setArticleDescription(articleCacheFullData.getArticleDescription())
@@ -307,15 +302,13 @@ public class ArticleMasterDataRepository {
     return null;
   }
 
-  public SimplePromotionArticleData getPromotion(
+  public SimplePromotionArticleData getActivePromotionForToday(
       String countryCode, Integer storeNumber, String languageCode, ArticleId articleId) {
     PromotionArticleData promotionArticleData =
         getPromotionArticle(countryCode, storeNumber, articleId).stream()
             .filter(PromotionArticleData::getValid)
             .filter(
-                promotion ->
-                    promotion.getPromotionStart().isBefore(LocalDate.now())
-                        && promotion.getPromotionEnd().isAfter(LocalDate.now()))
+                promotion -> isPromotionActiveToday(promotion.getPromotionStart(),promotion.getPromotionEnd()))
             .min(Comparator.comparing(PromotionArticleData::getPromotionEnd))
             .orElse(PromotionArticleData.builder().build());
 
@@ -344,5 +337,10 @@ public class ArticleMasterDataRepository {
         .promotionStart(promotionArticleData.getPromotionStart())
         .promotionEnd(promotionArticleData.getPromotionEnd())
         .build();
+  }
+
+  private boolean isPromotionActiveToday(LocalDate startDate, LocalDate endDate) {
+    return ((now().isAfter(startDate) || now().equals(startDate))
+        && (now().isBefore(endDate) || now().equals(endDate)));
   }
 }
