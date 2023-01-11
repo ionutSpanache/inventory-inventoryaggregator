@@ -53,7 +53,7 @@ class PromotionServiceTest {
         .thenReturn(null);
 
     List<PromotionArticleData> promotionArticleDataForArticleId =
-        promotionService.getFuturePromotionArticleDataForArticleId(articleId, storeId);
+        promotionService.getAllArticlePromotionsForArticleId(articleId, storeId);
     assertTrue(CollectionUtils.isEmpty(promotionArticleDataForArticleId));
 
     PromotionArticleData promotionArticleData =

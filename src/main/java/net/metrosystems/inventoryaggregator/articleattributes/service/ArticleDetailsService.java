@@ -411,9 +411,6 @@ public class ArticleDetailsService {
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard =
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
 
-    //    CompletableFuture<PromotionArticleData> promotionArticleData =
-    // articleMasterDataRepository.getPromotionArticleData(countryCode,
-    //            storeNo, articleId);
 
     CompletableFuture.allOf(
         articleMasterData,
@@ -432,12 +429,6 @@ public class ArticleDetailsService {
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
     }
 
-    //    if (promotionArticleData.get().getPromotionNetSalesPricePerBundle() != null
-    //            && (promotionArticleData.get() != null &&
-    //            promotionArticleData.get().getIsActive())) {
-    //      rawArticleStoreMasterData.get().setStorePromotionBundleNetPrice(promotionArticleData
-    //              .get().getPromotionNetSalesPricePerBundle());
-    //    }
 
     RawArticleData rawArticleData =
         RawArticleData.builder()

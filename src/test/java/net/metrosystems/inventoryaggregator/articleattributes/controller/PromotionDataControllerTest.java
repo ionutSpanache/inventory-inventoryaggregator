@@ -56,7 +56,7 @@ class PromotionDataControllerTest {
             .build();
     List<PromotionArticleData> promotionArticleDataListExpected =
         List.of(PromotionArticleData.builder().promotionId("1234").build());
-    when(promotionService.getFuturePromotionArticleDataForArticleId(articleId, storeId)).thenReturn(promotionArticleDataListExpected);
+    when(promotionService.getAllArticlePromotionsForArticleId(articleId, storeId)).thenReturn(promotionArticleDataListExpected);
 
     List<PromotionArticleData> promotionArticleDataList =
         WebTestClient.bindToController(promotionDataController)

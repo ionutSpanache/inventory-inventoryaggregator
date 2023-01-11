@@ -34,7 +34,7 @@ public class PromotionDataController {
       value =
           "/promotion/countryCode/{countryCode}/salesLine/{salesLine}/storeNumber/{storeNumber}/articleNumber/{articleNumber}/variantNumber/{variantNumber}/bundleNumber/{bundleNumber}",
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<PromotionArticleData> getFuturePromotionArticleData(
+  public List<PromotionArticleData> getAllPromotionArticleData(
       @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
       @PathVariable("storeNumber") Integer storeNumber,
@@ -53,6 +53,6 @@ public class PromotionDataController {
             .salesLine(salesLine)
             .storeNumber(storeNumber)
             .build();
-    return promotionService.getFuturePromotionArticleDataForArticleId(articleId, storeId);
+    return promotionService.getAllArticlePromotionsForArticleId(articleId, storeId);
   }
 }
