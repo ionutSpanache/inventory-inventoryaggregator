@@ -585,7 +585,7 @@ public class ArticleCacheService {
             : 0,
         articleCacheDataGroup320.getAssignedStoreSupplierType(),
         articleCacheDataGroup310.getInOutIndicator(),
-        articleCacheDataGroup300.getMinimumGrossSalesPricePerUnit());
+        articleCacheDataGroup320.getMinimumGrossSalesPricePerUnit());
   }
 
   private MinimumRetailPrice calculateMinimumRetailPrice(
