@@ -55,4 +55,5 @@ public class ArticleCacheFullData {
     private Integer coreAssortmentIndicator;
     private String assignedStoreSupplierType;
     private Integer inOutIndicator;
+    private Double minimumGrossSalesPricePerUnit;
 }

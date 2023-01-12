@@ -411,7 +411,6 @@ public class ArticleDetailsService {
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard =
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
 
-
     CompletableFuture.allOf(
         articleMasterData,
         rawArticleStoreMasterData,
@@ -428,7 +427,6 @@ public class ArticleDetailsService {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
     }
-
 
     RawArticleData rawArticleData =
         RawArticleData.builder()

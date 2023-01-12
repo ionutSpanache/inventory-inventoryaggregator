@@ -1,12 +1,12 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 @Data
 @Builder
@@ -64,8 +64,9 @@ public class ArticleMasterData implements Serializable {
   private Long presencePeriodStartYear;
   private Long presencePeriodStartWeek;
   private String assortmentCluster;
+  private Double minimumGrossSalesPricePerUnit;
+
   public static long getSerialversionuid() {
     return serialVersionUID;
   }
-
 }

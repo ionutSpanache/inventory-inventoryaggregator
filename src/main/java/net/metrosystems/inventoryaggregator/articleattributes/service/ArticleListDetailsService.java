@@ -193,6 +193,8 @@ public class ArticleListDetailsService {
       }
     }
 
+
+
     CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl =
         CompletableFuture.completedFuture(Collections.emptyMap());
     if (dataTypeList.isEmpty()

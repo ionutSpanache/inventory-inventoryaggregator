@@ -1,7 +1,20 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
@@ -25,29 +38,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
 public class ArticleCacheService {
 
-  @Value("${ARTICLE_CACHE_STORE_EXCEPTIONS_PATH}")
-  private String articleCacheStoreExceptionsPath;
-
-  @Value("${app.stage}")
-  private String k8sEnvironment;
-
-  private final DocumentsService documentsService;
-  private final ArticleCacheAAAClient articleCacheClient;
-  private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
-
   private static final String PAKISTAN_COUNTRY_CODE = "PK";
   private static final Double ZERO = 0.0;
-
   private static final String IHDS_TREE = "erp_ihds_tree";
   private static final String BUNDLE_NO = "bundleno";
   private static final String MMS_ARTNO = "mmsartno";
@@ -61,8 +57,14 @@ public class ArticleCacheService {
   private static final String K8S_PP_ENVIRONMENT = "pp";
   private static final String LOCAL_ENVIRONMENT = "local";
   private static final String LANGUAGE = "language";
-
   private static final Set<String> COUNTRY_CODES = Set.of("IN", "CZ", "SK");
+  private final DocumentsService documentsService;
+  private final ArticleCacheAAAClient articleCacheClient;
+  private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
+  @Value("${ARTICLE_CACHE_STORE_EXCEPTIONS_PATH}")
+  private String articleCacheStoreExceptionsPath;
+  @Value("${app.stage}")
+  private String k8sEnvironment;
 
   @Autowired
   public ArticleCacheService(
@@ -581,9 +583,10 @@ public class ArticleCacheService {
         articleCacheDataGroup320.getCoreAssortmentIndicator() != null
             ? articleCacheDataGroup320.getCoreAssortmentIndicator()
             : 0,
-				articleCacheDataGroup320.getAssignedStoreSupplierType(),
- 		    articleCacheDataGroup310.getInOutIndicator());
-	}
+        articleCacheDataGroup320.getAssignedStoreSupplierType(),
+        articleCacheDataGroup310.getInOutIndicator(),
+        articleCacheDataGroup300.getMinimumGrossSalesPricePerUnit());
+  }
 
   private MinimumRetailPrice calculateMinimumRetailPrice(
       ArticleCacheIhdsTree articleCacheIhdsTree,

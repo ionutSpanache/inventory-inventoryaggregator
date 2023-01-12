@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -495,6 +496,17 @@ public class ArticleCacheDataGroup {
     this.coreAssortmentIndicator = coreAssortmentIndicator;
   }
 
+  private Double minimumGrossSalesPricePerUnit;
+
+  public Double getMinimumGrossSalesPricePerUnit() {
+    return minimumGrossSalesPricePerUnit;
+  }
+
+  @XmlElement(name = "MINIMUMGROSSSALESPRICEPERUNIT")
+  public void setMinimumGrossSalesPricePerUnit(Double minimumGrossSalesPricePerUnit) {
+    this.minimumGrossSalesPricePerUnit = minimumGrossSalesPricePerUnit;
+  }
+
   @Override
   public String toString() {
     return "ArticleCacheDataGroup{" +
@@ -539,6 +551,7 @@ public class ArticleCacheDataGroup {
             ", pieceNetNetBuyingPrice=" + pieceNetNetBuyingPrice +
             ", bundleNetNetBuyingPrice=" + bundleNetNetBuyingPrice +
             ", coreAssortmentIndicator=" + coreAssortmentIndicator +
+            ", minimumGrossSalesPricePerUnit=" + minimumGrossSalesPricePerUnit +
             '}';
   }
 }

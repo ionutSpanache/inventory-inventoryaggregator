@@ -1,8 +1,27 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
+import static java.time.LocalDate.now;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.SimplePromotionArticleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
@@ -15,26 +34,14 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
-
-import static java.time.LocalDate.now;
-
 @Repository
 @Slf4j
 @RequiredArgsConstructor
 public class ArticleMasterDataRepository {
 
+  private static final String DEFAULT_LANGUAGE_CODE = "EN";
   private final ArticleCacheService articleCacheService;
   private final DocumentsService documentsService;
-
-  private static final String DEFAULT_LANGUAGE_CODE = "EN";
-
   @Qualifier("ForkJoinCustomPool")
   private final ExecutorService forkJoinPoolCustom;
 
@@ -57,7 +64,8 @@ public class ArticleMasterDataRepository {
             storeNo);
 
     ArticleMasterData articleMasterData =
-        transformArticleCacheFullToArticleMasterData(articleCacheFullData, countryCode, storeNo, languageCode, articleId);
+        transformArticleCacheFullToArticleMasterData(
+            articleCacheFullData, countryCode, storeNo, languageCode, articleId);
 
     return CompletableFuture.completedFuture(articleMasterData);
   }
@@ -157,7 +165,12 @@ public class ArticleMasterDataRepository {
                           if (articleCacheFullData != null)
                             result.put(
                                 articleId,
-                                transformArticleCacheFullToArticleMasterData(articleCacheFullData, countryCode, storeNo, languageCode, articleId));
+                                transformArticleCacheFullToArticleMasterData(
+                                    articleCacheFullData,
+                                    countryCode,
+                                    storeNo,
+                                    languageCode,
+                                    articleId));
                         }))
         .get();
     return CompletableFuture.completedFuture(result);
@@ -247,7 +260,7 @@ public class ArticleMasterDataRepository {
     if (articleCacheFullData != null) {
 
       SimplePromotionArticleData promotion =
-              getActivePromotionForToday(countryCode, storeNumber, languageCode, articleId);
+          getActivePromotionForToday(countryCode, storeNumber, languageCode, articleId);
 
       return new ArticleMasterData()
           .setArticleDescription(articleCacheFullData.getArticleDescription())
@@ -297,7 +310,9 @@ public class ArticleMasterDataRepository {
           .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator())
           .setCoreAssortmentIndicator(articleCacheFullData.getCoreAssortmentIndicator())
           .setAssignedStoreSupplierType(articleCacheFullData.getAssignedStoreSupplierType())
-          .setInOutIndicator(articleCacheFullData.getInOutIndicator());
+          .setInOutIndicator(articleCacheFullData.getInOutIndicator())
+          .setMinimumGrossSalesPricePerUnit(
+              articleCacheFullData.getMinimumGrossSalesPricePerUnit());
     }
     return null;
   }
@@ -308,13 +323,15 @@ public class ArticleMasterDataRepository {
         getPromotionArticle(countryCode, storeNumber, articleId).stream()
             .filter(PromotionArticleData::getValid)
             .filter(
-                promotion -> isPromotionActiveToday(promotion.getPromotionStart(),promotion.getPromotionEnd()))
+                promotion ->
+                    isPromotionActiveToday(
+                        promotion.getPromotionStart(), promotion.getPromotionEnd()))
             .min(Comparator.comparing(PromotionArticleData::getPromotionEnd))
             .orElse(PromotionArticleData.builder().build());
 
     Optional<PromotionDescription> promotionDescription = Optional.empty();
 
-    if(!CollectionUtils.isEmpty(promotionArticleData.getDescriptions())){
+    if (!CollectionUtils.isEmpty(promotionArticleData.getDescriptions())) {
       promotionDescription =
           promotionArticleData.getDescriptions().stream()
               .filter(promotionDesc -> (promotionDesc.getLanguage().equalsIgnoreCase(languageCode)))
@@ -333,7 +350,8 @@ public class ArticleMasterDataRepository {
 
     return SimplePromotionArticleData.builder()
         .promotionId(promotionArticleData.getPromotionId())
-        .promotionDescription(promotionDescription.map(PromotionDescription::getDescription).orElse(null))
+        .promotionDescription(
+            promotionDescription.map(PromotionDescription::getDescription).orElse(null))
         .promotionStart(promotionArticleData.getPromotionStart())
         .promotionEnd(promotionArticleData.getPromotionEnd())
         .build();
