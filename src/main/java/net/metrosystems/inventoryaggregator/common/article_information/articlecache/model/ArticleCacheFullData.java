@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.model;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -55,5 +56,5 @@ public class ArticleCacheFullData {
     private Integer coreAssortmentIndicator;
     private String assignedStoreSupplierType;
     private Integer inOutIndicator;
-    private Double minimumGrossSalesPricePerUnit;
+    private BigDecimal minimumGrossSalesPricePerUnit;
 }

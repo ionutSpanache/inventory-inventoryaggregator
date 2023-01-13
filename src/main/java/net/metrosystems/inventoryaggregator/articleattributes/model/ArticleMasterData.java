@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,7 +65,7 @@ public class ArticleMasterData implements Serializable {
   private Long presencePeriodStartYear;
   private Long presencePeriodStartWeek;
   private String assortmentCluster;
-  private Double minimumGrossSalesPricePerUnit;
+  private BigDecimal minimumGrossSalesPricePerUnit;
 
   public static long getSerialversionuid() {
     return serialVersionUID;

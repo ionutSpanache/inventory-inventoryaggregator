@@ -496,14 +496,14 @@ public class ArticleCacheDataGroup {
     this.coreAssortmentIndicator = coreAssortmentIndicator;
   }
 
-  private Double minimumGrossSalesPricePerUnit;
+  private BigDecimal minimumGrossSalesPricePerUnit;
 
-  public Double getMinimumGrossSalesPricePerUnit() {
+  public BigDecimal getMinimumGrossSalesPricePerUnit() {
     return minimumGrossSalesPricePerUnit;
   }
 
   @XmlElement(name = "MINIMUMGROSSSALESPRICEPERUNIT")
-  public void setMinimumGrossSalesPricePerUnit(Double minimumGrossSalesPricePerUnit) {
+  public void setMinimumGrossSalesPricePerUnit(BigDecimal minimumGrossSalesPricePerUnit) {
     this.minimumGrossSalesPricePerUnit = minimumGrossSalesPricePerUnit;
   }
 
