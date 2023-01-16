@@ -320,8 +320,8 @@ public class ArticleMasterDataRepository {
   public SimplePromotionArticleData getActivePromotionForToday(
       String countryCode, Integer storeNumber, String languageCode, ArticleId articleId) {
     PromotionArticleData promotionArticleData =
-        getPromotionArticle(countryCode, storeNumber, articleId).stream()
-            .filter(PromotionArticleData::getValid)
+            getPromotionArticle(countryCode, storeNumber, articleId).stream()
+            .filter(promotion -> promotion.getValid() != null && promotion.getValid())
             .filter(
                 promotion ->
                     isPromotionActiveToday(
@@ -358,7 +358,10 @@ public class ArticleMasterDataRepository {
   }
 
   private boolean isPromotionActiveToday(LocalDate startDate, LocalDate endDate) {
-    return ((now().isAfter(startDate) || now().equals(startDate))
-        && (now().isBefore(endDate) || now().equals(endDate)));
+    if(startDate != null && endDate != null){
+      return ((now().isAfter(startDate) || now().equals(startDate))
+              && (now().isBefore(endDate) || now().equals(endDate)));
+    }
+    return false;
   }
 }
