@@ -35,8 +35,10 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Slf4j
 @Service
@@ -259,7 +261,11 @@ public class ArticleCacheService {
       promotionArticleData =
           mapToPromotionArticleData(articleCacheClient.getPromotionArticle(documentUrl));
     } catch (Exception ex) {
-      log.error("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl, ex);
+      if(ex instanceof HttpClientErrorException exception && exception.getStatusCode() == HttpStatus.CONFLICT){
+        log.debug(ex.getMessage(), ex);
+      } else {
+        log.error("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl, ex);
+      }
     }
 
     return promotionArticleData;
