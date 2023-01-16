@@ -113,7 +113,7 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
 
   @Override
   public Optional<ArticleCacheIhdsTree> getSupplierInformation(
-      String countryCode, String salesLine, Optional<String> environment, Long supplierNumber) {
+      String countryCode, String salesLine, Optional<String> environment, Long supplierNumber) throws Exception {
     Documents articleUrlPathList =
         documentsService.getDocumentsBySupplier(countryCode, salesLine, supplierNumber);
     if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) return Optional.empty();

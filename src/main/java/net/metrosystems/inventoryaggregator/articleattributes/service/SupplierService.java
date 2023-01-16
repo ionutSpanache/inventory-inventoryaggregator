@@ -24,7 +24,7 @@ public class SupplierService {
       String salesLine,
       Optional<String> environment,
       Long supplierNumber,
-      Long commercialSupplier) {
+      Long commercialSupplier) throws Exception {
     Optional<ArticleCacheIhdsTree> articleCacheIhdsTree =
         articleCacheAAAClient.getSupplierInformation(
             countryCode, salesLine, environment, supplierNumber);

@@ -38,7 +38,7 @@ public class SupplierController {
       @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
       @TagField(name = "supplier") @PathVariable("supplier") Long supplierNumber,
       @TagField(name = "commercialsupplier") @PathVariable("commercialsupplier") Long commercialSupplier,
-      @RequestParam(name = "environment", required = false) Optional<String> environment) {
+      @RequestParam(name = "environment", required = false) Optional<String> environment) throws Exception {
 
     SupplierInformation supplierInformation = supplierService
         .getSupplierInformation(countryCode, salesLine, environment, supplierNumber, commercialSupplier);

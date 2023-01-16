@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -31,6 +30,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.common.model.InterruptedRuntimeException;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.stereotype.Service;
 
@@ -369,15 +369,20 @@ public class ArticleListDetailsService {
     }
   }
 
-  @SneakyThrows
   public List<PromotionArticleDataForArticleId> getFuturePromotionsForArticleIds(
       List<ArticleId> articleIds, StoreId storeId) {
     if (articleIds == null || articleIds.isEmpty()) {
       return Collections.emptyList();
     }
-    return articleMasterDataRepository
-        .getPromotionDataArticlesForArticleIds(
-            articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
-        .get();
+    try {
+      return articleMasterDataRepository
+          .getPromotionDataArticlesForArticleIds(
+              articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
+          .get();
+    } catch (InterruptedException | ExecutionException e) {
+      log.error(e.getMessage(), e);
+      Thread.currentThread().interrupt();
+      throw new InterruptedRuntimeException("Could not getFuturePromotionsForArticleIds");
+    }
   }
 }

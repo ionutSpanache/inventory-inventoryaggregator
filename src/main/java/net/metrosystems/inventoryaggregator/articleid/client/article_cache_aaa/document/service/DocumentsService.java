@@ -239,9 +239,8 @@ public class DocumentsService {
     return this.getDocumentsNextpage(documents, filter);
   }
 
-  @SneakyThrows
   public Documents getDocumentsBySupplier(
-      String countryCode, String salesLine, Long supplierNumber) {
+      String countryCode, String salesLine, Long supplierNumber) throws Exception {
     FilterSupplierInformation filter =
         filterAAAService.initializeSupplierInformationFilter(
             countryCode, salesLine, supplierNumber);
