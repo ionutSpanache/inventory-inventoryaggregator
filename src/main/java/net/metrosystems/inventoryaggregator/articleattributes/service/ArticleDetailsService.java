@@ -421,6 +421,9 @@ public class ArticleDetailsService {
         maximumRetailPrice,
         iduItemDerivedStandard);
 
+      articleCacheService.enhanceArticleMasterData(
+          articleMasterData.get(), iduDerivedStandardsList.get());
+
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
     if (articleDataFromMovie.get() != null) {
