@@ -18,6 +18,12 @@ public class ContentIduItemDerivedStandard implements Serializable {
 
     private GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables;
 
+    private IsTradeItemInSellOut isTradeItemInSellOut;
+
+    private IsTradeItemSellableInPFSShop isTradeItemSellableInPFSShop;
+
+    private IsTradeItemDiscountMachine isTradeItemDiscountMachine;
+
     private AssortmentClusterSpecificationV2 assortmentClusterSpecificationV2;
 
     private Boolean isTradeItemAVariableUnit;
@@ -48,10 +54,40 @@ public class ContentIduItemDerivedStandard implements Serializable {
         return gradeCodeReferenceFruitsVegetables;
     }
 
+    public IsTradeItemInSellOut getIsTradeItemInSellOut() {
+        return isTradeItemInSellOut;
+    }
+
+    public IsTradeItemSellableInPFSShop getIsTradeItemSellableInPFSShop() {
+        return isTradeItemSellableInPFSShop;
+    }
+
+    public IsTradeItemDiscountMachine getIsTradeItemDiscountMachine() {
+        return isTradeItemDiscountMachine;
+    }
+
     @XmlElement("gradeCodeReferenceFruitsVegetables")
     public void setGradeCodeReferenceFruitsVegetables(
         GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables) {
         this.gradeCodeReferenceFruitsVegetables = gradeCodeReferenceFruitsVegetables;
+    }
+
+    @XmlElement("isTradeItemInSellOut")
+    public void setIsTradeItemInSellOut(
+            IsTradeItemInSellOut isTradeItemInSellOut) {
+        this.isTradeItemInSellOut = isTradeItemInSellOut;
+    }
+
+    @XmlElement("isTradeItemSellableInPFSShop")
+    public void setIsTradeItemSellableInPFSShop(
+            IsTradeItemSellableInPFSShop isTradeItemSellableInPFSShop) {
+        this.isTradeItemSellableInPFSShop = isTradeItemSellableInPFSShop;
+    }
+
+    @XmlElement("isTradeItemDiscountMachine")
+    public void setIsTradeItemDiscountMachine(
+            IsTradeItemDiscountMachine isTradeItemDiscountMachine) {
+        this.isTradeItemDiscountMachine = isTradeItemDiscountMachine;
     }
 
     @XmlElement("isTradeItemExcludedFromDiscounts")

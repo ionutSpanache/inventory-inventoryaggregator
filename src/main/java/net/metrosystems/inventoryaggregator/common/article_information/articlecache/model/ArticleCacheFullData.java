@@ -48,8 +48,6 @@ public class ArticleCacheFullData {
     private String brandName;
     private MinimumRetailPrice minimumRetailPrice;
     private String countryOfOrigin;
-    private Boolean isTradeItemExcludedFromDiscounts;
-    private String gradeCodeReferenceFruitsVegetables;
     private Integer packageFactor;
     private String alcoholClass;
     private Long traceabilityIndicator;

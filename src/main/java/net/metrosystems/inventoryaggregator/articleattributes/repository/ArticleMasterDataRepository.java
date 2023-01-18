@@ -301,10 +301,6 @@ public class ArticleMasterDataRepository {
           .setBrandName(articleCacheFullData.getBrandName())
           .setMinimumRetailPrice(articleCacheFullData.getMinimumRetailPrice())
           .setCountryOfOrigin(articleCacheFullData.getCountryOfOrigin())
-          .setIsTradeItemExcludedFromDiscounts(
-              articleCacheFullData.getIsTradeItemExcludedFromDiscounts())
-          .setGradeCodeReferenceFruitsVegetables(
-              articleCacheFullData.getGradeCodeReferenceFruitsVegetables())
           .setPackageFactor(articleCacheFullData.getPackageFactor())
           .setAlcoholClass(articleCacheFullData.getAlcoholClass())
           .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator())

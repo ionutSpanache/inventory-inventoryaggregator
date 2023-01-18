@@ -66,6 +66,9 @@ public class ArticleMasterData implements Serializable {
   private Long presencePeriodStartWeek;
   private String assortmentCluster;
   private BigDecimal minimumGrossSalesPricePerUnit;
+  private Boolean isTradeItemInSellOut;
+  private Boolean isTradeItemSellableInPFSShop;
+  private Boolean isTradeItemDiscountMachine;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
