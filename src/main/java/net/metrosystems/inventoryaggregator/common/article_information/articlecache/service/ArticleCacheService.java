@@ -22,9 +22,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.GradeCodeReferenceFruitsVegetables;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.*;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
@@ -32,6 +30,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticleDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.IsTradeItem;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -151,20 +150,9 @@ public class ArticleCacheService {
     }
     String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 
-    List<String> articleKeys =
-        getArticleKeysForDerivedStandardDocument(
-            countryCode, articleNumber, bundleNumber, variantNumber, salesLine);
-    String gradeCodeReferenceFruitsVegetablesValue = null;
-    if (articleKeys != null && !articleKeys.isEmpty()) {
-      gradeCodeReferenceFruitsVegetablesValue =
-          hasGradeCodeReferenceFruitsVegetables(articleKeys.get(0)).getValue();
-    }
-
     return transformArticleCacheDocumentToArticleFullData(
         articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
-        storeNo,
-        null,
-        gradeCodeReferenceFruitsVegetablesValue);
+        storeNo);
   }
 
   public Optional<IduItemDerivedStandard> getMultiLanguageDataByArtVarBundle(
@@ -418,7 +406,7 @@ public class ArticleCacheService {
     }
 
     return transformArticleCacheDocumentToArticleFullData(
-        articleCacheDocument, storeNo, null, null);
+        articleCacheDocument, storeNo);
   }
 
   public List<String> getArticleKeysForDerivedStandardDocument(
@@ -472,34 +460,9 @@ public class ArticleCacheService {
     return result;
   }
 
-  public GradeCodeReferenceFruitsVegetables hasGradeCodeReferenceFruitsVegetables(
-      String articleKey) {
-
-    GradeCodeReferenceFruitsVegetables result = new GradeCodeReferenceFruitsVegetables();
-
-    IduItemDerivedStandard iduItemDerivedStandard =
-        articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
-
-    if (iduItemDerivedStandard != null
-        && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null
-        && iduItemDerivedStandard
-                .getContentIduItemDerivedStandard()
-                .getGradeCodeReferenceFruitsVegetables()
-            != null) {
-      result =
-          iduItemDerivedStandard
-              .getContentIduItemDerivedStandard()
-              .getGradeCodeReferenceFruitsVegetables();
-    }
-
-    return result;
-  }
-
   private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData(
       ArticleCacheIhdsTree articleCacheDocument,
-      Integer storeNo,
-      Boolean isTradeItemExcludedFromDiscounts,
-      String gradeCodeReferenceFruitsVegetables) {
+      Integer storeNo) {
     Integer hierarchySequenceStoreNo =
         articleCacheDocument
             .getTransaction()
@@ -581,8 +544,6 @@ public class ArticleCacheService {
         calculateMinimumRetailPrice(
             articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
         articleCacheDataGroup200.getCountryOfOrigin(),
-        isTradeItemExcludedFromDiscounts,
-        gradeCodeReferenceFruitsVegetables,
         articleCacheDataGroup200.getPackageFactor(),
         articleCacheDataGroup100.getAlcoholClass(),
         articleCacheReaderDigest.getTraceabilityIndicator(),
@@ -765,9 +726,12 @@ public class ArticleCacheService {
     if (articleMasterData == null || CollectionUtils.isEmpty(iduItemDerivedStandards)) return;
     articleMasterData
         .setIsTradeItemExcludedFromDiscounts(
-            getIsTradeItemExcludedFromDiscounts(iduItemDerivedStandards))
+                getIsTradeItem(iduItemDerivedStandards,"isTradeItemExcludedFromDiscounts"))
         .setGradeCodeReferenceFruitsVegetables(
-            getGradeCodeReferenceFruitsVegetables(iduItemDerivedStandards));
+            getGradeCodeReferenceFruitsVegetables(iduItemDerivedStandards))
+        .setIsTradeItemInSellOut(getIsTradeItem(iduItemDerivedStandards,"isTradeItemInSellOut"))
+        .setIsTradeItemSellableInPFSShop(getIsTradeItem(iduItemDerivedStandards,"isTradeItemSellableInPFSShop"))
+        .setIsTradeItemDiscountMachine(getIsTradeItem(iduItemDerivedStandards,"isTradeItemDiscountMachine"));
   }
 
   public String getGradeCodeReferenceFruitsVegetables(
@@ -791,38 +755,50 @@ public class ArticleCacheService {
     return null;
   }
 
-  public Boolean getIsTradeItemExcludedFromDiscounts(
-      List<IduItemDerivedStandard> iduItemDerivedStandards) {
-
-    if (CollectionUtils.isEmpty(iduItemDerivedStandards)) return false;
-    IsTradeItemExcludedFromDiscounts result = new IsTradeItemExcludedFromDiscounts();
-
-    for (IduItemDerivedStandard iduItemDerivedStandard : iduItemDerivedStandards) {
-      if (iduItemDerivedStandard != null
-          && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
-        IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
-            iduItemDerivedStandard
-                .getContentIduItemDerivedStandard()
-                .getIsTradeItemExcludedFromDiscounts();
-        if (isTradeItemExcludedFromDiscounts != null
-            && Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
-          result.setValue(true);
-          if (result.getValidFrom() == null
-              || isTradeItemExcludedFromDiscounts.getValidFrom().after(result.getValidFrom())) {
-            result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
+  public Boolean getIsTradeItem(
+          List<IduItemDerivedStandard> iduItemDerivedStandards, String tradeIdem) {
+    IsTradeItem resultIsTradeItem = new IsTradeItem();
+    iduItemDerivedStandards.forEach(elem -> {
+      if (elem.getContentIduItemDerivedStandard() != null) {
+        IsTradeItem isTradeItem = getSpecificItem(elem
+                .getContentIduItemDerivedStandard(), tradeIdem);
+        if (isTradeItem != null
+                && Boolean.TRUE.equals(isTradeItem.getValue())) {
+          resultIsTradeItem.setValue(true);
+          if (resultIsTradeItem.getValidFrom() == null
+                  || isTradeItem.getValidFrom().after(resultIsTradeItem.getValidFrom())) {
+            resultIsTradeItem.setValidFrom(isTradeItem.getValidFrom());
           }
         }
       }
-    }
-    if (Boolean.TRUE.equals(result.getValue())) {
-      if (result.getValidFrom() == null) {
+    });
+
+    if (Boolean.TRUE.equals(resultIsTradeItem.getValue())) {
+      if (resultIsTradeItem.getValidFrom() == null) {
         return true;
       } else {
         LocalDate validFrom =
-            result.getValidFrom().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                resultIsTradeItem.getValidFrom().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return LocalDate.now().isAfter(validFrom);
       }
     }
     return false;
+  }
+
+  private IsTradeItem getSpecificItem(ContentIduItemDerivedStandard contentIduItemDerivedStandard, String tradeItem) {
+    if("isTradeItemExcludedFromDiscounts".equals(tradeItem)
+            && contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts() != null) {
+      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts());
+    } else if("isTradeItemInSellOut".equals(tradeItem)
+            && contentIduItemDerivedStandard.getIsTradeItemInSellOut() != null) {
+      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemInSellOut());
+    }else if("isTradeItemSellableInPFSShop".equals(tradeItem)
+            && contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop() != null){
+      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop());
+    }else if("isTradeItemDiscountMachine".equals(tradeItem)
+            && contentIduItemDerivedStandard.getIsTradeItemDiscountMachine() != null) {
+      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemDiscountMachine());
+    }
+    return null;
   }
 }
