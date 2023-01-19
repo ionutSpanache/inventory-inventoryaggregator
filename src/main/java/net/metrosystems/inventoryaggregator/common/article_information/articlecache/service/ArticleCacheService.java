@@ -786,14 +786,18 @@ public class ArticleCacheService {
   }
 
   private IsTradeItem getSpecificItem(ContentIduItemDerivedStandard contentIduItemDerivedStandard, String tradeItem) {
-    if("isTradeItemExcludedFromDiscounts".equals(tradeItem)) {
-      contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts();
-    } else if("isTradeItemInSellOut".equals(tradeItem)) {
-      contentIduItemDerivedStandard.getIsTradeItemInSellOut();
-    }else if("isTradeItemSellableInPFSShop".equals(tradeItem)){
-      contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop();
-    }else if("isTradeItemDiscountMachine".equals(tradeItem)) {
-      contentIduItemDerivedStandard.getIsTradeItemDiscountMachine();
+    if("isTradeItemExcludedFromDiscounts".equals(tradeItem)
+            && contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts() != null) {
+      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts());
+    } else if("isTradeItemInSellOut".equals(tradeItem)
+            && contentIduItemDerivedStandard.getIsTradeItemInSellOut() != null) {
+      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemInSellOut());
+    }else if("isTradeItemSellableInPFSShop".equals(tradeItem)
+            && contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop() != null){
+      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop());
+    }else if("isTradeItemDiscountMachine".equals(tradeItem)
+            && contentIduItemDerivedStandard.getIsTradeItemDiscountMachine() != null) {
+      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemDiscountMachine());
     }
     return null;
   }
