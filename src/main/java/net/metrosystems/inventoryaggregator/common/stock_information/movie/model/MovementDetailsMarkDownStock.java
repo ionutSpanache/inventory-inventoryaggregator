@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MovementDetailsMarkDownStock {
 
+    @JsonProperty("LABEL")
     private Float LABEL;
-    private Float SALES;
 
+    @JsonProperty("SALES")
+    private Float SALES;
 }
