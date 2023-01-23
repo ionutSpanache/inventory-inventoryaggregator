@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 public class MovementDetailsSystemStock {
 
     @JsonProperty("GR")
-    private Float GR;
+    private Float goodsReceivingQuantity;
 
     @JsonProperty("SALES")
-    private Float SALES;
+    private Float saleQuantity;
 
     @JsonProperty("SC")
-    private Float SC;
+    private Float stockCorrectionQuantity;
 }

@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 public class MovementDetailsMarkDownStock {
 
     @JsonProperty("LABEL")
-    private Float LABEL;
+    private Float label;
 
     @JsonProperty("SALES")
-    private Float SALES;
+    private Float sales;
 }
