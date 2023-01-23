@@ -113,11 +113,11 @@ public class MovieService {
     if (stockDetails.getMovementDetails() != null
         && stockDetails.getMovementDetails().getSystemStock() != null) {
       movieAdapter.setTotalSaleQuantity(
-          stockDetails.getMovementDetails().getSystemStock().getSALES());
+          stockDetails.getMovementDetails().getSystemStock().getSaleQuantity());
       movieAdapter.setTotalGoodsReceivingQuantity(
-          stockDetails.getMovementDetails().getSystemStock().getGR());
+          stockDetails.getMovementDetails().getSystemStock().getGoodsReceivingQuantity());
       movieAdapter.setTotalStockCorrectionQuantity(
-          stockDetails.getMovementDetails().getSystemStock().getSC());
+          stockDetails.getMovementDetails().getSystemStock().getStockCorrectionQuantity());
     }
 
     if (stockDetails.getReservation() != null) {
