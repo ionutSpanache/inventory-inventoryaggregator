@@ -3,10 +3,10 @@ package net.metrosystems.inventoryaggregator.common.stock_information.movie.clie
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.AclArticleStockLocation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MovieLocationRequestBody;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MovieLocationResponse;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +34,13 @@ public class MovieClient {
 
   @Value("${MOVIE_STOCK_PATH_FOR_VARIANT}")
   private String movieStockPathForVariant;
+
+  @Value("${MOVIE_TOTAL_AVERAGE_SALES_HOST}")
+  private String movieTotalAverageSalesHost;
+
+  @Value("${MOVIE_TOTAL_AVERAGE_PATH}")
+  private String movieTotalAveragePath;
+
 
   private WebClient webClient;
 
@@ -63,6 +70,34 @@ public class MovieClient {
               .getStockDetails();
     } catch (Exception e) {
       log.error("Error while calling MOVIE input{} exception{}", urlInUse, e);
+      return null;
+    }
+  }
+
+  public Integer getTotalAverageSales(
+     String country, String salesLine, String locationId, List<Article> articles, int daysBefore ) {
+    MovieLocationRequestBody locationRequestBody = new MovieLocationRequestBody();
+    String urlInUse = String.format(movieTotalAverageSalesHost + movieTotalAveragePath);
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonStringMovie = null;
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    try {
+      jsonStringMovie = mapper.writeValueAsString(locationRequestBody);
+      HttpEntity<String> request = new HttpEntity<>(jsonStringMovie, headers);
+      MovieLocationResponse response = webClient.post()
+              .uri(urlInUse)
+              .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
+              .bodyValue(locationRequestBody)
+              .retrieve()
+              .onStatus(this::isErrorResponse, clientResponse -> log(clientResponse, "Movie total sales details- api call unsuccessful  : status %d"))
+              .bodyToMono(MovieLocationResponse.class)
+              .block();
+
+      return response == null ? null : response.getDaysBefore();
+    } catch (Exception e) {
+      log.error("Error while calling MOVIE input{} exception{}", jsonStringMovie, e);
       return null;
     }
   }
