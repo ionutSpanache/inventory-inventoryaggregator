@@ -1,11 +1,23 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.MovieLocationRequestBody;
-import net.metrosystems.inventoryaggregator.articleattributes.model.MovieLocationResponse;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Article;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.ArticleVariantBundle;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Bundle;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAverageRequest;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAverageSale;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAverageSalesPerArticle;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieDataGroups;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieLocation;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieRequestBody;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetails;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetailsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -17,11 +29,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -74,30 +81,44 @@ public class MovieClient {
     }
   }
 
-  public Integer getTotalAverageSales(
-     String country, String salesLine, String locationId, List<Article> articles, int daysBefore ) {
-    MovieLocationRequestBody locationRequestBody = new MovieLocationRequestBody();
-    String urlInUse = String.format(movieTotalAverageSalesHost + movieTotalAveragePath);
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonStringMovie = null;
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
+  public List<MovieAverageSale> getTotalAverageSales(
+      String countryName,
+      String salesLine,
+      Integer storeNumber,
+      List<ArticleVariantBundle> articleVariantBundle,
+      int daysBefore) {
+    MovieAverageRequest locationRequestBody =
+        MovieAverageRequest.builder()
+            .location(
+                MovieLocation.builder()
+                    .country(countryName)
+                    .salesLine(salesLine)
+                    .locationID(storeNumber)
+                    .build())
+            .articles(articleVariantBundle)
+            .daysBefore(daysBefore)
+            .build();
 
     try {
-      jsonStringMovie = mapper.writeValueAsString(locationRequestBody);
-      HttpEntity<String> request = new HttpEntity<>(jsonStringMovie, headers);
-      MovieLocationResponse response = webClient.post()
-              .uri(urlInUse)
+      MovieAverageSalesPerArticle response =
+          webClient
+              .post()
+              .uri(movieTotalAverageSalesHost + movieTotalAveragePath)
               .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
               .bodyValue(locationRequestBody)
               .retrieve()
-              .onStatus(this::isErrorResponse, clientResponse -> log(clientResponse, "Movie total sales details- api call unsuccessful  : status %d"))
-              .bodyToMono(MovieLocationResponse.class)
+              .onStatus(
+                  this::isErrorResponse,
+                  clientResponse ->
+                      log(
+                          clientResponse,
+                          "Movie total sales details- api call unsuccessful  : status %d"))
+              .bodyToMono(MovieAverageSalesPerArticle.class)
               .block();
 
-      return response == null ? null : response.getDaysBefore();
+      return response == null ? null : response.getAverages();
     } catch (Exception e) {
-      log.error("Error while calling MOVIE input{} exception{}", jsonStringMovie, e);
+      log.error("Error while calling MOVIE getTotalAverageSales", e);
       return null;
     }
   }

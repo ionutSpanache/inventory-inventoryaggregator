@@ -23,6 +23,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -36,6 +37,7 @@ public class ArticleDetailsService {
   private final ArticleMasterDataRepository articleMasterDataRepository;
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
+  private final MovieService movieService;
 
   private static final String MERCHANDISE_GROUP_INFORMATION = "merchandiseGroupInformation";
 
@@ -45,12 +47,14 @@ public class ArticleDetailsService {
       RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository,
       ArticleMasterDataRepository articleMasterDataRepository,
       ArticleDataFromMovieRepository articleDataFromMovieRepository,
-      AclBundleStockLocationRepository aclBundleStockLocationRepository) {
+      AclBundleStockLocationRepository aclBundleStockLocationRepository,
+      MovieService movieService) {
     this.articleCacheService = articleCacheService;
     this.rawArticleStoreMasterDataRepository = rawArticleStoreMasterDataRepository;
     this.articleMasterDataRepository = articleMasterDataRepository;
     this.articleDataFromMovieRepository = articleDataFromMovieRepository;
     this.aclBundleStockLocationRepository = aclBundleStockLocationRepository;
+    this.movieService = movieService;
   }
 
   public List<RawArticleData> getArticleDataListByEan(
@@ -410,6 +414,7 @@ public class ArticleDetailsService {
 
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard =
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
+
 
     CompletableFuture.allOf(
         articleMasterData,
