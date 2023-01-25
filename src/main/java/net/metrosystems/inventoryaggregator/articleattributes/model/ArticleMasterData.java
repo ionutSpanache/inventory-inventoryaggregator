@@ -69,6 +69,7 @@ public class ArticleMasterData implements Serializable {
   private Boolean isTradeItemInSellOut;
   private Boolean isTradeItemSellableInPFSShop;
   private Boolean isTradeItemDiscountMachine;
+  private Boolean isMerchandiseOwnBrand;
 
   public static long getSerialversionuid() {
     return serialVersionUID;

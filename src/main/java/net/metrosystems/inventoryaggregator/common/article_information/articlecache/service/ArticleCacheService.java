@@ -731,7 +731,8 @@ public class ArticleCacheService {
             getGradeCodeReferenceFruitsVegetables(iduItemDerivedStandards))
         .setIsTradeItemInSellOut(getIsTradeItem(iduItemDerivedStandards,"isTradeItemInSellOut"))
         .setIsTradeItemSellableInPFSShop(getIsTradeItem(iduItemDerivedStandards,"isTradeItemSellableInPFSShop"))
-        .setIsTradeItemDiscountMachine(getIsTradeItem(iduItemDerivedStandards,"isTradeItemDiscountMachine"));
+        .setIsTradeItemDiscountMachine(getIsTradeItem(iduItemDerivedStandards,"isTradeItemDiscountMachine"))
+        .setIsMerchandiseOwnBrand(getIsTradeItem(iduItemDerivedStandards,"merchandiseBrand"));
   }
 
   public String getGradeCodeReferenceFruitsVegetables(
@@ -798,6 +799,9 @@ public class ArticleCacheService {
     }else if("isTradeItemDiscountMachine".equals(tradeItem)
             && contentIduItemDerivedStandard.getIsTradeItemDiscountMachine() != null) {
       return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemDiscountMachine());
+    }else if("merchandiseBrand".equals(tradeItem)
+            && contentIduItemDerivedStandard.getMerchandiseBrand() != null) {
+      return new IsTradeItem(contentIduItemDerivedStandard.getMerchandiseBrand());
     }
     return null;
   }
