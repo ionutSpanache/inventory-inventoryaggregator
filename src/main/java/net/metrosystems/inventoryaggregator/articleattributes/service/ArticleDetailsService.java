@@ -10,11 +10,27 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructure;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructureList;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.LanguageData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MultiLanguageData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.VariantDescription;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBundleStockLocationRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.ContentIduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.Domain;
@@ -36,6 +52,7 @@ public class ArticleDetailsService {
   private final ArticleMasterDataRepository articleMasterDataRepository;
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
+  private final GeneralDataRepository generalDataRepository;
 
   private static final String MERCHANDISE_GROUP_INFORMATION = "merchandiseGroupInformation";
 
@@ -45,12 +62,14 @@ public class ArticleDetailsService {
       RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository,
       ArticleMasterDataRepository articleMasterDataRepository,
       ArticleDataFromMovieRepository articleDataFromMovieRepository,
-      AclBundleStockLocationRepository aclBundleStockLocationRepository) {
+      AclBundleStockLocationRepository aclBundleStockLocationRepository,
+      GeneralDataRepository generalDataRepository) {
     this.articleCacheService = articleCacheService;
     this.rawArticleStoreMasterDataRepository = rawArticleStoreMasterDataRepository;
     this.articleMasterDataRepository = articleMasterDataRepository;
     this.articleDataFromMovieRepository = articleDataFromMovieRepository;
     this.aclBundleStockLocationRepository = aclBundleStockLocationRepository;
+    this.generalDataRepository = generalDataRepository;
   }
 
   public List<RawArticleData> getArticleDataListByEan(
@@ -423,6 +442,9 @@ public class ArticleDetailsService {
 
       articleCacheService.enhanceArticleMasterData(
           articleMasterData.get(), iduDerivedStandardsList.get());
+
+    generalDataRepository.enhanceRawArticleStoreMasterDataWithDepartmentName(
+        countryCode, salesLine, storeNo, rawArticleStoreMasterData.get());
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
