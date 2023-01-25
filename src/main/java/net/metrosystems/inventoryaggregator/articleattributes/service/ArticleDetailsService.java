@@ -23,6 +23,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAverageSale;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -156,6 +157,7 @@ public class ArticleDetailsService {
     }
 
     CompletableFuture.allOf(articleMasterData, discountArticleStoreMasterData);
+
 
     return CompleteArticleMasterData.builder()
         .articleMasterData(articleMasterData.get())
@@ -426,11 +428,21 @@ public class ArticleDetailsService {
         maximumRetailPrice,
         iduItemDerivedStandard);
 
+
+
       articleCacheService.enhanceArticleMasterData(
           articleMasterData.get(), iduDerivedStandardsList.get());
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
+
+    CompletableFuture<String> dailyMeanSales =
+        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
+
+    if (dailyMeanSales.get() != null || !(dailyMeanSales.get().isEmpty())) {
+      stockDetails.setDailyMeanSales(dailyMeanSales.get());
+    }
+
     if (articleDataFromMovie.get() != null) {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();

@@ -2,14 +2,15 @@ package net.metrosystems.inventoryaggregator.common.stock_information.movie.serv
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.client.MovieClient;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAdapter;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieOpenOrder;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Stock;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetails;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 public class MovieService {
@@ -19,6 +20,27 @@ public class MovieService {
   @Autowired
   public MovieService(MovieClient pMovieClient) {
     this.movieClient = pMovieClient;
+  }
+  @Async("asyncExecutor")
+  public CompletableFuture<String> getTotalAverageSales(
+      String countryName, String salesLine, Integer storeNumber, ArticleId articleId) {
+
+    List<MovieAverageSale> totalAverageSales =
+        movieClient.getTotalAverageSales(
+            countryName,
+            salesLine,
+            storeNumber,
+            List.of(
+                ArticleVariantBundle.builder()
+                    .articleNo(articleId.getArticleNumber())
+                    .variant(articleId.getArticleNumber())
+                    .bundleNo(articleId.getBundleNumber())
+                    .build()),
+            30);
+    if (CollectionUtils.isEmpty(totalAverageSales)) {
+      return CompletableFuture.completedFuture(null);
+    }
+    return CompletableFuture.completedFuture(totalAverageSales.get(0).getValue());
   }
 
   private MovieAdapter transformStockDetailToMovieAdapter(StockDetails stockDetails) {
