@@ -155,9 +155,7 @@ public class ArticleDetailsService {
     } catch (Exception e) {
       e.printStackTrace();
     }
-
     CompletableFuture.allOf(articleMasterData, discountArticleStoreMasterData);
-
 
     return CompleteArticleMasterData.builder()
         .articleMasterData(articleMasterData.get())
@@ -417,7 +415,6 @@ public class ArticleDetailsService {
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard =
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
 
-
     CompletableFuture.allOf(
         articleMasterData,
         rawArticleStoreMasterData,
@@ -428,8 +425,6 @@ public class ArticleDetailsService {
         maximumRetailPrice,
         iduItemDerivedStandard);
 
-
-
       articleCacheService.enhanceArticleMasterData(
           articleMasterData.get(), iduDerivedStandardsList.get());
 
@@ -439,7 +434,7 @@ public class ArticleDetailsService {
     CompletableFuture<String> dailyMeanSales =
         movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
 
-    if (dailyMeanSales.get() != null || !(dailyMeanSales.get().isEmpty())) {
+    if (dailyMeanSales.get() != null) {
       stockDetails.setDailyMeanSales(dailyMeanSales.get());
     }
 
