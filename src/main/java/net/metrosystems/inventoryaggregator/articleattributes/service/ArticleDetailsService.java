@@ -39,6 +39,8 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAverageSale;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -53,6 +55,7 @@ public class ArticleDetailsService {
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
   private final GeneralDataRepository generalDataRepository;
+  private final MovieService movieService;
 
   private static final String MERCHANDISE_GROUP_INFORMATION = "merchandiseGroupInformation";
 
@@ -63,13 +66,15 @@ public class ArticleDetailsService {
       ArticleMasterDataRepository articleMasterDataRepository,
       ArticleDataFromMovieRepository articleDataFromMovieRepository,
       AclBundleStockLocationRepository aclBundleStockLocationRepository,
-      GeneralDataRepository generalDataRepository) {
+      GeneralDataRepository generalDataRepository,
+      MovieService movieService) {
     this.articleCacheService = articleCacheService;
     this.rawArticleStoreMasterDataRepository = rawArticleStoreMasterDataRepository;
     this.articleMasterDataRepository = articleMasterDataRepository;
     this.articleDataFromMovieRepository = articleDataFromMovieRepository;
     this.aclBundleStockLocationRepository = aclBundleStockLocationRepository;
     this.generalDataRepository = generalDataRepository;
+    this.movieService = movieService;
   }
 
   public List<RawArticleData> getArticleDataListByEan(
@@ -448,6 +453,14 @@ public class ArticleDetailsService {
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
+
+    CompletableFuture<String> dailyMeanSales =
+        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
+
+    if (dailyMeanSales.get() != null) {
+      stockDetails.setDailyMeanSales(dailyMeanSales.get());
+    }
+
     if (articleDataFromMovie.get() != null) {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
