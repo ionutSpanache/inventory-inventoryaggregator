@@ -24,6 +24,8 @@ public class ContentIduItemDerivedStandard implements Serializable {
 
     private IsTradeItemDiscountMachine isTradeItemDiscountMachine;
 
+    private MerchandiseBrand merchandiseBrand;
+
     private AssortmentClusterSpecificationV2 assortmentClusterSpecificationV2;
 
     private Boolean isTradeItemAVariableUnit;
@@ -66,6 +68,10 @@ public class ContentIduItemDerivedStandard implements Serializable {
         return isTradeItemDiscountMachine;
     }
 
+    public MerchandiseBrand getMerchandiseBrand() {
+        return merchandiseBrand;
+    }
+
     @XmlElement("gradeCodeReferenceFruitsVegetables")
     public void setGradeCodeReferenceFruitsVegetables(
         GradeCodeReferenceFruitsVegetables gradeCodeReferenceFruitsVegetables) {
@@ -95,6 +101,10 @@ public class ContentIduItemDerivedStandard implements Serializable {
         this.isTradeItemExcludedFromDiscounts = isTradeItemExcludedFromDiscounts;
     }
 
+    @XmlElement("merchandiseBrand")
+    public void setMerchandiseBrand(MerchandiseBrand merchandiseBrand) {
+        this.merchandiseBrand = merchandiseBrand;
+    }
 
     public AssortmentClusterSpecificationV2 getAssortmentClusterSpecificationV2() {
         return assortmentClusterSpecificationV2;

@@ -29,4 +29,5 @@ public class RawArticleStoreMasterData {
     private Date storePromotionValidTo;
     private Integer leadTime;
     private Integer orderProposalBlockingCode;
+    private String departmentName;
 }

@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemDiscountMachine;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemInSellOut;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemSellableInPFSShop;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.*;
 
 import java.util.Date;
 
@@ -38,5 +35,10 @@ public class IsTradeItem {
     public IsTradeItem(IsTradeItemDiscountMachine isTradeItemDiscountMachine) {
         this.value = isTradeItemDiscountMachine.getValue();
         this.validFrom =isTradeItemDiscountMachine.getValidFrom();
+    }
+
+    public IsTradeItem(MerchandiseBrand merchandiseBrand) {
+        this.value = merchandiseBrand.getIsMerchandiseOwnBrand();
+        this.validFrom =merchandiseBrand.getValidFrom();
     }
 }
