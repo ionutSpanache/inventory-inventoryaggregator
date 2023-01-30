@@ -113,7 +113,7 @@ jobs:
   deploy-gke-dev:
     needs: [build]
     environment: gke-dev
-    runs-on: [self-hosted, Linux, metro-network]
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
