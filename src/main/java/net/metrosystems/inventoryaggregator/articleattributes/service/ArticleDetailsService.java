@@ -457,13 +457,12 @@ public class ArticleDetailsService {
     CompletableFuture<String> dailyMeanSales =
         movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
 
-    if (dailyMeanSales.get() != null) {
-      stockDetails.setDailyMeanSales(dailyMeanSales.get());
-    }
-
     if (articleDataFromMovie.get() != null) {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
+      if (dailyMeanSales.get() != null && stockDetails!=null) {
+        stockDetails.setDailyMeanSales30(dailyMeanSales.get());
+      }
     }
 
     RawArticleData rawArticleData =

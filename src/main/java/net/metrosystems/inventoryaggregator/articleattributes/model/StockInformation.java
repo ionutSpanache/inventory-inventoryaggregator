@@ -24,6 +24,7 @@ public class StockInformation implements Serializable {
   private Double blockedStock;
   private String stockCoverage;
   private String dailyMeanSales;
+  private String dailyMeanSales30;
   private Float openInterstoreQuantity;
   private Float openReturnQuantity;
   private Double openGoodReceiving;

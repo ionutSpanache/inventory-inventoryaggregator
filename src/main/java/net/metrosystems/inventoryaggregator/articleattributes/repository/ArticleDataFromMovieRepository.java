@@ -108,6 +108,7 @@ public class ArticleDataFromMovieRepository {
         movieAdapter.getBlockedStock(),
         movieAdapter.getStockCoverage(),
         movieAdapter.getDailyMeanSales(),
+        null,
         movieAdapter.getOpenInterstoreQuantity(),
         movieAdapter.getOpenReturnQuantity(),
         movieAdapter.getOpenGoodReceiving(),
