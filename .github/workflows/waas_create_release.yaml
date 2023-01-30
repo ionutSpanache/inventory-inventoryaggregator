@@ -178,7 +178,7 @@ jobs:
   deploy-gke-pp:
     needs: [deploy-gke-dev]
     environment: gke-pp
-    runs-on: [self-hosted, Linux, metro-network]
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -203,7 +203,7 @@ jobs:
         gpg-private-key: ${{ secrets.GPG_KEY }}
     - name: Update master authorized networks
       run: |
-        apt install dnsutils -y
+        sudo apt install dnsutils -y
         dig +short myip.opendns.com @resolver1.opendns.com > _EXT-IP
         gcloud container clusters describe $_GKE_PP_CLUSTER --project=$_GKE_PP_PROJECT --zone=europe-west1 | grep cidrBlock: | awk '{gsub("  - cidrBlock: ", "");print}' | tee master-auth-ranges master-auth-ranges-new && echo $(cat _EXT-IP)/32 >> master-auth-ranges-new && tr '\n' ',' < master-auth-ranges-new > master-auth-test && truncate -s -1 master-auth-test && CIDRS=$(cat master-auth-test)
         gcloud container clusters update $_GKE_PP_CLUSTER --project=$_GKE_PP_PROJECT --region=$_GKE_LOCATION \
