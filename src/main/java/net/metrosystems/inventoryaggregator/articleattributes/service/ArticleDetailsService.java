@@ -454,15 +454,15 @@ public class ArticleDetailsService {
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
 
-    CompletableFuture<String> dailyMeanSales =
-        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
+//    CompletableFuture<String> dailyMeanSales =
+//        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
 
     if (articleDataFromMovie.get() != null) {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
-      if (dailyMeanSales.get() != null && stockDetails!=null) {
-        stockDetails.setDailyMeanSales30(dailyMeanSales.get());
-      }
+//      if (dailyMeanSales.get() != null && stockDetails!=null) {
+//        stockDetails.setDailyMeanSales30(dailyMeanSales.get());
+//      }
     }
 
     RawArticleData rawArticleData =
