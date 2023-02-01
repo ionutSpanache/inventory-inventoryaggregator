@@ -93,7 +93,7 @@ public class MovieClient {
                 MovieLocation.builder()
                     .country(countryName)
                     .salesLine(salesLine)
-                    .locationID(storeNumber)
+                    .locationId(storeNumber)
                     .build())
             .articles(articleVariantBundle)
             .daysBefore(daysBefore)
@@ -104,7 +104,7 @@ public class MovieClient {
           webClient
               .post()
               .uri(movieTotalAverageSalesHost + movieTotalAveragePath)
-              .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
+              .contentType(MediaType.APPLICATION_JSON)
               .bodyValue(locationRequestBody)
               .retrieve()
               .onStatus(
@@ -115,7 +115,6 @@ public class MovieClient {
                           "Movie total sales details- api call unsuccessful  : status %d"))
               .bodyToMono(MovieAverageSalesPerArticle.class)
               .block();
-
       return response == null ? null : response.getAverages();
     } catch (Exception e) {
       log.error("Error while calling MOVIE getTotalAverageSales", e);

@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -454,15 +455,19 @@ public class ArticleDetailsService {
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
 
-//    CompletableFuture<String> dailyMeanSales =
-//        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
+    CompletableFuture<String> dailyMeanSales =
+        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
 
     if (articleDataFromMovie.get() != null) {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
-//      if (dailyMeanSales.get() != null && stockDetails!=null) {
-//        stockDetails.setDailyMeanSales30(dailyMeanSales.get());
-//      }
+      if (dailyMeanSales.get() != null && stockDetails!=null) {
+        Float parsedDailyMeanSales = Float.parseFloat(dailyMeanSales.get());
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        String dailyMeanSales30 = df.format(parsedDailyMeanSales);
+        stockDetails.setDailyMeanSales30(dailyMeanSales30);
+      }
     }
 
     RawArticleData rawArticleData =

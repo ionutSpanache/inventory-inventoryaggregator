@@ -33,7 +33,7 @@ public class MovieService {
             List.of(
                 ArticleVariantBundle.builder()
                     .articleNo(articleId.getArticleNumber())
-                    .variant(articleId.getArticleNumber())
+                    .variant(articleId.getVariantNumber())
                     .bundleNo(articleId.getBundleNumber())
                     .build()),
             30);
