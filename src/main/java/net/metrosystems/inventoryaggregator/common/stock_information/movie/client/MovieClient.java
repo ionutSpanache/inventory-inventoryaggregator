@@ -104,8 +104,7 @@ public class MovieClient {
           webClient
               .post()
               .uri(movieTotalAverageSalesHost + movieTotalAveragePath)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .accept(MediaType.TEXT_PLAIN)
+              .contentType(MediaType.APPLICATION_JSON)
               .bodyValue(locationRequestBody)
               .retrieve()
               .onStatus(
@@ -116,7 +115,6 @@ public class MovieClient {
                           "Movie total sales details- api call unsuccessful  : status %d"))
               .bodyToMono(MovieAverageSalesPerArticle.class)
               .block();
-
       return response == null ? null : response.getAverages();
     } catch (Exception e) {
       log.error("Error while calling MOVIE getTotalAverageSales", e);
