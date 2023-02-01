@@ -1,12 +1,12 @@
-apiVersion: skaffold/v2beta12
+apiVersion: skaffold/v2beta26
 kind: Config
 metadata:
   name: inventoryaggregator
 build:
   artifacts:
-  - image: inventoryaggregator
-    docker:
-      dockerfile: Dockerfile
+    - image: inventoryaggregator
+      docker:
+        dockerfile: Dockerfile
   tagPolicy:
     gitCommit:
       variant: AbbrevCommitSha
@@ -15,38 +15,30 @@ build:
     push: false
 deploy:
   kustomize: {}
-  statusCheckDeadlineSeconds: 360
+  statusCheckDeadlineSeconds: 240
 profiles:
   - name: push
     build:
       local:
         push: true
-    activation:
-      - command: push
-  - name: dev-be-gcw1
+  - name: dev
     deploy:
       kustomize:
         buildArgs:
-        - --enable_alpha_plugins
+          - '--enable-alpha-plugins'
         paths:
-        - waas-config/environments/be-gcw1/dev
-    activation:
-      - command: dev-be-gcw1
-  - name: pp-be-gcw1
+          - deployment-configuration/profiles/dev
+  - name: pp
     deploy:
       kustomize:
         buildArgs:
-        - --enable_alpha_plugins
+          - '--enable-alpha-plugins'
         paths:
-        - waas-config/environments/be-gcw1/pp
-    activation:
-      - command: pp-be-gcw1
-  - name: prod-be-gcw1
+          - deployment-configuration/profiles/pp
+  - name: prod
     deploy:
       kustomize:
         buildArgs:
-        - --enable_alpha_plugins
+          - '--enable-alpha-plugins'
         paths:
-        - waas-config/environments/be-gcw1/prod
-    activation:
-      - command: prod-be-gcw1
+          - deployment-configuration/profiles/prod

@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: inventory-inventoryaggregator
 spec:
-  replicas: 1
+  replicas: 2
   template:
     spec:
       containers:
       - name: inventoryaggregator
         resources:
           limits:
-            cpu: "1"
-            memory: 2Gi
+            cpu: "2"
+            memory: 1.5Gi
           requests:
-            cpu: 100m
-            memory: 1Gi
+            cpu: 200m
+            memory: 800Mi
 

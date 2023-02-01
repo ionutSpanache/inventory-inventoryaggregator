@@ -1,0 +1,46 @@
+name: 'Deploy to Production'
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Provide GitHub tag to be deployed"
+        type: text
+        required: true
+      datacenter:
+        description: 'Datacenter for deployment'
+        required: true
+        default: 'be-gcw1'
+      stage:
+        description: 'Environment to deploy'
+        required: true
+        default: 'prod'
+concurrency:
+  group: 'WaaS: Deployment pipeline'
+  cancel-in-progress: false
+env:
+  SOPS_VERSION: 3.6.1
+  tag: ${{ github.event.inputs.tag }}
+  datacenter: ${{ github.event.inputs.datacenter }}
+  stage: ${{ github.event.inputs.stage }}
+jobs:
+  checkout-workflows-testing:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out inventory-configuration
+      uses: actions/checkout@master
+      with:
+        repository: metro-digital-inner-source/inventory-configuration
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+    - uses: actions/upload-artifact@v3
+      with:
+        name: workflows-configuration
+        path: .github/workflows/
+  trigger-deployment-pipeline:
+    needs: 
+    - checkout-workflows-testing
+    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/deploy-to-production.yaml@master
+    with:
+      tag: ${{ github.event.inputs.tag }}
+      datacenter: ${{ github.event.inputs.datacenter }}
+      stage: ${{ github.event.inputs.stage }}
+    secrets: inherit

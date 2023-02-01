@@ -1,6 +1,0 @@
-apiVersion: goabout.com/v1beta1
-kind: SopsSecretGenerator
-metadata:
-  name: inventoryaggregator-application-secrets
-envs:
-  - application.secrets.yaml
