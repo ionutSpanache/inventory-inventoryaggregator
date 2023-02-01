@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 public class MovieLocation {
   private String country;
   private String salesLine;
-  private Integer locationID;
+  private Integer locationId;
 }

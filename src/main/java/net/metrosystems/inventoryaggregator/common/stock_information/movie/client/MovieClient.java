@@ -93,7 +93,7 @@ public class MovieClient {
                 MovieLocation.builder()
                     .country(countryName)
                     .salesLine(salesLine)
-                    .locationID(storeNumber)
+                    .locationId(storeNumber)
                     .build())
             .articles(articleVariantBundle)
             .daysBefore(daysBefore)
@@ -104,7 +104,8 @@ public class MovieClient {
           webClient
               .post()
               .uri(movieTotalAverageSalesHost + movieTotalAveragePath)
-              .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.TEXT_PLAIN)
               .bodyValue(locationRequestBody)
               .retrieve()
               .onStatus(
