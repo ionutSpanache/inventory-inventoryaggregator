@@ -29,7 +29,4 @@ jobs:
     uses: metro-digital-inner-source/inventory-configuration/.github/workflows/deployment-pipeline-without-tests.yaml@master
     secrets:
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      TECH_PASSWORD: ${{ secrets.TECH_PASSWORD }}
-      IDAM_SECRET_PASSWORD: ${{ secrets.IDAM_SECRET_PASSWORD }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      TEST_SERVICE: ${{ secrets.TEST_SERVICE }}

@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: inventoryaggregator
+  name: PROJECT_NAME
 spec:
   selector:
     matchLabels:
-      service: inventoryaggregator
+      service: PROJECT_NAME
   template:
     metadata:
       labels:
-        service: inventoryaggregator
+        service: PROJECT_NAME
     spec:
       containers:
-      - image: inventoryaggregator
+      - image: PROJECT_NAME
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: secret
@@ -28,7 +28,7 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
-        name: inventoryaggregator
+        name: PROJECT_NAME
         ports:
         - containerPort: 8080
           protocol: TCP
@@ -46,17 +46,17 @@ spec:
         - name: ARTICLE_CACHE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: inventoryaggregator-secret
+              name: PROJECT_NAME-secret
               key: article_cache_password
         - name: IDAM_CLIENT_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
-              name: inventoryaggregator-secret
+              name: PROJECT_NAME-secret
               key: idam_client_client_secret
         - name: IDAM_SECRET
           valueFrom:
             secretKeyRef:
-              name: inventoryaggregator-secret
+              name: PROJECT_NAME-secret
               key: idam_secret
         - name: DD_AGENT_HOST
           valueFrom:
@@ -102,9 +102,9 @@ spec:
               fieldPath: metadata.labels['repository.commit_sha']
         envFrom:
         - configMapRef:
-            name: inventoryaggregator
+            name: PROJECT_NAME
         - secretRef:
-            name: inventoryaggregator-application-secrets
+            name: PROJECT_NAME-application-secrets
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -112,11 +112,11 @@ spec:
             podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  service: inventoryaggregator
+                  service: PROJECT_NAME
               topologyKey: "kubernetes.io/hostname"
       imagePullSecrets:
       - name: dockerlogin
       volumes:
       - name: secret
         secret:
-          secretName: "inventoryaggregator-secret"
+          secretName: "PROJECT_NAME-secret"

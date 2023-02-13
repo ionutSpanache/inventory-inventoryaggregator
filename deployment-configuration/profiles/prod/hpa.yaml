@@ -1,7 +1,7 @@
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: inventory-inventoryaggregator
+  name: inventory-PROJECT_NAME
 spec:
   maxReplicas: 10
   minReplicas: 2
@@ -21,4 +21,4 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: inventory-inventoryaggregator
+    name: inventory-PROJECT_NAME

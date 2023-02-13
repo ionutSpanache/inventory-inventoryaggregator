@@ -5,8 +5,8 @@ metadata:
     networking.gke.io/load-balancer-type: Internal
     networking.gke.io/internal-load-balancer-allow-global-access: "true"
   labels:
-    service: inventory-inventoryaggregator
-  name: inventory-inventoryaggregator-internal-lb
+    service: PROJECT_NAME
+  name: PROJECT_NAME-internal-lb
   namespace: inventory-gke-pp
 spec:
   allocateLoadBalancerNodePorts: true
@@ -33,7 +33,7 @@ spec:
       protocol: TCP
       targetPort: 8080
   selector:
-    service: inventoryaggregator
+    service: PROJECT_NAME
   sessionAffinity: None
   type: LoadBalancer
   loadBalancerIP: 10.32.24.106

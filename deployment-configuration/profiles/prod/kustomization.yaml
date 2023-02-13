@@ -8,7 +8,7 @@ resources:
 generators:
 - generator.yaml
 configMapGenerator:
-- name: inventoryaggregator
+- name: PROJECT_NAME
   behavior: merge
   envs:
   - application.properties

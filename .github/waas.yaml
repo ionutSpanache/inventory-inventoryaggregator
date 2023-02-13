@@ -1,6 +1,6 @@
 apiVersion: waas/v2
 metadata:
-  name: inventoryaggregator
+  name: PROJECT_NAME
 profiles:
   - name: dev
     environment: test

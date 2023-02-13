@@ -1,6 +1,6 @@
 resources:
 - templates/deployment.yaml
 configMapGenerator:
-- name: inventoryaggregator
+- name: PROJECT_NAME
   envs:
     - application.properties

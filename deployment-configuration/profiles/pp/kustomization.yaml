@@ -6,21 +6,21 @@ resources:
 generators:
 - googleSecretManagerSecretGenerator.yaml
 configMapGenerator:
-- name: inventoryaggregator
+- name: PROJECT_NAME
   behavior: merge
   envs:
   - application.properties
 patches:
 - target:
     kind: Deployment
-    name: inventoryaggregator
+    name: PROJECT_NAME
   path: resources.yaml
 - target:
     kind: Deployment
-    name: inventoryaggregator
+    name: PROJECT_NAME
   patch: |-
     - op: add
       path: /spec/template/spec/containers/0/envFrom/-
       value:
         secretRef:
-          name: inventoryaggregator-google-secret-manager-secrets
+          name: PROJECT_NAME-google-secret-manager-secrets

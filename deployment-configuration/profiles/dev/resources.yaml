@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: inventory-inventoryaggregator
+  name: PROJECT_NAME
 spec:
   replicas: 2
   template:
     spec:
       containers:
-      - name: inventoryaggregator
+      - name: PROJECT_NAME
         resources:
           limits:
             cpu: "2"
