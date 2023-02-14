@@ -3,16 +3,15 @@ kind: Deployment
 metadata:
   name: PROJECT_NAME
 spec:
-  replicas: 10
+  replicas: 3
   template:
     spec:
       containers:
       - name: PROJECT_NAME
         resources:
           limits:
-            cpu: "2"
-            memory: 1Gi
+            cpu: "3"
+            memory: 4.5Gi
           requests:
-            cpu: 500m
-            memory: 800Mi
-
+            cpu: "0.5"
+            memory: 2Gi
