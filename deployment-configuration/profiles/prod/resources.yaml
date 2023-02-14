@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: inventory-PROJECT_NAME
+  name: PROJECT_NAME
 spec:
   replicas: 10
   template:
@@ -11,8 +11,8 @@ spec:
         resources:
           limits:
             cpu: "2"
-            memory: 800Mi
+            memory: 1Gi
           requests:
-            cpu: 200m
-            memory: 500Mi
+            cpu: 500m
+            memory: 800Mi
 
