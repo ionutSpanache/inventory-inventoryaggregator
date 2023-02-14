@@ -25,18 +25,18 @@ public class MovieService {
   public CompletableFuture<String> getTotalAverageSales(
       String countryName, String salesLine, Integer storeNumber, ArticleId articleId) {
 
-    List<MovieAverageSale> totalAverageSales =
-        movieClient.getTotalAverageSales(
-            countryName,
-            salesLine,
-            storeNumber,
-            List.of(
-                ArticleVariantBundle.builder()
-                    .articleNo(articleId.getArticleNumber())
-                    .variant(articleId.getVariantNumber())
-                    .bundleNo(articleId.getBundleNumber())
-                    .build()),
-            30);
+    List<MovieAverageSale> totalAverageSales = new ArrayList<>();
+//        movieClient.getTotalAverageSales(
+//            countryName,
+//            salesLine,
+//            storeNumber,
+//            List.of(
+//                ArticleVariantBundle.builder()
+//                    .articleNo(articleId.getArticleNumber())
+//                    .variant(articleId.getVariantNumber())
+//                    .bundleNo(articleId.getBundleNumber())
+//                    .build()),
+//            30);
     if (CollectionUtils.isEmpty(totalAverageSales)) {
       return CompletableFuture.completedFuture(null);
     }
