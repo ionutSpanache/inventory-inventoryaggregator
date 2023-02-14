@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: inventory-PROJECT_NAME
 spec:
-  replicas: 2
+  replicas: 10
   template:
     spec:
       containers:
