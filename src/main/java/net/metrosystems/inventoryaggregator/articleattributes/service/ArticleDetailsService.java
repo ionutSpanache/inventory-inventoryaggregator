@@ -436,6 +436,9 @@ public class ArticleDetailsService {
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard =
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
 
+    CompletableFuture<String> dailyMeanSales =
+        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
+
     CompletableFuture.allOf(
         articleMasterData,
         rawArticleStoreMasterData,
@@ -444,7 +447,8 @@ public class ArticleDetailsService {
         articleLocationList,
         iduDerivedStandardsList,
         maximumRetailPrice,
-        iduItemDerivedStandard);
+        iduItemDerivedStandard,
+        dailyMeanSales);
 
       articleCacheService.enhanceArticleMasterData(
           articleMasterData.get(), iduDerivedStandardsList.get());
@@ -455,8 +459,6 @@ public class ArticleDetailsService {
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
 
-    CompletableFuture<String> dailyMeanSales =
-        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
 
     if (articleDataFromMovie.get() != null) {
       stockDetails = articleDataFromMovie.get().getArticleStockData();

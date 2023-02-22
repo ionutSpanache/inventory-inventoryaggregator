@@ -107,18 +107,17 @@ public class MovieClient {
               .contentType(MediaType.APPLICATION_JSON)
               .bodyValue(locationRequestBody)
               .retrieve()
-              .onStatus(
-                  this::isErrorResponse,
-                  clientResponse ->
-                      log(
-                          clientResponse,
-                          "Movie total sales details- api call unsuccessful  : status %d"))
               .bodyToMono(MovieAverageSalesPerArticle.class)
+              .onErrorResume(
+                  error -> {
+                    log.error("Movie total sales details- api call unsuccessful for {}", locationRequestBody, error);
+                    return Mono.empty();
+                  })
               .block();
       return response == null ? null : response.getAverages();
     } catch (Exception e) {
       log.error("Error while calling MOVIE getTotalAverageSales", e);
-      return null;
+      return Collections.emptyList();
     }
   }
 
@@ -196,15 +195,8 @@ public class MovieClient {
     movieRequest.setArticles(articleList);
     movieRequest.setDataGroups(dataGroupsList);
 
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonStringMovie = null;
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
 
     try {
-      jsonStringMovie = mapper.writeValueAsString(movieRequest);
-      HttpEntity<String> request = new HttpEntity<>(jsonStringMovie, headers);
-//      StockDetailsResponse response = restTemplate.postForObject(urlInUse, request, StockDetailsResponse.class);
       StockDetailsResponse response = webClient.post()
               .uri(urlInUse)
               .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
@@ -216,7 +208,7 @@ public class MovieClient {
 
       return response == null ? Collections.emptyList() : response.getStockDetails();
     } catch (Exception e) {
-      log.error("Error while calling MOVIE input{} exception{}", jsonStringMovie, e);
+      log.error("Error while calling MOVIE input{} exception{}", movieRequest, e);
       return null;
     }
   }
