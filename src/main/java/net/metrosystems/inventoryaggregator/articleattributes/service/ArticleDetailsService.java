@@ -450,7 +450,7 @@ public class ArticleDetailsService {
         iduItemDerivedStandard,
         dailyMeanSales);
 
-      articleCacheService.enhanceArticleMasterData(
+    articleCacheService.enhanceArticleMasterData(
           articleMasterData.get(), iduDerivedStandardsList.get());
 
     generalDataRepository.enhanceRawArticleStoreMasterDataWithDepartmentName(
