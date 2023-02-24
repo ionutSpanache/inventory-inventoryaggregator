@@ -106,7 +106,7 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   }
 
   @Override
-  public IsuItemStoreMerchandise getChannelDeliveryFlagDocument(String articleUrlPath) {
+  public IsuItemStoreMerchandise getIsuItemStoreMerchandiseDocument(String articleUrlPath) {
     return getForArticleCacheObject(
             articleCacheServiceHost + "/" + articleUrlPath, IsuItemStoreMerchandise.class);
   }

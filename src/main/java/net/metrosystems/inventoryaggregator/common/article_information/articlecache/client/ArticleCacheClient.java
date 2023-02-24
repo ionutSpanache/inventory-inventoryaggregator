@@ -33,7 +33,7 @@ public interface ArticleCacheClient {
 
 	Documents getChannelDeliveryFlagUrl(String countryCode, ArticleId articleId);
 
-	IsuItemStoreMerchandise getChannelDeliveryFlagDocument(String articlePath);
+	IsuItemStoreMerchandise getIsuItemStoreMerchandiseDocument(String articlePath);
 
 	Documents getMultiLanguageDocumentUrl(String countryCode, ArticleId articleId);
 

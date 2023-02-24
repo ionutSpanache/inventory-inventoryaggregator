@@ -270,7 +270,7 @@ public class ArticleCacheService {
             .filter(
                 promotionArticleDataGroup ->
                     promotionArticleDataGroup.getId().equalsIgnoreCase("110"))
-            .collect(Collectors.toList());
+            .toList();
 
     List<PromotionArticleData> promotions = new ArrayList<>();
 
@@ -292,7 +292,7 @@ public class ArticleCacheService {
     return promotions;
   }
 
-  public Optional<String> getChannelDeliveryFlag(
+  public Optional<StoreInformationGroup> getStoreInformationGroup(
       String countryCode,
       net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
       Integer storeNumber) {
@@ -306,16 +306,15 @@ public class ArticleCacheService {
     String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 
     IsuItemStoreMerchandise isuItemStoreMerchandise =
-        articleCacheClient.getChannelDeliveryFlagDocument(articleUrlPath);
+        articleCacheClient.getIsuItemStoreMerchandiseDocument(articleUrlPath);
 
-    return mapToDeliveryFlagForStore(isuItemStoreMerchandise, storeNumber);
+    return mapToStoreInformationGroupForStore(isuItemStoreMerchandise, storeNumber);
   }
 
-  private Optional<String> mapToDeliveryFlagForStore(
+  private Optional<StoreInformationGroup> mapToStoreInformationGroupForStore(
       IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
     if (isuItemStoreMerchandise == null) return Optional.empty();
-    Optional<StoreInformationGroup> response =
-        isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
+    return isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
                 == null
             ? Optional.empty()
             : isuItemStoreMerchandise
@@ -325,50 +324,6 @@ public class ArticleCacheService {
                 .filter(
                     storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
                 .findFirst();
-
-    if (response.isPresent()) {
-      return response.map(StoreInformationGroup::getChannelDeliveryFlag);
-    }
-
-    return Optional.empty();
-  }
-
-  private String buildIhdsTreeUrl(
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Long articleNumber,
-      Long variantNumber,
-      Long bundleNumber) {
-
-    return "/documents/"
-        + countryCode.toLowerCase()
-        + "/"
-        + IHDS_TREE
-        + "?"
-        + BUNDLE_NO
-        + "="
-        + bundleNumber
-        + "&"
-        + COMPANY
-        + "="
-        + salesLine.toLowerCase()
-        + "&"
-        + ENVIRONMENT
-        + "="
-        + getEnvironment(countryCode)
-        + "&"
-        + LANGUAGE
-        + "="
-        + languageCode.toLowerCase()
-        + "&"
-        + MMS_ARTNO
-        + "="
-        + articleNumber
-        + "&"
-        + VARIANT_NO
-        + "="
-        + variantNumber;
   }
 
   private String getEnvironment(String countryCode) {
@@ -716,7 +671,7 @@ public class ArticleCacheService {
             .stream()
             .filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
             .map(ArticleCacheDataGroup::getStoreNo)
-            .collect(Collectors.toList());
+            .toList();
 
     return activeStoresList;
   }

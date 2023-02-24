@@ -24,11 +24,11 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArt
 import net.metrosystems.inventoryaggregator.articleattributes.model.SimplePromotionArticleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionDescription;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
@@ -110,25 +110,25 @@ public class ArticleMasterDataRepository {
                               promotionArticleData =
                                   getPromotionArticle(countryCode, storeId, articleId).stream()
                                       .filter(t -> Boolean.TRUE.equals(t.getValid()))
-                                      .collect(Collectors.toList());
+                                      .toList();
                               return PromotionArticleDataForArticleId.builder()
                                   .articleId(articleId)
                                   .promotionArticleData(promotionArticleData)
                                   .build();
                             })
                         .filter(Objects::nonNull)
-                        .collect(Collectors.toList()))
+                        .toList())
             .get();
     return CompletableFuture.completedFuture(promotionArticleDataList);
   }
 
   @Async("asyncExecutor")
-  public CompletableFuture<String> getChannelDeliveryFlag(
+  public CompletableFuture<StoreInformationGroup> getDeliveryFlagAndStoreInformation(
       String countryCode, ArticleId articleId, Integer storeNumber) {
-    String channelDeliveryFlag =
-        getDeliveryFlag(countryCode, articleId, storeNumber).orElse(StringUtils.EMPTY);
+    StoreInformationGroup storeInformationGroup =
+            getStoreSupplierInformationGroup(countryCode, articleId, storeNumber).orElse(new StoreInformationGroup());
 
-    return CompletableFuture.completedFuture(channelDeliveryFlag);
+    return CompletableFuture.completedFuture(storeInformationGroup);
   }
 
   @Async("asyncExecutor")
@@ -224,10 +224,10 @@ public class ArticleMasterDataRepository {
     return articleCacheService.getIduItemDerivedStandards(countryCode, articleId);
   }
 
-  private Optional<String> getDeliveryFlag(
+  private Optional<StoreInformationGroup> getStoreSupplierInformationGroup(
       String countryCode, ArticleId articleId, Integer storeNumber) {
 
-    return articleCacheService.getChannelDeliveryFlag(countryCode, articleId, storeNumber);
+    return articleCacheService.getStoreInformationGroup(countryCode, articleId, storeNumber);
   }
 
   private ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
