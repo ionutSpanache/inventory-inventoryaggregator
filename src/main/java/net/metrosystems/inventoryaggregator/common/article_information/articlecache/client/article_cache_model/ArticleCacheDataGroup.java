@@ -507,6 +507,28 @@ public class ArticleCacheDataGroup {
     this.minimumGrossSalesPricePerUnit = minimumGrossSalesPricePerUnit;
   }
 
+  private Integer returnCode;
+
+  public Integer getReturnCode() {
+    return returnCode;
+  }
+
+  @XmlElement(name = "RETURN_CODE")
+  public void setReturnCode(Integer returnCode) {
+    this.returnCode = returnCode;
+  }
+
+  private Integer store;
+
+  public Integer getStore() {
+    return store;
+  }
+
+  @XmlElement(name = "STORE")
+  public void setStore(Integer store) {
+    this.store = store;
+  }
+
   @Override
   public String toString() {
     return "ArticleCacheDataGroup{" +
@@ -552,6 +574,8 @@ public class ArticleCacheDataGroup {
             ", bundleNetNetBuyingPrice=" + bundleNetNetBuyingPrice +
             ", coreAssortmentIndicator=" + coreAssortmentIndicator +
             ", minimumGrossSalesPricePerUnit=" + minimumGrossSalesPricePerUnit +
+            ", returnCode=" + returnCode +
+            ", store=" + store +
             '}';
   }
 }

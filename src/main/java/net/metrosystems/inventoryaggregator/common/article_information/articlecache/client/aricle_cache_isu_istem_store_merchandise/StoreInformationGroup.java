@@ -8,34 +8,45 @@ import java.io.Serializable;
 @XmlRootElement(name = "storeInformationGroup")
 public class StoreInformationGroup implements Serializable {
 
-    private int groupingId;
-    private Long originalSupplierNumber;
-    private String ChannelDeliveryFlag;
+  private int groupingId;
+  private Long originalSupplierNumber;
+  private String ChannelDeliveryFlag;
+  private StoreItemPhaseOutInformation storeItemPhaseOutInformation;
 
-    public int getGroupingId() {
-        return groupingId;
-    }
+  public int getGroupingId() {
+    return groupingId;
+  }
 
-    @XmlAttribute(name = "groupingId")
-    public void setGroupingId(int groupingId) {
-        this.groupingId = groupingId;
-    }
+  @XmlAttribute(name = "groupingId")
+  public void setGroupingId(int groupingId) {
+    this.groupingId = groupingId;
+  }
 
-    public Long getOriginalSupplierNumber() {
-        return originalSupplierNumber;
-    }
+  public Long getOriginalSupplierNumber() {
+    return originalSupplierNumber;
+  }
 
-    @XmlElement(name = "originalSupplierNumber")
-    public void setOriginalSupplierNumber(Long originalSupplierNumber) {
-        this.originalSupplierNumber = originalSupplierNumber;
-    }
+  @XmlElement(name = "originalSupplierNumber")
+  public void setOriginalSupplierNumber(Long originalSupplierNumber) {
+    this.originalSupplierNumber = originalSupplierNumber;
+  }
 
-    public String getChannelDeliveryFlag() {
-        return ChannelDeliveryFlag;
-    }
+  public String getChannelDeliveryFlag() {
+    return ChannelDeliveryFlag;
+  }
 
-    @XmlElement(name = "ChannelDeliveryFlag")
-    public void setChannelDeliveryFlag(String channelDeliveryFlag) {
-        ChannelDeliveryFlag = channelDeliveryFlag;
-    }
+  @XmlElement(name = "ChannelDeliveryFlag")
+  public void setChannelDeliveryFlag(String channelDeliveryFlag) {
+    ChannelDeliveryFlag = channelDeliveryFlag;
+  }
+
+  public StoreItemPhaseOutInformation getStoreItemPhaseOutInformation() {
+    return storeItemPhaseOutInformation;
+  }
+
+  @XmlElement(name = "storeItemPhaseOutInformation")
+  public void setStoreItemPhaseOutInformation(
+      StoreItemPhaseOutInformation storeItemPhaseOutInformation ) {
+    this.storeItemPhaseOutInformation = storeItemPhaseOutInformation ;
+  }
 }

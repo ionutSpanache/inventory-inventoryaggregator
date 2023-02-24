@@ -27,6 +27,7 @@ public class RawArticleData implements Serializable {
     private ProductLifeCycleData productLifeCycleData;
     private MaximumRetailPrice maximumRetailPrice;
     private String channelDeliveryFlag;
+    private Long returnPossibilityStoreSupplierNumber;
     private MinimumRetailPrice minimumRetailPrice;
     private MultiLanguageData multiLanguageData;
 
@@ -43,6 +44,7 @@ public class RawArticleData implements Serializable {
                 ", channelDeliveryFlag=" + channelDeliveryFlag +
                 ", minimumRetailPrice=" + minimumRetailPrice +
                 ", multiLanguageData=" + multiLanguageData +
+                ", returnPossibilityStoreSupplierNumber=" + returnPossibilityStoreSupplierNumber +
                 ", util=" + "]";
     }
 }

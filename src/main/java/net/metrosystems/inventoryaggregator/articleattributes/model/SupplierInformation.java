@@ -13,5 +13,5 @@ public class SupplierInformation {
 
   private String generalSupplierName;
   private String originalSupplierName;
-
+  private Integer returnCode;
 }
