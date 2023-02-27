@@ -32,11 +32,15 @@ public class SupplierService {
     Optional<ArticleCacheIhdsTree> articleCacheIhdsTree =
         articleCacheAAAClient.getSupplierInformation(
             countryCode, salesLine, environment, supplierNumber);
+
     String generalSupplierName = null;
     Integer returnCode = null;
+    Integer goodsEntryDetailCheck = null;
+
     if (articleCacheIhdsTree.isPresent()) {
       generalSupplierName = getSupplierNameFromArticleCache(articleCacheIhdsTree.get());
       returnCode = getReturnCode(articleCacheIhdsTree, storeNo);
+      goodsEntryDetailCheck = getGoodsEntryDetailCheck(articleCacheIhdsTree, storeNo);
     }
 
     if (supplierNumber.equals(commercialSupplier)) {
@@ -44,6 +48,7 @@ public class SupplierService {
           .generalSupplierName(generalSupplierName)
           .originalSupplierName(generalSupplierName)
           .returnCode(returnCode)
+          .goodsEntryDetailCheck(goodsEntryDetailCheck)
           .build();
     } else {
       Optional<ArticleCacheIhdsTree> originalSupplier =
@@ -53,12 +58,14 @@ public class SupplierService {
       if (originalSupplier.isPresent()) {
         originalSupplierName = getSupplierNameFromArticleCache(originalSupplier.get());
         returnCode = getReturnCode(articleCacheIhdsTree, storeNo);
+        goodsEntryDetailCheck = getGoodsEntryDetailCheck(articleCacheIhdsTree, storeNo);
       }
 
       return SupplierInformation.builder()
           .generalSupplierName(generalSupplierName)
           .originalSupplierName(originalSupplierName)
           .returnCode(returnCode)
+          .goodsEntryDetailCheck(goodsEntryDetailCheck)
           .build();
     }
   }
@@ -96,6 +103,31 @@ public class SupplierService {
                                 .findFirst()
                                 .orElse(new ArticleCacheDataGroup())
                                 .getReturnCode())
+                    .orElse(null))
+        .orElse(null);
+  }
+
+  private Integer getGoodsEntryDetailCheck(
+      Optional<ArticleCacheIhdsTree> optionalArticleCacheIhdsTree, Optional<Integer> storeNo) {
+
+    return optionalArticleCacheIhdsTree
+        .map(
+            articleCacheIhdsTree ->
+                storeNo
+                    .map(
+                        storeNumber ->
+                            articleCacheIhdsTree
+                                .getTransaction()
+                                .getArticleCacheIncident()
+                                .getArticleCacheDataGroup()
+                                .stream()
+                                .filter(data -> data.getId() == SUPPLIER_STORE_DATA_GROUP_ID)
+                                .filter(
+                                    articleCacheDataGroup ->
+                                        articleCacheDataGroup.getStore().equals(storeNumber))
+                                .findFirst()
+                                .orElse(new ArticleCacheDataGroup())
+                                .getGoodsEntryDetailCheck())
                     .orElse(null))
         .orElse(null);
   }
