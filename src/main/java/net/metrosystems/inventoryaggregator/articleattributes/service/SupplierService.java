@@ -35,12 +35,12 @@ public class SupplierService {
 
     String generalSupplierName = null;
     Integer returnCode = null;
-    Integer goodsEntryDetailCheck = null;
+    Integer goodsReceivingDetailedCheckRequirement  = null;
 
     if (articleCacheIhdsTree.isPresent()) {
       generalSupplierName = getSupplierNameFromArticleCache(articleCacheIhdsTree.get());
       returnCode = getReturnCode(articleCacheIhdsTree, storeNo);
-      goodsEntryDetailCheck = getGoodsEntryDetailCheck(articleCacheIhdsTree, storeNo);
+      goodsReceivingDetailedCheckRequirement = getGoodsEntryDetailCheck(articleCacheIhdsTree, storeNo);
     }
 
     if (supplierNumber.equals(commercialSupplier)) {
@@ -48,7 +48,7 @@ public class SupplierService {
           .generalSupplierName(generalSupplierName)
           .originalSupplierName(generalSupplierName)
           .returnCode(returnCode)
-          .goodsEntryDetailCheck(goodsEntryDetailCheck)
+          .goodsReceivingDetailedCheckRequirement(goodsReceivingDetailedCheckRequirement)
           .build();
     } else {
       Optional<ArticleCacheIhdsTree> originalSupplier =
@@ -58,14 +58,14 @@ public class SupplierService {
       if (originalSupplier.isPresent()) {
         originalSupplierName = getSupplierNameFromArticleCache(originalSupplier.get());
         returnCode = getReturnCode(articleCacheIhdsTree, storeNo);
-        goodsEntryDetailCheck = getGoodsEntryDetailCheck(articleCacheIhdsTree, storeNo);
+        goodsReceivingDetailedCheckRequirement = getGoodsEntryDetailCheck(articleCacheIhdsTree, storeNo);
       }
 
       return SupplierInformation.builder()
           .generalSupplierName(generalSupplierName)
           .originalSupplierName(originalSupplierName)
           .returnCode(returnCode)
-          .goodsEntryDetailCheck(goodsEntryDetailCheck)
+          .goodsReceivingDetailedCheckRequirement(goodsReceivingDetailedCheckRequirement)
           .build();
     }
   }
