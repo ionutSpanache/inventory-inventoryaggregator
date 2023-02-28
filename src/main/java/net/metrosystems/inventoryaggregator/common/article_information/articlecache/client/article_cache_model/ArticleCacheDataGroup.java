@@ -518,6 +518,17 @@ public class ArticleCacheDataGroup {
     this.returnCode = returnCode;
   }
 
+  private Integer goodsEntryDetailCheck;
+
+  public Integer getGoodsEntryDetailCheck() {
+    return goodsEntryDetailCheck;
+  }
+
+  @XmlElement(name = "GOODS_ENTRY_DETAIL_CHECK")
+  public void setGoodsEntryDetailCheck(Integer goodsEntryDetailCheck) {
+    this.goodsEntryDetailCheck = goodsEntryDetailCheck;
+  }
+
   private Integer store;
 
   public Integer getStore() {
@@ -575,6 +586,7 @@ public class ArticleCacheDataGroup {
             ", coreAssortmentIndicator=" + coreAssortmentIndicator +
             ", minimumGrossSalesPricePerUnit=" + minimumGrossSalesPricePerUnit +
             ", returnCode=" + returnCode +
+            ", goodsEntryDetailCheck=" + goodsEntryDetailCheck +
             ", store=" + store +
             '}';
   }
