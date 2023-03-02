@@ -27,7 +27,6 @@ public class ArticleCacheFullData {
     private Double vatPercent;
     private double pieceNetSellPrice;
     private double bundleNetSellPrice;
-    private double promotionBundleNetPrice;
     private String variantDescription;
     private Long articleType;
     private String articleClass;

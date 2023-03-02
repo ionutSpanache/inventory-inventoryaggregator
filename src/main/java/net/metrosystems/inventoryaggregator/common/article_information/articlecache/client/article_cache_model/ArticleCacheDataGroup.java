@@ -365,15 +365,6 @@ public class ArticleCacheDataGroup {
     this.bundleNetSellPrice = bundleNetSellPrice;
   }
 
-  public double getPromotionBundleNetPrice() {
-    return promotionBundleNetPrice;
-  }
-
-  @XmlElement(name = "PROMOTIONNETSALESPRICEPERBUNDLE")
-  public void setPromotionBundleNetPrice(double promotionBundleNetPrice) {
-    this.promotionBundleNetPrice = promotionBundleNetPrice;
-  }
-
   private Double minimumRetailPriceForVatCalculation;
 
   public Double getMinimumRetailPriceForVatCalculation() {

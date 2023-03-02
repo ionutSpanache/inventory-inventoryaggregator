@@ -278,7 +278,7 @@ public class ArticleMasterDataRepository {
           .setVatPercent(articleCacheFullData.getVatPercent())
           .setPieceNetSellPrice(articleCacheFullData.getPieceNetSellPrice())
           .setBundleNetSellPrice(articleCacheFullData.getBundleNetSellPrice())
-          .setPromotionBundleNetPrice(articleCacheFullData.getPromotionBundleNetPrice())
+          .setPromotionBundleNetPrice(promotion.getPromotionNetSalesPricePerBundle())
           .setVariantDescription(articleCacheFullData.getVariantDescription())
           .setArticleType(articleCacheFullData.getArticleType())
           .setArticleClass(articleCacheFullData.getArticleClass())
@@ -350,6 +350,7 @@ public class ArticleMasterDataRepository {
             promotionDescription.map(PromotionDescription::getDescription).orElse(null))
         .promotionStart(promotionArticleData.getPromotionStart())
         .promotionEnd(promotionArticleData.getPromotionEnd())
+        .promotionNetSalesPricePerBundle(promotionArticleData.getPromotionNetSalesPricePerBundle())
         .build();
   }
 

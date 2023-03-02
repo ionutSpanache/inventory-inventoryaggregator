@@ -477,7 +477,6 @@ public class ArticleCacheService {
         articleCacheDataGroup100.getVatPercent(),
         articleCacheDataGroup320.getPieceNetSellPrice(),
         articleCacheDataGroup320.getBundleNetSellPrice(),
-        articleCacheDataGroup320.getPromotionBundleNetPrice(),
         articleCacheReaderDigest.getVariantText(),
         articleCacheReaderDigest.getArticleType(),
         articleCacheDataGroup325.getArticleClass(),

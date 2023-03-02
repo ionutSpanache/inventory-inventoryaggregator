@@ -16,4 +16,5 @@ public class SimplePromotionArticleData  {
   private LocalDate promotionEnd;
   private LocalDate promotionStart;
   private String promotionId;
+  private Double promotionNetSalesPricePerBundle;
 }
