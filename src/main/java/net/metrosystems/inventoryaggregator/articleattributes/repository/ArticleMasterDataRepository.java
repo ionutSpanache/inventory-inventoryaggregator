@@ -350,6 +350,7 @@ public class ArticleMasterDataRepository {
             promotionDescription.map(PromotionDescription::getDescription).orElse(null))
         .promotionStart(promotionArticleData.getPromotionStart())
         .promotionEnd(promotionArticleData.getPromotionEnd())
+        .promotionNetSalesPricePerBundle(promotionArticleData.getPromotionNetSalesPricePerBundle())
         .build();
   }
 
