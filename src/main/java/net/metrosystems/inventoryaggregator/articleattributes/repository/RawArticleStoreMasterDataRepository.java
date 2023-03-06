@@ -165,7 +165,7 @@ public class RawArticleStoreMasterDataRepository {
                         rawArticleStoreMasterData.setStorePieceGrossSellPrice(articleIdArticleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerPiece());
                         rawArticleStoreMasterData.setStoreBundleGrossSellPrice(articleIdArticleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerBundle());
                         rawArticleStoreMasterData.setStorePriceValidFrom(articleIdArticleCacheStoreExceptionsDataGroup100.getValidFrom());
-                        rawArticleStoreMasterData.setStorePromotionValidTo(articleIdArticleCacheStoreExceptionsDataGroup100.getValidTo());
+                        rawArticleStoreMasterData.setStorePriceValidTo(articleIdArticleCacheStoreExceptionsDataGroup100.getValidTo());
                     }
                     if(articleIdArticleCacheStoreExceptionsDataGroup200 != null){
                         rawArticleStoreMasterData.setStorePromotionPieceNetPrice(articleIdArticleCacheStoreExceptionsDataGroup200.getPromotionNetSalesPricePerPiece());
