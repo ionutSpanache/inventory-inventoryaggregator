@@ -412,8 +412,9 @@ public class ArticleDetailsService {
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard =
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
 
-//    CompletableFuture<String> dailyMeanSales =
-//        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
+    CompletableFuture<String> dailyMeanSales =
+        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
+
 
     CompletableFuture.allOf(
         articleMasterData,
@@ -423,18 +424,8 @@ public class ArticleDetailsService {
         articleLocationList,
         iduDerivedStandardsList,
         maximumRetailPrice,
-        iduItemDerivedStandard);
-
-//    CompletableFuture.allOf(
-//        articleMasterData,
-//        rawArticleStoreMasterData,
-//        articleDataFromMovie,
-//        articleStockLocationList,
-//        articleLocationList,
-//        iduDerivedStandardsList,
-//        maximumRetailPrice,
-//        iduItemDerivedStandard,
-//        dailyMeanSales);
+        iduItemDerivedStandard,
+        dailyMeanSales);
 
     articleCacheService.enhanceArticleMasterData(
           articleMasterData.get(), iduDerivedStandardsList.get());
@@ -449,13 +440,13 @@ public class ArticleDetailsService {
     if (articleDataFromMovie.get() != null) {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
-//      if (dailyMeanSales.get() != null && stockDetails!=null) {
-//        Float parsedDailyMeanSales = Float.parseFloat(dailyMeanSales.get());
-//        DecimalFormat df = new DecimalFormat();
-//        df.setMaximumFractionDigits(2);
-//        String dailyMeanSales30 = df.format(parsedDailyMeanSales);
-//        stockDetails.setDailyMeanSales30(dailyMeanSales30);
-//      }
+      if (dailyMeanSales.get() != null && stockDetails!=null) {
+        Float parsedDailyMeanSales = Float.parseFloat(dailyMeanSales.get());
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        String dailyMeanSales30 = df.format(parsedDailyMeanSales);
+        stockDetails.setDailyMeanSales30(dailyMeanSales30);
+      }
     }
 
     RawArticleData rawArticleData =
