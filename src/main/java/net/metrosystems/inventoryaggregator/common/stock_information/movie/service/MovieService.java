@@ -25,7 +25,7 @@ public class MovieService {
   public CompletableFuture<String> getTotalAverageSales(
       String countryName, String salesLine, Integer storeNumber, ArticleId articleId) {
 
-    List<MovieAverageSale> totalAverageSales = new ArrayList<>();
+    List<MovieAverageSale> totalAverageSales =
         movieClient.getTotalAverageSales(
             countryName,
             salesLine,
