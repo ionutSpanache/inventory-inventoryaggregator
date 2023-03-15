@@ -36,4 +36,4 @@ spec:
     service: PROJECT_NAME
   sessionAffinity: None
   type: LoadBalancer
-  loadBalancerIP: 10.32.24.106
+  loadBalancerIP: 10.32.2.85
