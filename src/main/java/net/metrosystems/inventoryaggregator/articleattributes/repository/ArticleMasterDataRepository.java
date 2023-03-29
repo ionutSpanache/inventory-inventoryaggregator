@@ -5,7 +5,6 @@ import static java.time.LocalDate.now;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +28,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionDescription;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
+import net.metrosystems.inventoryaggregator.common.promotions.acl.service.PromotionsAclService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
@@ -42,6 +42,8 @@ public class ArticleMasterDataRepository {
   private static final String DEFAULT_LANGUAGE_CODE = "EN";
   private final ArticleCacheService articleCacheService;
   private final DocumentsService documentsService;
+  private final PromotionsAclService promotionsAclService;
+
   @Qualifier("ForkJoinCustomPool")
   private final ExecutorService forkJoinPoolCustom;
 
@@ -126,7 +128,8 @@ public class ArticleMasterDataRepository {
   public CompletableFuture<StoreInformationGroup> getDeliveryFlagAndStoreInformation(
       String countryCode, ArticleId articleId, Integer storeNumber) {
     StoreInformationGroup storeInformationGroup =
-            getStoreSupplierInformationGroup(countryCode, articleId, storeNumber).orElse(new StoreInformationGroup());
+        getStoreSupplierInformationGroup(countryCode, articleId, storeNumber)
+            .orElse(new StoreInformationGroup());
 
     return CompletableFuture.completedFuture(storeInformationGroup);
   }
@@ -278,7 +281,10 @@ public class ArticleMasterDataRepository {
           .setVatPercent(articleCacheFullData.getVatPercent())
           .setPieceNetSellPrice(articleCacheFullData.getPieceNetSellPrice())
           .setBundleNetSellPrice(articleCacheFullData.getBundleNetSellPrice())
-          .setPromotionBundleNetPrice(promotion.getPromotionNetSalesPricePerBundle() != null ? promotion.getPromotionNetSalesPricePerBundle() : 0)
+          .setPromotionBundleNetPrice(
+              promotion.getPromotionNetSalesPricePerBundle() != null
+                  ? promotion.getPromotionNetSalesPricePerBundle()
+                  : 0)
           .setVariantDescription(articleCacheFullData.getVariantDescription())
           .setArticleType(articleCacheFullData.getArticleType())
           .setArticleClass(articleCacheFullData.getArticleClass())
@@ -315,15 +321,20 @@ public class ArticleMasterDataRepository {
 
   public SimplePromotionArticleData getActivePromotionForToday(
       String countryCode, Integer storeNumber, String languageCode, ArticleId articleId) {
-    PromotionArticleData promotionArticleData =
-            getPromotionArticle(countryCode, storeNumber, articleId).stream()
+    List<PromotionArticleData> promotionArticleDataList =
+        getPromotionArticle(countryCode, storeNumber, articleId).stream()
             .filter(promotion -> promotion.getValid() != null && promotion.getValid())
             .filter(
                 promotion ->
                     isPromotionActiveToday(
                         promotion.getPromotionStart(), promotion.getPromotionEnd()))
-            .min(Comparator.comparing(PromotionArticleData::getPromotionEnd))
-            .orElse(PromotionArticleData.builder().build());
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    PromotionArticleData promotionArticleData =
+        CollectionUtils.isEmpty(promotionArticleDataList)
+            ? PromotionArticleData.builder().build()
+            : promotionsAclService.getActivePromotion(
+                countryCode, storeNumber, articleId, promotionArticleDataList);
 
     Optional<PromotionDescription> promotionDescription = Optional.empty();
 
@@ -355,9 +366,9 @@ public class ArticleMasterDataRepository {
   }
 
   private boolean isPromotionActiveToday(LocalDate startDate, LocalDate endDate) {
-    if(startDate != null && endDate != null){
+    if (startDate != null && endDate != null) {
       return ((now().isAfter(startDate) || now().equals(startDate))
-              && (now().isBefore(endDate) || now().equals(endDate)));
+          && (now().isBefore(endDate) || now().equals(endDate)));
     }
     return false;
   }
