@@ -14,10 +14,6 @@ spec:
       containers:
       - image: PROJECT_NAME
         imagePullPolicy: IfNotPresent
-        volumeMounts:
-        - name: secret
-          mountPath: "/etc/secrets"
-          readOnly: true
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -43,21 +39,6 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         env:
-        - name: ARTICLE_CACHE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: PROJECT_NAME-secret
-              key: article_cache_password
-        - name: IDAM_CLIENT_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: PROJECT_NAME-secret
-              key: idam_client_client_secret
-        - name: IDAM_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: PROJECT_NAME-secret
-              key: idam_secret
         - name: DD_AGENT_HOST
           valueFrom:
             fieldRef:
@@ -103,8 +84,6 @@ spec:
         envFrom:
         - configMapRef:
             name: PROJECT_NAME
-        - secretRef:
-            name: PROJECT_NAME-application-secrets
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -114,9 +93,3 @@ spec:
                 matchLabels:
                   service: PROJECT_NAME
               topologyKey: "kubernetes.io/hostname"
-      imagePullSecrets:
-      - name: dockerlogin
-      volumes:
-      - name: secret
-        secret:
-          secretName: "PROJECT_NAME-secret"

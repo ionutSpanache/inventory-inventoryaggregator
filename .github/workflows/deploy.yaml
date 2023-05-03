@@ -23,21 +23,7 @@ env:
   datacenter: ${{ github.event.inputs.datacenter }}
   stage: ${{ github.event.inputs.stage }}
 jobs:
-  checkout-workflows-testing:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out inventory-configuration
-      uses: actions/checkout@master
-      with:
-        repository: metro-digital-inner-source/inventory-configuration
-        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-    - uses: actions/upload-artifact@v3
-      with:
-        name: workflows-configuration
-        path: .github/workflows/
   trigger-deployment-pipeline:
-    needs: 
-    - checkout-workflows-testing
     uses: metro-digital-inner-source/inventory-configuration/.github/workflows/deploy-to-production.yaml@master
     with:
       tag: ${{ github.event.inputs.tag }}
