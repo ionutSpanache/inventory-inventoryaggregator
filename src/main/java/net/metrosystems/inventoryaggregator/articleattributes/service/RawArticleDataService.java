@@ -83,6 +83,7 @@ public class RawArticleDataService {
           "ArticleDetailsService.buildRawArticleDataList - rawArticleStoreMasterData - error: {}",
           e.getMessage(),
           e);
+      Thread.currentThread().interrupt();
     }
 
     CompletableFuture<ArticleDataFromMovie> articleDataFromMovie = new CompletableFuture<>();
