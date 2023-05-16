@@ -15,4 +15,5 @@ public class SupplierInformation {
   private String originalSupplierName;
   private Integer returnCode;
   private Integer goodsReceivingDetailedCheckRequirement;
+  private Boolean isPlatformSupplier;
 }
