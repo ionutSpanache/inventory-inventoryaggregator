@@ -520,6 +520,28 @@ public class ArticleCacheDataGroup {
     this.goodsEntryDetailCheck = goodsEntryDetailCheck;
   }
 
+  private Integer warehouseSupplierFlag;
+
+  public Integer getWarehouseSupplierFlag() {
+    return warehouseSupplierFlag;
+  }
+
+  @XmlElement(name = "WAREHOUSE_SUPPLIER_FLAG")
+  public void setWarehouseSupplierFlag(Integer warehouseSupplierFlag) {
+    this.warehouseSupplierFlag = warehouseSupplierFlag;
+  }
+
+  private Integer salesLine;
+
+  public Integer getSalesLine() {
+    return salesLine;
+  }
+
+  @XmlElement(name = "SALESLINE")
+  public void setSalesLine(Integer salesLine) {
+    this.salesLine = salesLine;
+  }
+
   private Integer store;
 
   public Integer getStore() {
@@ -578,6 +600,8 @@ public class ArticleCacheDataGroup {
             ", minimumGrossSalesPricePerUnit=" + minimumGrossSalesPricePerUnit +
             ", returnCode=" + returnCode +
             ", goodsEntryDetailCheck=" + goodsEntryDetailCheck +
+            ", warehouseSupplierFlag=" + warehouseSupplierFlag +
+            ", salesLine=" + salesLine +
             ", store=" + store +
             '}';
   }

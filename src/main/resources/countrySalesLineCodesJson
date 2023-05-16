@@ -1,0 +1,117 @@
+[
+      {
+        "countryCode":"BE",
+        "salesLine": "MCC",
+        "salesLineCode":86
+      },
+      {
+        "countryCode":"BG",
+        "salesLine": "MCC",
+        "salesLineCode":75
+      },
+      {
+        "countryCode":"CZ",
+        "salesLine": "MCC",
+        "salesLineCode":68
+      },
+      {
+        "countryCode":"DE",
+        "salesLine": "MCC",
+        "salesLineCode":11
+      },
+      {
+        "countryCode":"ES",
+        "salesLine": "MCC",
+        "salesLineCode":66
+      },
+      {
+        "countryCode":"FR",
+        "salesLine": "MCC",
+        "salesLineCode":67
+      },
+      {
+        "countryCode":"HR",
+        "salesLine": "MCC",
+        "salesLineCode":58
+      },
+      {
+        "countryCode":"HU",
+        "salesLine": "MCC",
+        "salesLineCode":84
+      },
+      {
+        "countryCode":"IN",
+        "salesLine": "MCC",
+        "salesLineCode":54
+      },
+      {
+        "countryCode":"IT",
+        "salesLine": "MCC",
+        "salesLineCode":71
+      },
+      {
+        "countryCode":"IT",
+        "salesLine": "MAXI",
+        "salesLineCode":110
+      },
+      {
+        "countryCode":"KZ",
+        "salesLine": "MCC",
+        "salesLineCode":95
+      },
+      {
+        "countryCode":"MD",
+        "salesLine": "MCC",
+        "salesLineCode":56
+      },
+      {
+        "countryCode":"NL",
+        "salesLine": "MCC",
+        "salesLineCode":85
+      },
+      {
+         "countryCode":"PK",
+         "salesLine": "MCC",
+         "salesLineCode":109
+      },
+      {
+         "countryCode":"PL",
+         "salesLine": "MCC",
+         "salesLineCode":89
+      },
+      {
+         "countryCode":"PT",
+         "salesLine": "MCC",
+         "salesLineCode":93
+      },
+      {
+         "countryCode":"RO",
+         "salesLine": "MCC",
+         "salesLineCode":64
+      },
+      {
+         "countryCode":"RS",
+         "salesLine": "MCC",
+         "salesLineCode":60
+      },
+      {
+         "countryCode":"RU",
+         "salesLine": "MCC",
+         "salesLineCode":11
+      },
+      {
+         "countryCode":"SK",
+         "salesLine": "MCC",
+         "salesLineCode":69
+      },
+      {
+         "countryCode":"TR",
+         "salesLine": "MCC",
+         "salesLineCode":77
+      },
+      {
+         "countryCode":"UA",
+         "salesLine": "MCC",
+         "salesLineCode":96
+      }
+]
