@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 public class RawArticleDataListService {
 
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
-  private final ArticleMasterDataRepository articleMasterDataRepository;
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
   private final ArticleComponentRepository articleComponentRepository;

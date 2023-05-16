@@ -30,6 +30,9 @@ public class DataSourceRepository {
   @Value("${mstore.inventory.datasource.articlelistdata.url}")
   private String dataSourceArticleListDataUrl;
 
+  @Value("${mstore.inventory.datasource.articledata.url}")
+  private String dataSourceArticleDataUrl;
+
   public CompletableFuture<Map<ArticleId, ArticleMasterData>> getArticleMasterDataForArticleIdList(
       List<ArticleId> articleIdList,
       String countryCode,
@@ -64,5 +67,38 @@ public class DataSourceRepository {
     }
 
     return CompletableFuture.completedFuture(articleIdArticleMasterDataMap);
+  }
+
+  public CompletableFuture<ArticleMasterId> getArticleMasterIdForArticleId(
+      ArticleId articleId,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo) {
+
+    UriComponents url =
+        UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleDataUrl)
+            .buildAndExpand(
+                countryCode,
+                languageCode,
+                storeNo,
+                articleId.getArticleNumber(),
+                articleId.getVariantNumber(),
+                articleId.getBundleNumber());
+
+    ArticleMasterId articleMasterId =
+        webClient
+            .post()
+            .uri(url.toString())
+            .retrieve()
+            .bodyToMono(ArticleMasterId.class)
+            .onErrorResume(
+                error -> {
+                  log.error("Error on retrieving article master data from DataSource ", error);
+                  return Mono.empty();
+                })
+            .block();
+
+    return CompletableFuture.completedFuture(articleMasterId);
   }
 }

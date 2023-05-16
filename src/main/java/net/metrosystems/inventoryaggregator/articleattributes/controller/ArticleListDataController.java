@@ -1,6 +1,9 @@
 package net.metrosystems.inventoryaggregator.articleattributes.controller;
 
-import lombok.RequiredArgsConstructor;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
@@ -9,22 +12,31 @@ import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.metrics.annotation.Timed;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
 @Timed("ArticleData")
-@RequiredArgsConstructor
 @RequestMapping(value = "/inventoryaggregator", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArticleListDataController {
 
+  @Value("#{'${countriesV2DataSource:null}'}")
+  private  List<String> countriesV2DataSource;
+
   private final ArticleListDetailsService articleListDetailsService;
+
+  public ArticleListDataController(ArticleListDetailsService articleListDetailsService) {
+    this.articleListDetailsService = articleListDetailsService;
+  }
 
   @AddTimer
   @AddLogs
@@ -42,24 +54,34 @@ public class ArticleListDataController {
       @RequestParam("dataSource") Optional<Boolean> dataSource,
       @RequestBody List<ArticleId> articleIdList)
       throws Exception {
-      return ResponseEntity.ok(
-          articleListDetailsService.getArticleDataListByArticleVariantBundle(
-              articleIdList, countryCode, salesLine, languageCode, storeNo,dataTypeList, dataSource));
+
+    if (!isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode)) {
+      dataSource = Optional.of(true);
+    }
+    return ResponseEntity.ok(
+        articleListDetailsService.getArticleDataListByArticleVariantBundle(
+            articleIdList,
+            countryCode,
+            salesLine,
+            languageCode,
+            storeNo,
+            dataTypeList,
+            dataSource));
   }
 
   @AddTimer
   @AddLogs
   @PostMapping(
-          value =
-                  "countries/{countryCode}/saleslines/{salesLine}/articles/isexcludedfromdiscounts",
-          consumes = "application/json",
-          produces = "application/json")
+      value = "countries/{countryCode}/saleslines/{salesLine}/articles/isexcludedfromdiscounts",
+      consumes = "application/json",
+      produces = "application/json")
   public ResponseEntity<?> getIsTradeItemExcludedFromDiscountsByArtVarBundle(
-          @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-          @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-          @RequestBody List<ArticleId> articleIdList) {
+      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
+      @RequestBody List<ArticleId> articleIdList) {
     return ResponseEntity.ok(
-            articleListDetailsService.isTradeItemExcludedFromDiscounts(articleIdList, countryCode, salesLine));
+        articleListDetailsService.isTradeItemExcludedFromDiscounts(
+            articleIdList, countryCode, salesLine));
   }
 
   @AddTimer
