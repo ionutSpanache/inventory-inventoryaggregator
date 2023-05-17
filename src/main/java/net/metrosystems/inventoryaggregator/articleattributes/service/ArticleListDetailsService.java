@@ -108,7 +108,7 @@ public class ArticleListDetailsService {
                 e);
           }
         });
-    if (dataSource.isPresent() && dataSource.get()) {
+    if (dataSource.isPresent() && Boolean.TRUE.equals(dataSource.get())) {
       rawArticleDataListService.buildRawArticleDataList(
           articleIdList,
           countryCode,

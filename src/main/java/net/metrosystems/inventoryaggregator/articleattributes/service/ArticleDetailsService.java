@@ -1,9 +1,37 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.*;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructure;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructureList;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.LanguageData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
+import net.metrosystems.inventoryaggregator.articleattributes.model.MultiLanguageData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.VariantDescription;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.*;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBundleStockLocationRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.ContentIduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.Domain;
@@ -17,15 +45,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
 @Service
 @Slf4j
 public class ArticleDetailsService {
 
+  private static final String MERCHANDISE_GROUP_INFORMATION = "merchandiseGroupInformation";
   private final ArticleCacheService articleCacheService;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final ArticleMasterDataRepository articleMasterDataRepository;
@@ -33,8 +57,7 @@ public class ArticleDetailsService {
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
   private final GeneralDataRepository generalDataRepository;
   private final MovieService movieService;
-
-  private static final String MERCHANDISE_GROUP_INFORMATION = "merchandiseGroupInformation";
+  private final RawArticleDataService rawArticleDataService;
 
   @Autowired
   public ArticleDetailsService(
@@ -44,7 +67,8 @@ public class ArticleDetailsService {
       ArticleDataFromMovieRepository articleDataFromMovieRepository,
       AclBundleStockLocationRepository aclBundleStockLocationRepository,
       GeneralDataRepository generalDataRepository,
-      MovieService movieService) {
+      MovieService movieService,
+      RawArticleDataService rawArticleDataService) {
     this.articleCacheService = articleCacheService;
     this.rawArticleStoreMasterDataRepository = rawArticleStoreMasterDataRepository;
     this.articleMasterDataRepository = articleMasterDataRepository;
@@ -52,6 +76,7 @@ public class ArticleDetailsService {
     this.aclBundleStockLocationRepository = aclBundleStockLocationRepository;
     this.generalDataRepository = generalDataRepository;
     this.movieService = movieService;
+    this.rawArticleDataService = rawArticleDataService;
   }
 
   public List<RawArticleData> getArticleDataListByEan(
@@ -81,7 +106,8 @@ public class ArticleDetailsService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
+      Integer storeNo,
+      boolean dataSource)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
         ArticleId.builder()
@@ -92,7 +118,8 @@ public class ArticleDetailsService {
         countryCode,
         salesLine,
         languageCode,
-        storeNo);
+        storeNo,
+        dataSource);
   }
 
   public List<ArticleMasterData> getArticleMasterDataListByArticleVariantBundle(
@@ -296,7 +323,8 @@ public class ArticleDetailsService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
+      Integer storeNo,
+      boolean dataSource)
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
@@ -306,14 +334,26 @@ public class ArticleDetailsService {
                 articleId.getArticleNumber(), countryCode, salesLine, languageCode),
             articleId.getArticleNumber());
 
-    buildRawArticleDataList(
-        articleId,
-        countryCode,
-        salesLine,
-        languageCode,
-        storeNo,
-        rawArticleDataList,
-        articleComponent);
+    if (dataSource) {
+      rawArticleDataService.buildRawArticleDataList(
+          articleId,
+          countryCode,
+          salesLine,
+          languageCode,
+          storeNo,
+          rawArticleDataList,
+          articleComponent);
+    } else {
+
+      buildRawArticleDataList(
+          articleId,
+          countryCode,
+          salesLine,
+          languageCode,
+          storeNo,
+          rawArticleDataList,
+          articleComponent);
+    }
     return rawArticleDataList;
   }
 
@@ -407,14 +447,14 @@ public class ArticleDetailsService {
             countryCode, salesLine, storeNo, articleId);
 
     CompletableFuture<StoreInformationGroup> storeInformationGroup =
-        articleMasterDataRepository.getDeliveryFlagAndStoreInformation(countryCode, articleId, storeNo);
+        articleMasterDataRepository.getDeliveryFlagAndStoreInformation(
+            countryCode, articleId, storeNo);
 
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard =
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
 
     CompletableFuture<String> dailyMeanSales =
         movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
-
 
     CompletableFuture.allOf(
         articleMasterData,
@@ -428,7 +468,7 @@ public class ArticleDetailsService {
         dailyMeanSales);
 
     articleCacheService.enhanceArticleMasterData(
-          articleMasterData.get(), iduDerivedStandardsList.get());
+        articleMasterData.get(), iduDerivedStandardsList.get());
 
     generalDataRepository.enhanceRawArticleStoreMasterDataWithDepartmentName(
         countryCode, salesLine, storeNo, rawArticleStoreMasterData.get());
@@ -436,11 +476,10 @@ public class ArticleDetailsService {
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
 
-
     if (articleDataFromMovie.get() != null) {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
-      if (dailyMeanSales.get() != null && stockDetails!=null) {
+      if (dailyMeanSales.get() != null && stockDetails != null) {
         Float parsedDailyMeanSales = Float.parseFloat(dailyMeanSales.get());
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
@@ -540,14 +579,12 @@ public class ArticleDetailsService {
                 + articleMasterData.getPresentationSubMerchandiseGroup());
 
     return MultiLanguageData.builder()
-            .variantDescriptions(variantDescriptions)
-            .articleDescriptions(articleDescriptions)
-            .presentationMainMerchandiseGroupDescriptions(
-                presentationMainMerchandiseGroupDescriptions)
-            .presentationMerchandiseGroupDescriptions(presentationMerchandiseGroupDescriptions)
-            .presentationSubMerchandiseGroupDescriptions(
-                presentationSubMerchandiseGroupDescriptions)
-            .build();
+        .variantDescriptions(variantDescriptions)
+        .articleDescriptions(articleDescriptions)
+        .presentationMainMerchandiseGroupDescriptions(presentationMainMerchandiseGroupDescriptions)
+        .presentationMerchandiseGroupDescriptions(presentationMerchandiseGroupDescriptions)
+        .presentationSubMerchandiseGroupDescriptions(presentationSubMerchandiseGroupDescriptions)
+        .build();
   }
 
   private List<LanguageData> getPmmgData(
@@ -613,23 +650,23 @@ public class ArticleDetailsService {
       Integer storeNo)
       throws Exception {
 
-
-    Map<ArticleId, List<IduItemDerivedStandard>> iduItemDerivedStandardList = articleMasterDataRepository.getIduItemDerivedStandards(
-        articleIds, countryCode).get();
-
+    Map<ArticleId, List<IduItemDerivedStandard>> iduItemDerivedStandardList =
+        articleMasterDataRepository.getIduItemDerivedStandards(articleIds, countryCode).get();
 
     return iduItemDerivedStandardList.keySet().parallelStream()
         .map(
             articleId -> {
-              IduItemDerivedStandard iduItemDerivedStandard = iduItemDerivedStandardList.get(articleId).get(0);
+              IduItemDerivedStandard iduItemDerivedStandard =
+                  iduItemDerivedStandardList.get(articleId).get(0);
               String lang = languageCode.toLowerCase();
               ArticleMasterData articleMasterData =
                   getArticleMasterDataFromIduDerived(iduItemDerivedStandard, lang);
               return RawArticleData.builder()
-                      .articleId(articleId)
-                      .articleMasterData(articleMasterData)
-                      .build();
-            }).toList();
+                  .articleId(articleId)
+                  .articleMasterData(articleMasterData)
+                  .build();
+            })
+        .toList();
   }
 
   private ArticleMasterData getArticleMasterDataFromIduDerived(
@@ -644,9 +681,9 @@ public class ArticleDetailsService {
                     lang.equals(merchandiseArticleDescription.getLanguage()))
             .findFirst();
     return ArticleMasterData.builder()
-            .subsystemArticleNumber(domain.getStoreSubsystemArticleNumber())
-            .articleDescription(firstLang.isPresent() ? firstLang.get().getDescription() : "")
-            .weightArticle(contentIduItemDerivedStandard.getWeightArticle())
-            .build();
+        .subsystemArticleNumber(domain.getStoreSubsystemArticleNumber())
+        .articleDescription(firstLang.isPresent() ? firstLang.get().getDescription() : "")
+        .weightArticle(contentIduItemDerivedStandard.getWeightArticle())
+        .build();
   }
 }

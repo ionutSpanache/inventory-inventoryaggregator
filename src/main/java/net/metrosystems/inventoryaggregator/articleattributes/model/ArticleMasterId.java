@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ArticleMasterId {
   private ArticleId articleId;
   private ArticleMasterData articleMasterData;
+  private  MultiLanguageData multiLanguageData;
 }
