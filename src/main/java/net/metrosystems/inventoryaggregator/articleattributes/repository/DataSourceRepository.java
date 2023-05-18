@@ -88,7 +88,7 @@ public class DataSourceRepository {
 
     ArticleMasterId articleMasterId =
         webClient
-            .post()
+            .get()
             .uri(url.toString())
             .retrieve()
             .bodyToMono(ArticleMasterId.class)

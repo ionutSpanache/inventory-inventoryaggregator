@@ -65,7 +65,7 @@ public class RawArticleDataService {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
-          "ArticleListDetailsService.buildRawArticleDataList - articleMasterIdForArticleId - error: {}",
+          "RawArticleDataService.buildRawArticleDataList - articleMasterIdForArticleId - error: {}",
           e.getMessage(),
           e);
     }
@@ -80,7 +80,7 @@ public class RawArticleDataService {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
-          "ArticleDetailsService.buildRawArticleDataList - rawArticleStoreMasterData - error: {}",
+          "RawArticleDataService.buildRawArticleDataList - rawArticleStoreMasterData - error: {}",
           e.getMessage(),
           e);
       Thread.currentThread().interrupt();
@@ -95,7 +95,7 @@ public class RawArticleDataService {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
-          "ArticleDetailsService.buildRawArticleDataList - articleDataFromMovie - error: {}",
+          "RawArticleDataService.buildRawArticleDataList - articleDataFromMovie - error: {}",
           e.getMessage(),
           e);
     }
@@ -110,7 +110,7 @@ public class RawArticleDataService {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
-          "ArticleDetailsService.buildRawArticleDataList - articleStockLocationList - error: {}",
+          "RawArticleDataService.buildRawArticleDataList - articleStockLocationList - error: {}",
           e.getMessage(),
           e);
     }
@@ -124,7 +124,7 @@ public class RawArticleDataService {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
       log.error(
-          "ArticleDetailsService.buildRawArticleDataList - articleLocationList - error: {}",
+          "RawArticleDataService.buildRawArticleDataList - articleLocationList - error: {}",
           e.getMessage(),
           e);
     }
