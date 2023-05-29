@@ -51,6 +51,10 @@ public class PromotionsAclClient {
           .block();
 
     } catch (Exception e) {
+      //      SDCORP-684107
+      if ("SK".equalsIgnoreCase(storeId.getCountryCode())) {
+        log.error("No promotion active for SK for {}. Error={}", articleId, e.getMessage(), e);
+      }
       return false;
     }
   }

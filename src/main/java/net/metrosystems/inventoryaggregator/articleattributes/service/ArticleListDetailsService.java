@@ -380,7 +380,7 @@ public class ArticleListDetailsService {
               articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
           .get();
     } catch (InterruptedException | ExecutionException e) {
-      log.error(e.getMessage(), e);
+      log.error("Could not getFuturePromotionsForArticleIds={}",e.getMessage(), e);
       Thread.currentThread().interrupt();
       throw new InterruptedRuntimeException("Could not getFuturePromotionsForArticleIds");
     }
