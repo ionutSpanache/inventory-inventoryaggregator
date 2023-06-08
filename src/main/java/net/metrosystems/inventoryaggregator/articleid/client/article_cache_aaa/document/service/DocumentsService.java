@@ -173,7 +173,7 @@ public class DocumentsService {
 
   public Documents getIsuItemStoreMerchandiseByArtVarBundle(
       String countryCode,
-      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
+      ArticleId articleId) {
     FilterKeyIsuItemStoreMerchandise filterKeyStoreMerchandise =
         FilterKeyIsuItemStoreMerchandise.builder()
             .bundleNumber(articleId.getBundleNumber())

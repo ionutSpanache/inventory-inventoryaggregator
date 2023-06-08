@@ -26,6 +26,6 @@ public class FilterKeyIsuItemStoreMerchandise {
     public String getHardKey() {
         return "/" + countryCode + "/isu-item-store-merchandise?company=mcc&articlenumber=" + articleNumber
                 + "&variantnumber=" + variantNumber
-                + "&bundlenumber=" + bundleNumber;
+                + "&bundlenumber=" + bundleNumber+"&connector=odout";
     }
 }
