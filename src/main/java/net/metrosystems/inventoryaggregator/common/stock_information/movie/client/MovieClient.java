@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -98,22 +99,24 @@ public class MovieClient {
             .build();
 
     try {
-      return webClient
-          .post()
-          .uri(movieTotalAverageSalesHost + movieTotalAveragePath)
-          .contentType(MediaType.APPLICATION_JSON)
-          .bodyValue(locationRequestBody)
-          .retrieve()
-          .bodyToMono(BigDecimal.class)
-          .onErrorResume(
-              error -> {
-                log.error(
-                    "Movie total sales details- api call unsuccessful for {}",
-                    locationRequestBody,
-                    error);
-                return Mono.empty();
-              })
-          .block();
+      ResponseEntity<BigDecimal> responseEntity =
+          webClient
+              .post()
+              .uri(movieTotalAverageSalesHost + movieTotalAveragePath)
+              .bodyValue(locationRequestBody)
+              .retrieve()
+              .toEntity(BigDecimal.class)
+              .onErrorResume(
+                  error -> {
+                    log.error(
+                        "Movie total sales details- api call unsuccessful for {}",
+                        locationRequestBody,
+                        error);
+                    return Mono.empty();
+                  })
+              .block();
+
+      return responseEntity == null ? null : responseEntity.getBody();
     } catch (Exception e) {
       log.error("Error while calling MOVIE getTotalAverageSales", e);
       return null;
