@@ -1,16 +1,19 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.client.MovieClient;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.*;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.ArticleVariantBundle;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAdapter;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieOpenOrder;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Stock;
+import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Service
 public class MovieService {
@@ -21,26 +24,23 @@ public class MovieService {
   public MovieService(MovieClient pMovieClient) {
     this.movieClient = pMovieClient;
   }
+
   @Async("asyncExecutor")
-  public CompletableFuture<String> getTotalAverageSales(
+  public CompletableFuture<BigDecimal> getTotalAverageSales(
       String countryName, String salesLine, Integer storeNumber, ArticleId articleId) {
 
-    List<MovieAverageSale> totalAverageSales =
+    BigDecimal totalAverageSales =
         movieClient.getTotalAverageSales(
             countryName,
             salesLine,
             storeNumber,
-            List.of(
-                ArticleVariantBundle.builder()
-                    .articleNo(articleId.getArticleNumber())
-                    .variant(articleId.getVariantNumber())
-                    .bundleNo(articleId.getBundleNumber())
-                    .build()),
+            ArticleVariantBundle.builder()
+                .articleNo(articleId.getArticleNumber())
+                .variant(articleId.getVariantNumber())
+                .bundleNo(articleId.getBundleNumber())
+                .build(),
             30);
-    if (CollectionUtils.isEmpty(totalAverageSales)) {
-      return CompletableFuture.completedFuture(null);
-    }
-    return CompletableFuture.completedFuture(totalAverageSales.get(0).getValue());
+    return CompletableFuture.completedFuture(totalAverageSales);
   }
 
   private MovieAdapter transformStockDetailToMovieAdapter(StockDetails stockDetails) {
@@ -100,12 +100,18 @@ public class MovieService {
       movieAdapter.setLastGoodReceivingDate(lastGRDateTemp);
       movieAdapter.setLastSalesDate(lastSaleDateTemp);
       movieAdapter.setLastStockCorrectionDate(lastSCDDateTemp);
-      movieAdapter.setLastGRQuantity(stockDetails.getSystemStock().get(lastGrDateIndex) != null ?
-          stockDetails.getSystemStock().get(lastGrDateIndex).getLastGRQuantity() : null);
-      movieAdapter.setLastSalesQuantity(stockDetails.getSystemStock().get(lastSaleDateIndex) != null ?
-          stockDetails.getSystemStock().get(lastSaleDateIndex).getLastSalesQuantity() : null);
-      movieAdapter.setLastSCQuantity(stockDetails.getSystemStock().get(lastScdDateIndex) != null ?
-          stockDetails.getSystemStock().get(lastScdDateIndex).getLastSCQuantity() : null);
+      movieAdapter.setLastGRQuantity(
+          stockDetails.getSystemStock().get(lastGrDateIndex) != null
+              ? stockDetails.getSystemStock().get(lastGrDateIndex).getLastGRQuantity()
+              : null);
+      movieAdapter.setLastSalesQuantity(
+          stockDetails.getSystemStock().get(lastSaleDateIndex) != null
+              ? stockDetails.getSystemStock().get(lastSaleDateIndex).getLastSalesQuantity()
+              : null);
+      movieAdapter.setLastSCQuantity(
+          stockDetails.getSystemStock().get(lastScdDateIndex) != null
+              ? stockDetails.getSystemStock().get(lastScdDateIndex).getLastSCQuantity()
+              : null);
     }
     if (stockDetails.getOpenOrders() != null) {
       movieAdapter.setOpenOrders(new ArrayList<>());
@@ -123,9 +129,10 @@ public class MovieService {
       movieAdapter.setStockCoverage(stockDetails.getStockRelatedData().getStockCoverage());
       movieAdapter.setDailyMeanSales(stockDetails.getStockRelatedData().getDailyMeanSales());
     }
-    if (stockDetails.getConsignmentStock() != null && !stockDetails.getConsignmentStock().isEmpty()) {
+    if (stockDetails.getConsignmentStock() != null
+        && !stockDetails.getConsignmentStock().isEmpty()) {
       if (stockDetails.getConsignmentStock().get(0).getLastChange() != null
-              && !stockDetails.getConsignmentStock().get(0).getLastChange().isEmpty()) {
+          && !stockDetails.getConsignmentStock().get(0).getLastChange().isEmpty()) {
         movieAdapter.setConsignmentStock(stockDetails.getConsignmentStock().get(0).getQuantity());
         movieAdapter.setConsigStock(true);
       }
@@ -143,15 +150,18 @@ public class MovieService {
     }
 
     if (stockDetails.getReservation() != null) {
-      stockDetails.getReservation().forEach(reservation -> {
-        if ("COD picked".equals(reservation.getReservationType())) {
-          movieAdapter.setPickedStock(reservation.getQuantity());
-        } else if ("COD confirmed".equals(reservation.getReservationType())) {
-          movieAdapter.setConfirmedStock(reservation.getQuantity());
-        } else if ("MMS".equals(reservation.getReservationType())) {
-          movieAdapter.setMariStock(reservation.getQuantity());
-        }
-      });
+      stockDetails
+          .getReservation()
+          .forEach(
+              reservation -> {
+                if ("COD picked".equals(reservation.getReservationType())) {
+                  movieAdapter.setPickedStock(reservation.getQuantity());
+                } else if ("COD confirmed".equals(reservation.getReservationType())) {
+                  movieAdapter.setConfirmedStock(reservation.getQuantity());
+                } else if ("MMS".equals(reservation.getReservationType())) {
+                  movieAdapter.setMariStock(reservation.getQuantity());
+                }
+              });
     }
 
     return movieAdapter;
@@ -180,14 +190,14 @@ public class MovieService {
       Long articleNumber,
       Long variant,
       Long bundleNumber) {
-      MovieAdapter movieAdapterConsignment = new MovieAdapter();
+    MovieAdapter movieAdapterConsignment = new MovieAdapter();
     List<StockDetails> stockDetailsList =
         movieClient.getStockDetailsForArticleVariantBundle(
             countryCode, salesLine, storeNo, articleNumber, variant, bundleNumber);
     if (stockDetailsList != null && !stockDetailsList.isEmpty()) {
       for (StockDetails stockDetails : stockDetailsList) {
         if (stockDetails.getReturnCode() == 0) {
-            movieAdapterConsignment = transformStockDetailToMovieAdapter(stockDetails);
+          movieAdapterConsignment = transformStockDetailToMovieAdapter(stockDetails);
           return movieAdapterConsignment;
         }
       }
@@ -198,10 +208,7 @@ public class MovieService {
   }
 
   public List<MovieAdapter> getArticleStockListForVariantBundle(
-      String countryCode,
-      String salesLine,
-      int storeNo,
-			List<ArticleId> articleIdList) {
+      String countryCode, String salesLine, int storeNo, List<ArticleId> articleIdList) {
     List<StockDetails> stockDetailsList =
         movieClient.getStockDetailsForArticleVariantBundleList(
             countryCode, salesLine, storeNo, articleIdList);

@@ -1,6 +1,6 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,8 +11,6 @@ import net.metrosystems.inventoryaggregator.common.stock_information.movie.model
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.ArticleVariantBundle;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Bundle;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAverageRequest;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAverageSale;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieAverageSalesPerArticle;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieDataGroups;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieLocation;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieRequestBody;
@@ -20,8 +18,6 @@ import net.metrosystems.inventoryaggregator.common.stock_information.movie.model
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetailsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -48,11 +44,11 @@ public class MovieClient {
   @Value("${MOVIE_TOTAL_AVERAGE_PATH}")
   private String movieTotalAveragePath;
 
-
   private WebClient webClient;
 
   @Autowired
-  public  MovieClient(/*@Qualifier("restTemplateMovie")*/ RestTemplate restTemplate,WebClient webClient) {
+  public MovieClient(
+      /*@Qualifier("restTemplateMovie")*/ RestTemplate restTemplate, WebClient webClient) {
     this.restTemplate = restTemplate;
     this.webClient = webClient;
   }
@@ -68,24 +64,26 @@ public class MovieClient {
             mmsArtNo,
             variantNo);
     try {
-//      return restTemplate.getForObject(urlInUse, StockDetailsResponse.class).getStockDetails();
-      return webClient.get()
-              .uri(urlInUse)
-              .retrieve()
-              .bodyToMono(StockDetailsResponse.class)
-              .block()
-              .getStockDetails();
+      //      return restTemplate.getForObject(urlInUse,
+      // StockDetailsResponse.class).getStockDetails();
+      return webClient
+          .get()
+          .uri(urlInUse)
+          .retrieve()
+          .bodyToMono(StockDetailsResponse.class)
+          .block()
+          .getStockDetails();
     } catch (Exception e) {
       log.error("Error while calling MOVIE input{} exception{}", urlInUse, e);
       return null;
     }
   }
 
-  public List<MovieAverageSale> getTotalAverageSales(
+  public BigDecimal getTotalAverageSales(
       String countryName,
       String salesLine,
       Integer storeNumber,
-      List<ArticleVariantBundle> articleVariantBundle,
+      ArticleVariantBundle articleVariantBundle,
       int daysBefore) {
     MovieAverageRequest locationRequestBody =
         MovieAverageRequest.builder()
@@ -95,29 +93,30 @@ public class MovieClient {
                     .salesLine(salesLine)
                     .locationId(storeNumber)
                     .build())
-            .articles(articleVariantBundle)
+            .article(articleVariantBundle)
             .daysBefore(daysBefore)
             .build();
 
     try {
-      MovieAverageSalesPerArticle response =
-          webClient
-              .post()
-              .uri(movieTotalAverageSalesHost + movieTotalAveragePath)
-              .contentType(MediaType.APPLICATION_JSON)
-              .bodyValue(locationRequestBody)
-              .retrieve()
-              .bodyToMono(MovieAverageSalesPerArticle.class)
-              .onErrorResume(
-                  error -> {
-                    log.error("Movie total sales details- api call unsuccessful for {}", locationRequestBody, error);
-                    return Mono.empty();
-                  })
-              .block();
-      return response == null ? null : response.getAverages();
+      return webClient
+          .post()
+          .uri(movieTotalAverageSalesHost + movieTotalAveragePath)
+          .contentType(MediaType.APPLICATION_JSON)
+          .bodyValue(locationRequestBody)
+          .retrieve()
+          .bodyToMono(BigDecimal.class)
+          .onErrorResume(
+              error -> {
+                log.error(
+                    "Movie total sales details- api call unsuccessful for {}",
+                    locationRequestBody,
+                    error);
+                return Mono.empty();
+              })
+          .block();
     } catch (Exception e) {
       log.error("Error while calling MOVIE getTotalAverageSales", e);
-      return Collections.emptyList();
+      return null;
     }
   }
 
@@ -195,14 +194,20 @@ public class MovieClient {
     movieRequest.setArticles(articleList);
     movieRequest.setDataGroups(dataGroupsList);
 
-
     try {
-      StockDetailsResponse response = webClient.post()
+      StockDetailsResponse response =
+          webClient
+              .post()
               .uri(urlInUse)
               .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
               .bodyValue(movieRequest)
               .retrieve()
-              .onStatus(this::isErrorResponse, clientResponse -> log(clientResponse, "Movie stock details - api call unsuccessful  : status %d"))
+              .onStatus(
+                  this::isErrorResponse,
+                  clientResponse ->
+                      log(
+                          clientResponse,
+                          "Movie stock details - api call unsuccessful  : status %d"))
               .bodyToMono(StockDetailsResponse.class)
               .block();
 
@@ -212,9 +217,11 @@ public class MovieClient {
       return null;
     }
   }
+
   private boolean isErrorResponse(HttpStatus httpStatus) {
-    return  !httpStatus.is2xxSuccessful();
+    return !httpStatus.is2xxSuccessful();
   }
+
   private Mono<? extends Throwable> log(ClientResponse clientResponse, String message) {
     log.error(message, clientResponse.statusCode().value());
     return Mono.empty();

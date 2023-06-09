@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Optional;
@@ -143,7 +144,7 @@ public class RawArticleDataService {
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard =
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
 
-    CompletableFuture<String> dailyMeanSales =
+    CompletableFuture<BigDecimal> dailyMeanSales =
         movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
 
     CompletableFuture.allOf(
@@ -167,10 +168,9 @@ public class RawArticleDataService {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
       if (dailyMeanSales.get() != null && stockDetails != null) {
-        Float parsedDailyMeanSales = Float.parseFloat(dailyMeanSales.get());
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
-        String dailyMeanSales30 = df.format(parsedDailyMeanSales);
+        String dailyMeanSales30 = df.format(dailyMeanSales.get());
         stockDetails.setDailyMeanSales30(dailyMeanSales30);
       }
     }
