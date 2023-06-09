@@ -454,7 +454,7 @@ public class ArticleDetailsService {
     CompletableFuture<Optional<IduItemDerivedStandard>> iduItemDerivedStandard =
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
 
-    CompletableFuture<BigDecimal> dailyMeanSales =
+    CompletableFuture<String> dailyMeanSales =
         movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
 
     CompletableFuture.allOf(
@@ -481,9 +481,10 @@ public class ArticleDetailsService {
       stockDetails = articleDataFromMovie.get().getArticleStockData();
       plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
       if (dailyMeanSales.get() != null && stockDetails != null) {
+        Float parsedDailyMeanSales = Float.parseFloat(dailyMeanSales.get());
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
-        String dailyMeanSales30 = df.format(dailyMeanSales.get());
+        String dailyMeanSales30 = df.format(parsedDailyMeanSales);
         stockDetails.setDailyMeanSales30(dailyMeanSales30);
       }
     }

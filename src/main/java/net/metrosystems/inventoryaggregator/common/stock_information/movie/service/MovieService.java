@@ -26,10 +26,10 @@ public class MovieService {
   }
 
   @Async("asyncExecutor")
-  public CompletableFuture<BigDecimal> getTotalAverageSales(
+  public CompletableFuture<String> getTotalAverageSales(
       String countryName, String salesLine, Integer storeNumber, ArticleId articleId) {
 
-    BigDecimal totalAverageSales =
+    String totalAverageSales =
         movieClient.getTotalAverageSales(
             countryName,
             salesLine,

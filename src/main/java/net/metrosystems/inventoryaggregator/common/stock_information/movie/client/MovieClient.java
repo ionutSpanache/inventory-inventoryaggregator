@@ -80,7 +80,7 @@ public class MovieClient {
     }
   }
 
-  public BigDecimal getTotalAverageSales(
+  public String getTotalAverageSales(
       String countryName,
       String salesLine,
       Integer storeNumber,
@@ -99,13 +99,14 @@ public class MovieClient {
             .build();
 
     try {
-      ResponseEntity<BigDecimal> responseEntity =
+      ResponseEntity<String> responseEntity =
           webClient
               .post()
               .uri(movieTotalAverageSalesHost + movieTotalAveragePath)
+              .contentType(MediaType.APPLICATION_JSON)
               .bodyValue(locationRequestBody)
               .retrieve()
-              .toEntity(BigDecimal.class)
+              .toEntity(String.class)
               .onErrorResume(
                   error -> {
                     log.error(
