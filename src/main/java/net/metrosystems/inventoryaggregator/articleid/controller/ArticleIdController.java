@@ -94,7 +94,7 @@ public class ArticleIdController {
     ) {
         List<ArticleId> articleIds;
         try {
-            articleIds = articleIdService.getArticleIdByArticleNumber(countryCode, salesLine, languageCode, storeNo, articleNumber);
+            articleIds = articleIdService.getArticleIdByArticleNumber(countryCode, salesLine, storeNo, articleNumber);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

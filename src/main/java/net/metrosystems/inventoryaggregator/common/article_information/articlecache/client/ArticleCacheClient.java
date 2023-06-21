@@ -15,14 +15,14 @@ public interface ArticleCacheClient {
 
 	Documents getArticleUrlPathByEan(String ean, String countryCode, String salesLine, String languageCode) throws Exception;
 
-	Documents getArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
+	Documents getArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine) throws Exception;
 
 	Documents getArticleUrlPathByArtVarBundle(Long articleNumber, Long variantNumber, Long bundleNumber, String countryCode,
-      String salesLine, String languageCode) throws Exception;
+      String salesLine) throws Exception;
 
 	Documents getArticleUrlPathBySubsysArtNo(Long subsysArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
 
-	Documents findArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine, String languageCode) throws Exception;
+	Documents findArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine) throws Exception;
 
 	ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath);
 

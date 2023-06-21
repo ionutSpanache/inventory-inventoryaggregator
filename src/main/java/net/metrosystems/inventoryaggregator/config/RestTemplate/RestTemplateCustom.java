@@ -41,7 +41,7 @@ public class RestTemplateCustom {
 
     public Object postForObject(String url, Object newValue, Class<?> returnType, Boolean sendDecodedURL) {
 
-        if (sendDecodedURL) {
+        if (sendDecodedURL!=null && sendDecodedURL.booleanValue()) {
             return restTemplate.postForObject(UriUtils.decode(url, "UTF-8"), newValue, returnType);
         } else {
             return restTemplate.postForObject(url, newValue, returnType);

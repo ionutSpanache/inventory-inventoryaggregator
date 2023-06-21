@@ -190,7 +190,7 @@ public class DocumentsService {
   }
 
   public Documents getDocumentsByArticleNumber(
-      String countryCode, String salesLine, String languageCode, Long articleNumber)
+      String countryCode, String salesLine, Long articleNumber)
       throws Exception {
 
     ArticleFilterKey artFilterKey  = new ArticleFilterKey();
@@ -199,13 +199,12 @@ public class DocumentsService {
     artFilterKey.getSubFilterKeys().add(artHardKey);
 
     Documents documents = filterAAAClient.getFilteredDocuments(artFilterKey);
-    return this.getDocumentsNextpage(documents, artFilterKey);
+    return getDocumentsNextpage(documents, artFilterKey);
   }
 
   public Documents getDocumentsByArticleNumberVarianBundleId(
       String countryCode,
       String salesLine,
-      String languageCode,
       Long articleNumber,
       Long variantNr,
       Long bundleId)
