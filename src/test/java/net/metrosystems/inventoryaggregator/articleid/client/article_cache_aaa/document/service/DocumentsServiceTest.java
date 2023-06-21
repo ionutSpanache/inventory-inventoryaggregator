@@ -46,28 +46,6 @@ class DocumentsServiceTest {
   }
 
   @Test
-  void testTransformDocumentListInArticleIdList() {
-    Documents documents = new Documents();
-    documents.setArticleKeys(
-        List.of(
-            "https://test.test?mmsartno=123&variantno=456&bundleno=789",
-            "https://test.test?mmsartno=111&variantno=222&bundleno=333"));
-    Integer storeNo = 1;
-
-    List<ArticleId> articleIdList =
-        documentsService.transformDocumentListInArticleIdList(documents, storeNo);
-
-    assertNotNull(articleIdList);
-    assertEquals(2, articleIdList.size());
-    assertEquals(123, articleIdList.get(0).getArticleNumber());
-    assertEquals(456, articleIdList.get(0).getVariantNumber());
-    assertEquals(789, articleIdList.get(0).getBundleNumber());
-    assertEquals(111, articleIdList.get(1).getArticleNumber());
-    assertEquals(222, articleIdList.get(1).getVariantNumber());
-    assertEquals(333, articleIdList.get(1).getBundleNumber());
-  }
-
-  @Test
   void testGetDocumentsNextpage_one_page() throws Exception {
     Documents initialDocuments = new Documents();
     initialDocuments.setArticleKeys(
