@@ -35,10 +35,10 @@ public class ArticleComponentRepository {
 
   private List<ArticleVariantBundleIdentifier>
       getArticleVariantBundleIdentifierListForArticleNumber(
-          Long articleNumber, String countryCode, String salesLine, String languageCode)
+          Long articleNumber, String countryCode, String salesLine)
           throws Exception {
     return articleCacheService.getArticleVariantBundleListForArticleNumber(
-        articleNumber, countryCode, salesLine, languageCode);
+        articleNumber, countryCode, salesLine);
   }
 
   private ArticleComponent transformArticleVariantBundleListToArticleComponentByArticle(

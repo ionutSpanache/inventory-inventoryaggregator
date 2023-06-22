@@ -3,7 +3,6 @@ package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -69,15 +68,15 @@ public class DocumentsService {
     return articleIdList;
   }
 
-  public Documents getDocumentsNextpage(Documents documents, Filter filter) throws Exception {
+  public <T> Documents getDocumentsNextpage(Documents documents, T filter) throws Exception {
 
     while (documents != null && documents.getNextPageToken() != null) {
       Documents documentsNextPage =
-          filterAAAClient.getFilteredDocumentsNextPage(filter, documents.getNextPageToken());
+              filterAAAClient.getFilteredDocumentsNextPage(filter, documents.getNextPageToken());
       if (documentsNextPage != null) {
         documents
-            .getArticleKeys()
-            .addAll((Collection<? extends String>) documentsNextPage.getArticleKeys());
+                .getArticleKeys()
+                .addAll((Collection<? extends String>) documentsNextPage.getArticleKeys());
         documents.setNextPageToken(documentsNextPage.getNextPageToken());
       }
     }
@@ -191,40 +190,33 @@ public class DocumentsService {
   }
 
   public Documents getDocumentsByArticleNumber(
-      String countryCode, String salesLine, String languageCode, Long articleNumber)
+      String countryCode, String salesLine, Long articleNumber)
       throws Exception {
-    Filter filter = filterAAAService.initializeFilter(countryCode, salesLine);
-    SubFilterKey subFilterKey =
-        filterAAAService.addSubFilterKey(
-            KeysWithTypes.mmsArtNo, String.valueOf(articleNumber), languageCode);
-    filter.getFilterKeys().get(0).getSubFilterKeys().add(subFilterKey);
-    Documents documents = filterAAAClient.getFilteredDocuments(filter);
-    return this.getDocumentsNextpage(documents, filter);
+
+    ArticleFilterKey artFilterKey  = new ArticleFilterKey();
+    ArticleHardKey artHardKey = new ArticleHardKey(countryCode, salesLine, String.valueOf(articleNumber),
+            null, null);
+    artFilterKey.getSubFilterKeys().add(artHardKey);
+
+    Documents documents = filterAAAClient.getFilteredDocuments(artFilterKey);
+    return getDocumentsNextpage(documents, artFilterKey);
   }
 
   public Documents getDocumentsByArticleNumberVarianBundleId(
       String countryCode,
       String salesLine,
-      String languageCode,
       Long articleNumber,
       Long variantNr,
       Long bundleId)
       throws Exception {
-    Filter filter = filterAAAService.initializeFilter(countryCode, salesLine);
-    SubFilterKey subFilterKeyArtNo =
-        filterAAAService.addSubFilterKey(
-            KeysWithTypes.mmsArtNo, String.valueOf(articleNumber), languageCode);
-    filter.getFilterKeys().get(0).getSubFilterKeys().add(subFilterKeyArtNo);
-    SubFilterKey subFilterKeyVariantNr =
-        filterAAAService.addSubFilterKey(
-            KeysWithTypes.variantNo, String.valueOf(variantNr), languageCode);
-    filter.getFilterKeys().get(0).getSubFilterKeys().add(subFilterKeyVariantNr);
-    SubFilterKey subFilterKeyBundleId =
-        filterAAAService.addSubFilterKey(
-            KeysWithTypes.bundleNo, String.valueOf(bundleId), languageCode);
-    filter.getFilterKeys().get(0).getSubFilterKeys().add(subFilterKeyBundleId);
-    Documents documents = filterAAAClient.getFilteredDocuments(filter);
-    return this.getDocumentsNextpage(documents, filter);
+
+    ArticleFilterKey artFilterKey  = new ArticleFilterKey();
+    ArticleHardKey artHardKey = new ArticleHardKey(countryCode, salesLine, String.valueOf(articleNumber),
+            String.valueOf(variantNr), String.valueOf(bundleId));
+    artFilterKey.getSubFilterKeys().add(artHardKey);
+
+    Documents documents = filterAAAClient.getFilteredDocuments(artFilterKey);
+    return this.getDocumentsNextpage(documents, artFilterKey);
   }
 
   public Documents getDocumentsBySubsysArticleNumber(

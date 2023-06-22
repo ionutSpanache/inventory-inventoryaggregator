@@ -102,16 +102,16 @@ public class ArticleCacheService {
       throws Exception {
     return getArticleVariantBundleIdentifierListFromFilterUrl(
         articleCacheClient.getArticleUrlPathByArtVarBundle(
-            articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode));
+            articleNumber, variantNumber, bundleNumber, countryCode, salesLine));
   }
 
   public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForArticleNumber(
-      Long articleNumber, String countryCode, String salesLine, String languageCode)
+      Long articleNumber, String countryCode, String salesLine)
       throws Exception {
 
     return getArticleVariantBundleIdentifierListFromFilterUrl(
         articleCacheClient.getArticleUrlPathByMmsArtNo(
-            articleNumber, countryCode, salesLine, languageCode));
+            articleNumber, countryCode, salesLine));
   }
 
   private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(
@@ -145,7 +145,7 @@ public class ArticleCacheService {
       throws Exception {
     Documents articleUrlPathList =
         articleCacheClient.getArticleUrlPathByArtVarBundle(
-            articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode);
+            articleNumber, variantNumber, bundleNumber, countryCode, salesLine);
     if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
       throw new ArticleNotFoundException();
     }
@@ -659,8 +659,7 @@ public class ArticleCacheService {
             articleId.getVariantNumber(),
             articleId.getBundleNumber(),
             countryCode,
-            salesLine,
-            languageCode);
+            salesLine);
     if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
       throw new ArticleNotFoundException();
     }

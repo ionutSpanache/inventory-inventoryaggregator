@@ -72,11 +72,11 @@ public class FilterAAAService {
                                 getDocumentsByBarcode(countryCode, salesLine, languageCode, barCode), storeNo);
     }
 
-    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, String languageCode, Integer storeNo, Long articleNumber) throws Exception {
+    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, Integer storeNo, Long articleNumber) throws Exception {
         return documentsService.
                 transformDocumentListInArticleIdList(
                         documentsService.
-                                getDocumentsByArticleNumber(countryCode, salesLine, languageCode, articleNumber), storeNo);
+                                getDocumentsByArticleNumber(countryCode, salesLine, articleNumber), storeNo);
     }
 
     public List<ArticleId> getArticleIdBySubsysArticleNumber(String countryCode, String salesLine, String languageCode, Integer storeNo, Long subsysArticleNumber) throws Exception {

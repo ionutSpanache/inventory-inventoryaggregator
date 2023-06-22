@@ -261,13 +261,22 @@
 				</sonar.coverage.jacoco.xmlReportPaths>
 				<sonar.exclusions>
 					src/main/java/net/metrosystems/inventoryaggregator/InventoryAggregatorApplication.java,
+					src/main/java/net/metrosystems/inventoryaggregator/config/RestTemplate/RestTemplateCustom.java,
 					src/main/java/net/metrosystems/inventoryaggregator/**/model/*.java,
-					src/main/java/net/metrosystems/inventoryaggregator/articleattributes/**/model/*.java
+					src/main/java/net/metrosystems/inventoryaggregator/articleattributes/**/model/*.java,
 					**/PromotionArticleDataGroup.java
 				</sonar.exclusions>
 				<sonar.coverage.exclusions>
-					**/model/*.java
-					**/PromotionArticleDataGroup.java
+					**/config/RestTemplate/RestTemplateCustom.java,
+					**/model/*.java,
+					**/PromotionArticleDataGroup.java,
+					**/articleattributes/service/ArticleDetailsService.java,
+					**/articleid/client/ArticleIdClient.java,
+					**/articleid/controller/ArticleIdController.java,
+					**/articleid/service/ArticleIdService.java,
+					**/articleid/client/article_cache_aaa/filter_aaa/service/FilterAAAService.java,
+					**/articleid/client/article_cache_aaa/filter_aaa/client/FilterAAAClient.java,
+					**/common/article_information/articlecache/client/article_cache_aaa/ArticleCacheAAAClient.java
 				</sonar.coverage.exclusions>
 			</properties>
 		</profile>

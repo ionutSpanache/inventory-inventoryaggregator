@@ -17,8 +17,8 @@ public class ArticleIdClient {
 
     }
 
-    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, String languageCode, Integer storeNo, Long articleNumber) throws Exception {
-        return filterAAAService.getArticleIdByArticleNumber(countryCode, salesLine, languageCode, storeNo, articleNumber);
+    public List<ArticleId> getArticleIdByArticleNumber(String countryCode, String salesLine, Integer storeNo, Long articleNumber) throws Exception {
+        return filterAAAService.getArticleIdByArticleNumber(countryCode, salesLine, storeNo, articleNumber);
 
     }
 

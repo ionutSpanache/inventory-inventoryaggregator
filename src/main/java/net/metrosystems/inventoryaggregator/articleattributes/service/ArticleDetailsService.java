@@ -216,10 +216,10 @@ public class ArticleDetailsService {
 
   private List<ArticleVariantBundleIdentifier>
       getArticleVariantBundleIdentifierListForArticleNumber(
-          Long articleNumber, String countryCode, String salesLine, String languageCode)
+          Long articleNumber, String countryCode, String salesLine)
           throws Exception {
     return articleCacheService.getArticleVariantBundleListForArticleNumber(
-        articleNumber, countryCode, salesLine, languageCode);
+        articleNumber, countryCode, salesLine);
   }
 
   private ArticleIdTreeStructureList transformArticleVariantBundleListToArticleIdTreeStructureList(
@@ -294,7 +294,7 @@ public class ArticleDetailsService {
       ArticleComponent articleComponent =
           transformArticleVariantBundleListToArticleComponentByArticle(
               getArticleVariantBundleIdentifierListForArticleNumber(
-                  articleIdTreeStructure.getArticleNumber(), countryCode, salesLine, languageCode),
+                  articleIdTreeStructure.getArticleNumber(), countryCode, salesLine),
               articleIdTreeStructure.getArticleNumber());
 
       for (ArticleComponent.ArticleVariant articleVariant :
@@ -332,7 +332,7 @@ public class ArticleDetailsService {
     ArticleComponent articleComponent =
         transformArticleVariantBundleListToArticleComponentByArticle(
             getArticleVariantBundleIdentifierListForArticleNumber(
-                articleId.getArticleNumber(), countryCode, salesLine, languageCode),
+                articleId.getArticleNumber(), countryCode, salesLine),
             articleId.getArticleNumber());
 
     if (dataSource) {

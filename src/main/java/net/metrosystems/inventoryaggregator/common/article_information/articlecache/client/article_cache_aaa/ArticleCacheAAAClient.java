@@ -60,10 +60,10 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
 
   @Override
   public Documents getArticleUrlPathByMmsArtNo(
-      Long mmsArtNo, String countryCode, String salesLine, String languageCode) throws Exception {
+      Long mmsArtNo, String countryCode, String salesLine) throws Exception {
 
     return documentsService.getDocumentsByArticleNumber(
-        countryCode, salesLine, languageCode, mmsArtNo);
+        countryCode, salesLine, mmsArtNo);
   }
 
   @Override
@@ -72,11 +72,10 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
       Long variantNumber,
       Long bundleNumber,
       String countryCode,
-      String salesLine,
-      String languageCode)
+      String salesLine)
       throws Exception {
     return documentsService.getDocumentsByArticleNumberVarianBundleId(
-        countryCode, salesLine, languageCode, articleNumber, variantNumber, bundleNumber);
+        countryCode, salesLine, articleNumber, variantNumber, bundleNumber);
   }
 
   @Override
@@ -89,8 +88,8 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
 
   @Override
   public Documents findArticleUrlPathByMmsArtNo(
-      Long mmsArtNo, String countryCode, String salesLine, String languageCode) throws Exception {
-    return getArticleUrlPathByMmsArtNo(mmsArtNo, countryCode, salesLine, languageCode);
+      Long mmsArtNo, String countryCode, String salesLine) throws Exception {
+    return getArticleUrlPathByMmsArtNo(mmsArtNo, countryCode, salesLine);
   }
 
   @Override
