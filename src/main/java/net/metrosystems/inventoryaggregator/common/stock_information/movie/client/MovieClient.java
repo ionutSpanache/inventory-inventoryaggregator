@@ -1,10 +1,11 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.client;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Article;
@@ -16,6 +17,7 @@ import net.metrosystems.inventoryaggregator.common.stock_information.movie.model
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieRequestBody;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetails;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetailsResponse;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -165,7 +167,13 @@ public class MovieClient {
 
           articleList.add(article);
         });
-    return getDataFromMovie(countryCode, salesLine, storeNo, articleList);
+
+    List<List<Article>> partitions = ListUtils.partition(articleList, 500);
+    return partitions.parallelStream()
+        .map(a -> getDataFromMovie(countryCode, salesLine, storeNo, articleList))
+        .filter(Objects::nonNull)
+        .flatMap(List::stream)
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private List<StockDetails> getDataFromMovie(
