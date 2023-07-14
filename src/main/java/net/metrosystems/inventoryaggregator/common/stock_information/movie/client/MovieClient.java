@@ -170,7 +170,7 @@ public class MovieClient {
 
     List<List<Article>> partitions = ListUtils.partition(articleList, 500);
     return partitions.parallelStream()
-        .map(a -> getDataFromMovie(countryCode, salesLine, storeNo, articleList))
+        .map(a -> getDataFromMovie(countryCode, salesLine, storeNo, a))
         .filter(Objects::nonNull)
         .flatMap(List::stream)
         .collect(Collectors.toCollection(ArrayList::new));
