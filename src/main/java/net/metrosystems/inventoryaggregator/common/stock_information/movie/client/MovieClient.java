@@ -179,7 +179,7 @@ public class MovieClient {
   private List<StockDetails> getDataFromMovie(
       String countryCode, String salesLine, int storeNo, List<Article> articleList) {
     String urlInUse = String.format("%s/cache", movieStockServiceHost);
-
+    log.warn("ArticleDetails - movie list size: {}", articleList.size());
     List<String> reasonsList = new ArrayList<>();
     reasonsList.add("IST");
     reasonsList.add("RET");
