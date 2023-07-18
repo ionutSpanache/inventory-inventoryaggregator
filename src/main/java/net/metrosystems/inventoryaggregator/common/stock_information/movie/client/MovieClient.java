@@ -199,7 +199,7 @@ public class MovieClient {
     dataGroupsList.add(new MovieDataGroups("RESV"));
 
     MovieRequestBody movieRequest = new MovieRequestBody();
-    movieRequest.setConsumer("MSTORE");
+    movieRequest.setConsumer("MSTORE5");
     movieRequest.setCountry(countryCode.toUpperCase());
     movieRequest.setSalesLine(salesLine.toUpperCase());
     movieRequest.setLocationId(storeNumber);
