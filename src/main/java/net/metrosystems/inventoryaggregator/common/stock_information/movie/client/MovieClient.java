@@ -179,7 +179,6 @@ public class MovieClient {
   private List<StockDetails> getDataFromMovie(
       String countryCode, String salesLine, int storeNo, List<Article> articleList) {
     String urlInUse = String.format("%s/cache", movieStockServiceHost);
-    log.warn("InventoryAggregator - movie list size: {}", articleList.size());
     List<String> reasonsList = new ArrayList<>();
     reasonsList.add("IST");
     reasonsList.add("RET");
@@ -199,7 +198,7 @@ public class MovieClient {
     dataGroupsList.add(new MovieDataGroups("RESV"));
 
     MovieRequestBody movieRequest = new MovieRequestBody();
-    movieRequest.setConsumer("MSTORE5");
+    movieRequest.setConsumer("MSTORE");
     movieRequest.setCountry(countryCode.toUpperCase());
     movieRequest.setSalesLine(salesLine.toUpperCase());
     movieRequest.setLocationId(storeNumber);
