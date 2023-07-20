@@ -24,7 +24,7 @@
 		<springdoc.version>1.6.11</springdoc.version>
 		<metrics.version>0.5.1.RELEASE</metrics.version>
 		<logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
-		<spring-boot-starter-inventory-api-error.version>0.0.3-SNAPSHOT
+		<spring-boot-starter-inventory-api-error.version>0.0.4-SNAPSHOT
 		</spring-boot-starter-inventory-api-error.version>
 		<spring-cloud-starter-sleuth.version>3.1.4</spring-cloud-starter-sleuth.version>
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>

@@ -14,22 +14,21 @@ public class Aspects {
 
     @Around("net.metrosystems.inventoryaggregator.config.aspect.AspectConfig.appFlow()")
     public Object logAroundAllMethods(ProceedingJoinPoint joinPoint) throws Throwable {
-        final Logger LOG = getLogger(joinPoint.getTarget().getClass());
+        final Logger logger = getLogger(joinPoint.getTarget().getClass());
         long start = System.currentTimeMillis();
         try {
 
-            Object[] signatureArgs = joinPoint.getArgs();
-            LOG.debug("Run: {} with Params: {}", joinPoint.getSignature().toShortString(), joinPoint.getArgs());
+            logger.debug("Run: {} with Params: {}", joinPoint.getSignature().toShortString(), joinPoint.getArgs());
             Object response = joinPoint.proceed();
-            LOG.debug("{} returned with value {}", joinPoint.getSignature().getName(), response);
+            logger.debug("{} returned with value {}", joinPoint.getSignature().getName(), response);
             return response;
         } catch (Exception ex) {
-            LOG.error("{} returned with exception {}", joinPoint.getSignature().getName(), ex);
+            logger.error("{} returned with exception {}", joinPoint.getSignature().getName(), ex.getMessage(), ex);
             throw ex;
         } finally {
             long end = System.currentTimeMillis();
             long time = end - start;
-            LOG.debug("{} execution {} ms", joinPoint.getSignature().getName(), time);
+            logger.debug("{} execution {} ms", joinPoint.getSignature().getName(), time);
         }
     }
 

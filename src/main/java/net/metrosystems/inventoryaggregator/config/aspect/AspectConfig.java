@@ -34,7 +34,7 @@ public class AspectConfig {
     }
 
 
-    @Pointcut("(controller()||services()||client()||articleCacheAAA())&&!articleCacheAAAConfig()")
+    @Pointcut("(client()||articleCacheAAA())&&!articleCacheAAAConfig()")
     public void appFlow() {
     }
 

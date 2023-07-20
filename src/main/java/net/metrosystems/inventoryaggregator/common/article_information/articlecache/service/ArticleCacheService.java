@@ -251,11 +251,6 @@ public class ArticleCacheService {
           mapToPromotionArticleData(articleCacheClient.getPromotionArticle(documentUrl));
     } catch (Exception ex) {
       if(ex instanceof HttpClientErrorException exception && exception.getStatusCode() == HttpStatus.CONFLICT){
-
-//        SDCORP-684107
-        if("SK".equalsIgnoreCase(countryCode)){
-          log.error("Error for getting promotion for SK = {}",ex.getMessage(), ex);
-        }
         log.debug(ex.getMessage(), ex);
       } else {
         log.error("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl, ex);
