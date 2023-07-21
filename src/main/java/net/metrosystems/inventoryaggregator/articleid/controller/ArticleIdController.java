@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleid.service.ArticleIdService;
+import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
@@ -15,9 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @Timed("ArticleId")
@@ -50,7 +49,7 @@ public class ArticleIdController {
         try {
             articleIds = articleIdService.getArticleIdByBarcode(countryCode, salesLine, languageCode, storeNo, barCode);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+          throw new ArticleNotFoundException(e.getMessage(), e);
         }
         if (articleIds == null || articleIds.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -73,7 +72,7 @@ public class ArticleIdController {
         try {
             articleIds = articleIdService.getArticleIdBySubsysArticleNumber(countryCode, salesLine, languageCode, storeNo, subsysArticleNumber);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            throw new ArticleNotFoundException(e.getMessage(), e);
         }
         if (articleIds == null || articleIds.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -96,7 +95,7 @@ public class ArticleIdController {
         try {
             articleIds = articleIdService.getArticleIdByArticleNumber(countryCode, salesLine, storeNo, articleNumber);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            throw new ArticleNotFoundException(e.getMessage(), e);
         }
         if (articleIds == null || articleIds.isEmpty()) {
             return ResponseEntity.notFound().build();
