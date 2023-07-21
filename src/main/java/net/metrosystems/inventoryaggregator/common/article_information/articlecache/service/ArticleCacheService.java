@@ -65,6 +65,9 @@ public class ArticleCacheService {
   private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
   @Value("${ARTICLE_CACHE_STORE_EXCEPTIONS_PATH}")
   private String articleCacheStoreExceptionsPath;
+  @Value("${ARTICLE_CACHE_DOCUMENTS}")
+  private String articleCacheErpPath;
+
   @Value("${app.stage}")
   private String k8sEnvironment;
 
@@ -142,18 +145,29 @@ public class ArticleCacheService {
       String salesLine,
       String languageCode,
       Integer storeNo)
-      throws Exception {
-    Documents articleUrlPathList =
-        articleCacheClient.getArticleUrlPathByArtVarBundle(
-            articleNumber, variantNumber, bundleNumber, countryCode, salesLine);
-    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-      throw new ArticleNotFoundException();
-    }
-    String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
+       {
 
-    return transformArticleCacheDocumentToArticleFullData(
-        articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath),
-        storeNo);
+    String articleUrlPath =
+        String.format(
+            articleCacheErpPath,
+            countryCode.toLowerCase(),
+            bundleNumber,
+            salesLine.toLowerCase(),
+            getEnvironment(countryCode),
+            languageCode.toLowerCase(),
+            articleNumber,
+            variantNumber);
+    try{
+      ArticleCacheIhdsTree articleCacheIhdsTree = articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
+      return transformArticleCacheDocumentToArticleFullData(
+          articleCacheIhdsTree,
+          storeNo);
+    }catch(Exception e){
+      if(e instanceof HttpClientErrorException httpClientErrorException && HttpStatus.CONFLICT == httpClientErrorException.getStatusCode()){
+        throw new ArticleNotFoundException();
+      }
+      throw e;
+    }
   }
 
   public Optional<IduItemDerivedStandard> getMultiLanguageDataByArtVarBundle(

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -30,6 +31,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.promotions.acl.service.PromotionsAclService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -46,6 +48,12 @@ public class ArticleMasterDataRepository {
 
   @Qualifier("ForkJoinCustomPool")
   private final ExecutorService forkJoinPoolCustom;
+
+  @Value("${ARTICLE_CACHE_DOCUMENTS}")
+  private String articleCacheErpPath;
+
+  @Value("${app.stage}")
+  private String k8sEnvironment;
 
   @Async("asyncExecutor")
   public CompletableFuture<ArticleMasterData> getArticleMasterData(
@@ -143,9 +151,6 @@ public class ArticleMasterDataRepository {
       Integer storeNo)
       throws Exception {
     Map<ArticleId, ArticleMasterData> result = new ConcurrentHashMap<>();
-    Map<ArticleId, String> articlesDocumentUrlMap =
-        documentsService.getDocumentsForMultipleArticles(
-            countryCode, salesLine, languageCode, articleIdList);
 
     forkJoinPoolCustom
         .submit(
@@ -153,12 +158,23 @@ public class ArticleMasterDataRepository {
                 articleIdList.parallelStream()
                     .forEach(
                         articleId -> {
+                          String articleUrlPath =
+                              String.format(
+                                  articleCacheErpPath,
+                                  countryCode.toLowerCase(),
+                                  articleId.getBundleNumber(),
+                                  salesLine.toLowerCase(),
+                                  getEnvironment(countryCode),
+                                  languageCode.toLowerCase(),
+                                  articleId.getArticleNumber(),
+                                  articleId.getVariantNumber());
+
                           ArticleCacheFullData articleCacheFullData = null;
                           try {
                             articleCacheFullData =
                                 articleCacheService
                                     .getArticleCacheFullDataByArtVarBundleForArticleId(
-                                        storeNo, articlesDocumentUrlMap.get(articleId));
+                                        storeNo, articleUrlPath);
                           } catch (Exception e) {
                             log.error(
                                 "ArticleMasterDataRepository.getArticleCacheFullDataByArtVarBundleForArticleId error: {}",
@@ -178,6 +194,7 @@ public class ArticleMasterDataRepository {
         .get();
     return CompletableFuture.completedFuture(result);
   }
+
 
   @Async("asyncExecutor")
   public CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> getIduItemDerivedStandards(
@@ -371,5 +388,20 @@ public class ArticleMasterDataRepository {
           && (now().isBefore(endDate) || now().equals(endDate)));
     }
     return false;
+  }
+
+  private String getEnvironment(String countryCode) {
+    if ("dev".equalsIgnoreCase(k8sEnvironment)
+        || "pp".equalsIgnoreCase(k8sEnvironment)
+        || "local".equalsIgnoreCase(k8sEnvironment)) {
+
+      if (Set.of("IN", "CZ", "SK").contains(countryCode)) {
+        return "pp2";
+      } else {
+        return "pp1";
+      }
+    } else {
+      return "prod";
+    }
   }
 }

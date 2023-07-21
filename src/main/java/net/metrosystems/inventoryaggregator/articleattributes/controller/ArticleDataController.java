@@ -64,10 +64,7 @@ public class ArticleDataController {
       @PathVariable("variant") Long variant,
       @PathVariable("bundlenumber") Long bundleNumber)
       throws Exception {
-    boolean dataSource = false;
-    if (!isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode)) {
-      dataSource = true;
-    }
+    boolean dataSource = !isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode);
 
     return ResponseEntity.ok(
         articleDetailsService.getArticleDataListByArticleVariantBundle(
