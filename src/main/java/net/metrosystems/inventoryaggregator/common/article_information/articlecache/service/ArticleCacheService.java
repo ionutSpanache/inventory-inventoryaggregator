@@ -167,7 +167,7 @@ public class ArticleCacheService {
             bundleNumber,
             salesLine.toLowerCase(),
             getEnvironment(countryCode),
-            languageCodeForAC,
+            languageCodeForAC.toLowerCase(),
             articleNumber,
             variantNumber);
     try{

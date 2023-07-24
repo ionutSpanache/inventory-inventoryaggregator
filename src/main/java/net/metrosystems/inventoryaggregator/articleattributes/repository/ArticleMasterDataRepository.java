@@ -177,7 +177,7 @@ public class ArticleMasterDataRepository {
                                   articleId.getBundleNumber(),
                                   salesLine.toLowerCase(),
                                   getEnvironment(countryCode),
-                                  languageCode.toLowerCase(),
+                                  languageCodeForAC.toLowerCase(),
                                   articleId.getArticleNumber(),
                                   articleId.getVariantNumber());
 
