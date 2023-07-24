@@ -5,7 +5,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +72,15 @@ public class ArticleCacheService {
 
   @Value("${app.stage}")
   private String k8sEnvironment;
+
+  public static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>() {{
+    put("UA", "UK");
+    put("KZ", "KK");
+    put("MD", "RO");
+    put("PK", "UR");
+    put("RS", "SR");
+    put("CZ", "CS");
+  }};
 
   @Autowired
   public ArticleCacheService(
@@ -147,6 +158,8 @@ public class ArticleCacheService {
       Integer storeNo)
        {
 
+    String languageCodeForAC = getCorrectLanguageCode(countryCode, languageCode);
+
     String articleUrlPath =
         String.format(
             articleCacheErpPath,
@@ -154,7 +167,7 @@ public class ArticleCacheService {
             bundleNumber,
             salesLine.toLowerCase(),
             getEnvironment(countryCode),
-            languageCode.toLowerCase(),
+            languageCodeForAC,
             articleNumber,
             variantNumber);
     try{
@@ -168,6 +181,15 @@ public class ArticleCacheService {
       }
       throw e;
     }
+  }
+
+  private String getCorrectLanguageCode(String countryCode, String languageCode) {
+    if("EN".equalsIgnoreCase(languageCode)){
+      return LANGUAGE_CODE_EXCEPTIONS.containsKey(countryCode)
+          ? LANGUAGE_CODE_EXCEPTIONS.get(countryCode)
+          : countryCode;
+    }
+    return languageCode;
   }
 
   public Optional<IduItemDerivedStandard> getMultiLanguageDataByArtVarBundle(

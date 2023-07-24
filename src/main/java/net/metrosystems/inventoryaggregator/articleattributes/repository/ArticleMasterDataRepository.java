@@ -5,6 +5,7 @@ import static java.time.LocalDate.now;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,6 +55,15 @@ public class ArticleMasterDataRepository {
 
   @Value("${app.stage}")
   private String k8sEnvironment;
+
+  public static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>() {{
+    put("UA", "UK");
+    put("KZ", "KK");
+    put("MD", "RO");
+    put("PK", "UR");
+    put("RS", "SR");
+    put("CZ", "CS");
+  }};
 
   @Async("asyncExecutor")
   public CompletableFuture<ArticleMasterData> getArticleMasterData(
@@ -152,6 +162,8 @@ public class ArticleMasterDataRepository {
       throws Exception {
     Map<ArticleId, ArticleMasterData> result = new ConcurrentHashMap<>();
 
+    String languageCodeForAC = getCorrectLanguageCode(countryCode, languageCode);
+
     forkJoinPoolCustom
         .submit(
             () ->
@@ -237,6 +249,16 @@ public class ArticleMasterDataRepository {
                             .bundleNumber(iduItemDerivedStandard.getDomain().getBundleNumber())
                             .build())));
   }
+
+  private String getCorrectLanguageCode(String countryCode, String languageCode) {
+    if("EN".equalsIgnoreCase(languageCode)){
+      return LANGUAGE_CODE_EXCEPTIONS.containsKey(countryCode)
+          ? LANGUAGE_CODE_EXCEPTIONS.get(countryCode)
+          : countryCode;
+    }
+    return languageCode;
+  }
+
 
   private List<IduItemDerivedStandard> getIduItemDerivedStandards(
       String countryCode, ArticleId articleId) {
