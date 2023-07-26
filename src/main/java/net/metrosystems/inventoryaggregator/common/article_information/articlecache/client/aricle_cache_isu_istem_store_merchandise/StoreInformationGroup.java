@@ -10,7 +10,7 @@ public class StoreInformationGroup implements Serializable {
 
   private int groupingId;
   private Long originalSupplierNumber;
-  private String ChannelDeliveryFlag;
+  private String channelDeliveryFlag;
   private StoreItemPhaseOutInformation storeItemPhaseOutInformation;
 
   public int getGroupingId() {
@@ -32,12 +32,12 @@ public class StoreInformationGroup implements Serializable {
   }
 
   public String getChannelDeliveryFlag() {
-    return ChannelDeliveryFlag;
+    return channelDeliveryFlag;
   }
 
   @XmlElement(name = "ChannelDeliveryFlag")
   public void setChannelDeliveryFlag(String channelDeliveryFlag) {
-    ChannelDeliveryFlag = channelDeliveryFlag;
+    this.channelDeliveryFlag = channelDeliveryFlag;
   }
 
   public StoreItemPhaseOutInformation getStoreItemPhaseOutInformation() {

@@ -47,7 +47,7 @@ public class MovieClient {
   @Value("${MOVIE_TOTAL_AVERAGE_PATH}")
   private String movieTotalAveragePath;
 
-  private WebClient webClient;
+  private final WebClient webClient;
 
   @Autowired
   public MovieClient(

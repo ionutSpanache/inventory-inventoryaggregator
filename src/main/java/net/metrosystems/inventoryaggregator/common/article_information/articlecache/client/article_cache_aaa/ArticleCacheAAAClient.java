@@ -17,12 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
@@ -94,20 +95,18 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
 
   @Override
   public ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath) {
-    return getForArticleCacheObject(
-        articleCacheServiceHost + "/" + articleUrlPath, ArticleCacheIhdsTree.class);
+    return getForArticleCacheObject(articleUrlPath, ArticleCacheIhdsTree.class);
   }
 
   @Override
   public PromotionArticle getPromotionArticle(String articleUrlPath) {
-    return getForArticleCacheObject(
-            articleCacheServiceHost + "/" + articleUrlPath, PromotionArticle.class);
+    return getForArticleCacheObject(articleUrlPath, PromotionArticle.class);
   }
 
   @Override
   public IsuItemStoreMerchandise getIsuItemStoreMerchandiseDocument(String articleUrlPath) {
     return getForArticleCacheObject(
-            articleCacheServiceHost + "/" + articleUrlPath, IsuItemStoreMerchandise.class);
+            articleUrlPath, IsuItemStoreMerchandise.class);
   }
 
   @Override
@@ -117,7 +116,7 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
         documentsService.getDocumentsBySupplier(countryCode, salesLine, supplierNumber);
     if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) return Optional.empty();
 
-    String url = articleCacheServiceHost + "/" + articleUrlPathList.getArticleKeys().get(0);
+    String url = articleUrlPathList.getArticleKeys().get(0);
     return Optional.ofNullable(getForArticleCacheObject(url, ArticleCacheIhdsTree.class));
   }
 
@@ -140,23 +139,27 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   @Override
   public IduItemDerivedStandard getIduItemDerivedStandardDocument(String articlePath) {
     return getForArticleCacheObject(
-            articleCacheServiceHost + "/" + articlePath, IduItemDerivedStandard.class);
+            articlePath, IduItemDerivedStandard.class);
   }
 
   @Override
-  public List<IduItemDerivedStandard> getMultipleIduItemDerivedStandardDocument(List<String> articlePaths) {
+  public List<IduItemDerivedStandard> getMultipleIduItemDerivedStandardDocument(
+      List<String> articlePaths) {
     List<IduItemDerivedStandard> iduItemDerivedStandards = new ArrayList<>();
-    articlePaths.forEach(articlePath ->
-        iduItemDerivedStandards.add(getForArticleCacheObject(
-            articleCacheServiceHost + "/" + articlePath, IduItemDerivedStandard.class))
-    );
+    articlePaths.forEach(
+        articlePath ->
+            iduItemDerivedStandards.add(
+                getForArticleCacheObject(articlePath, IduItemDerivedStandard.class)));
 
     return iduItemDerivedStandards;
   }
 
   private <T> T getForArticleCacheObject(String articleUrl, Class<T> responseType) {
     try {
-      return restTemplateArticleCache.getForObject(articleUrl, responseType);
+      UriComponents uri =
+          UriComponentsBuilder.fromUriString(articleCacheServiceHost).path(articleUrl).build();
+
+      return restTemplateArticleCache.getForObject(uri.toUriString(), responseType);
     } catch (Exception e) {
       log.debug(
           "ArticleCacheAAAClient.getForArticleCacheObject - error on GET api call: message {}",

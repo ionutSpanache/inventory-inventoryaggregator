@@ -18,6 +18,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class FilterAAAClient {
 
+  public static final String ISU_ITEM_MASTER_ERROR_WHEN_RECEIVING_DATA = "ISU_ITEM_MASTER error when receiving data";
+  public static final String ENV_DEV = "environment=dev";
+  public static final String ENV_QA = "environment=qa";
   private final ConfigArticleCacheAAA configArticleCacheAAA;
   private final RestTemplateCustom restTemplateCustom;
 
@@ -45,8 +48,8 @@ public class FilterAAAClient {
           .getArticleKeys()
           .removeIf(
               articleKey ->
-                  articleKey.toLowerCase().contains("environment=dev")
-                      || articleKey.toLowerCase().contains("environment=qa"));
+                  articleKey.toLowerCase().contains(ENV_DEV)
+                      || articleKey.toLowerCase().contains(ENV_QA));
     return documents;
   }
 
@@ -63,7 +66,7 @@ public class FilterAAAClient {
     try {
       filterAsString = ObjectMapperCustom.getMapper().writeValueAsString(filterIsuMaster);
     } catch (JsonProcessingException e) {
-      log.error("ISU_ITEM_MASTER error when receiving data");
+      log.error(ISU_ITEM_MASTER_ERROR_WHEN_RECEIVING_DATA);
     }
     Documents documents =
         (Documents)
@@ -74,8 +77,8 @@ public class FilterAAAClient {
           .getArticleKeys()
           .removeIf(
               articleKey ->
-                  articleKey.toLowerCase().contains("environment=dev")
-                      || articleKey.toLowerCase().contains("environment=qa"));
+                  articleKey.toLowerCase().contains(ENV_DEV)
+                      || articleKey.toLowerCase().contains(ENV_QA));
     return documents;
   }
 
@@ -94,7 +97,7 @@ public class FilterAAAClient {
       filterAsString =
           ObjectMapperCustom.getMapper().writeValueAsString(filterIsuItemStoreMerchandise);
     } catch (JsonProcessingException e) {
-      log.error("ISU_ITEM_MASTER error when receiving data");
+      log.error(ISU_ITEM_MASTER_ERROR_WHEN_RECEIVING_DATA);
     }
     Documents documents =
         (Documents)
@@ -105,8 +108,8 @@ public class FilterAAAClient {
           .getArticleKeys()
           .removeIf(
               articleKey ->
-                  articleKey.toLowerCase().contains("environment=dev")
-                      || articleKey.toLowerCase().contains("environment=qa"));
+                  articleKey.toLowerCase().contains(ENV_DEV)
+                      || articleKey.toLowerCase().contains(ENV_QA));
     return documents;
   }
 
@@ -125,7 +128,7 @@ public class FilterAAAClient {
       filterAsString =
           ObjectMapperCustom.getMapper().writeValueAsString(filterIduItemDerivedStandard);
     } catch (JsonProcessingException e) {
-      log.error("ISU_ITEM_MASTER error when receiving data");
+      log.error(ISU_ITEM_MASTER_ERROR_WHEN_RECEIVING_DATA);
     }
     Documents documents =
         (Documents)
@@ -136,8 +139,8 @@ public class FilterAAAClient {
           .getArticleKeys()
           .removeIf(
               articleKey ->
-                  articleKey.toLowerCase().contains("environment=dev")
-                      || articleKey.toLowerCase().contains("environment=qa"));
+                  articleKey.toLowerCase().contains(ENV_DEV)
+                      || articleKey.toLowerCase().contains(ENV_QA));
     return documents;
   }
 

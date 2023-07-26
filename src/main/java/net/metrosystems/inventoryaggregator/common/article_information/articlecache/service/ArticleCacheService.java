@@ -287,6 +287,7 @@ public class ArticleCacheService {
           mapToPromotionArticleData(articleCacheClient.getPromotionArticle(documentUrl));
     } catch (Exception ex) {
       if(ex instanceof HttpClientErrorException exception && exception.getStatusCode() == HttpStatus.CONFLICT){
+
         log.debug(ex.getMessage(), ex);
       } else {
         log.error("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl, ex);

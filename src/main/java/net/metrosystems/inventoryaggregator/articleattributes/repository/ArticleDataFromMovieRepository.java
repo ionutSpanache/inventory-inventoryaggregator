@@ -11,6 +11,8 @@ import net.metrosystems.inventoryaggregator.common.stock_information.movie.servi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -133,7 +135,7 @@ public class ArticleDataFromMovieRepository {
         && (!movieAdapter.getOpenOrders().isEmpty())) {
       List<ArticlePlannedDeliveryDate> articlePlannedDeliveryDateList = new ArrayList<>();
       for (MovieOpenOrder movieOpenOrder : movieAdapter.getOpenOrders()) {
-        if (articlePlannedDeliveryDateList == null) {
+        if (CollectionUtils.isEmpty(articlePlannedDeliveryDateList)) {
           articlePlannedDeliveryDateList =
               new ArrayList<>(
                   Collections.singletonList(

@@ -4,13 +4,14 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleDetailsService;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.metrics.annotation.Timed;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,16 +39,15 @@ public class ArticleDataController {
   @AddTimer
   @AddLogs
   @GetMapping(value = "/ean/{ean}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> getArticlesByEan(
+  public List<RawArticleData> getArticlesByEan(
       @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
       @PathVariable("languageCode") String languageCode,
       @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
       @PathVariable("ean") String ean)
       throws Exception {
-    return ResponseEntity.ok(
-        articleDetailsService.getArticleDataListByEan(
-            ean, countryCode, salesLine, languageCode, storeNo));
+    return articleDetailsService.getArticleDataListByEan(
+        ean, countryCode, salesLine, languageCode, storeNo);
   }
 
   @AddTimer
@@ -55,7 +55,7 @@ public class ArticleDataController {
   @GetMapping(
       value = "/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}",
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> getArticleByArtVarBundle(
+  public List<RawArticleData> getArticleByArtVarBundle(
       @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
       @PathVariable("languageCode") String languageCode,
@@ -66,16 +66,15 @@ public class ArticleDataController {
       throws Exception {
     boolean dataSource = !isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode);
 
-    return ResponseEntity.ok(
-        articleDetailsService.getArticleDataListByArticleVariantBundle(
-            articleNumber,
-            variant,
-            bundleNumber,
-            countryCode,
-            salesLine,
-            languageCode,
-            storeNo,
-            dataSource));
+    ArticleId articleId =
+        ArticleId.builder()
+            .articleNumber(articleNumber)
+            .variantNumber(variant)
+            .bundleNumber(bundleNumber)
+            .build();
+
+    return articleDetailsService.getArticleDataListByArticleVariantBundle(
+        articleId, countryCode, salesLine, languageCode, storeNo, dataSource);
   }
 
   @AddTimer
@@ -83,15 +82,14 @@ public class ArticleDataController {
   @GetMapping(
       value = "/subsystemarticlenumber/{subsystemarticlenumber}",
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> getArticleBySubsys(
+  public List<RawArticleData> getArticleBySubsys(
       @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
       @PathVariable("languageCode") String languageCode,
       @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
       @PathVariable("subsystemarticlenumber") Long subsystemArticleNumber)
       throws Exception {
-    return ResponseEntity.ok(
-        articleDetailsService.getArticleDataListBySubsys(
-            subsystemArticleNumber, countryCode, salesLine, languageCode, storeNo));
+    return articleDetailsService.getArticleDataListBySubsys(
+        subsystemArticleNumber, countryCode, salesLine, languageCode, storeNo);
   }
 }

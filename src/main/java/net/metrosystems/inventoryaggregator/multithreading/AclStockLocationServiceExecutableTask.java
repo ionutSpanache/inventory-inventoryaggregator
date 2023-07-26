@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
+
 
 @Slf4j
 public class AclStockLocationServiceExecutableTask implements Callable<ArticleVariant> {
@@ -117,7 +117,7 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 			try {
 				aclStockLocationsForBundle = aclBundleStockLocations.stream()
 						.filter(aclBundleStockLocation -> (aclBundleStockLocation.getBundleNo().equals(bundleNo)))
-						.collect(Collectors.toList());
+						.toList();
 			}catch (Exception e) {
 				return null;
 			}

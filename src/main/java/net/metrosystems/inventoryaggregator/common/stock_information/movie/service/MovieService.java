@@ -1,6 +1,5 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

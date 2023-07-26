@@ -7,7 +7,7 @@ import java.util.List;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.AssortmentClusterSpecificationV2;
 
 @XmlRootElement(name = "content")
-public class ContentIduItemDerivedStandard implements Serializable {
+public class ContentIduItemDerivedStandard {
 
 
     private List<MerchandiseArticleDescription> merchandiseArticleDescription;

@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @Component
 public class GeneralIntercept implements HandlerInterceptor {
+    public static final String TRACE_ID = "traceId";
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Override
@@ -20,10 +21,10 @@ public class GeneralIntercept implements HandlerInterceptor {
                              HttpServletResponse response, Object handler) throws Exception {
 
 
-        if (request.getHeader("traceId") != null) {
+        if (request.getHeader(TRACE_ID) != null) {
             UUID uuid = UUID.randomUUID();
             MDC.put("transactionId", uuid.toString());
-            MDC.put("traceId", request.getHeader("traceId"));
+            MDC.put(TRACE_ID, request.getHeader(TRACE_ID));
             MDC.put("Flow", request.getHeader("Flow"));
 
         }

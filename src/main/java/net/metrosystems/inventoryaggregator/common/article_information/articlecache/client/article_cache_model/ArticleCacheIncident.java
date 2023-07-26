@@ -5,15 +5,11 @@ import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundExceptio
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @XmlRootElement(name="Incident")
-public class ArticleCacheIncident implements Serializable{
-	
-	private static final long serialVersionUID = -5311733533525426584L;
+public class ArticleCacheIncident {
 	
 	private int id;
 	public int getId() {
@@ -62,7 +58,7 @@ public class ArticleCacheIncident implements Serializable{
         } else {
 			List<ArticleCacheDataGroup> articleCacheDataGroupList200 = this.getArticleCacheDataGroup().stream()
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId()==200))
-					.collect(Collectors.toList());
+					.toList();
 			try {
 				if(  (!articleCacheDataGroupList200.isEmpty())
 						&&(!articleCacheDataGroupList200.get(0).getSingleItemSalesBarcode().isEmpty())) {
@@ -80,7 +76,7 @@ public class ArticleCacheIncident implements Serializable{
 			return this.getArticleCacheDataGroup().stream()
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getStoreNo() == storeNo))
-					.collect(Collectors.toList())
+					.toList()
 					.get(0).getAssignedStoreSupplierType();
 		}catch(Exception e) {
 			return null;
@@ -93,7 +89,7 @@ public class ArticleCacheIncident implements Serializable{
 			Integer result = this.getArticleCacheDataGroup().stream()
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getStoreNo() == storeNo))
-					.collect(Collectors.toList())
+					.toList()
 					.get(0).getHierarchySequenceStore();
 			if (result == null) {
 				throw new ArticleNotFoundException();
@@ -110,7 +106,7 @@ public class ArticleCacheIncident implements Serializable{
 			return this.getArticleCacheDataGroup().stream()
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 325))
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getHierarchySequenceStoreRef() == storeNo))
-					.collect(Collectors.toList())
+					.toList()
 					.get(0).getProcurementCd();
 		}catch (Exception e) {
 			return null;
@@ -123,7 +119,7 @@ public class ArticleCacheIncident implements Serializable{
 			return this.getArticleCacheDataGroup().stream()
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 325))
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getHierarchySequenceStoreRef() == storeNo))
-					.collect(Collectors.toList())
+					.toList()
 					.get(0).getBlockingCode();
 		}catch (Exception e) {
 			return null;
@@ -136,7 +132,7 @@ public class ArticleCacheIncident implements Serializable{
 			return this.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getHierarchySequenceStore() == storeNo))
-						.collect(Collectors.toList())
+						.toList()
 						.get(0).getPromotionId();
 		}catch(Exception e){
 			return null;
@@ -147,7 +143,7 @@ public class ArticleCacheIncident implements Serializable{
 		try {
 			return this.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 100))
-						.collect(Collectors.toList())
+						.toList()
 						.get(0).getOwnBrandId();
 		}catch(Exception e){
 			return "";   // in case of missing or null data from ArticleCache, we assume the article is not own brand
@@ -158,7 +154,7 @@ public class ArticleCacheIncident implements Serializable{
 		try {
 			return this.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 100))
-						.collect(Collectors.toList())
+						.toList()
 						.get(0).getPresentationMerchandiseGroup();
 		}catch(Exception e){
 			return 0;   // in case of missing or null data from ArticleCache
@@ -169,7 +165,7 @@ public class ArticleCacheIncident implements Serializable{
 		try {
 			return this.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 300))
-						.collect(Collectors.toList())
+						.toList()
 						.get(0).getSalesBundleIndicator();
 		}catch(Exception e){
 			return null;
@@ -180,7 +176,7 @@ public class ArticleCacheIncident implements Serializable{
 		try {
 			return this.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 310))
-						.collect(Collectors.toList())
+						.toList()
 						.get(0).getSellingBundleContent();
 		}catch(Exception e){
 			return null;
@@ -191,7 +187,7 @@ public class ArticleCacheIncident implements Serializable{
 		try {
 			return this.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 310))
-						.collect(Collectors.toList())
+						.toList()
 						.get(0).getPriceCheckCodeMccSalesLine();
 		}catch(Exception e){
 			return null;
@@ -203,7 +199,7 @@ public class ArticleCacheIncident implements Serializable{
 			return this.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getHierarchySequenceStore() == storeNo))
-						.collect(Collectors.toList())
+						.toList()
 						.get(0).getActivationStatus();
 		}catch(Exception e){
 			return null;
@@ -215,7 +211,7 @@ public class ArticleCacheIncident implements Serializable{
 			return this.getArticleCacheDataGroup().stream()
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getHierarchySequenceStore() == storeNo))
-					.collect(Collectors.toList())
+					.toList()
 					.get(0).getWeightArticle();
 		} catch (Exception e) {
 			return null;
@@ -228,7 +224,7 @@ public class ArticleCacheIncident implements Serializable{
 			return this.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == dataGroupId))
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getHierarchySequenceStore() == storeNo))
-						.collect(Collectors.toList())
+						.toList()
 						.get(0);
 		}catch(Exception e){
 			return new ArticleCacheDataGroup();
@@ -241,7 +237,7 @@ public class ArticleCacheIncident implements Serializable{
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == dataGroupId))
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getHierarchySequenceStore() == storeNo))
 					.map(ArticleCacheDataGroup::getPromotionId)
-					.collect(Collectors.toList());
+					.toList();
 		}catch(Exception e){
 			return Collections.emptyList();
 		}
@@ -253,7 +249,7 @@ public class ArticleCacheIncident implements Serializable{
 			return this.getArticleCacheDataGroup().stream()
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == dataGroupId))
 					.filter(articleCacheDataGroup -> (articleCacheDataGroup.getHierarchySequenceStoreRef() == storeNo))
-					.collect(Collectors.toList())
+					.toList()
 					.get(0);
 		}catch(Exception e){
 			return new ArticleCacheDataGroup();
@@ -264,7 +260,7 @@ public class ArticleCacheIncident implements Serializable{
 		try {
 			return this.getArticleCacheDataGroup().stream()
 						.filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == dataGroupId))
-						.collect(Collectors.toList())
+						.toList()
 						.get(0);
 		}catch(Exception e){
 			return new ArticleCacheDataGroup();

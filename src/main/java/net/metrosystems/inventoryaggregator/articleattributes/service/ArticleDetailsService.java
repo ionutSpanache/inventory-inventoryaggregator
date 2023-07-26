@@ -1,15 +1,11 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
@@ -28,8 +24,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleSt
 import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.VariantDescription;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBundleStockLocationRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
@@ -42,43 +36,21 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ArticleDetailsService {
-
   private static final String MERCHANDISE_GROUP_INFORMATION = "merchandiseGroupInformation";
   private final ArticleCacheService articleCacheService;
-  private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
-  private final ArticleMasterDataRepository articleMasterDataRepository;
-  private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
-  private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
-  private final GeneralDataRepository generalDataRepository;
   private final MovieService movieService;
+  private final ArticleMasterDataRepository articleMasterDataRepository;
+  private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
+  private final GeneralDataRepository generalDataRepository;
   private final RawArticleDataService rawArticleDataService;
-
-  @Autowired
-  public ArticleDetailsService(
-      ArticleCacheService articleCacheService,
-      RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository,
-      ArticleMasterDataRepository articleMasterDataRepository,
-      ArticleDataFromMovieRepository articleDataFromMovieRepository,
-      AclBundleStockLocationRepository aclBundleStockLocationRepository,
-      GeneralDataRepository generalDataRepository,
-      MovieService movieService,
-      RawArticleDataService rawArticleDataService) {
-    this.articleCacheService = articleCacheService;
-    this.rawArticleStoreMasterDataRepository = rawArticleStoreMasterDataRepository;
-    this.articleMasterDataRepository = articleMasterDataRepository;
-    this.articleDataFromMovieRepository = articleDataFromMovieRepository;
-    this.aclBundleStockLocationRepository = aclBundleStockLocationRepository;
-    this.generalDataRepository = generalDataRepository;
-    this.movieService = movieService;
-    this.rawArticleDataService = rawArticleDataService;
-  }
+  private final ArticleProcessingService articleProcessingService;
 
   public List<RawArticleData> getArticleDataListByEan(
       String ean, String countryCode, String salesLine, String languageCode, Integer storeNo)
@@ -101,9 +73,7 @@ public class ArticleDetailsService {
   }
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
-      Long articleNumber,
-      Long variantNumber,
-      Long bundleNumber,
+      ArticleId articleId,
       String countryCode,
       String salesLine,
       String languageCode,
@@ -111,16 +81,7 @@ public class ArticleDetailsService {
       boolean dataSource)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        ArticleId.builder()
-            .articleNumber(articleNumber)
-            .variantNumber(variantNumber)
-            .bundleNumber(bundleNumber)
-            .build(),
-        countryCode,
-        salesLine,
-        languageCode,
-        storeNo,
-        dataSource);
+        articleId, countryCode, salesLine, languageCode, storeNo, dataSource);
   }
 
   public List<ArticleMasterData> getArticleMasterDataListByArticleVariantBundle(
@@ -368,77 +329,24 @@ public class ArticleDetailsService {
       ArticleComponent articleComponent)
       throws ExecutionException, InterruptedException {
 
-    CompletableFuture<ArticleMasterData> articleMasterData = new CompletableFuture<>();
-    try {
-      articleMasterData =
-          articleMasterDataRepository.getArticleMasterData(
-              articleId, countryCode, salesLine, languageCode, storeNo);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-          "ArticleDetailsService.buildRawArticleDataList - articleMasterData - error: {}",
-          e.getMessage(),
-          e);
-    }
+    CompletableFuture<ArticleMasterData> articleMasterData =
+        articleProcessingService.getArticleMasterData(
+            articleId, countryCode, salesLine, languageCode, storeNo);
 
     CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData =
-        new CompletableFuture<>();
-    try {
-      rawArticleStoreMasterData =
-          rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
-              articleId, countryCode, salesLine, storeNo);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-          "ArticleDetailsService.buildRawArticleDataList - rawArticleStoreMasterData - error: {}",
-          e.getMessage(),
-          e);
-    }
+        articleProcessingService.getRawArticleStoreMasterData(
+            articleId, countryCode, salesLine, storeNo);
 
-    CompletableFuture<ArticleDataFromMovie> articleDataFromMovie = new CompletableFuture<>();
-    try {
-      articleDataFromMovie =
-          articleDataFromMovieRepository.getArticleDataFromMovie(
-              articleId, countryCode, salesLine, storeNo);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-          "ArticleDetailsService.buildRawArticleDataList - articleDataFromMovie - error: {}",
-          e.getMessage(),
-          e);
-    }
+    CompletableFuture<ArticleDataFromMovie> articleDataFromMovie =
+        articleProcessingService.getArticleDataFromMovie(
+            articleId, countryCode, salesLine, storeNo);
 
     CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
-        new CompletableFuture<>();
-    try {
-      articleStockLocationList =
-          aclBundleStockLocationRepository.getArticleStockLocation(
-              articleId, countryCode, salesLine, storeNo);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-          "ArticleDetailsService.buildRawArticleDataList - articleStockLocationList - error: {}",
-          e.getMessage(),
-          e);
-    }
+        articleProcessingService.getArticleStockLocation(
+            articleId, countryCode, salesLine, storeNo);
 
-    CompletableFuture<ArticleLocation> articleLocationList = new CompletableFuture<>();
-    try {
-      articleLocationList =
-          aclBundleStockLocationRepository.getArticleLocation(
-              countryCode, salesLine, storeNo, articleId);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-          "ArticleDetailsService.buildRawArticleDataList - articleLocationList - error: {}",
-          e.getMessage(),
-          e);
-    }
+    CompletableFuture<ArticleLocation> articleLocationList =
+        articleProcessingService.getArticleLocationList(articleId, countryCode, salesLine, storeNo);
 
     CompletableFuture<List<IduItemDerivedStandard>> iduDerivedStandardsList =
         articleMasterDataRepository.getIduItemDerivedStandardsAsync(countryCode, articleId);
