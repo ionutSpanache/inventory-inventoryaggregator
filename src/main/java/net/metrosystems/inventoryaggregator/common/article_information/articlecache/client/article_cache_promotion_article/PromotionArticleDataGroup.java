@@ -16,6 +16,7 @@ public class PromotionArticleDataGroup {
   private String promotionId;
   private Double promotionNetSalesPricePerPiece;
   private String promotionActiveStartDate;
+  private String promotionChannel;
   private Boolean validity;
 
   private List<PromotionDescription> descriptions;
@@ -58,5 +59,9 @@ public class PromotionArticleDataGroup {
   @XmlElement(name = "PROMOTION_DESCRIPTION")
   public void setDescriptions(List<PromotionDescription> descriptions) {
     this.descriptions = descriptions;
+  }
+  @XmlElement(name = "PROMO_CHANNEL")
+  public void setPromotionChannel(String promotionChannel) {
+    this.promotionChannel = promotionChannel;
   }
 }

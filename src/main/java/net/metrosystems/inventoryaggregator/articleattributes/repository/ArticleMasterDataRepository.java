@@ -5,6 +5,7 @@ import static java.time.LocalDate.now;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionDescription;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
-import net.metrosystems.inventoryaggregator.common.promotions.acl.service.PromotionsAclService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -45,8 +46,8 @@ public class ArticleMasterDataRepository {
   private static final String DEFAULT_LANGUAGE_CODE = "EN";
   private final ArticleCacheService articleCacheService;
   private final DocumentsService documentsService;
-  private final PromotionsAclService promotionsAclService;
-
+  @Value("${ARTICLE_DOCUMENT_ACTIVE_PROMOTION_CHANNEL}")
+  private final String promotionChannel;
   @Qualifier("ForkJoinCustomPool")
   private final ExecutorService forkJoinPoolCustom;
 
@@ -360,31 +361,22 @@ public class ArticleMasterDataRepository {
 
   public SimplePromotionArticleData getActivePromotionForToday(
       String countryCode, Integer storeNumber, String languageCode, ArticleId articleId) {
-    List<PromotionArticleData> promotionArticleDataList =
+    PromotionArticleData promotionArticleData =
         getPromotionArticle(countryCode, storeNumber, articleId).stream()
             .filter(promotion -> promotion.getValid() != null && promotion.getValid())
             .filter(
                 promotion ->
                     isPromotionActiveToday(
-                        promotion.getPromotionStart(), promotion.getPromotionEnd()))
-            .collect(Collectors.toCollection(ArrayList::new));
-
-    PromotionArticleData promotionArticleData =
-        CollectionUtils.isEmpty(promotionArticleDataList)
-            ? PromotionArticleData.builder().build()
-            : promotionsAclService.getActivePromotion(
-                countryCode, storeNumber, articleId, promotionArticleDataList);
-
+                        promotion.getPromotionStart(), promotion.getPromotionEnd(), promotion.getPromotionChannel()))
+            .min(Comparator.comparing(PromotionArticleData::getPromotionEnd))
+            .orElse(PromotionArticleData.builder().build());
     Optional<PromotionDescription> promotionDescription = Optional.empty();
-
     if (!CollectionUtils.isEmpty(promotionArticleData.getDescriptions())) {
       promotionDescription =
           promotionArticleData.getDescriptions().stream()
               .filter(promotionDesc -> (promotionDesc.getLanguage().equalsIgnoreCase(languageCode)))
               .findFirst();
-
       if (promotionDescription.isEmpty()) {
-
         promotionDescription =
             promotionArticleData.getDescriptions().stream()
                 .filter(
@@ -404,7 +396,10 @@ public class ArticleMasterDataRepository {
         .build();
   }
 
-  private boolean isPromotionActiveToday(LocalDate startDate, LocalDate endDate) {
+  private boolean isPromotionActiveToday(LocalDate startDate, LocalDate endDate, String promotionChannelInput) {
+    if (!StringUtils.containsIgnoreCase(promotionChannel,promotionChannelInput)) {
+      return false;
+    }
     if (startDate != null && endDate != null) {
       return ((now().isAfter(startDate) || now().equals(startDate))
           && (now().isBefore(endDate) || now().equals(endDate)));

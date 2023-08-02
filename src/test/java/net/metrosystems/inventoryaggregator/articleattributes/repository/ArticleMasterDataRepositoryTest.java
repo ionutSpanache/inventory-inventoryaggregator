@@ -6,7 +6,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.SimplePromot
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionDescription;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
-import net.metrosystems.inventoryaggregator.common.promotions.acl.service.PromotionsAclService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,13 +25,14 @@ import static org.mockito.Mockito.when;
 
 class ArticleMasterDataRepositoryTest {
 
-  @Mock private ArticleCacheService articleCacheService;
+  @Mock
+  private ArticleCacheService articleCacheService;
 
-  @Mock private DocumentsService documentsService;
+  @Mock
+  private DocumentsService documentsService;
 
-  @Mock private ExecutorService forkJoinPoolCustom;
-  @Mock private PromotionsAclService promotionsAclService;
-
+  @Mock
+  private ExecutorService forkJoinPoolCustom;
 
   private final String COUNTRY_CODE = "NL";
   private final Integer STORE_NUMBER = 1;
@@ -43,11 +43,13 @@ class ArticleMasterDataRepositoryTest {
 
   private final LocalDate CURRENT_DATE = now();
 
-  @InjectMocks private ArticleMasterDataRepository articleMasterDataRepository;
+  private ArticleMasterDataRepository articleMasterDataRepository;
 
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
+    articleMasterDataRepository = new ArticleMasterDataRepository(articleCacheService, documentsService, "MCC",
+        forkJoinPoolCustom);
   }
 
   @Test
@@ -57,31 +59,32 @@ class ArticleMasterDataRepositoryTest {
         true,
         NETHERLANDS_LANGUAGE_CODE,
         CURRENT_DATE.minusMonths(2),
-        CURRENT_DATE.plusMonths(2));
+        CURRENT_DATE.plusMonths(2),
+        "MCC");
     List<PromotionArticleData> promotionArticleDataList = List.of(
         promotionArticleData,
         generatePromotion(
             true,
             DEFAULT_LANGUAGE_CODE,
             CURRENT_DATE.minusMonths(1),
-            CURRENT_DATE.plusMonths(3)),
+            CURRENT_DATE.plusMonths(3),
+            "MCC"),
         generatePromotion(
             true,
             ROMANIA_LANGUAGE_CODE,
             CURRENT_DATE.minusMonths(5),
-            CURRENT_DATE.plusMonths(2)));
+            CURRENT_DATE.plusMonths(2),
+            "MCC"));
     when(articleCacheService.getPromotionArticleData(
-            COUNTRY_CODE, generateArticleId(123L, 1L, 1L), STORE_NUMBER))
+        COUNTRY_CODE, generateArticleId(123L, 1L, 1L), STORE_NUMBER))
         .thenReturn(
             promotionArticleDataList);
 
     ArticleId articleId = generateArticleId(123L, 1L, 1L);
-    when(promotionsAclService.getActivePromotion(COUNTRY_CODE, 1, articleId, promotionArticleDataList)).thenReturn(promotionArticleData);
 
     SimplePromotionArticleData simplePromotionArticleData =
         articleMasterDataRepository.getActivePromotionForToday(
             COUNTRY_CODE, 1, NETHERLANDS_LANGUAGE_CODE, articleId);
-
     assertEquals(
         NETHERLANDS_LANGUAGE_CODE + "_TEST", simplePromotionArticleData.getPromotionDescription());
     assertEquals(CURRENT_DATE.minusMonths(2), simplePromotionArticleData.getPromotionStart());
@@ -92,20 +95,18 @@ class ArticleMasterDataRepositoryTest {
   void getPromotion_WITH_DEFAULT_LANGUAGE_CODE() {
 
     PromotionArticleData promotionArticleData = generatePromotion(
-        true, null, CURRENT_DATE.minusMonths(1), CURRENT_DATE.plusMonths(3));
+        true, null, CURRENT_DATE.minusMonths(1), CURRENT_DATE.plusMonths(3), "MCC");
     PromotionArticleData promotionArticleData1 = generatePromotion(
-        true, null, CURRENT_DATE.minusMonths(5), CURRENT_DATE.plusMonths(2));
+        true, null, CURRENT_DATE.minusMonths(5), CURRENT_DATE.plusMonths(2), "MCC");
     List<PromotionArticleData> promotionArticleDataList = List.of(
         promotionArticleData,
         promotionArticleData1);
     when(articleCacheService.getPromotionArticleData(
-            COUNTRY_CODE, generateArticleId(123L, 1L, 1L), STORE_NUMBER))
+        COUNTRY_CODE, generateArticleId(123L, 1L, 1L), STORE_NUMBER))
         .thenReturn(
             promotionArticleDataList);
 
     ArticleId articleId = generateArticleId(123L, 1L, 1L);
-    when(promotionsAclService.getActivePromotion(COUNTRY_CODE, 1, articleId, promotionArticleDataList)).thenReturn(promotionArticleData1);
-
     SimplePromotionArticleData simplePromotionArticleData =
         articleMasterDataRepository.getActivePromotionForToday(
             COUNTRY_CODE, 1, NETHERLANDS_LANGUAGE_CODE, articleId);
@@ -120,18 +121,17 @@ class ArticleMasterDataRepositoryTest {
   void getPromotion_NO_DESCRIPTION() {
 
     PromotionArticleData promotionArticleData = generatePromotion(
-        false, null, CURRENT_DATE.minusMonths(4), CURRENT_DATE.plusMonths(1));
+        false, null, CURRENT_DATE.minusMonths(4), CURRENT_DATE.plusMonths(1), "MCC");
     List<PromotionArticleData> promotionArticleDataList = List.of(
         promotionArticleData,
         generatePromotion(
-            false, null, CURRENT_DATE.minusMonths(2), CURRENT_DATE.plusMonths(3)));
+            false, null, CURRENT_DATE.minusMonths(2), CURRENT_DATE.plusMonths(3), "MCC"));
     when(articleCacheService.getPromotionArticleData(
-            COUNTRY_CODE, generateArticleId(123L, 1L, 1L), STORE_NUMBER))
+        COUNTRY_CODE, generateArticleId(123L, 1L, 1L), STORE_NUMBER))
         .thenReturn(
             promotionArticleDataList);
 
     ArticleId articleId = generateArticleId(123L, 1L, 1L);
-    when(promotionsAclService.getActivePromotion(COUNTRY_CODE, 1, articleId, promotionArticleDataList)).thenReturn(promotionArticleData);
 
     SimplePromotionArticleData simplePromotionArticleData =
         articleMasterDataRepository.getActivePromotionForToday(
@@ -143,18 +143,44 @@ class ArticleMasterDataRepositoryTest {
   }
 
   @Test
-  void getPromotion_NO_PROMOTION() {
+  void getPromotion_Invalid_PromotionChannel() {
 
     PromotionArticleData promotionArticleData = generatePromotion(
-        true, null, CURRENT_DATE.plusMonths(4), CURRENT_DATE.plusMonths(8));
+        false, null, CURRENT_DATE.minusMonths(4), CURRENT_DATE.plusMonths(1), "APT");
     List<PromotionArticleData> promotionArticleDataList = List.of(
         promotionArticleData,
         generatePromotion(
-            true, null, CURRENT_DATE.plusMonths(2), CURRENT_DATE.plusMonths(3)));
+            false, null, CURRENT_DATE.minusMonths(2), CURRENT_DATE.plusMonths(3), "ABC"));
+    when(articleCacheService.getPromotionArticleData(
+        COUNTRY_CODE, generateArticleId(123L, 1L, 1L), STORE_NUMBER))
+        .thenReturn(
+            promotionArticleDataList);
+
+    ArticleId articleId = generateArticleId(123L, 1L, 1L);
+
+    SimplePromotionArticleData simplePromotionArticleData =
+        articleMasterDataRepository.getActivePromotionForToday(
+            COUNTRY_CODE, 1, ROMANIA_LANGUAGE_CODE, articleId);
+
+    assertNull(simplePromotionArticleData.getPromotionDescription());
+    assertEquals(null, simplePromotionArticleData.getPromotionStart());
+    assertEquals(null, simplePromotionArticleData.getPromotionEnd());
+    assertEquals(null, simplePromotionArticleData.getPromotionChannel());
+  }
+
+  @Test
+  void getPromotion_NO_PROMOTION() {
+
+    PromotionArticleData promotionArticleData = generatePromotion(
+        true, null, CURRENT_DATE.plusMonths(4), CURRENT_DATE.plusMonths(8), "MCC");
+    List<PromotionArticleData> promotionArticleDataList = List.of(
+        promotionArticleData,
+        generatePromotion(
+            true, null, CURRENT_DATE.plusMonths(2), CURRENT_DATE.plusMonths(3), "MCC"));
     ArticleId articleId = generateArticleId(123L, 1L, 1L);
 
     when(articleCacheService.getPromotionArticleData(
-            COUNTRY_CODE, articleId, STORE_NUMBER))
+        COUNTRY_CODE, articleId, STORE_NUMBER))
         .thenReturn(
             promotionArticleDataList);
 
@@ -168,7 +194,7 @@ class ArticleMasterDataRepositoryTest {
   }
 
   private PromotionArticleData generatePromotion(
-      Boolean hasDescription, String otherLanguageCode, LocalDate start, LocalDate end) {
+      Boolean hasDescription, String otherLanguageCode, LocalDate start, LocalDate end, String promotionChannel) {
 
     List<PromotionDescription> promotionDescriptionList = null;
 
@@ -187,6 +213,7 @@ class ArticleMasterDataRepositoryTest {
         .promotionEnd(end)
         .valid(true)
         .descriptions(promotionDescriptionList)
+        .promotionChannel(promotionChannel)
         .build();
   }
 
