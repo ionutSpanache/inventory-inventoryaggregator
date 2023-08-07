@@ -455,97 +455,101 @@ public class ArticleCacheService {
   }
 
   private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData(
-      ArticleCacheIhdsTree articleCacheDocument,
-      Integer storeNo) {
+          ArticleCacheIhdsTree articleCacheDocument,
+          Integer storeNo) {
     Integer hierarchySequenceStoreNo =
-        articleCacheDocument
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getHierarchySequenceStoreNo(storeNo);
+            articleCacheDocument
+                    .getTransaction()
+                    .getArticleCacheIncident()
+                    .getHierarchySequenceStoreNo(storeNo);
     if (hierarchySequenceStoreNo == null) {
       throw new ArticleNotFoundException();
     }
     ArticleCacheReaderDigest articleCacheReaderDigest =
-        articleCacheDocument
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getArticleCacheReaderDigest();
+            articleCacheDocument
+                    .getTransaction()
+                    .getArticleCacheIncident()
+                    .getArticleCacheReaderDigest();
     ArticleCacheDataGroup articleCacheDataGroup100 =
-        articleCacheDocument
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getArticleCacheDataGroupWithoutStore(100);
+            articleCacheDocument
+                    .getTransaction()
+                    .getArticleCacheIncident()
+                    .getArticleCacheDataGroupWithoutStore(100);
     ArticleCacheDataGroup articleCacheDataGroup300 =
-        articleCacheDocument
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getArticleCacheDataGroupWithoutStore(300);
+            articleCacheDocument
+                    .getTransaction()
+                    .getArticleCacheIncident()
+                    .getArticleCacheDataGroupWithoutStore(300);
     ArticleCacheDataGroup articleCacheDataGroup310 =
-        articleCacheDocument
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getArticleCacheDataGroupWithoutStore(310);
+            articleCacheDocument
+                    .getTransaction()
+                    .getArticleCacheIncident()
+                    .getArticleCacheDataGroupWithoutStore(310);
     ArticleCacheDataGroup articleCacheDataGroup320 =
-        articleCacheDocument
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
+            articleCacheDocument
+                    .getTransaction()
+                    .getArticleCacheIncident()
+                    .getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
     ArticleCacheDataGroup articleCacheDataGroup325 =
-        articleCacheDocument
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
+            articleCacheDocument
+                    .getTransaction()
+                    .getArticleCacheIncident()
+                    .getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
     ArticleCacheDataGroup articleCacheDataGroup200 =
-        articleCacheDocument
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getArticleCacheDataGroupWithoutStore(200);
+            articleCacheDocument
+                    .getTransaction()
+                    .getArticleCacheIncident()
+                    .getArticleCacheDataGroupWithoutStore(200);
 
     return new ArticleCacheFullData(
-        articleCacheReaderDigest.getMmsArtNo(),
-        articleCacheReaderDigest.getVariantNo(),
-        articleCacheReaderDigest.getBundleNo(),
-        articleCacheReaderDigest.getArticleDescription(),
-        articleCacheDocument.getTransaction().getArticleCacheIncident().getBarcodeForBundle(),
-        articleCacheReaderDigest.getProducingSupplier(),
-        articleCacheDataGroup100.getPresentationMerchandiseGroup(),
-        articleCacheDataGroup310.getSellingBundleContent(),
-        articleCacheDataGroup100.getWeightArticles(),
-        articleCacheDataGroup200.getNetWeight(),
-        articleCacheReaderDigest.getSubsysNo(),
-        articleCacheDataGroup100.getVatPercent(),
-        articleCacheDataGroup320.getPieceNetSellPrice(),
-        articleCacheDataGroup320.getBundleNetSellPrice(),
-        articleCacheReaderDigest.getVariantText(),
-        articleCacheReaderDigest.getArticleType(),
-        articleCacheDataGroup325.getArticleClass(),
-        articleCacheDataGroup100.getFoodNonfoodIndicator(),
-        articleCacheDataGroup100.getPresentationMainMerchandiseGroup(),
-        articleCacheDataGroup100.getPresentationSubMerchandiseGroup(),
-        articleCacheDataGroup320.getAssignedStoreSupplier(),
-        articleCacheDataGroup325.getProcurementCd(),
-        articleCacheDataGroup320.getAssortmentCode(),
-        articleCacheDataGroup320.getBlockingCode(),
-        articleCacheDataGroup320.getActivationStatus(),
-        articleCacheDataGroup200.getExpiryDays(),
-        articleCacheDataGroup325.getPieceNetBuyingPrice(),
-        articleCacheDataGroup325.getBundleNetBuyingPrice(),
-        articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
-        articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
-        articleCacheDataGroup300.getArticleNoEmptiesSales(),
-        articleCacheReaderDigest.getBrandName(),
-        calculateMinimumRetailPrice(
-            articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
-        articleCacheDataGroup200.getCountryOfOrigin(),
-        articleCacheDataGroup200.getPackageFactor(),
-        articleCacheDataGroup100.getAlcoholClass(),
-        articleCacheReaderDigest.getTraceabilityIndicator(),
-        articleCacheDataGroup320.getCoreAssortmentIndicator() != null
-            ? articleCacheDataGroup320.getCoreAssortmentIndicator()
-            : 0,
-        articleCacheDataGroup320.getAssignedStoreSupplierType(),
-        articleCacheDataGroup310.getInOutIndicator(),
-        articleCacheDataGroup320.getMinimumGrossSalesPricePerUnit());
+            articleCacheReaderDigest.getMmsArtNo(),
+            articleCacheReaderDigest.getVariantNo(),
+            articleCacheReaderDigest.getBundleNo(),
+            articleCacheReaderDigest.getArticleDescription(),
+            articleCacheDocument.getTransaction().getArticleCacheIncident().getBarcodeForBundle(),
+            articleCacheReaderDigest.getProducingSupplier(),
+            articleCacheDataGroup100.getPresentationMerchandiseGroup(),
+            articleCacheDataGroup310.getSellingBundleContent(),
+            articleCacheDataGroup100.getWeightArticles(),
+            articleCacheDataGroup200.getNetWeight(),
+            articleCacheReaderDigest.getSubsysNo(),
+            articleCacheDataGroup100.getVatPercent(),
+            articleCacheDataGroup320.getPieceNetSellPrice(),
+            articleCacheDataGroup320.getBundleNetSellPrice(),
+            articleCacheReaderDigest.getVariantText(),
+            articleCacheReaderDigest.getArticleType(),
+            articleCacheDataGroup325.getArticleClass(),
+            articleCacheDataGroup100.getFoodNonfoodIndicator(),
+            articleCacheDataGroup100.getPresentationMainMerchandiseGroup(),
+            articleCacheDataGroup100.getPresentationSubMerchandiseGroup(),
+            articleCacheDataGroup320.getAssignedStoreSupplier(),
+            articleCacheDataGroup325.getProcurementCd(),
+            articleCacheDataGroup320.getAssortmentCode(),
+            articleCacheDataGroup320.getBlockingCode(),
+            articleCacheDataGroup320.getActivationStatus(),
+            articleCacheDataGroup200.getExpiryDays(),
+            articleCacheDataGroup325.getPieceNetBuyingPrice(),
+            articleCacheDataGroup325.getBundleNetBuyingPrice(),
+            articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
+            articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
+            articleCacheDataGroup300.getArticleNoEmptiesSales(),
+            articleCacheReaderDigest.getBrandName(),
+            calculateMinimumRetailPrice(
+                    articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
+            articleCacheDataGroup200.getCountryOfOrigin(),
+            articleCacheDataGroup200.getPackageFactor(),
+            articleCacheDataGroup100.getAlcoholClass(),
+            articleCacheReaderDigest.getTraceabilityIndicator(),
+            articleCacheDataGroup320.getCoreAssortmentIndicator() != null
+                    ? articleCacheDataGroup320.getCoreAssortmentIndicator()
+                    : 0,
+            articleCacheDataGroup320.getAssignedStoreSupplierType(),
+            articleCacheDataGroup310.getInOutIndicator(),
+            articleCacheDataGroup320.getMinimumGrossSalesPricePerUnit(),
+            articleCacheDataGroup200.getBasPriceContent(),
+            articleCacheDataGroup200.getBasPriceContentMeasureUnit(),
+            articleCacheDataGroup200.getBasPriceContentUnit(),
+            articleCacheDataGroup200.getBasPriceFactor());
   }
 
   private MinimumRetailPrice calculateMinimumRetailPrice(

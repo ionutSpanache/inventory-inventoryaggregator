@@ -205,6 +205,50 @@ public class ArticleCacheDataGroup {
     this.packageFactor = packageFactor;
   }
 
+  private Double basPriceContent;
+
+  public Double getBasPriceContent() {
+    return basPriceContent;
+  }
+
+  @XmlElement(name="BASEPRICECONTENT")
+  public void setBasPriceContent(Double basPriceContent) {
+    this.basPriceContent = basPriceContent;
+  }
+
+  private String basPriceContentMeasureUnit;
+
+  public String getBasPriceContentMeasureUnit() {
+    return basPriceContentMeasureUnit;
+  }
+
+  @XmlElement(name="BASEPRICECONTENTMEASUREUNIT")
+  public void setBasPriceContentMeasureUnit(String basPriceContentMeasureUnit) {
+    this.basPriceContentMeasureUnit = basPriceContentMeasureUnit;
+  }
+
+  private Integer basPriceContentUnit;
+
+  public Integer getBasPriceContentUnit() {
+    return basPriceContentUnit;
+  }
+
+  @XmlElement(name="BASEPRICECONTENTUNIT")
+  public void setBasPriceContentUnit(Integer basPriceContentUnit) {
+    this.basPriceContentUnit = basPriceContentUnit;
+  }
+
+  private Integer basPriceFactor;
+
+  public Integer getBasPriceFactor() {
+    return basPriceFactor;
+  }
+
+  @XmlElement(name="BASEPRICEBASEFACTOR")
+  public void setBasPriceFactor(Integer basPriceFactor) {
+    this.basPriceFactor = basPriceFactor;
+  }
+
   /*Data Group 300*/
   private Long articleNoEmptiesSales;
 

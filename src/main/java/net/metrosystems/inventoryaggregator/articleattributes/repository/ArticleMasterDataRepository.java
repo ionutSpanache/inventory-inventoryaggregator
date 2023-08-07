@@ -294,67 +294,71 @@ public class ArticleMasterDataRepository {
   }
 
   private ArticleMasterData transformArticleCacheFullToArticleMasterData(
-      ArticleCacheFullData articleCacheFullData,
-      String countryCode,
-      Integer storeNumber,
-      String languageCode,
-      ArticleId articleId) {
+          ArticleCacheFullData articleCacheFullData,
+          String countryCode,
+          Integer storeNumber,
+          String languageCode,
+          ArticleId articleId) {
 
     if (articleCacheFullData != null) {
 
       SimplePromotionArticleData promotion =
-          getActivePromotionForToday(countryCode, storeNumber, languageCode, articleId);
+              getActivePromotionForToday(countryCode, storeNumber, languageCode, articleId);
 
       return new ArticleMasterData()
-          .setArticleDescription(articleCacheFullData.getArticleDescription())
-          .setBarcode(articleCacheFullData.getBarcode())
-          .setCommercialSupplier(articleCacheFullData.getCommercialSupplier())
-          .setPresentationMerchandiseGroup(articleCacheFullData.getPresentationMerchandiseGroup())
-          .setPromotionId(promotion.getPromotionId())
-          .setPromotionDescription(promotion.getPromotionDescription())
-          .setPromotionStartDate(promotion.getPromotionStart())
-          .setPromotionEndDate(promotion.getPromotionEnd())
-          .setSellingBundleContent(articleCacheFullData.getSellingBundleContent())
-          .setWeightArticle(articleCacheFullData.getWeightArticle())
-          .setNetWeight(articleCacheFullData.getNetWeight())
-          .setSubsystemArticleNumber(articleCacheFullData.getSubsysArticleNumber())
-          .setVatPercent(articleCacheFullData.getVatPercent())
-          .setPieceNetSellPrice(articleCacheFullData.getPieceNetSellPrice())
-          .setBundleNetSellPrice(articleCacheFullData.getBundleNetSellPrice())
-          .setPromotionBundleNetPrice(
-              promotion.getPromotionNetSalesPricePerBundle() != null
-                  ? promotion.getPromotionNetSalesPricePerBundle()
-                  : 0)
-          .setVariantDescription(articleCacheFullData.getVariantDescription())
-          .setArticleType(articleCacheFullData.getArticleType())
-          .setArticleClass(articleCacheFullData.getArticleClass())
-          .setFoodNonfoodIndicator(articleCacheFullData.getFoodNonfoodIndicator())
-          .setPresentationMainMerchandiseGroup(
-              articleCacheFullData.getPresentationMainMerchandiseGroup())
-          .setPresentationSubMerchandiseGroup(
-              articleCacheFullData.getPresentationSubMerchandiseGroup())
-          .setSupplierNumber(articleCacheFullData.getSupplierNumber())
-          .setProcurementCode(articleCacheFullData.getProcurementCode())
-          .setAssortmentCode(articleCacheFullData.getAssortmentCode())
-          .setBlockingCode(articleCacheFullData.getBlockingCode())
-          .setActivationStatus(articleCacheFullData.getActivationStatus())
-          .setExpiryDays(articleCacheFullData.getExpiryDays())
-          .setPieceNetBuyingPrice(articleCacheFullData.getPieceNetBuyingPrice())
-          .setBundleNetBuyingPrice(articleCacheFullData.getBundleNetBuyingPrice())
-          .setPieceNetNetBuyingPrice(articleCacheFullData.getPieceNetNetBuyingPrice())
-          .setBundleNetNetBuyingPrice(articleCacheFullData.getBundleNetNetBuyingPrice())
-          .setArticleNoEmptiesSales(articleCacheFullData.getArticleNoEmptiesSales())
-          .setBrandName(articleCacheFullData.getBrandName())
-          .setMinimumRetailPrice(articleCacheFullData.getMinimumRetailPrice())
-          .setCountryOfOrigin(articleCacheFullData.getCountryOfOrigin())
-          .setPackageFactor(articleCacheFullData.getPackageFactor())
-          .setAlcoholClass(articleCacheFullData.getAlcoholClass())
-          .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator())
-          .setCoreAssortmentIndicator(articleCacheFullData.getCoreAssortmentIndicator())
-          .setAssignedStoreSupplierType(articleCacheFullData.getAssignedStoreSupplierType())
-          .setInOutIndicator(articleCacheFullData.getInOutIndicator())
-          .setMinimumGrossSalesPricePerUnit(
-              articleCacheFullData.getMinimumGrossSalesPricePerUnit());
+              .setArticleDescription(articleCacheFullData.getArticleDescription())
+              .setBarcode(articleCacheFullData.getBarcode())
+              .setCommercialSupplier(articleCacheFullData.getCommercialSupplier())
+              .setPresentationMerchandiseGroup(articleCacheFullData.getPresentationMerchandiseGroup())
+              .setPromotionId(promotion.getPromotionId())
+              .setPromotionDescription(promotion.getPromotionDescription())
+              .setPromotionStartDate(promotion.getPromotionStart())
+              .setPromotionEndDate(promotion.getPromotionEnd())
+              .setSellingBundleContent(articleCacheFullData.getSellingBundleContent())
+              .setWeightArticle(articleCacheFullData.getWeightArticle())
+              .setNetWeight(articleCacheFullData.getNetWeight())
+              .setSubsystemArticleNumber(articleCacheFullData.getSubsysArticleNumber())
+              .setVatPercent(articleCacheFullData.getVatPercent())
+              .setPieceNetSellPrice(articleCacheFullData.getPieceNetSellPrice())
+              .setBundleNetSellPrice(articleCacheFullData.getBundleNetSellPrice())
+              .setPromotionBundleNetPrice(
+                      promotion.getPromotionNetSalesPricePerBundle() != null
+                              ? promotion.getPromotionNetSalesPricePerBundle()
+                              : 0)
+              .setVariantDescription(articleCacheFullData.getVariantDescription())
+              .setArticleType(articleCacheFullData.getArticleType())
+              .setArticleClass(articleCacheFullData.getArticleClass())
+              .setFoodNonfoodIndicator(articleCacheFullData.getFoodNonfoodIndicator())
+              .setPresentationMainMerchandiseGroup(
+                      articleCacheFullData.getPresentationMainMerchandiseGroup())
+              .setPresentationSubMerchandiseGroup(
+                      articleCacheFullData.getPresentationSubMerchandiseGroup())
+              .setSupplierNumber(articleCacheFullData.getSupplierNumber())
+              .setProcurementCode(articleCacheFullData.getProcurementCode())
+              .setAssortmentCode(articleCacheFullData.getAssortmentCode())
+              .setBlockingCode(articleCacheFullData.getBlockingCode())
+              .setActivationStatus(articleCacheFullData.getActivationStatus())
+              .setExpiryDays(articleCacheFullData.getExpiryDays())
+              .setPieceNetBuyingPrice(articleCacheFullData.getPieceNetBuyingPrice())
+              .setBundleNetBuyingPrice(articleCacheFullData.getBundleNetBuyingPrice())
+              .setPieceNetNetBuyingPrice(articleCacheFullData.getPieceNetNetBuyingPrice())
+              .setBundleNetNetBuyingPrice(articleCacheFullData.getBundleNetNetBuyingPrice())
+              .setArticleNoEmptiesSales(articleCacheFullData.getArticleNoEmptiesSales())
+              .setBrandName(articleCacheFullData.getBrandName())
+              .setMinimumRetailPrice(articleCacheFullData.getMinimumRetailPrice())
+              .setCountryOfOrigin(articleCacheFullData.getCountryOfOrigin())
+              .setPackageFactor(articleCacheFullData.getPackageFactor())
+              .setAlcoholClass(articleCacheFullData.getAlcoholClass())
+              .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator())
+              .setCoreAssortmentIndicator(articleCacheFullData.getCoreAssortmentIndicator())
+              .setAssignedStoreSupplierType(articleCacheFullData.getAssignedStoreSupplierType())
+              .setInOutIndicator(articleCacheFullData.getInOutIndicator())
+              .setMinimumGrossSalesPricePerUnit(
+                      articleCacheFullData.getMinimumGrossSalesPricePerUnit())
+              .setBasPriceContent(articleCacheFullData.getBasPriceContent())
+              .setBasPriceContentMeasureUnit(articleCacheFullData.getBasPriceContentMeasureUnit())
+              .setBasPriceContentUnit(articleCacheFullData.getBasPriceContentUnit())
+              .setBasPriceBaseFactor(articleCacheFullData.getBasPriceBaseFactor());
     }
     return null;
   }

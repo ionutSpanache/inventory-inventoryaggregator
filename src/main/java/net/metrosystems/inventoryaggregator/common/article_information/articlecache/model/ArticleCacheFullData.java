@@ -54,4 +54,8 @@ public class ArticleCacheFullData {
     private String assignedStoreSupplierType;
     private Integer inOutIndicator;
     private BigDecimal minimumGrossSalesPricePerUnit;
+    private Double basPriceContent;
+    private String basPriceContentMeasureUnit;
+    private Integer basPriceContentUnit;
+    private Integer basPriceBaseFactor;
 }

@@ -70,6 +70,10 @@ public class ArticleMasterData implements Serializable {
   private Boolean isTradeItemSellableInPFSShop;
   private Boolean isTradeItemDiscountMachine;
   private Boolean isMerchandiseOwnBrand;
+  private Double basPriceContent;
+  private String basPriceContentMeasureUnit;
+  private Integer basPriceContentUnit;
+  private Integer basPriceBaseFactor;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
