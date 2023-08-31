@@ -40,7 +40,6 @@ public class RawArticleDataService {
   private final MovieService movieService;
   private final ArticleProcessingService articleProcessingService;
 
-
   public void buildRawArticleDataList(
       ArticleId articleId,
       String countryCode,
@@ -51,15 +50,24 @@ public class RawArticleDataService {
       ArticleComponent articleComponent)
       throws ExecutionException, InterruptedException {
 
-    CompletableFuture<ArticleMasterId> articleMasterIdForArticleId = articleProcessingService.getArticleMasterId(articleId, countryCode, salesLine, languageCode, storeNo);
+    CompletableFuture<ArticleMasterId> articleMasterIdForArticleId =
+        articleProcessingService.getArticleMasterId(
+            articleId, countryCode, salesLine, languageCode, storeNo);
 
-    CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData = articleProcessingService.getRawArticleStoreMasterData(articleId, countryCode, salesLine, storeNo);
+    CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData =
+        articleProcessingService.getRawArticleStoreMasterData(
+            articleId, countryCode, salesLine, storeNo);
 
-    CompletableFuture<ArticleDataFromMovie> articleDataFromMovie = articleProcessingService.getArticleDataFromMovie(articleId, countryCode, salesLine, storeNo);
+    CompletableFuture<ArticleDataFromMovie> articleDataFromMovie =
+        articleProcessingService.getArticleDataFromMovie(
+            articleId, countryCode, salesLine, storeNo);
 
-    CompletableFuture<List<ArticleStockLocation>> articleStockLocationList = articleProcessingService.getArticleStockLocation(articleId, countryCode, salesLine, storeNo);
+    CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
+        articleProcessingService.getArticleStockLocation(
+            articleId, countryCode, salesLine, storeNo);
 
-    CompletableFuture<ArticleLocation> articleLocationList = articleProcessingService.getArticleLocation(articleId, countryCode, salesLine, storeNo);
+    CompletableFuture<ArticleLocation> articleLocationList =
+        articleProcessingService.getArticleLocation(articleId, countryCode, salesLine, storeNo);
 
     CompletableFuture<List<IduItemDerivedStandard>> iduDerivedStandardsList =
         articleMasterDataRepository.getIduItemDerivedStandardsAsync(countryCode, articleId);

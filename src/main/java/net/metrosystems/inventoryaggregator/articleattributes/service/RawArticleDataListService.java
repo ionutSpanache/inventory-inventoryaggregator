@@ -41,14 +41,16 @@ public class RawArticleDataListService {
       throws ExecutionException, InterruptedException {
 
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
-        articleProcessingService.getComponentForArticleId(articleIdList, countryCode, salesLine, languageCode, dataTypeList);
+        articleProcessingService.getComponentForArticleId(
+            articleIdList, countryCode, salesLine, languageCode, dataTypeList);
 
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
-            articleProcessingService.getMasterDataForArticleId(
+        articleProcessingService.getMasterDataForArticleId(
             articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
 
     CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl =
-            articleProcessingService.getArticleStoreMasterFromAcl(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+        articleProcessingService.getArticleStoreMasterFromAcl(
+            articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
         articleStoreExceptionsFromAC =
@@ -56,13 +58,16 @@ public class RawArticleDataListService {
                 articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture<List<StockData>> stockDataFromMovie =
-            articleProcessingService.getStockDataFromMovie(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+        articleProcessingService.getStockDataFromMovie(
+            articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
-            articleProcessingService.getArticleStockLocation(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+        articleProcessingService.getArticleStockLocation(
+            articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList =
-            articleProcessingService.getArticleLocationList(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+        articleProcessingService.getArticleLocationList(
+            articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture.allOf(
         articleComponentForArticleId,
