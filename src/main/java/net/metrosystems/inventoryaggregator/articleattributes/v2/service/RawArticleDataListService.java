@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.articleattributes.service;
+package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +19,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.articleattri
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RawArticleDataListService {
   private final ArticleProcessingService articleProcessingService;
+  private final ArticleProcessingServiceV2 articleProcessingServiceV2;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
 
   public void buildRawArticleDataList(
@@ -45,8 +47,8 @@ public class RawArticleDataListService {
             articleIdList, countryCode, salesLine, languageCode, dataTypeList);
 
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
-        articleProcessingService.getMasterDataForArticleId(
-            articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+        articleProcessingServiceV2.getMasterDataForArticleId(
+            articleIdList, countryCode, languageCode, storeNo, dataTypeList);
 
     CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl =
         articleProcessingService.getArticleStoreMasterFromAcl(

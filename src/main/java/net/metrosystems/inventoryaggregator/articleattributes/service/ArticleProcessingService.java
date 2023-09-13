@@ -8,6 +8,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.articleattri
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.*;
+import net.metrosystems.inventoryaggregator.articleattributes.v2.repository.DataSourceRepository;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
@@ -161,33 +162,6 @@ public class ArticleProcessingService {
     return articleStoreMasterFromAcl;
   }
 
-  public CompletableFuture<Map<ArticleId, ArticleMasterData>> getMasterDataForArticleId(
-      List<ArticleId> articleIdList,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo,
-      Optional<List<String>> dataTypeList) {
-    CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
-        CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty()
-        || dataTypeList.get().contains(DataType.ARTICLE_MASTER_DATA.getDataType())) {
-      try {
-        articleMasterDataForArticleId =
-            dataSourceRepository.getArticleMasterDataForArticleIdList(
-                articleIdList, countryCode, salesLine, languageCode, storeNo);
-      } catch (ArticleNotFoundException ex) {
-        throw new ArticleNotFoundException();
-      } catch (Exception e) {
-        log.error(
-            "ArticleListDetailsService.buildRawArticleDataList - articleMasterDataForArticleId - error: {}",
-            e.getMessage(),
-            e);
-      }
-    }
-    return articleMasterDataForArticleId;
-  }
-
   public CompletableFuture<Map<ArticleId, ArticleComponent>> getComponentForArticleId(
       List<ArticleId> articleIdList,
       String countryCode,
@@ -327,27 +301,5 @@ public class ArticleProcessingService {
           e);
     }
     return articleLocationList;
-  }
-
-  public CompletableFuture<ArticleMasterId> getArticleMasterId(
-      ArticleId articleId,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo) {
-    CompletableFuture<ArticleMasterId> articleMasterIdForArticleId = new CompletableFuture<>();
-    try {
-      articleMasterIdForArticleId =
-          dataSourceRepository.getArticleMasterIdForArticleId(
-              articleId, countryCode, salesLine, languageCode, storeNo);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-          "RawArticleDataService.buildRawArticleDataList - articleMasterIdForArticleId - error: {}",
-          e.getMessage(),
-          e);
-    }
-    return articleMasterIdForArticleId;
   }
 }

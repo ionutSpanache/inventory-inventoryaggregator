@@ -3,10 +3,12 @@ package net.metrosystems.inventoryaggregator.articleattributes.controller;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleDetailsService;
+import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleDetailsServiceV2;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @Timed("ArticleData")
+@RequiredArgsConstructor
 @RequestMapping(
     value =
         "/inventoryaggregator/countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/stores/{storeno}/articles",
@@ -28,13 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArticleDataController {
 
   private final ArticleDetailsService articleDetailsService;
+  private final ArticleDetailsServiceV2 articleDetailsServiceV2;
 
   @Value("#{'${countriesV2DataSource:null}'}")
-  private  List<String> countriesV2DataSource;
-
-  public ArticleDataController(ArticleDetailsService articleDetailsService) {
-    this.articleDetailsService = articleDetailsService;
-  }
+  private List<String> countriesV2DataSource;
 
   @AddTimer
   @AddLogs
@@ -64,7 +64,8 @@ public class ArticleDataController {
       @PathVariable("variant") Long variant,
       @PathVariable("bundlenumber") Long bundleNumber)
       throws Exception {
-    boolean dataSource = !isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode);
+    boolean dataSource =
+        !isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode);
 
     ArticleId articleId =
         ArticleId.builder()
@@ -72,9 +73,13 @@ public class ArticleDataController {
             .variantNumber(variant)
             .bundleNumber(bundleNumber)
             .build();
-
-    return articleDetailsService.getArticleDataListByArticleVariantBundle(
-        articleId, countryCode, salesLine, languageCode, storeNo, dataSource);
+    if (dataSource) {
+      return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
+          articleId, countryCode, salesLine, languageCode, storeNo);
+    } else {
+      return articleDetailsService.getArticleDataListByArticleVariantBundle(
+          articleId, countryCode, salesLine, languageCode, storeNo);
+    }
   }
 
   @AddTimer

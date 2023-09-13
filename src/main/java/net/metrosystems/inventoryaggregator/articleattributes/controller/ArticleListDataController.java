@@ -4,12 +4,14 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawIsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleListDetailsService;
+import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleDetailsServiceV2;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
@@ -27,17 +29,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @Timed("ArticleData")
+@RequiredArgsConstructor
 @RequestMapping(value = "/inventoryaggregator", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArticleListDataController {
 
-  @Value("#{'${countriesV2DataSource:null}'}")
-  private  List<String> countriesV2DataSource;
-
   private final ArticleListDetailsService articleListDetailsService;
+  private final ArticleDetailsServiceV2 articleDetailsServiceV2;
 
-  public ArticleListDataController(ArticleListDetailsService articleListDetailsService) {
-    this.articleListDetailsService = articleListDetailsService;
-  }
+  @Value("#{'${countriesV2DataSource:null}'}")
+  private List<String> countriesV2DataSource;
 
   @AddTimer
   @AddLogs
@@ -52,15 +52,18 @@ public class ArticleListDataController {
       @PathVariable("languageCode") String languageCode,
       @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
       @RequestParam("dataType") Optional<List<String>> dataTypeList,
-      @RequestParam("dataSource") Optional<Boolean> dataSource,
       @RequestBody List<ArticleId> articleIdList)
       throws Exception {
 
-    if (!isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode)) {
-      dataSource = Optional.of(true);
+    boolean dataSource =
+        !isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode);
+    if (dataSource) {
+      return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
+          articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+    } else {
+      return articleListDetailsService.getArticleDataListByArticleVariantBundle(
+          articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
     }
-    return articleListDetailsService.getArticleDataListByArticleVariantBundle(
-        articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList, dataSource);
   }
 
   @AddTimer

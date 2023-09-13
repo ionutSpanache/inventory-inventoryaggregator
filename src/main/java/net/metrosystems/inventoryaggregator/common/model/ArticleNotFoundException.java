@@ -9,6 +9,10 @@ public class ArticleNotFoundException extends ApiErrorAwareRuntimeException {
 		super();
 	}
 
+	public ArticleNotFoundException(String message) {
+		super(message);
+	}
+
   public ArticleNotFoundException(String message, Throwable t) {
     super(message, t);
 	}

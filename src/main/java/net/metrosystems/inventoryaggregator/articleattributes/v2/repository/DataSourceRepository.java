@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.articleattributes.repository;
+package net.metrosystems.inventoryaggregator.articleattributes.v2.repository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,8 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
+import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,11 +36,7 @@ public class DataSourceRepository {
   private String dataSourceArticleDataUrl;
 
   public CompletableFuture<Map<ArticleId, ArticleMasterData>> getArticleMasterDataForArticleIdList(
-      List<ArticleId> articleIdList,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo) {
+      List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
 
     UriComponents url =
         UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleListDataUrl)
@@ -70,11 +68,7 @@ public class DataSourceRepository {
   }
 
   public CompletableFuture<ArticleMasterId> getArticleMasterIdForArticleId(
-      ArticleId articleId,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo) {
+      ArticleId articleId, String countryCode, String languageCode, Integer storeNo) {
 
     UriComponents url =
         UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleDataUrl)
@@ -91,9 +85,16 @@ public class DataSourceRepository {
             .get()
             .uri(url.toString())
             .retrieve()
+            .onStatus(
+                httpStatus -> httpStatus == HttpStatus.NOT_FOUND,
+                error ->
+                    Mono.error(new ArticleNotFoundException("Article not found in local cache")))
             .bodyToMono(ArticleMasterId.class)
             .onErrorResume(
                 error -> {
+                  if (error instanceof ArticleNotFoundException e) {
+                    throw  e;
+                  }
                   log.error("Error on retrieving article master data from DataSource ", error);
                   return Mono.empty();
                 })

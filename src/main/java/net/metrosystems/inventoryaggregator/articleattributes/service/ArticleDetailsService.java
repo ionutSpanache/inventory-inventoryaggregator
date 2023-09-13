@@ -1,10 +1,14 @@
 package net.metrosystems.inventoryaggregator.articleattributes.service;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
@@ -49,7 +53,6 @@ public class ArticleDetailsService {
   private final ArticleMasterDataRepository articleMasterDataRepository;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final GeneralDataRepository generalDataRepository;
-  private final RawArticleDataService rawArticleDataService;
   private final ArticleProcessingService articleProcessingService;
 
   public List<RawArticleData> getArticleDataListByEan(
@@ -77,11 +80,10 @@ public class ArticleDetailsService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo,
-      boolean dataSource)
+      Integer storeNo)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleId, countryCode, salesLine, languageCode, storeNo, dataSource);
+        articleId, countryCode, salesLine, languageCode, storeNo);
   }
 
   public List<ArticleMasterData> getArticleMasterDataListByArticleVariantBundle(
@@ -177,8 +179,7 @@ public class ArticleDetailsService {
 
   private List<ArticleVariantBundleIdentifier>
       getArticleVariantBundleIdentifierListForArticleNumber(
-          Long articleNumber, String countryCode, String salesLine)
-          throws Exception {
+          Long articleNumber, String countryCode, String salesLine) throws Exception {
     return articleCacheService.getArticleVariantBundleListForArticleNumber(
         articleNumber, countryCode, salesLine);
   }
@@ -285,8 +286,7 @@ public class ArticleDetailsService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo,
-      boolean dataSource)
+      Integer storeNo)
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
@@ -296,26 +296,14 @@ public class ArticleDetailsService {
                 articleId.getArticleNumber(), countryCode, salesLine),
             articleId.getArticleNumber());
 
-    if (dataSource) {
-      rawArticleDataService.buildRawArticleDataList(
-          articleId,
-          countryCode,
-          salesLine,
-          languageCode,
-          storeNo,
-          rawArticleDataList,
-          articleComponent);
-    } else {
-
-      buildRawArticleDataList(
-          articleId,
-          countryCode,
-          salesLine,
-          languageCode,
-          storeNo,
-          rawArticleDataList,
-          articleComponent);
-    }
+    buildRawArticleDataList(
+        articleId,
+        countryCode,
+        salesLine,
+        languageCode,
+        storeNo,
+        rawArticleDataList,
+        articleComponent);
     return rawArticleDataList;
   }
 

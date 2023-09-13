@@ -23,7 +23,12 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.RawIsTradeIt
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.*;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.AclBundleStockLocationRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleComponentRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.v2.service.RawArticleDataListService;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
@@ -45,7 +50,6 @@ public class ArticleListDetailsService {
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
   private final ArticleComponentRepository articleComponentRepository;
   private final ArticleCacheService articleCacheService;
-  private final RawArticleDataListService rawArticleDataListService;
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       List<ArticleId> articleIdList,
@@ -53,11 +57,10 @@ public class ArticleListDetailsService {
       String salesLine,
       String languageCode,
       Integer storeNo,
-      Optional<List<String>> dataTypeList,
-      Optional<Boolean> dataSource)
+      Optional<List<String>> dataTypeList)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList, dataSource);
+        articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
   }
 
   public List<RawIsTradeItemExcludedFromDiscounts> isTradeItemExcludedFromDiscounts(
@@ -83,7 +86,7 @@ public class ArticleListDetailsService {
                   .variantNumber(articleId.getVariantNumber())
                   .build();
             })
-            .toList();
+        .toList();
   }
 
   private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(
@@ -92,8 +95,7 @@ public class ArticleListDetailsService {
       String salesLine,
       String languageCode,
       Integer storeNo,
-      Optional<List<String>> dataTypeList,
-      Optional<Boolean> dataSource)
+      Optional<List<String>> dataTypeList)
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
@@ -108,25 +110,14 @@ public class ArticleListDetailsService {
                 e);
           }
         });
-    if (dataSource.isPresent() && Boolean.TRUE.equals(dataSource.get())) {
-      rawArticleDataListService.buildRawArticleDataList(
-          articleIdList,
-          countryCode,
-          salesLine,
-          languageCode,
-          storeNo,
-          rawArticleDataList,
-          dataTypeList);
-    } else {
-      buildRawArticleDataList(
-          articleIdList,
-          countryCode,
-          salesLine,
-          languageCode,
-          storeNo,
-          rawArticleDataList,
-          dataTypeList);
-    }
+    buildRawArticleDataList(
+        articleIdList,
+        countryCode,
+        salesLine,
+        languageCode,
+        storeNo,
+        rawArticleDataList,
+        dataTypeList);
     return rawArticleDataList;
   }
 
@@ -140,21 +131,34 @@ public class ArticleListDetailsService {
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
-    CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId = getArticleComponentForArticleId(articleIdList, countryCode, salesLine, languageCode, dataTypeList);
+    CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
+        getArticleComponentForArticleId(
+            articleIdList, countryCode, salesLine, languageCode, dataTypeList);
 
-    CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId = getArticleMasterDataForArticleId(articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+    CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
+        getArticleMasterDataForArticleId(
+            articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
 
-    CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> iduItemDerivedStandards = getIduItemDerivedStandards(articleIdList, countryCode, dataTypeList);
+    CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> iduItemDerivedStandards =
+        getIduItemDerivedStandards(articleIdList, countryCode, dataTypeList);
 
-    CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl = getArticleStoreMasterFromAcl(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+    CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl =
+        getArticleStoreMasterFromAcl(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
-    CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>> articleStoreExceptionsFromAC = getArticleStoreExceptionFromAC(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+    CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
+        articleStoreExceptionsFromAC =
+            getArticleStoreExceptionFromAC(
+                articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
-    CompletableFuture<List<StockData>> stockDataFromMovie = getStockDataFromMovie(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+    CompletableFuture<List<StockData>> stockDataFromMovie =
+        getStockDataFromMovie(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
-    CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList = getArticleStockLocationList(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+    CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
+        getArticleStockLocationList(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
-    CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList = getArticleLocationForArticleId(articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+    CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList =
+        getArticleLocationForArticleId(
+            articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture.allOf(
         articleComponentForArticleId,
@@ -238,7 +242,12 @@ public class ArticleListDetailsService {
     }
   }
 
-  private CompletableFuture<List<ArticleLocationForArticleId>> getArticleLocationForArticleId(List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo, Optional<List<String>> dataTypeList) {
+  private CompletableFuture<List<ArticleLocationForArticleId>> getArticleLocationForArticleId(
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList) {
     CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList =
         CompletableFuture.completedFuture(Collections.emptyList());
     if (dataTypeList.isEmpty()
@@ -246,7 +255,7 @@ public class ArticleListDetailsService {
       try {
         articleLocationList =
             aclBundleStockLocationRepository.getArticleLocationForArticleList(
-                    countryCode, salesLine, storeNo, articleIdList);
+                countryCode, salesLine, storeNo, articleIdList);
       } catch (ArticleNotFoundException ex) {
         throw new ArticleNotFoundException();
       } catch (Exception e) {
@@ -259,7 +268,12 @@ public class ArticleListDetailsService {
     return articleLocationList;
   }
 
-  private CompletableFuture<List<ArticleIdStockLocation>> getArticleStockLocationList(List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo, Optional<List<String>> dataTypeList) {
+  private CompletableFuture<List<ArticleIdStockLocation>> getArticleStockLocationList(
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList) {
     CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
         CompletableFuture.completedFuture(Collections.emptyList());
     if (dataTypeList.isEmpty()
@@ -267,7 +281,7 @@ public class ArticleListDetailsService {
       try {
         articleStockLocationList =
             aclBundleStockLocationRepository.getStockLocationsForArticleList(
-                    articleIdList, countryCode, salesLine, storeNo);
+                articleIdList, countryCode, salesLine, storeNo);
       } catch (ArticleNotFoundException ex) {
         throw new ArticleNotFoundException();
       } catch (Exception e) {
@@ -280,14 +294,19 @@ public class ArticleListDetailsService {
     return articleStockLocationList;
   }
 
-  private CompletableFuture<List<StockData>> getStockDataFromMovie(List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo, Optional<List<String>> dataTypeList) {
+  private CompletableFuture<List<StockData>> getStockDataFromMovie(
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList) {
     CompletableFuture<List<StockData>> stockDataFromMovie =
         CompletableFuture.completedFuture(Collections.emptyList());
     if (dataTypeList.isEmpty() || dataTypeList.get().contains(DataType.STOCK_DATA.getDataType())) {
       try {
         stockDataFromMovie =
             articleDataFromMovieRepository.getArticleListDataFromMovie(
-                    articleIdList, countryCode, salesLine, storeNo);
+                articleIdList, countryCode, salesLine, storeNo);
 
       } catch (ArticleNotFoundException ex) {
         throw new ArticleNotFoundException();
@@ -301,7 +320,13 @@ public class ArticleListDetailsService {
     return stockDataFromMovie;
   }
 
-  private CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>> getArticleStoreExceptionFromAC(List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo, Optional<List<String>> dataTypeList) {
+  private CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
+      getArticleStoreExceptionFromAC(
+          List<ArticleId> articleIdList,
+          String countryCode,
+          String salesLine,
+          Integer storeNo,
+          Optional<List<String>> dataTypeList) {
     CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
         articleStoreExceptionsFromAC = CompletableFuture.completedFuture(Collections.emptyMap());
     if (dataTypeList.isEmpty()
@@ -309,7 +334,7 @@ public class ArticleListDetailsService {
       try {
         articleStoreExceptionsFromAC =
             rawArticleStoreMasterDataRepository.getArticleIdArticleCacheStoreExceptionIhdsTree(
-                    countryCode, salesLine, storeNo, new HashSet<>(articleIdList));
+                countryCode, salesLine, storeNo, new HashSet<>(articleIdList));
 
       } catch (ArticleNotFoundException ex) {
         throw new ArticleNotFoundException();
@@ -324,7 +349,12 @@ public class ArticleListDetailsService {
     return articleStoreExceptionsFromAC;
   }
 
-  private CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> getArticleStoreMasterFromAcl(List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo, Optional<List<String>> dataTypeList) {
+  private CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> getArticleStoreMasterFromAcl(
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList) {
     CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl =
         CompletableFuture.completedFuture(Collections.emptyMap());
     if (dataTypeList.isEmpty()
@@ -332,7 +362,7 @@ public class ArticleListDetailsService {
       try {
         articleStoreMasterFromAcl =
             rawArticleStoreMasterDataRepository.getArticleStoreMasterFromAcl(
-                    articleIdList, countryCode, salesLine, storeNo);
+                articleIdList, countryCode, salesLine, storeNo);
 
       } catch (ArticleNotFoundException ex) {
         throw new ArticleNotFoundException();
@@ -346,7 +376,9 @@ public class ArticleListDetailsService {
     return articleStoreMasterFromAcl;
   }
 
-  private CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> getIduItemDerivedStandards(List<ArticleId> articleIdList, String countryCode, Optional<List<String>> dataTypeList) {
+  private CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>>
+      getIduItemDerivedStandards(
+          List<ArticleId> articleIdList, String countryCode, Optional<List<String>> dataTypeList) {
     CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> iduItemDerivedStandards =
         CompletableFuture.completedFuture(Collections.emptyMap());
     if (dataTypeList.isEmpty()
@@ -366,7 +398,13 @@ public class ArticleListDetailsService {
     return iduItemDerivedStandards;
   }
 
-  private CompletableFuture<Map<ArticleId, ArticleMasterData>> getArticleMasterDataForArticleId(List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode, Integer storeNo, Optional<List<String>> dataTypeList) {
+  private CompletableFuture<Map<ArticleId, ArticleMasterData>> getArticleMasterDataForArticleId(
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList) {
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         CompletableFuture.completedFuture(Collections.emptyMap());
     if (dataTypeList.isEmpty()
@@ -374,7 +412,7 @@ public class ArticleListDetailsService {
       try {
         articleMasterDataForArticleId =
             articleMasterDataRepository.getArticleMasterDataForArticleIdList(
-                    articleIdList, countryCode, salesLine, languageCode, storeNo);
+                articleIdList, countryCode, salesLine, languageCode, storeNo);
       } catch (ArticleNotFoundException ex) {
         throw new ArticleNotFoundException();
       } catch (Exception e) {
@@ -387,7 +425,12 @@ public class ArticleListDetailsService {
     return articleMasterDataForArticleId;
   }
 
-  private CompletableFuture<Map<ArticleId, ArticleComponent>> getArticleComponentForArticleId(List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode, Optional<List<String>> dataTypeList) {
+  private CompletableFuture<Map<ArticleId, ArticleComponent>> getArticleComponentForArticleId(
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Optional<List<String>> dataTypeList) {
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
         CompletableFuture.completedFuture(Collections.emptyMap());
     if (dataTypeList.isEmpty()
@@ -395,7 +438,7 @@ public class ArticleListDetailsService {
       try {
         articleComponentForArticleId =
             articleComponentRepository.getArticleComponentForArticleIdList(
-                    articleIdList, countryCode, salesLine, languageCode);
+                articleIdList, countryCode, salesLine, languageCode);
       } catch (ArticleNotFoundException ex) {
         throw new ArticleNotFoundException();
       } catch (Exception e) {
@@ -419,7 +462,7 @@ public class ArticleListDetailsService {
               articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
           .get();
     } catch (InterruptedException | ExecutionException e) {
-      log.error("Could not getFuturePromotionsForArticleIds={}",e.getMessage(), e);
+      log.error("Could not getFuturePromotionsForArticleIds={}", e.getMessage(), e);
       Thread.currentThread().interrupt();
       throw new InterruptedRuntimeException("Could not getFuturePromotionsForArticleIds");
     }
