@@ -5,8 +5,8 @@ profiles:
   - name: dev
     environment: test
     deploy: auto
-    runtimeProvider:                              
-      gcp:                                        
+    runtimeProvider:
+      gcp:
         service: gke
     secretsProvider:
       googleSecretManager:
@@ -14,16 +14,18 @@ profiles:
   - name: pp
     environment: test
     deploy: auto
-    runtimeProvider:                              
-      gcp:                                        
+    runtimeProvider:
+      gcp:
         service: gke
     secretsProvider:
       googleSecretManager:
         projectId: cf-inventory-pp-h3
   - name: prod
     environment: production
+    deploy: manual
     runtimeProvider:
-      metro:
-        service: kubernetes
+      gcp:
+        service: gke
     secretsProvider:
-      sops: {}
+      googleSecretManager:
+        projectId: cf-inventory-prod-7p

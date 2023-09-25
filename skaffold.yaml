@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta26
+apiVersion: skaffold/v4beta6
 kind: Config
 metadata:
   name: PROJECT_NAME
@@ -13,32 +13,42 @@ build:
       ignoreChanges: true
   local:
     push: false
+manifests:
+  kustomize:
+    paths:
+      - .
 deploy:
-  kustomize: {}
-  statusCheckDeadlineSeconds: 240
+  kubectl: {}
+  statusCheckDeadlineSeconds: 420
 profiles:
   - name: push
     build:
       local:
         push: true
   - name: dev
-    deploy:
+    manifests:
       kustomize:
-        buildArgs:
-          - '--enable-alpha-plugins'
         paths:
           - deployment-configuration/profiles/dev
-  - name: pp
-    deploy:
-      kustomize:
         buildArgs:
-          - '--enable-alpha-plugins'
+          - --enable-alpha-plugins
+    deploy:
+      kubectl: {}
+  - name: pp
+    manifests:
+      kustomize:
         paths:
           - deployment-configuration/profiles/pp
-  - name: prod
-    deploy:
-      kustomize:
         buildArgs:
-          - '--enable-alpha-plugins'
+          - --enable-alpha-plugins
+    deploy:
+      kubectl: {}
+  - name: prod
+    manifests:
+      kustomize:
         paths:
           - deployment-configuration/profiles/prod
+        buildArgs:
+          - --enable-alpha-plugins
+    deploy:
+      kubectl: {}

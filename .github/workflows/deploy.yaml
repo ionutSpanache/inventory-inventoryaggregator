@@ -1,32 +1,17 @@
-name: 'Deploy to Production'
+name: 'Deploy GKE'
 on:
   workflow_dispatch:
     inputs:
       tag:
         description: "Provide GitHub tag to be deployed"
-        type: text
+        type: string
         required: true
-      datacenter:
-        description: 'Datacenter for deployment'
-        required: true
-        default: 'be-gcw1'
-      stage:
-        description: 'Environment to deploy'
-        required: true
-        default: 'prod'
 concurrency:
   group: 'WaaS: Deployment pipeline'
   cancel-in-progress: false
-env:
-  SOPS_VERSION: 3.6.1
-  tag: ${{ github.event.inputs.tag }}
-  datacenter: ${{ github.event.inputs.datacenter }}
-  stage: ${{ github.event.inputs.stage }}
 jobs:
   trigger-deployment-pipeline:
-    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/deploy-to-production.yaml@master
+    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/deploy.yaml@master
     with:
-      tag: ${{ github.event.inputs.tag }}
-      datacenter: ${{ github.event.inputs.datacenter }}
-      stage: ${{ github.event.inputs.stage }}
+      tag: ${{ inputs.tag }}
     secrets: inherit
