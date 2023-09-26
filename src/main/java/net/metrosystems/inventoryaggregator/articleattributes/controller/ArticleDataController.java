@@ -65,7 +65,7 @@ public class ArticleDataController {
       @PathVariable("bundlenumber") Long bundleNumber)
       throws Exception {
     boolean dataSource =
-        !isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode);
+        !isEmpty(countriesV2DataSource) && (countriesV2DataSource.contains(countryCode) || "ALL".equals(countriesV2DataSource.get(0)));
 
     ArticleId articleId =
         ArticleId.builder()

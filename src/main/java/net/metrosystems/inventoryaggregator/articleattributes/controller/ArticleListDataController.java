@@ -56,7 +56,7 @@ public class ArticleListDataController {
       throws Exception {
 
     boolean dataSource =
-        !isEmpty(countriesV2DataSource) && countriesV2DataSource.contains(countryCode);
+        !isEmpty(countriesV2DataSource) && (countriesV2DataSource.contains(countryCode) || "ALL".equals(countriesV2DataSource.get(0)));
     if (dataSource) {
       return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
           articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
