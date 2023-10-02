@@ -65,7 +65,7 @@ public class RawArticleDataService {
 
     CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
         articleProcessingService.getArticleStockLocation(
-            articleId, countryCode, salesLine, storeNo);
+            articleId, countryCode, storeNo);
 
     CompletableFuture<ArticleLocation> articleLocationList =
         articleProcessingService.getArticleLocation(articleId, countryCode, salesLine, storeNo);

@@ -28,6 +28,7 @@
 		</spring-boot-starter-inventory-api-error.version>
 		<spring-cloud-starter-sleuth.version>3.1.4</spring-cloud-starter-sleuth.version>
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+		<mockwebserver.version>4.10.0</mockwebserver.version>
 	</properties>
 
 	<dependencies>
@@ -100,7 +101,11 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<version>4.10.0</version>
+		</dependency>
 		<!--security-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -285,7 +290,8 @@
 					**/articleid/service/ArticleIdService.java,
 					**/articleid/client/article_cache_aaa/filter_aaa/service/FilterAAAService.java,
 					**/articleid/client/article_cache_aaa/filter_aaa/client/FilterAAAClient.java,
-					**/common/article_information/articlecache/client/article_cache_aaa/ArticleCacheAAAClient.java
+					**/common/article_information/articlecache/client/article_cache_aaa/ArticleCacheAAAClient.java,
+					**/common/utils/JsonHelper.java
 				</sonar.coverage.exclusions>
 			</properties>
 		</profile>

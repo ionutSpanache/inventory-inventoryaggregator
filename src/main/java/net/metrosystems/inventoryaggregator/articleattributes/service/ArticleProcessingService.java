@@ -21,10 +21,12 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @RequiredArgsConstructor
 public class ArticleProcessingService {
+
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
+  private final MstoreAclStockLocationRepository mstoreAclStockLocationRepository;
+
   private final ArticleComponentRepository articleComponentRepository;
-  private final DataSourceRepository dataSourceRepository;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final ArticleMasterDataRepository articleMasterDataRepository;
 
@@ -66,10 +68,8 @@ public class ArticleProcessingService {
         || dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
       try {
         articleStockLocationList =
-            aclBundleStockLocationRepository.getStockLocationsForArticleList(
-                articleIdList, countryCode, salesLine, storeNo);
-      } catch (ArticleNotFoundException ex) {
-        throw new ArticleNotFoundException();
+            mstoreAclStockLocationRepository.getStockLocationsForArticleList(
+                articleIdList, countryCode, storeNo);
       } catch (Exception e) {
         log.error(
             "ArticleListDetailsService.articleStockLocationList - articleDataFromMovieRepository - error: {}",
@@ -107,12 +107,12 @@ public class ArticleProcessingService {
   }
 
   public CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
-      getArticleStoreExceptionsFromAC(
-          List<ArticleId> articleIdList,
-          String countryCode,
-          String salesLine,
-          Integer storeNo,
-          Optional<List<String>> dataTypeList) {
+  getArticleStoreExceptionsFromAC(
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList) {
     CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
         articleStoreExceptionsFromAC = CompletableFuture.completedFuture(Collections.emptyMap());
     if (dataTypeList.isEmpty()
@@ -249,15 +249,13 @@ public class ArticleProcessingService {
   }
 
   public CompletableFuture<List<ArticleStockLocation>> getArticleStockLocation(
-      ArticleId articleId, String countryCode, String salesLine, Integer storeNo) {
+      ArticleId articleId, String countryCode, Integer storeNo) {
     CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
         new CompletableFuture<>();
     try {
       articleStockLocationList =
-          aclBundleStockLocationRepository.getArticleStockLocation(
-              articleId, countryCode, salesLine, storeNo);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
+          mstoreAclStockLocationRepository.getArticleStockLocation(
+              articleId, countryCode, storeNo);
     } catch (Exception e) {
       log.error(
           "ArticleDetailsService.buildRawArticleDataList - articleStockLocationList - error: {}",

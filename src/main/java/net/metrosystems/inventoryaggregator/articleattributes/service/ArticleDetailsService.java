@@ -331,7 +331,7 @@ public class ArticleDetailsService {
 
     CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
         articleProcessingService.getArticleStockLocation(
-            articleId, countryCode, salesLine, storeNo);
+            articleId, countryCode, storeNo);
 
     CompletableFuture<ArticleLocation> articleLocationList =
         articleProcessingService.getArticleLocationList(articleId, countryCode, salesLine, storeNo);

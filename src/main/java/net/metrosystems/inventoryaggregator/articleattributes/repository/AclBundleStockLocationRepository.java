@@ -24,107 +24,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class AclBundleStockLocationRepository {
+
   private final AclStockService aclStockService;
 
   @Autowired
   public AclBundleStockLocationRepository(AclStockService aclStockService) {
     this.aclStockService = aclStockService;
-  }
-
-  @Async("asyncExecutor")
-  public CompletableFuture<List<ArticleStockLocation>> getArticleStockLocation(
-      ArticleId articleId, String countryCode, String salesLine, Integer storeNo) {
-    List<AclBundleStockLocation> aclBundleStockLocations =
-        aclStockService.getAclBundleStockLocations(
-            countryCode,
-            salesLine,
-            storeNo,
-            articleId.getArticleNumber(),
-            articleId.getVariantNumber());
-
-    List<ArticleStockLocation> articleStockLocationList =
-        transformAclBundleStockLocationsToArticleStockLocationListByBundle(
-            aclBundleStockLocations, articleId.getBundleNumber());
-
-    return CompletableFuture.completedFuture(articleStockLocationList);
-  }
-
-  @Async("asyncExecutor")
-  public CompletableFuture<List<ArticleIdStockLocation>> getStockLocationsForArticleList(
-      List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo) {
-    List<AclArticleStockLocation> aclBundleStockLocations =
-        aclStockService.getStockLocationsForArticleList(
-            countryCode, salesLine, storeNo, articleIdList);
-
-    List<ArticleIdStockLocation> articleIdStockLocationList =
-        Stream.ofNullable(aclBundleStockLocations)
-            .flatMap(Collection::stream)
-            .filter(
-                aclArticleStockLocation ->
-                    aclArticleStockLocation.getArticleNumber() != null
-                        && aclArticleStockLocation.getVariantNumber() != null
-                        && aclArticleStockLocation.getBundleNumber() != null)
-            .map(
-                aclArticleStockLocation ->
-                    ArticleIdStockLocation.builder()
-                        .articleId(
-                            ArticleId.builder()
-                                .articleNumber(aclArticleStockLocation.getArticleNumber())
-                                .variantNumber(
-                                    Long.valueOf(aclArticleStockLocation.getVariantNumber()))
-                                .bundleNumber(
-                                    Long.valueOf(aclArticleStockLocation.getBundleNumber()))
-                                .build())
-                        .articleStockLocationList(
-                            transformAclBundleStockLocationsToArticleStockLocationListByBundle(
-                                aclArticleStockLocation.getAisleBay(),
-                                Long.valueOf(aclArticleStockLocation.getBundleNumber())))
-                        .build())
-            .collect(Collectors.toList());
-
-    return CompletableFuture.completedFuture(articleIdStockLocationList);
-  }
-
-  private List<ArticleStockLocation>
-      transformAclBundleStockLocationsToArticleStockLocationListByBundle(
-          List<AclBundleStockLocation> aclBundleStockLocations, Long bundleNo) {
-    if ((aclBundleStockLocations != null) && (!aclBundleStockLocations.isEmpty())) {
-      List<AclBundleStockLocation> aclStockLocationsForBundle;
-      try {
-        aclStockLocationsForBundle =
-            aclBundleStockLocations.stream()
-                .filter(
-                    aclBundleStockLocation ->
-                        (aclBundleStockLocation.getBundleNo().equals(bundleNo)))
-                .collect(Collectors.toList());
-      } catch (Exception e) {
-        return null;
-      }
-
-      if ((aclStockLocationsForBundle != null) && (!aclStockLocationsForBundle.isEmpty())) {
-        List<ArticleStockLocation> articleStockLocationList = null;
-        for (AclBundleStockLocation aclBundleStockLocation : aclStockLocationsForBundle) {
-          ArticleStockLocation articleStockLocation =
-              new ArticleStockLocation(
-                  aclBundleStockLocation.getBundleNo(),
-                  StringUtils.leftPad(String.valueOf(aclBundleStockLocation.getAisleNo()), 3, "0"),
-                  StringUtils.leftPad(String.valueOf(aclBundleStockLocation.getBayNo()), 3, "0"),
-                  aclBundleStockLocation.getQuantity(),
-                  aclBundleStockLocation.getBestBeforeDate(),
-                  aclBundleStockLocation.getDateOfCreation(),
-                  aclBundleStockLocation.getLastChangeDate(),
-                  aclBundleStockLocation.getSerialShippingContainerCode());
-          if (articleStockLocationList == null) {
-            articleStockLocationList =
-                new ArrayList<>(Collections.singletonList(articleStockLocation));
-          } else {
-            articleStockLocationList.add(articleStockLocation);
-          }
-        }
-        return articleStockLocationList;
-      }
-    }
-    return null;
   }
 
   @Async("asyncExecutor")

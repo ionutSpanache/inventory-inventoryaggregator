@@ -9,13 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AclBundleStockLocation {
 
-	private Long bundleNo;
-	private Integer aisleNo;
-	private Integer bayNo;
-	private Integer quantity;
-	private String bestBeforeDate;
-	private String dateOfCreation;
-	private String lastChangeDate ;
-	private String serialShippingContainerCode;
+  private Long bundleNo;
+  private Integer aisleNo;
+  private Integer bayNo;
+  private Integer quantity;
+  private String bestBeforeDate;
+  private String dateOfCreation;
+  private String lastChangeDate;
+  private String serialShippingContainerCode;
+  private String storeLocation;
+  private String masterSscc;
 
 }
