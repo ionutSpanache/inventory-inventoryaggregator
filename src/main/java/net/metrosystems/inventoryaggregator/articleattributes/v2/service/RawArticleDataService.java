@@ -2,7 +2,6 @@ package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.repository.General
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
 import org.springframework.stereotype.Service;
@@ -72,16 +70,10 @@ public class RawArticleDataService {
     CompletableFuture<ArticleLocation> articleLocationList =
         articleProcessingService.getArticleLocation(articleId, countryCode, salesLine, storeNo);
 
-    CompletableFuture<List<IduItemDerivedStandard>> iduDerivedStandardsList =
-        articleMasterDataRepository.getIduItemDerivedStandardsAsync(countryCode, articleId);
-
     CompletableFuture<MaximumRetailPrice> maximumRetailPrice =
         rawArticleStoreMasterDataRepository.getMaximumRetailPrice(
             countryCode, salesLine, storeNo, articleId);
 
-    CompletableFuture<StoreInformationGroup> storeInformationGroup =
-        articleMasterDataRepository.getDeliveryFlagAndStoreInformation(
-            countryCode, articleId, storeNo);
 
     CompletableFuture<String> dailyMeanSales =
         movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
@@ -92,7 +84,6 @@ public class RawArticleDataService {
         articleDataFromMovie,
         articleStockLocationList,
         articleLocationList,
-        iduDerivedStandardsList,
         maximumRetailPrice,
         dailyMeanSales);
 
@@ -127,14 +118,9 @@ public class RawArticleDataService {
             .articleComponent(articleComponent)
             .productLifeCycleData(buildProductLifeCycleData(articleMasterData))
             .maximumRetailPrice(maximumRetailPrice.get())
-            .channelDeliveryFlag(storeInformationGroup.get().getChannelDeliveryFlag())
+            .channelDeliveryFlag(articleMasterData.getChannelDeliveryFlag())
             .returnPossibilityStoreSupplierNumber(
-                storeInformationGroup.get().getStoreItemPhaseOutInformation() != null
-                    ? storeInformationGroup
-                        .get()
-                        .getStoreItemPhaseOutInformation()
-                        .getReturnPossibilityStoreSupplierNumber()
-                    : null)
+                articleMasterData.getReturnPossibilityStoreSupplierNumber())
             .minimumRetailPrice(articleMasterData.getMinimumRetailPrice())
             .multiLanguageData(articleMasterIdForArticleId.get().getMultiLanguageData())
             .build();
