@@ -1,5 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -24,8 +25,7 @@ public class MstoreAclStockLocationRepository {
   public CompletableFuture<List<ArticleStockLocation>> getArticleStockLocation(
       ArticleId articleId, String countryCode, Integer storeNumber) {
     List<ArticleStockLocation> mstoreAclStockLocations =
-        mstoreAclClientService.getArticleStockLocation(
-            articleId, countryCode, storeNumber);
+        mstoreAclClientService.getArticleStockLocation(articleId, countryCode, storeNumber);
     return CompletableFuture.completedFuture(mstoreAclStockLocations);
   }
 
@@ -35,6 +35,8 @@ public class MstoreAclStockLocationRepository {
     List<ArticleIdStockLocation> mstoreAclStockLocations =
         mstoreAclClientService.getArticleStockLocationForArticleList(
             articleIdList, countryCode, storeNo);
-    return CompletableFuture.completedFuture(mstoreAclStockLocations);
+    return mstoreAclStockLocations != null
+        ? CompletableFuture.completedFuture(mstoreAclStockLocations)
+        : CompletableFuture.completedFuture(Collections.emptyList());
   }
 }
