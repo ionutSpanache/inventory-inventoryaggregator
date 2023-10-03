@@ -1,6 +1,7 @@
 package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,19 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class RawArticleDataListService {
+
+  private static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>();
+
+  static {
+    LANGUAGE_CODE_EXCEPTIONS.put("UA", "UK");
+    LANGUAGE_CODE_EXCEPTIONS.put("KZ", "KK");
+    LANGUAGE_CODE_EXCEPTIONS.put("MD", "RO");
+    LANGUAGE_CODE_EXCEPTIONS.put("PK", "UR");
+    LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");
+    LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
+  }
+
+
   private final ArticleProcessingService articleProcessingService;
   private final ArticleProcessingServiceV2 articleProcessingServiceV2;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
@@ -42,13 +56,16 @@ public class RawArticleDataListService {
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
+    String correctLanguageCode =
+        LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, languageCode);
+
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
         articleProcessingService.getComponentForArticleId(
-            articleIdList, countryCode, salesLine, languageCode, dataTypeList);
+            articleIdList, countryCode, salesLine, correctLanguageCode, dataTypeList);
 
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         articleProcessingServiceV2.getMasterDataForArticleId(
-            articleIdList, countryCode, languageCode, storeNo, dataTypeList);
+            articleIdList, countryCode, correctLanguageCode, storeNo, dataTypeList);
 
     CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl =
         articleProcessingService.getArticleStoreMasterFromAcl(
