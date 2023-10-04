@@ -59,7 +59,7 @@ public class ArticleListDataController {
         !isEmpty(countriesV2DataSource) && (countriesV2DataSource.contains(countryCode) || "ALL".equals(countriesV2DataSource.get(0)));
     if (dataSource) {
       return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
-          articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+          articleIdList, countryCode, salesLine, storeNo, dataTypeList);
     } else {
       return articleListDetailsService.getArticleDataListByArticleVariantBundle(
           articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);

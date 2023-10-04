@@ -50,14 +50,13 @@ public class RawArticleDataListService {
       List<ArticleId> articleIdList,
       String countryCode,
       String salesLine,
-      String languageCode,
       Integer storeNo,
       List<RawArticleData> rawArticleDataList,
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
     String correctLanguageCode =
-        LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, languageCode);
+        LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
 
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
         articleProcessingService.getComponentForArticleId(

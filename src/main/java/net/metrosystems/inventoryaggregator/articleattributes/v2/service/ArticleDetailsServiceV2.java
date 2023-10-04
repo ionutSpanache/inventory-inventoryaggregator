@@ -35,12 +35,11 @@ public class ArticleDetailsServiceV2 {
       List<ArticleId> articleIdList,
       String countryCode,
       String salesLine,
-      String languageCode,
       Integer storeNo,
       Optional<List<String>> dataTypeList)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+        articleIdList, countryCode, salesLine, storeNo, dataTypeList);
   }
 
   private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(
@@ -94,7 +93,6 @@ public class ArticleDetailsServiceV2 {
       List<ArticleId> articleIdList,
       String countryCode,
       String salesLine,
-      String languageCode,
       Integer storeNo,
       Optional<List<String>> dataTypeList)
       throws Exception {
@@ -115,7 +113,6 @@ public class ArticleDetailsServiceV2 {
           articleIdList,
           countryCode,
           salesLine,
-          languageCode,
           storeNo,
           rawArticleDataList,
           dataTypeList);
