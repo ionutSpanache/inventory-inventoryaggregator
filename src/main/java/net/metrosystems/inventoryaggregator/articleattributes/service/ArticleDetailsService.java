@@ -31,6 +31,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocat
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.StockLocationRepository;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.ContentIduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.Domain;
@@ -54,6 +55,7 @@ public class ArticleDetailsService {
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final GeneralDataRepository generalDataRepository;
   private final ArticleProcessingService articleProcessingService;
+  private  final StockLocationRepository stockLocationRepository;
 
   public List<RawArticleData> getArticleDataListByEan(
       String ean, String countryCode, String salesLine, String languageCode, Integer storeNo)
@@ -330,8 +332,8 @@ public class ArticleDetailsService {
             articleId, countryCode, salesLine, storeNo);
 
     CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
-        articleProcessingService.getArticleStockLocation(
-            articleId, countryCode, storeNo);
+        stockLocationRepository.getArticleStockLocation(
+            articleId, countryCode,salesLine, storeNo);
 
     CompletableFuture<ArticleLocation> articleLocationList =
         articleProcessingService.getArticleLocationList(articleId, countryCode, salesLine, storeNo);

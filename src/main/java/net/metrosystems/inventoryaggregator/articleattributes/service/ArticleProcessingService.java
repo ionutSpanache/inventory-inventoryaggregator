@@ -24,8 +24,6 @@ public class ArticleProcessingService {
 
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
-  private final MstoreAclStockLocationRepository mstoreAclStockLocationRepository;
-
   private final ArticleComponentRepository articleComponentRepository;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final ArticleMasterDataRepository articleMasterDataRepository;
@@ -54,30 +52,6 @@ public class ArticleProcessingService {
       }
     }
     return articleLocationList;
-  }
-
-  public CompletableFuture<List<ArticleIdStockLocation>> getArticleStockLocation(
-      List<ArticleId> articleIdList,
-      String countryCode,
-      String salesLine,
-      Integer storeNo,
-      Optional<List<String>> dataTypeList) {
-    CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
-        CompletableFuture.completedFuture(Collections.emptyList());
-    if (dataTypeList.isEmpty()
-        || dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
-      try {
-        articleStockLocationList =
-            mstoreAclStockLocationRepository.getStockLocationsForArticleList(
-                articleIdList, countryCode, storeNo);
-      } catch (Exception e) {
-        log.error(
-            "ArticleListDetailsService.articleStockLocationList - articleDataFromMovieRepository - error: {}",
-            e.getMessage(),
-            e);
-      }
-    }
-    return articleStockLocationList;
   }
 
   public CompletableFuture<List<StockData>> getStockDataFromMovie(
@@ -246,23 +220,6 @@ public class ArticleProcessingService {
           e);
     }
     return articleDataFromMovie;
-  }
-
-  public CompletableFuture<List<ArticleStockLocation>> getArticleStockLocation(
-      ArticleId articleId, String countryCode, Integer storeNo) {
-    CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
-        new CompletableFuture<>();
-    try {
-      articleStockLocationList =
-          mstoreAclStockLocationRepository.getArticleStockLocation(
-              articleId, countryCode, storeNo);
-    } catch (Exception e) {
-      log.error(
-          "ArticleDetailsService.buildRawArticleDataList - articleStockLocationList - error: {}",
-          e.getMessage(),
-          e);
-    }
-    return articleStockLocationList;
   }
 
   public CompletableFuture<ArticleLocation> getArticleLocationList(

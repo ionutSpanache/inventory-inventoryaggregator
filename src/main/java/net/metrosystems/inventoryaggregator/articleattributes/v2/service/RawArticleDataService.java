@@ -19,12 +19,10 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleDa
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.StockLocationRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +31,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RawArticleDataService {
 
-  private final ArticleCacheService articleCacheService;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
-  private final ArticleMasterDataRepository articleMasterDataRepository;
   private final GeneralDataRepository generalDataRepository;
   private final MovieService movieService;
   private final ArticleProcessingService articleProcessingService;
   private final ArticleProcessingServiceV2 articleProcessingServiceV2;
+  private  final StockLocationRepository stockLocationRepository;
 
   public void buildRawArticleDataList(
       ArticleId articleId,
@@ -64,8 +61,8 @@ public class RawArticleDataService {
             articleId, countryCode, salesLine, storeNo);
 
     CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
-        articleProcessingService.getArticleStockLocation(
-            articleId, countryCode, storeNo);
+        stockLocationRepository.getArticleStockLocation(
+            articleId, countryCode,salesLine, storeNo);
 
     CompletableFuture<ArticleLocation> articleLocationList =
         articleProcessingService.getArticleLocation(articleId, countryCode, salesLine, storeNo);

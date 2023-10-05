@@ -20,6 +20,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.articleattri
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.StockLocationRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
@@ -45,6 +46,7 @@ public class RawArticleDataListService {
   private final ArticleProcessingService articleProcessingService;
   private final ArticleProcessingServiceV2 articleProcessingServiceV2;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
+  private final StockLocationRepository stockLocationRepository;
 
   public void buildRawArticleDataList(
       List<ArticleId> articleIdList,
@@ -80,7 +82,7 @@ public class RawArticleDataListService {
             articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
-        articleProcessingService.getArticleStockLocation(
+        stockLocationRepository.getArticleStockLocation(
             articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList =
