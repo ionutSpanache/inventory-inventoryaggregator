@@ -372,6 +372,8 @@ public class ArticleDetailsService {
     generalDataRepository.enhanceRawArticleStoreMasterDataWithDepartmentName(
         countryCode, salesLine, storeNo, rawArticleStoreMasterData.get());
 
+    updateWithDefaultValues(rawArticleStoreMasterData.get());
+
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
 
@@ -415,6 +417,12 @@ public class ArticleDetailsService {
 
     if (rawArticleDataList != null) {
       rawArticleDataList.add(rawArticleData);
+    }
+  }
+
+  private void updateWithDefaultValues(RawArticleStoreMasterData rawArticleStoreMasterData) {
+    if (rawArticleStoreMasterData.getSalesBlockingCode() == null) {
+      rawArticleStoreMasterData.setSalesBlockingCode(1);
     }
   }
 
