@@ -1,8 +1,10 @@
 package net.metrosystems.inventoryaggregator.common.stock_information.movie.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.client.MovieClient;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.ArticleVariantBundle;
@@ -10,14 +12,17 @@ import net.metrosystems.inventoryaggregator.common.stock_information.movie.model
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.MovieOpenOrder;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.Stock;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetails;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class MovieService {
 
   private final MovieClient movieClient;
+  private static final String dateFormat = "yyyy-MM-dd";
 
   @Autowired
   public MovieService(MovieClient pMovieClient) {
@@ -45,9 +50,6 @@ public class MovieService {
   private MovieAdapter transformStockDetailToMovieAdapter(StockDetails stockDetails) {
     Float openInterstoreQuantity = 0.0f;
     Float openReturnQuantity = 0.0f;
-    int lastGrDateIndex = 0;
-    int lastSaleDateIndex = 0;
-    int lastScdDateIndex = 0;
     MovieAdapter movieAdapter = new MovieAdapter();
     movieAdapter.setArticleNo(stockDetails.getArticleNo());
     movieAdapter.setVariantId(stockDetails.getVariant());
@@ -75,42 +77,8 @@ public class MovieService {
       movieAdapter.setOpenInterstoreQuantity(openInterstoreQuantity);
       movieAdapter.setOpenReturnQuantity(openReturnQuantity);
     }
-    if (stockDetails.getSystemStock() != null) {
-      String lastGRDateTemp = stockDetails.getSystemStock().get(0).getLastGRDate();
-      String lastSaleDateTemp = stockDetails.getSystemStock().get(0).getLastSalesDate();
-      String lastSCDDateTemp = stockDetails.getSystemStock().get(0).getLastSCDate();
-      for (int i = 1; i < stockDetails.getSystemStock().size(); i++) {
-        if (Integer.parseInt(lastGRDateTemp)
-            > Integer.parseInt(stockDetails.getSystemStock().get(i).getLastGRDate())) {
-          lastGRDateTemp = stockDetails.getSystemStock().get(i).getLastGRDate();
-          lastGrDateIndex = i;
-        }
-        if (Integer.parseInt(lastSaleDateTemp)
-            < Integer.parseInt(stockDetails.getSystemStock().get(i).getLastSalesDate())) {
-          lastSaleDateTemp = stockDetails.getSystemStock().get(i).getLastSalesDate();
-          lastScdDateIndex = i;
-        }
-        if (Integer.parseInt(lastSCDDateTemp)
-            < Integer.parseInt(stockDetails.getSystemStock().get(i).getLastSCDate())) {
-          lastSCDDateTemp = stockDetails.getSystemStock().get(i).getLastSCDate();
-          lastScdDateIndex = i;
-        }
-      }
-      movieAdapter.setLastGoodReceivingDate(lastGRDateTemp);
-      movieAdapter.setLastSalesDate(lastSaleDateTemp);
-      movieAdapter.setLastStockCorrectionDate(lastSCDDateTemp);
-      movieAdapter.setLastGRQuantity(
-          stockDetails.getSystemStock().get(lastGrDateIndex) != null
-              ? stockDetails.getSystemStock().get(lastGrDateIndex).getLastGRQuantity()
-              : null);
-      movieAdapter.setLastSalesQuantity(
-          stockDetails.getSystemStock().get(lastSaleDateIndex) != null
-              ? stockDetails.getSystemStock().get(lastSaleDateIndex).getLastSalesQuantity()
-              : null);
-      movieAdapter.setLastSCQuantity(
-          stockDetails.getSystemStock().get(lastScdDateIndex) != null
-              ? stockDetails.getSystemStock().get(lastScdDateIndex).getLastSCQuantity()
-              : null);
+    if (stockDetails.getSystemStock() != null && !stockDetails.getSystemStock().isEmpty()) {
+      setLastDateAttributes(stockDetails, movieAdapter);
     }
     if (stockDetails.getOpenOrders() != null) {
       movieAdapter.setOpenOrders(new ArrayList<>());
@@ -164,6 +132,72 @@ public class MovieService {
     }
 
     return movieAdapter;
+  }
+
+  private void setLastDateAttributes(StockDetails stockDetails, MovieAdapter movieAdapter) {
+    int lastGrDateIndex = 0;
+    int lastSaleDateIndex = 0;
+    int lastScdDateIndex = 0;
+    String lastGRDateTemp = stockDetails.getSystemStock().get(0).getLastGRDate();
+    String lastSaleDateTemp = stockDetails.getSystemStock().get(0).getLastSalesDate();
+    String lastSCDDateTemp = stockDetails.getSystemStock().get(0).getLastSCDate();
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+    for (int i = 1; i < stockDetails.getSystemStock().size(); i++) {
+      if (!StringUtils.isBlank(lastGRDateTemp) && !StringUtils.isBlank(
+          stockDetails.getSystemStock().get(i).getLastGRDate())) {
+        try {
+          if (simpleDateFormat.parse(lastGRDateTemp)
+              .after(simpleDateFormat.parse(stockDetails.getSystemStock().get(i).getLastGRDate()))) {
+            lastGRDateTemp = stockDetails.getSystemStock().get(i).getLastGRDate();
+            lastGrDateIndex = i;
+          }
+        } catch (Exception error) {
+          log.error(
+              "Error when compare lastGRDateTemp {}", error.getMessage(), error);
+        }
+      }
+      if (!StringUtils.isBlank(lastSaleDateTemp) && !StringUtils.isBlank(
+          stockDetails.getSystemStock().get(i).getLastSalesDate())) {
+        try {
+          if (simpleDateFormat.parse(lastSaleDateTemp)
+              .before(simpleDateFormat.parse(stockDetails.getSystemStock().get(i).getLastSalesDate()))) {
+            lastSaleDateTemp = stockDetails.getSystemStock().get(i).getLastSalesDate();
+            lastSaleDateIndex = i;
+          }
+        } catch (Exception error) {
+          log.error(
+              "Error when compare lastSaleDateTemp {}", error.getMessage(), error);
+        }
+      }
+      if (!StringUtils.isBlank(lastSCDDateTemp) && !StringUtils.isBlank(
+          stockDetails.getSystemStock().get(i).getLastSCDate())) {
+        try {
+          if (simpleDateFormat.parse(lastSCDDateTemp)
+              .before(simpleDateFormat.parse(stockDetails.getSystemStock().get(i).getLastSCDate()))) {
+            lastSCDDateTemp = stockDetails.getSystemStock().get(i).getLastSCDate();
+            lastScdDateIndex = i;
+          }
+        } catch (Exception error) {
+          log.error(
+              "Error when compare lastSCDDateTemp {}", error.getMessage(), error);
+        }
+      }
+    }
+    movieAdapter.setLastGoodReceivingDate(lastGRDateTemp);
+    movieAdapter.setLastSalesDate(lastSaleDateTemp);
+    movieAdapter.setLastStockCorrectionDate(lastSCDDateTemp);
+    movieAdapter.setLastGRQuantity(
+        stockDetails.getSystemStock().get(lastGrDateIndex) != null
+            ? stockDetails.getSystemStock().get(lastGrDateIndex).getLastGRQuantity()
+            : null);
+    movieAdapter.setLastSalesQuantity(
+        stockDetails.getSystemStock().get(lastSaleDateIndex) != null
+            ? stockDetails.getSystemStock().get(lastSaleDateIndex).getLastSalesQuantity()
+            : null);
+    movieAdapter.setLastSCQuantity(
+        stockDetails.getSystemStock().get(lastScdDateIndex) != null
+            ? stockDetails.getSystemStock().get(lastScdDateIndex).getLastSCQuantity()
+            : null);
   }
 
   public List<MovieAdapter> getArticleStockForVariant(
