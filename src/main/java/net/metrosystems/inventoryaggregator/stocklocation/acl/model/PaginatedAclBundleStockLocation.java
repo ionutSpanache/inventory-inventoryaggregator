@@ -1,10 +1,11 @@
-package net.metrosystems.inventoryaggregator.common.stock_location.acl.model;
+package net.metrosystems.inventoryaggregator.stocklocation.acl.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import net.metrosystems.inventoryaggregator.stocklocation.acl.model.AclBundleStockLocation;
 
 @Data
 @AllArgsConstructor

@@ -18,7 +18,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTre
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructureList;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.LanguageData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
@@ -31,7 +31,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocat
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.StockLocationRepository;
+import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.ContentIduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.Domain;
@@ -331,7 +331,7 @@ public class ArticleDetailsService {
         articleProcessingService.getArticleDataFromMovie(
             articleId, countryCode, salesLine, storeNo);
 
-    CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
+    CompletableFuture<List<StockLocation>> articleStockLocationList =
         stockLocationRepository.getArticleStockLocation(
             articleId, countryCode,salesLine, storeNo);
 

@@ -1,5 +1,6 @@
-package net.metrosystems.inventoryaggregator.articleattributes.repository;
+package net.metrosystems.inventoryaggregator.stocklocation.repository;
 
+import static net.metrosystems.inventoryaggregator.articleattributes.model.DataType.ARTICLE_STOCK_LOCATION;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Collections;
@@ -9,9 +10,9 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
-import net.metrosystems.inventoryaggregator.articleattributes.model.DataType;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.acl.repository.AclBundleStockLocationRepository;
+import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -27,32 +28,31 @@ public class StockLocationRepository {
   @Value("#{'${countries.slm.active:null}'}")
   private List<String> countriesSlmActive;
 
-  public CompletableFuture<List<ArticleStockLocation>> getArticleStockLocation(
+  public CompletableFuture<List<StockLocation>> getArticleStockLocation(
       ArticleId articleId, String countryCode, String salesLine, Integer storeNo) {
     boolean slmActive =
         !isEmpty(countriesSlmActive)
             && (countriesSlmActive.contains(countryCode)
                 || "ALL".equals(countriesSlmActive.get(0)));
 
-    CompletableFuture<List<ArticleStockLocation>> articleStockLocationList =
-        new CompletableFuture<>();
+    CompletableFuture<List<StockLocation>> articleStockLocations = new CompletableFuture<>();
     try {
       if (slmActive) {
-        articleStockLocationList =
+        articleStockLocations =
             mstoreAclStockLocationRepository.getArticleStockLocation(
                 articleId, countryCode, storeNo);
       } else {
-        articleStockLocationList =
+        articleStockLocations =
             aclBundleStockLocationRepository.getArticleStockLocation(
                 articleId, countryCode, salesLine, storeNo);
       }
     } catch (Exception e) {
       log.error("StockLocationRepository.getArticleStockLocation - - error: {}", e.getMessage(), e);
     }
-    return articleStockLocationList;
+    return articleStockLocations;
   }
 
-  public CompletableFuture<List<ArticleIdStockLocation>> getArticleStockLocation(
+  public CompletableFuture<List<ArticleStockLocations>> getArticleStockLocation(
       List<ArticleId> articleIdList,
       String countryCode,
       String salesLine,
@@ -63,17 +63,17 @@ public class StockLocationRepository {
             && (countriesSlmActive.contains(countryCode)
                 || "ALL".equals(countriesSlmActive.get(0)));
 
-    CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
+    CompletableFuture<List<ArticleStockLocations>> articleStockLocations =
         CompletableFuture.completedFuture(Collections.emptyList());
     if (dataTypeList.isEmpty()
-        || dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
+        || dataTypeList.get().contains(ARTICLE_STOCK_LOCATION.getDataType())) {
       try {
         if (slmActive) {
-          articleStockLocationList =
+          articleStockLocations =
               mstoreAclStockLocationRepository.getStockLocationsForArticleList(
                   articleIdList, countryCode, storeNo);
         } else {
-          articleStockLocationList =
+          articleStockLocations =
               aclBundleStockLocationRepository.getStockLocationsForArticleList(
                   articleIdList, countryCode, salesLine, storeNo);
         }
@@ -85,6 +85,6 @@ public class StockLocationRepository {
             e);
       }
     }
-    return articleStockLocationList;
+    return articleStockLocations;
   }
 }

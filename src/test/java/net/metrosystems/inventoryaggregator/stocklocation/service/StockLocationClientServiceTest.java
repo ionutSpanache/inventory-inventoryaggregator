@@ -1,16 +1,14 @@
-package net.metrosystems.inventoryaggregator.articleattributes.service;
+package net.metrosystems.inventoryaggregator.stocklocation.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
 import net.metrosystems.inventoryaggregator.common.utils.JsonHelper;
+import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -18,10 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
-class MstoreAclClientServiceTest {
-
-  private WebClient webClient;
-  private MstoreAclClientService mstoreAclClientService;
+class StockLocationClientServiceTest {
+  private StockLocationClientService stockLocationClientService;
   private MockWebServer mockWebServer;
   private JsonHelper jsonHelper;
 
@@ -31,8 +27,10 @@ class MstoreAclClientServiceTest {
     this.mockWebServer.start();
     this.jsonHelper = new JsonHelper();
     String baseUrl = this.mockWebServer.url("/").toString();
-    mstoreAclClientService =
-        new MstoreAclClientService(WebClient.builder().baseUrl(baseUrl).build(), baseUrl + "aggregator",
+    stockLocationClientService =
+        new StockLocationClientService(
+            WebClient.builder().baseUrl(baseUrl).build(),
+            baseUrl + "aggregator",
             "/mstoreacl/api/v0/articlelocation/countrycode/{countryCode}/storenumber/{storeNumber}",
             "/mstoreacl/api/v0/articlelocation/countrycode/{countryCode}/storenumber/{storeNumber}"
                 + "/articlenumber/{articleNumber}/variantnumber/{variantNumber}/bundlenumber/{bundleNumber}");
@@ -44,7 +42,7 @@ class MstoreAclClientServiceTest {
   }
 
   @Test
-  void getArticleStockLocations_returnValue() throws JsonProcessingException, ExecutionException, InterruptedException {
+  void getArticleStockLocations_returnValue() throws JsonProcessingException {
     String countryCode = "DE";
     Integer storeNumber = 1;
 
@@ -53,18 +51,17 @@ class MstoreAclClientServiceTest {
             .setResponseCode(200)
             .setBody(jsonHelper.toJson(buildAticleIDStockLocationResponse()))
             .addHeader("Content-Type", "application/json"));
-    List<ArticleStockLocation> locations =
-        mstoreAclClientService.getArticleStockLocation(
+    List<StockLocation> locations =
+        stockLocationClientService.getArticleStockLocation(
             buildArticleId(), countryCode, storeNumber);
-    assertEquals(locations.get(0).getQuantity(), 20);
-    assertEquals(locations.get(0).getMasterSscc(), "asdcdsgasdscasc");
-    assertEquals(locations.get(0).getBayNo(), "123");
-    assertEquals(locations.get(0).getAisleNo(), "456");
+    assertEquals(20, locations.get(0).getQuantity());
+    assertEquals("asdcdsgasdscasc", locations.get(0).getMasterSscc());
+    assertEquals("123", locations.get(0).getBayNo());
+    assertEquals("456", locations.get(0).getAisleNo());
   }
 
   @Test
-  void getArticleStockLocationForArticleList_returnValue()
-      throws JsonProcessingException, ExecutionException, InterruptedException {
+  void getArticleStockLocationForArticleList_returnValue() throws JsonProcessingException {
     String countryCode = "DE";
     Integer storeNumber = 1;
     mockWebServer.enqueue(
@@ -72,18 +69,19 @@ class MstoreAclClientServiceTest {
             .setResponseCode(200)
             .setBody(jsonHelper.toJson(List.of(buildAticleIDStockLocationResponse())))
             .addHeader("Content-Type", "application/json"));
-    List<ArticleIdStockLocation> articleStockLocationForArticleList =
-        mstoreAclClientService.getArticleStockLocationForArticleList(
+    List<ArticleStockLocations> articleStockLocationForArticleList =
+        stockLocationClientService.getArticleStockLocationForArticleList(
             List.of(buildArticleId()), countryCode, storeNumber);
-    assertEquals(articleStockLocationForArticleList.get(0).getArticleStockLocationList().get(0).getQuantity(), 20);
-    assertEquals(articleStockLocationForArticleList.get(0).getArticleStockLocationList().get(0).getMasterSscc(),
-        "asdcdsgasdscasc");
-    assertEquals(articleStockLocationForArticleList.get(0).getArticleStockLocationList().get(0).getBayNo(), "123");
-    assertEquals(articleStockLocationForArticleList.get(0).getArticleStockLocationList().get(0).getAisleNo(), "456");
+    StockLocation stockLocation =
+        articleStockLocationForArticleList.get(0).getStockLocations().get(0);
+    assertEquals(20, stockLocation.getQuantity());
+    assertEquals("asdcdsgasdscasc", stockLocation.getMasterSscc());
+    assertEquals("123", stockLocation.getBayNo());
+    assertEquals("456", stockLocation.getAisleNo());
   }
 
-  private ArticleStockLocation buildAticleStockLocationResponse() {
-    return ArticleStockLocation.builder()
+  private StockLocation buildAticleStockLocationResponse() {
+    return StockLocation.builder()
         .storeLocation("storage")
         .quantity(20)
         .bayNo("123")
@@ -94,10 +92,10 @@ class MstoreAclClientServiceTest {
         .build();
   }
 
-  private ArticleIdStockLocation buildAticleIDStockLocationResponse() {
-    return ArticleIdStockLocation.builder()
+  private ArticleStockLocations buildAticleIDStockLocationResponse() {
+    return ArticleStockLocations.builder()
         .articleId(buildArticleId())
-        .articleStockLocationList(List.of(buildAticleStockLocationResponse()))
+        .stockLocations(List.of(buildAticleStockLocationResponse()))
         .build();
   }
 

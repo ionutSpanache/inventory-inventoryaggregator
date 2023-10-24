@@ -2,7 +2,7 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.model;
 
 import lombok.Data;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class ArticleBundle {
 	private Double  reservedStock;                                  // movie.cache.stockDetails.stockSummary.reservedStock+movie.cache.stockDetails.stockSummary.blockedStock
 
 	private List<ArticlePlannedDeliveryDate> plannedDeliveryDates;
-	private List<ArticleStockLocation> stockLocations;
+	private List<StockLocation> stockLocations;
 	private String lastSalesDate;
 	private String lastGRDate;
 	private String lastMutationDate;
@@ -194,7 +194,7 @@ public class ArticleBundle {
 						 Byte pProcurementCode,
 						 Byte pSalesBlockingStatus,
 						 List<ArticlePlannedDeliveryDate> plannedDeliveryDates,
-						 List<ArticleStockLocation> stockLocations,
+						 List<StockLocation> stockLocations,
 						 String lastSalesDate,
 						 String lastGRDate,
 						 String lastMutationDate) {
@@ -221,7 +221,7 @@ public class ArticleBundle {
 						 String barcode,
 						 Byte   status,
 						 List<ArticlePlannedDeliveryDate> plannedDeliveryDates,
-						 List<ArticleStockLocation> stockLocations,
+						 List<StockLocation> stockLocations,
 						 String lastSalesDate,
 						 String lastGRDate,
 						 String lastMutationDate) {
@@ -359,12 +359,12 @@ public class ArticleBundle {
 	}
 
 
-	public List<ArticleStockLocation> getStockLocations() {
+	public List<StockLocation> getStockLocations() {
 		return stockLocations;
 	}
 
 
-	public void setStockLocations(List<ArticleStockLocation> stockLocations) {
+	public void setStockLocations(List<StockLocation> stockLocations) {
 		this.stockLocations = stockLocations;
 	}
 

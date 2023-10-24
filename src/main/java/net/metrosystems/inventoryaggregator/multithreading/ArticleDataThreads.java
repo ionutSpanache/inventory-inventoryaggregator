@@ -10,7 +10,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
-import net.metrosystems.inventoryaggregator.common.stock_location.acl.service.AclStockService;
+import net.metrosystems.inventoryaggregator.stocklocation.acl.service.AclStockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

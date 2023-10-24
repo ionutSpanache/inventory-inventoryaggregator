@@ -16,11 +16,11 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMaste
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.StockLocationRepository;
+import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
@@ -81,7 +81,7 @@ public class RawArticleDataListService {
         articleProcessingService.getStockDataFromMovie(
             articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
-    CompletableFuture<List<ArticleIdStockLocation>> articleStockLocationList =
+    CompletableFuture<List<ArticleStockLocations>> articleStockLocationList =
         stockLocationRepository.getArticleStockLocation(
             articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
@@ -109,11 +109,11 @@ public class RawArticleDataListService {
                     StockData::getArticleId,
                     stockData -> stockData,
                     (oldValue, newValue) -> oldValue));
-    Map<ArticleId, ArticleIdStockLocation> articleStockLocationListMap =
+    Map<ArticleId, ArticleStockLocations> articleStockLocationListMap =
         articleStockLocationList.get().stream()
             .collect(
                 Collectors.toMap(
-                    ArticleIdStockLocation::getArticleId,
+                    ArticleStockLocations::getArticleId,
                     articleIdStockLocation -> articleIdStockLocation,
                     (oldValue, newValue) -> oldValue));
     Map<ArticleId, ArticleLocationForArticleId> articleLocationListMap =
@@ -149,7 +149,7 @@ public class RawArticleDataListService {
               .orElse(Collections.emptyList()));
       rawArticleData.setStockLocations(
           Optional.ofNullable(articleStockLocationListMap.get(rawArticleData.getArticleId()))
-              .map(ArticleIdStockLocation::getArticleStockLocationList)
+              .map(ArticleStockLocations::getStockLocations)
               .orElse(Collections.emptyList()));
       rawArticleData.setArticleLocation(
           Optional.ofNullable(articleLocationListMap.get(rawArticleData.getArticleId()))

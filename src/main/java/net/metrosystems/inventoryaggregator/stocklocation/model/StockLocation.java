@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.articleattributes.model;
+package net.metrosystems.inventoryaggregator.stocklocation.model;
 
 
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArticleStockLocation {
+public class StockLocation {
 
 	private Long bundleNo;
 	private String aisleNo;

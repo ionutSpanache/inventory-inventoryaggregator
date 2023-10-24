@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist;
+package net.metrosystems.inventoryaggregator.stocklocation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
@@ -7,14 +7,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties
-public class ArticleIdStockLocation {
+public class ArticleStockLocations {
   private ArticleId articleId;
-  private List<ArticleStockLocation> articleStockLocationList;
+  private List<StockLocation> stockLocations;
 }

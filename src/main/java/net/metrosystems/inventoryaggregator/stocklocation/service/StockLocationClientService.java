@@ -1,12 +1,12 @@
-package net.metrosystems.inventoryaggregator.articleattributes.service;
+package net.metrosystems.inventoryaggregator.stocklocation.service;
 
 import java.util.Collections;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleIdStockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Repository
 @AllArgsConstructor
-public class MstoreAclClientService {
+public class StockLocationClientService {
 
   @Qualifier("webClientForMstoreAcl")
   private final WebClient webClient;
@@ -36,7 +36,7 @@ public class MstoreAclClientService {
   @Value("${mstore.inventory.mstoreacl.stockLocation.article.url}")
   private String stockLocationArticleDataUrl;
 
-  public List<ArticleStockLocation> getArticleStockLocation(
+  public List<StockLocation> getArticleStockLocation(
       ArticleId articleId, String countryCode, Integer storeNumber) {
     UriComponents url =
         UriComponentsBuilder.fromHttpUrl(inventoryHost + stockLocationArticleDataUrl)
@@ -47,12 +47,12 @@ public class MstoreAclClientService {
                 articleId.getVariantNumber(),
                 articleId.getBundleNumber());
 
-    ArticleIdStockLocation articleStockLocation =
+    ArticleStockLocations articleStockLocation =
         webClient
             .get()
             .uri(url.toString())
             .retrieve()
-            .bodyToMono(ArticleIdStockLocation.class)
+            .bodyToMono(ArticleStockLocations.class)
             .onErrorResume(
                 error -> {
                   if(error instanceof WebClientResponseException webClientResponseException && HttpStatus.NOT_FOUND != webClientResponseException.getStatusCode()){
@@ -65,12 +65,12 @@ public class MstoreAclClientService {
                 })
             .block();
     return (!ObjectUtils.isEmpty(articleStockLocation))
-        ? articleStockLocation.getArticleStockLocationList()
+        ? articleStockLocation.getStockLocations()
         : Collections.emptyList();
   }
 
-  public List<ArticleIdStockLocation> getArticleStockLocationForArticleList(
-      List<ArticleId> articleIdList, String countryCode, Integer storeNo) {
+  public List<ArticleStockLocations> getArticleStockLocationForArticleList(
+      List<ArticleId> articleIds, String countryCode, Integer storeNo) {
     UriComponents url =
         UriComponentsBuilder.fromHttpUrl(inventoryHost + stockLocationArticleListDataUrl)
             .buildAndExpand(countryCode, storeNo);
@@ -78,9 +78,9 @@ public class MstoreAclClientService {
         .post()
         .uri(url.toString())
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(articleIdList)
+        .bodyValue(articleIds)
         .retrieve()
-        .bodyToFlux(ArticleIdStockLocation.class)
+        .bodyToFlux(ArticleStockLocations.class)
         .collectList()
         .onErrorResume(
             error -> {

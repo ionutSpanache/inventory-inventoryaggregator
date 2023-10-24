@@ -1,11 +1,11 @@
 package net.metrosystems.inventoryaggregator.multithreading;
 
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleStockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleBundle;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
-import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclBundleStockLocation;
-import net.metrosystems.inventoryaggregator.common.stock_location.acl.service.AclStockService;
+import net.metrosystems.inventoryaggregator.stocklocation.acl.model.AclBundleStockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.acl.service.AclStockService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 	}
 
 
-	private List<ArticleStockLocation> transformAclBundleStockLocationsToArticleStockLocationListByBundle(
+	private List<StockLocation> transformAclBundleStockLocationsToArticleStockLocationListByBundle(
 			List<AclBundleStockLocation> aclBundleStockLocations,
 			Long bundleNo) {
 		if ((aclBundleStockLocations != null)
@@ -123,9 +123,9 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 			}
 			if ((aclStockLocationsForBundle != null)
                   &&(!aclStockLocationsForBundle.isEmpty())){
-				List<ArticleStockLocation> articleStockLocationList = null;
+				List<StockLocation> stockLocationList = null;
 				for (AclBundleStockLocation aclBundleStockLocation : aclStockLocationsForBundle) {
-					ArticleStockLocation articleStockLocation = new ArticleStockLocation(
+					StockLocation stockLocation = new StockLocation(
 							aclBundleStockLocation.getBundleNo(),
 							StringUtils.leftPad(String.valueOf(aclBundleStockLocation.getAisleNo()),3, "0"),
 							StringUtils.leftPad(String.valueOf(aclBundleStockLocation.getBayNo()),3, "0"),
@@ -136,13 +136,13 @@ public class AclStockLocationServiceExecutableTask implements Callable<ArticleVa
 							aclBundleStockLocation.getSerialShippingContainerCode(),
 							aclBundleStockLocation.getStoreLocation(),
 							aclBundleStockLocation.getMasterSscc());
-					if (articleStockLocationList == null) {
-						articleStockLocationList = new ArrayList<>(Arrays.asList(articleStockLocation));
+					if (stockLocationList == null) {
+						stockLocationList = new ArrayList<>(Arrays.asList(stockLocation));
 					}else {
-						articleStockLocationList.add(articleStockLocation);
+						stockLocationList.add(stockLocation);
 					}
 				}
-				return articleStockLocationList;
+				return stockLocationList;
 			}
 		}
 		return null;

@@ -57,14 +57,16 @@ public class ArticleMasterDataRepository {
   @Value("${app.stage}")
   private String k8sEnvironment;
 
-  public static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>() {{
-    put("UA", "UK");
-    put("KZ", "KK");
-    put("MD", "RO");
-    put("PK", "UR");
-    put("RS", "SR");
-    put("CZ", "CS");
-  }};
+  private static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>();
+
+  static {
+    LANGUAGE_CODE_EXCEPTIONS.put("UA", "UK");
+    LANGUAGE_CODE_EXCEPTIONS.put("KZ", "KK");
+    LANGUAGE_CODE_EXCEPTIONS.put("MD", "RO");
+    LANGUAGE_CODE_EXCEPTIONS.put("PK", "UR");
+    LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");
+    LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
+  }
 
   @Async("asyncExecutor")
   public CompletableFuture<ArticleMasterData> getArticleMasterData(

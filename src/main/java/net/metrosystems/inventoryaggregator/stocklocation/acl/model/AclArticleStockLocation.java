@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist;
+package net.metrosystems.inventoryaggregator.stocklocation.acl.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.metrosystems.inventoryaggregator.common.stock_location.acl.model.AclBundleStockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.acl.model.AclBundleStockLocation;
 
 @Data
 @Builder

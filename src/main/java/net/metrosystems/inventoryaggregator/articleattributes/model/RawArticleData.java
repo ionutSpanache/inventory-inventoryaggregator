@@ -8,6 +8,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocat
 
 import java.io.Serializable;
 import java.util.List;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 
 @Data
 @Builder
@@ -21,7 +22,7 @@ public class RawArticleData implements Serializable {
     private RawArticleStoreMasterData articleStoreMasterData;
     private StockInformation stockDetails;
     private List<ArticlePlannedDeliveryDate> plannedDeliveryDates;
-    private List<ArticleStockLocation> stockLocations;
+    private List<StockLocation> stockLocations;
     private ArticleLocation articleLocation;
     private ArticleComponent articleComponent;
     private ProductLifeCycleData productLifeCycleData;
