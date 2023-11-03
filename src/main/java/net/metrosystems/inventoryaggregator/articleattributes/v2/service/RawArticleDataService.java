@@ -2,6 +2,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
@@ -12,18 +13,18 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
-import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
-import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,56 +37,50 @@ public class RawArticleDataService {
   private final MovieService movieService;
   private final ArticleProcessingService articleProcessingService;
   private final ArticleProcessingServiceV2 articleProcessingServiceV2;
-  private  final StockLocationRepository stockLocationRepository;
+  private final StockLocationRepository stockLocationRepository;
 
   public void buildRawArticleDataList(
       ArticleId articleId,
-      String countryCode,
-      String salesLine,
+      StoreId storeId,
       String languageCode,
-      Integer storeNo,
       List<RawArticleData> rawArticleDataList,
-      ArticleComponent articleComponent)
+      ArticleComponent articleComponent,
+      Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId =
         articleProcessingServiceV2.getArticleMasterId(
-            articleId, countryCode, languageCode, storeNo);
+            articleId, storeId.getCountryCode(), languageCode, storeId.getStoreNumber());
 
     CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData =
         articleProcessingService.getRawArticleStoreMasterData(
-            articleId, countryCode, salesLine, storeNo);
+            articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber());
 
     CompletableFuture<ArticleDataFromMovie> articleDataFromMovie =
         articleProcessingService.getArticleDataFromMovie(
-            articleId, countryCode, salesLine, storeNo);
+            articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber());
 
     CompletableFuture<List<StockLocation>> articleStockLocationList =
         stockLocationRepository.getArticleStockLocation(
-            articleId, countryCode,salesLine, storeNo);
-
-    CompletableFuture<ArticleLocation> articleLocationList =
-        articleProcessingService.getArticleLocation(articleId, countryCode, salesLine, storeNo);
+            articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), dataTypeList);
 
     CompletableFuture<MaximumRetailPrice> maximumRetailPrice =
         rawArticleStoreMasterDataRepository.getMaximumRetailPrice(
-            countryCode, salesLine, storeNo, articleId);
-
+            storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), articleId);
 
     CompletableFuture<String> dailyMeanSales =
-        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
+        movieService.getTotalAverageSales(storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), articleId);
 
     CompletableFuture.allOf(
         articleMasterIdForArticleId,
         rawArticleStoreMasterData,
         articleDataFromMovie,
         articleStockLocationList,
-        articleLocationList,
         maximumRetailPrice,
         dailyMeanSales);
 
     generalDataRepository.enhanceRawArticleStoreMasterDataWithDepartmentName(
-        countryCode, salesLine, storeNo, rawArticleStoreMasterData.get());
+        storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), rawArticleStoreMasterData.get());
 
     updateWithDefaultValues(rawArticleStoreMasterData.get());
 
@@ -113,7 +108,6 @@ public class RawArticleDataService {
             .stockDetails(stockDetails)
             .plannedDeliveryDates(plannedDeliveryDates)
             .stockLocations(articleStockLocationList.get())
-            .articleLocation(articleLocationList.get())
             .articleComponent(articleComponent)
             .productLifeCycleData(buildProductLifeCycleData(articleMasterData))
             .maximumRetailPrice(maximumRetailPrice.get())

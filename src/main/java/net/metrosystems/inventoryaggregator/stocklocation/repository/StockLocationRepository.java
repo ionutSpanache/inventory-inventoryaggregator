@@ -1,6 +1,5 @@
 package net.metrosystems.inventoryaggregator.stocklocation.repository;
 
-import static net.metrosystems.inventoryaggregator.articleattributes.model.DataType.ARTICLE_STOCK_LOCATION;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Collections;
@@ -10,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.DataType;
 import net.metrosystems.inventoryaggregator.stocklocation.acl.repository.AclBundleStockLocationRepository;
 import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
 import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
@@ -29,13 +29,24 @@ public class StockLocationRepository {
   private List<String> countriesSlmActive;
 
   public CompletableFuture<List<StockLocation>> getArticleStockLocation(
-      ArticleId articleId, String countryCode, String salesLine, Integer storeNo) {
+      ArticleId articleId,
+      String countryCode,
+      String salesLine,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList) {
+
+    CompletableFuture<List<StockLocation>> articleStockLocations =
+        CompletableFuture.completedFuture(Collections.emptyList());
+
+    if (dataTypeList.isEmpty()
+        || !dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
+      return articleStockLocations;
+    }
+
     boolean slmActive =
         !isEmpty(countriesSlmActive)
             && (countriesSlmActive.contains(countryCode)
                 || "ALL".equals(countriesSlmActive.get(0)));
-
-    CompletableFuture<List<StockLocation>> articleStockLocations = new CompletableFuture<>();
     try {
       if (slmActive) {
         articleStockLocations =
@@ -58,32 +69,35 @@ public class StockLocationRepository {
       String salesLine,
       Integer storeNo,
       Optional<List<String>> dataTypeList) {
+
+    CompletableFuture<List<ArticleStockLocations>> articleStockLocations =
+        CompletableFuture.completedFuture(Collections.emptyList());
+
+    if (dataTypeList.isEmpty()
+        || !dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
+      return articleStockLocations;
+    }
+
     boolean slmActive =
         !isEmpty(countriesSlmActive)
             && (countriesSlmActive.contains(countryCode)
                 || "ALL".equals(countriesSlmActive.get(0)));
-
-    CompletableFuture<List<ArticleStockLocations>> articleStockLocations =
-        CompletableFuture.completedFuture(Collections.emptyList());
-    if (dataTypeList.isEmpty()
-        || dataTypeList.get().contains(ARTICLE_STOCK_LOCATION.getDataType())) {
-      try {
-        if (slmActive) {
-          articleStockLocations =
-              mstoreAclStockLocationRepository.getStockLocationsForArticleList(
-                  articleIdList, countryCode, storeNo);
-        } else {
-          articleStockLocations =
-              aclBundleStockLocationRepository.getStockLocationsForArticleList(
-                  articleIdList, countryCode, salesLine, storeNo);
-        }
-
-      } catch (Exception e) {
-        log.error(
-            "ArticleListDetailsService.articleStockLocationList - articleDataFromMovieRepository - error: {}",
-            e.getMessage(),
-            e);
+    try {
+      if (slmActive) {
+        articleStockLocations =
+            mstoreAclStockLocationRepository.getStockLocationsForArticleList(
+                articleIdList, countryCode, storeNo);
+      } else {
+        articleStockLocations =
+            aclBundleStockLocationRepository.getStockLocationsForArticleList(
+                articleIdList, countryCode, salesLine, storeNo);
       }
+
+    } catch (Exception e) {
+      log.error(
+          "ArticleListDetailsService.articleStockLocationList - articleDataFromMovieRepository - error: {}",
+          e.getMessage(),
+          e);
     }
     return articleStockLocations;
   }

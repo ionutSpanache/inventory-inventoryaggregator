@@ -16,14 +16,13 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMaste
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
-import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.ArticleLocationForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
-import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
+import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
+import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,7 +41,6 @@ public class RawArticleDataListService {
     LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
   }
 
-
   private final ArticleProcessingService articleProcessingService;
   private final ArticleProcessingServiceV2 articleProcessingServiceV2;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
@@ -57,36 +55,31 @@ public class RawArticleDataListService {
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
-    String correctLanguageCode =
-        LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
+    String correctLanguageCode = LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
 
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
         articleProcessingService.getComponentForArticleId(
-            articleIdList, countryCode, salesLine, correctLanguageCode, dataTypeList);
+            articleIdList, countryCode, salesLine, correctLanguageCode);
 
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         articleProcessingServiceV2.getMasterDataForArticleId(
-            articleIdList, countryCode, correctLanguageCode, storeNo, dataTypeList);
+            articleIdList, countryCode, correctLanguageCode, storeNo);
 
     CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> articleStoreMasterFromAcl =
         articleProcessingService.getArticleStoreMasterFromAcl(
-            articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+            articleIdList, countryCode, salesLine, storeNo);
 
     CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
         articleStoreExceptionsFromAC =
             articleProcessingService.getArticleStoreExceptionsFromAC(
-                articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+                articleIdList, countryCode, salesLine, storeNo);
 
     CompletableFuture<List<StockData>> stockDataFromMovie =
         articleProcessingService.getStockDataFromMovie(
-            articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+            articleIdList, countryCode, salesLine, storeNo);
 
     CompletableFuture<List<ArticleStockLocations>> articleStockLocationList =
         stockLocationRepository.getArticleStockLocation(
-            articleIdList, countryCode, salesLine, storeNo, dataTypeList);
-
-    CompletableFuture<List<ArticleLocationForArticleId>> articleLocationList =
-        articleProcessingService.getArticleLocationList(
             articleIdList, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture.allOf(
@@ -95,8 +88,7 @@ public class RawArticleDataListService {
         articleStoreMasterFromAcl,
         articleStoreExceptionsFromAC,
         stockDataFromMovie,
-        articleStockLocationList,
-        articleLocationList);
+        articleStockLocationList);
 
     Map<ArticleId, RawArticleStoreMasterData> rawArticleStoreMasterDataMap =
         rawArticleStoreMasterDataRepository.getArticleIdRawArticleStoreMasterDataMap(
@@ -115,13 +107,6 @@ public class RawArticleDataListService {
                 Collectors.toMap(
                     ArticleStockLocations::getArticleId,
                     articleIdStockLocation -> articleIdStockLocation,
-                    (oldValue, newValue) -> oldValue));
-    Map<ArticleId, ArticleLocationForArticleId> articleLocationListMap =
-        articleLocationList.get().stream()
-            .collect(
-                Collectors.toMap(
-                    ArticleLocationForArticleId::getArticleId,
-                    articleLocationForArticleId -> articleLocationForArticleId,
                     (oldValue, newValue) -> oldValue));
 
     Map<ArticleId, ProductLifeCycleData> productLifeCycleMap =
@@ -151,10 +136,6 @@ public class RawArticleDataListService {
           Optional.ofNullable(articleStockLocationListMap.get(rawArticleData.getArticleId()))
               .map(ArticleStockLocations::getStockLocations)
               .orElse(Collections.emptyList()));
-      rawArticleData.setArticleLocation(
-          Optional.ofNullable(articleLocationListMap.get(rawArticleData.getArticleId()))
-              .map(ArticleLocationForArticleId::getArticleLocation)
-              .orElse(null));
       rawArticleData.setArticleComponent(
           articleComponentForArticleId.get().get(rawArticleData.getArticleId()));
       rawArticleData.setProductLifeCycleData(

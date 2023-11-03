@@ -18,7 +18,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTre
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleIdTreeStructureList;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
-import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.LanguageData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
@@ -27,11 +26,9 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleDa
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.VariantDescription;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articlelocation.ArticleLocation;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
-import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.ContentIduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.Domain;
@@ -41,6 +38,8 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
+import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -55,26 +54,46 @@ public class ArticleDetailsService {
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final GeneralDataRepository generalDataRepository;
   private final ArticleProcessingService articleProcessingService;
-  private  final StockLocationRepository stockLocationRepository;
+  private final StockLocationRepository stockLocationRepository;
 
   public List<RawArticleData> getArticleDataListByEan(
-      String ean, String countryCode, String salesLine, String languageCode, Integer storeNo)
+      String ean,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList)
       throws Exception {
     List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList =
         getArticleVariantBundleIdentifierListForEan(ean, countryCode, languageCode, salesLine);
 
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleVariantBundleIdentifierList, countryCode, salesLine, languageCode, storeNo);
+        articleVariantBundleIdentifierList,
+        countryCode,
+        salesLine,
+        languageCode,
+        storeNo,
+        dataTypeList);
   }
 
   public List<RawArticleData> getArticleDataListBySubsys(
-      Long subsysArtNo, String countryCode, String salesLine, String languageCode, Integer storeNo)
+      Long subsysArtNo,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList)
       throws Exception {
     List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList =
         getArticleVariantBundleIdentifierListForSubsys(
             subsysArtNo, countryCode, languageCode, salesLine);
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleVariantBundleIdentifierList, countryCode, salesLine, languageCode, storeNo);
+        articleVariantBundleIdentifierList,
+        countryCode,
+        salesLine,
+        languageCode,
+        storeNo,
+        dataTypeList);
   }
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
@@ -82,10 +101,11 @@ public class ArticleDetailsService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
+      Integer storeNo,
+      Optional<List<String>> dataTypeList)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleId, countryCode, salesLine, languageCode, storeNo);
+        articleId, countryCode, salesLine, languageCode, storeNo, dataTypeList);
   }
 
   public List<ArticleMasterData> getArticleMasterDataListByArticleVariantBundle(
@@ -246,7 +266,8 @@ public class ArticleDetailsService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
+      Integer storeNo,
+      Optional<List<String>> dataTypeList)
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
     ArticleIdTreeStructureList articleIdTreeStructureList =
@@ -276,7 +297,8 @@ public class ArticleDetailsService {
               languageCode,
               storeNo,
               rawArticleDataList,
-              articleComponent);
+              articleComponent,
+              dataTypeList);
         }
       }
     }
@@ -288,7 +310,8 @@ public class ArticleDetailsService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
+      Integer storeNo,
+      Optional<List<String>> dataTypeList)
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
@@ -305,7 +328,8 @@ public class ArticleDetailsService {
         languageCode,
         storeNo,
         rawArticleDataList,
-        articleComponent);
+        articleComponent,
+        dataTypeList);
     return rawArticleDataList;
   }
 
@@ -316,7 +340,8 @@ public class ArticleDetailsService {
       String languageCode,
       Integer storeNo,
       List<RawArticleData> rawArticleDataList,
-      ArticleComponent articleComponent)
+      ArticleComponent articleComponent,
+      Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
     CompletableFuture<ArticleMasterData> articleMasterData =
@@ -333,10 +358,7 @@ public class ArticleDetailsService {
 
     CompletableFuture<List<StockLocation>> articleStockLocationList =
         stockLocationRepository.getArticleStockLocation(
-            articleId, countryCode,salesLine, storeNo);
-
-    CompletableFuture<ArticleLocation> articleLocationList =
-        articleProcessingService.getArticleLocationList(articleId, countryCode, salesLine, storeNo);
+            articleId, countryCode, salesLine, storeNo, dataTypeList);
 
     CompletableFuture<List<IduItemDerivedStandard>> iduDerivedStandardsList =
         articleMasterDataRepository.getIduItemDerivedStandardsAsync(countryCode, articleId);
@@ -360,7 +382,6 @@ public class ArticleDetailsService {
         rawArticleStoreMasterData,
         articleDataFromMovie,
         articleStockLocationList,
-        articleLocationList,
         iduDerivedStandardsList,
         maximumRetailPrice,
         iduItemDerivedStandard,
@@ -397,7 +418,6 @@ public class ArticleDetailsService {
             .stockDetails(stockDetails)
             .plannedDeliveryDates(plannedDeliveryDates)
             .stockLocations(articleStockLocationList.get())
-            .articleLocation(articleLocationList.get())
             .articleComponent(articleComponent)
             .productLifeCycleData(
                 articleCacheService.buildProductLifeCycleData(iduDerivedStandardsList.get()))

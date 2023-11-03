@@ -46,12 +46,9 @@ public class ArticleProcessingServiceV2 {
       List<ArticleId> articleIdList,
       String countryCode,
       String languageCode,
-      Integer storeNo,
-      Optional<List<String>> dataTypeList) {
+      Integer storeNo) {
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         CompletableFuture.completedFuture(Collections.emptyMap());
-    if (dataTypeList.isEmpty()
-        || dataTypeList.get().contains(DataType.ARTICLE_MASTER_DATA.getDataType())) {
       try {
         articleMasterDataForArticleId =
             dataSourceRepository.getArticleMasterDataForArticleIdList(
@@ -63,7 +60,6 @@ public class ArticleProcessingServiceV2 {
             "ArticleListDetailsService.buildRawArticleDataList - articleMasterDataForArticleId - error: {}",
             e.getMessage(),
             e);
-      }
     }
     return articleMasterDataForArticleId;
   }

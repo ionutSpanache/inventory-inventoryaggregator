@@ -10,6 +10,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,13 +23,12 @@ public class ArticleDetailsServiceV2 {
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       ArticleId articleId,
-      String countryCode,
-      String salesLine,
+      StoreId storeId,
       String languageCode,
-      Integer storeNo)
+      Optional<List<String>> dataTypeList)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleId, countryCode, salesLine, languageCode, storeNo);
+        articleId, storeId, languageCode, dataTypeList);
   }
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
@@ -44,27 +44,25 @@ public class ArticleDetailsServiceV2 {
 
   private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(
       ArticleId articleId,
-      String countryCode,
-      String salesLine,
+      StoreId storeId,
       String languageCode,
-      Integer storeNo)
+      Optional<List<String>> dataTypeList)
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
     ArticleComponent articleComponent =
         transformArticleVariantBundleListToArticleComponentByArticle(
             getArticleVariantBundleIdentifierListForArticleNumber(
-                articleId.getArticleNumber(), countryCode, salesLine),
+                articleId.getArticleNumber(), storeId.getCountryCode(), storeId.getSalesLine()),
             articleId.getArticleNumber());
 
-      rawArticleDataService.buildRawArticleDataList(
-          articleId,
-          countryCode,
-          salesLine,
-          languageCode,
-          storeNo,
-          rawArticleDataList,
-          articleComponent);
+    rawArticleDataService.buildRawArticleDataList(
+        articleId,
+        storeId,
+        languageCode,
+        rawArticleDataList,
+        articleComponent,
+        dataTypeList);
     return rawArticleDataList;
   }
 
@@ -82,9 +80,8 @@ public class ArticleDetailsServiceV2 {
   }
 
   private List<ArticleVariantBundleIdentifier>
-  getArticleVariantBundleIdentifierListForArticleNumber(
-      Long articleNumber, String countryCode, String salesLine)
-      throws Exception {
+      getArticleVariantBundleIdentifierListForArticleNumber(
+          Long articleNumber, String countryCode, String salesLine) throws Exception {
     return articleCacheService.getArticleVariantBundleListForArticleNumber(
         articleNumber, countryCode, salesLine);
   }
@@ -109,15 +106,8 @@ public class ArticleDetailsServiceV2 {
                 e);
           }
         });
-      rawArticleDataListService.buildRawArticleDataList(
-          articleIdList,
-          countryCode,
-          salesLine,
-          storeNo,
-          rawArticleDataList,
-          dataTypeList);
+    rawArticleDataListService.buildRawArticleDataList(
+        articleIdList, countryCode, salesLine, storeNo, rawArticleDataList, dataTypeList);
     return rawArticleDataList;
   }
-
-
 }

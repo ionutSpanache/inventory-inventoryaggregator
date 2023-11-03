@@ -7,17 +7,14 @@ public enum DataType {
   ARTICLE_STORE_MASTER("articleStoreMaster"),
   ARTICLE_STORE_EXCEPTIONS("articleStoreExceptions"),
   STOCK_DATA("stockData"),
-  ARTICLE_STOCK_LOCATION("articleStockLocation"),
-  ARTICLE_LOCATION("articleLocation"),
-  ;
+  ARTICLE_STOCK_LOCATION("articleStockLocation");
+  private final String dataType;
 
-  private String dataType;
-
-  private DataType(String dataType){
+  DataType(String dataType) {
     this.dataType = dataType;
   }
 
-  public String getDataType(){
+  public String getDataType() {
     return dataType;
   }
 }

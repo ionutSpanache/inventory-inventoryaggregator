@@ -3,12 +3,14 @@ package net.metrosystems.inventoryaggregator.articleattributes.controller;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleDetailsService;
 import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleDetailsServiceV2;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
@@ -18,6 +20,7 @@ import org.springframework.metrics.annotation.Timed;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -44,10 +47,11 @@ public class ArticleDataController {
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
       @PathVariable("languageCode") String languageCode,
       @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-      @PathVariable("ean") String ean)
+      @PathVariable("ean") String ean,
+      @RequestParam("dataType") Optional<List<String>> dataTypeList)
       throws Exception {
     return articleDetailsService.getArticleDataListByEan(
-        ean, countryCode, salesLine, languageCode, storeNo);
+        ean, countryCode, salesLine, languageCode, storeNo, dataTypeList);
   }
 
   @AddTimer
@@ -62,10 +66,13 @@ public class ArticleDataController {
       @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
       @PathVariable("articlenumber") Long articleNumber,
       @PathVariable("variant") Long variant,
-      @PathVariable("bundlenumber") Long bundleNumber)
+      @PathVariable("bundlenumber") Long bundleNumber,
+      @RequestParam("dataType") Optional<List<String>> dataTypeList)
       throws Exception {
     boolean dataSource =
-        !isEmpty(countriesV2DataSource) && (countriesV2DataSource.contains(countryCode) || "ALL".equals(countriesV2DataSource.get(0)));
+        !isEmpty(countriesV2DataSource)
+            && (countriesV2DataSource.contains(countryCode)
+                || "ALL".equals(countriesV2DataSource.get(0)));
 
     ArticleId articleId =
         ArticleId.builder()
@@ -73,12 +80,18 @@ public class ArticleDataController {
             .variantNumber(variant)
             .bundleNumber(bundleNumber)
             .build();
+    StoreId storeId =
+        StoreId.builder()
+            .countryCode(countryCode)
+            .salesLine(salesLine)
+            .storeNumber(storeNo)
+            .build();
     if (dataSource) {
       return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
-          articleId, countryCode, salesLine, languageCode, storeNo);
+          articleId, storeId, languageCode, dataTypeList);
     } else {
       return articleDetailsService.getArticleDataListByArticleVariantBundle(
-          articleId, countryCode, salesLine, languageCode, storeNo);
+          articleId, countryCode, salesLine, languageCode, storeNo, dataTypeList);
     }
   }
 
@@ -92,9 +105,10 @@ public class ArticleDataController {
       @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
       @PathVariable("languageCode") String languageCode,
       @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-      @PathVariable("subsystemarticlenumber") Long subsystemArticleNumber)
+      @PathVariable("subsystemarticlenumber") Long subsystemArticleNumber,
+      @RequestParam("dataType") Optional<List<String>> dataTypeList)
       throws Exception {
     return articleDetailsService.getArticleDataListBySubsys(
-        subsystemArticleNumber, countryCode, salesLine, languageCode, storeNo);
+        subsystemArticleNumber, countryCode, salesLine, languageCode, storeNo, dataTypeList);
   }
 }

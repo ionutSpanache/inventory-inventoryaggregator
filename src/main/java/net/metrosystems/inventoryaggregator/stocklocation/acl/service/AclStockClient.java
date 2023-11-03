@@ -95,31 +95,6 @@ public class AclStockClient {
         : emptyList();
   }
 
-  public ArticleLocation getArticleLocationsForArticleVariant(
-      String countryCode, String salesLine, Integer storeNo, ArticleId articleId) {
-    UriComponents uriComponents =
-        UriComponentsBuilder.fromHttpUrl(aclStockLocationHost + aclArticleLocationPath)
-            .buildAndExpand(
-                countryCode.toUpperCase(),
-                salesLine.toUpperCase(),
-                storeNo,
-                articleId.getArticleNumber(),
-                articleId.getVariantNumber(),
-                articleId.getBundleNumber());
-    log.debug("uriArticleLocation=" + uriComponents.toString());
-
-    try {
-      return webClient
-          .get()
-          .uri(uriComponents.toUriString())
-          .retrieve()
-          .bodyToMono(ArticleLocation.class)
-          .block();
-
-    } catch (Exception e) {
-      return null;
-    }
-  }
 
   public List<ArticleLocationForArticleId> getArticleLocationsForArticleList(
       String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
