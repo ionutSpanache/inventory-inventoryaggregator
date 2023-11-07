@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +56,17 @@ public class ArticleDetailsService {
   private final GeneralDataRepository generalDataRepository;
   private final ArticleProcessingService articleProcessingService;
   private final StockLocationRepository stockLocationRepository;
+
+  private static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>();
+
+  static {
+    LANGUAGE_CODE_EXCEPTIONS.put("UA", "UK");
+    LANGUAGE_CODE_EXCEPTIONS.put("KZ", "KK");
+    LANGUAGE_CODE_EXCEPTIONS.put("MD", "RO");
+    LANGUAGE_CODE_EXCEPTIONS.put("PK", "UR");
+    LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");
+    LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
+  }
 
   public List<RawArticleData> getArticleDataListByEan(
       String ean,
@@ -344,9 +356,12 @@ public class ArticleDetailsService {
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
+    String correctLanguageCode =
+        LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
+
     CompletableFuture<ArticleMasterData> articleMasterData =
         articleProcessingService.getArticleMasterData(
-            articleId, countryCode, salesLine, languageCode, storeNo);
+            articleId, countryCode, salesLine, correctLanguageCode, storeNo);
 
     CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData =
         articleProcessingService.getRawArticleStoreMasterData(

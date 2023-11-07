@@ -1,7 +1,9 @@
 package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -39,6 +41,17 @@ public class RawArticleDataService {
   private final ArticleProcessingServiceV2 articleProcessingServiceV2;
   private final StockLocationRepository stockLocationRepository;
 
+  private static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>();
+
+  static {
+    LANGUAGE_CODE_EXCEPTIONS.put("UA", "UK");
+    LANGUAGE_CODE_EXCEPTIONS.put("KZ", "KK");
+    LANGUAGE_CODE_EXCEPTIONS.put("MD", "RO");
+    LANGUAGE_CODE_EXCEPTIONS.put("PK", "UR");
+    LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");
+    LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
+  }
+
   public void buildRawArticleDataList(
       ArticleId articleId,
       StoreId storeId,
@@ -48,9 +61,12 @@ public class RawArticleDataService {
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
+    String correctLanguageCode =
+        LANGUAGE_CODE_EXCEPTIONS.getOrDefault(storeId.getCountryCode(), storeId.getCountryCode());
+
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId =
         articleProcessingServiceV2.getArticleMasterId(
-            articleId, storeId.getCountryCode(), languageCode, storeId.getStoreNumber());
+            articleId, storeId.getCountryCode(), correctLanguageCode, storeId.getStoreNumber());
 
     CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData =
         articleProcessingService.getRawArticleStoreMasterData(
