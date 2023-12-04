@@ -4,13 +4,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.oauth2.client.*;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class AclStockWebClient {
+public class WebClientConfig {
   @Bean
   @Primary
   @Qualifier(value = "webClientForAcl")
@@ -41,5 +46,16 @@ public class AclStockWebClient {
   @Qualifier(value = "webClientForMstoreAcl")
   public WebClient simpleWebClient() {
     return WebClient.builder().build();
+  }
+
+  @Bean
+  @Qualifier(value = "webClientMovie")
+  public WebClient webClientMovieAcl() {
+    return WebClient.builder()
+        .exchangeStrategies(
+            ExchangeStrategies.builder()
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .build())
+        .build();
   }
 }

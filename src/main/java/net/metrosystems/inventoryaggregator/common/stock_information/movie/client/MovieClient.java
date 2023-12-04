@@ -19,6 +19,7 @@ import net.metrosystems.inventoryaggregator.common.stock_information.movie.model
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.StockDetailsResponse;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,11 +48,12 @@ public class MovieClient {
   @Value("${MOVIE_TOTAL_AVERAGE_PATH}")
   private String movieTotalAveragePath;
 
+
   private final WebClient webClient;
 
   @Autowired
   public MovieClient(
-      /*@Qualifier("restTemplateMovie")*/ RestTemplate restTemplate, WebClient webClient) {
+      /*@Qualifier("restTemplateMovie")*/ RestTemplate restTemplate,  @Qualifier("webClientMovie") WebClient webClient) {
     this.restTemplate = restTemplate;
     this.webClient = webClient;
   }
