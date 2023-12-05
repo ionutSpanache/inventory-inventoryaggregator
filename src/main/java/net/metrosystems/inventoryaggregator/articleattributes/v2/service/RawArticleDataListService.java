@@ -34,7 +34,7 @@ public class RawArticleDataListService {
 
   static {
     LANGUAGE_CODE_EXCEPTIONS.put("UA", "UK");
-    LANGUAGE_CODE_EXCEPTIONS.put("KZ", "KK");
+    LANGUAGE_CODE_EXCEPTIONS.put("KZ", "RU");
     LANGUAGE_CODE_EXCEPTIONS.put("MD", "RO");
     LANGUAGE_CODE_EXCEPTIONS.put("PK", "UR");
     LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");

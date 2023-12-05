@@ -75,7 +75,7 @@ public class ArticleCacheService {
 
   public static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>() {{
     put("UA", "UK");
-    put("KZ", "KK");
+    put("KZ", "RU");
     put("MD", "RO");
     put("PK", "UR");
     put("RS", "SR");
