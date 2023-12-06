@@ -29,7 +29,7 @@
              <!--<includeMdcKeyName>@request.articleNumber</includeMdcKeyName>-->
              <!--<includeMdcKeyName>@request.variantNumber</includeMdcKeyName>-->
 
-            <customFields>{"@vertical": "${DRP_CF_VERTICAL}", "@type": "service", "@service-name": "${DRP_CF_SERVICE}", "@hostname": "${HOSTNAME}", "@retention" : "technical"}</customFields>
+            <customFields>{"marc_id": "${DRP_EV_DD_MARC_ID}", "@vertical": "${DRP_CF_VERTICAL}", "@type": "service", "@service-name": "${DRP_CF_SERVICE}", "@hostname": "${HOSTNAME}", "@retention" : "technical"}</customFields>
             <includeContext>false</includeContext>
 
             <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">

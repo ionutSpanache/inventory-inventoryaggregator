@@ -21,7 +21,8 @@ public class DataDogConfig {
         @Value("${metrics.serviceName}") String serviceName,
         @Value("${metrics.host}") String hostName,
         @Value("${metrics.vertical}") String verticalName,
-        @Value("${metrics.stage}") String stageName) {
+        @Value("${metrics.stage}") String stageName,
+        @Value("${metrics.marcId}") String marcId) {
         return registry -> {
             registry
                 .config()
@@ -29,7 +30,8 @@ public class DataDogConfig {
                     "service", serviceName,
                     "host ", hostName,
                     "vertical", verticalName,
-                    "stage", stageName);
+                    "stage", stageName,
+                    "marc_id", marcId);
 
             // JVM Metrics
             new ClassLoaderMetrics().bindTo(registry);
