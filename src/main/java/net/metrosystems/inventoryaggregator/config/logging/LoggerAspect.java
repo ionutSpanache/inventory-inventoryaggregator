@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggerAspect {
 
+    // M|Runtime allows a maximum of 16KB
+    // Java chars are 2 bytes
+    private static final int LOG_MAX_LENGTH = (16*1024) /2;
     @Around("@annotation(AddLogs)")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
 
@@ -28,7 +31,7 @@ public class LoggerAspect {
             log.info("Called: {}.{}() with arguments = {}, received result = {}",
                     joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName(),
                     joinPoint.getArgs(),
-                    result);
+                    result.toString().substring(0,Math.min(result.toString().length(), LOG_MAX_LENGTH)));
         } catch (Exception e) {
             addLogging(joinPoint, false);
             MDC.put("executionTimeInMillis", Long.toString(System.currentTimeMillis() - start));
