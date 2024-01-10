@@ -9,10 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -35,6 +37,13 @@ public class DataSourceRepository {
   @Value("${mstore.inventory.datasource.articledata.url}")
   private String dataSourceArticleDataUrl;
 
+  @Value("${mstore.inventory.datasource.articlecomponent.url}")
+  private String dataSourceArticleComponentUrl;
+
+  @Value("${mstore.inventory.datasource.articlecomponents.url}")
+  private String dataSourceArticleComponentsUrl;
+
+  @Async("asyncExecutor")
   public CompletableFuture<Map<ArticleId, ArticleMasterData>> getArticleMasterDataForArticleIdList(
       List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
 
@@ -67,6 +76,7 @@ public class DataSourceRepository {
     return CompletableFuture.completedFuture(articleIdArticleMasterDataMap);
   }
 
+  @Async("asyncExecutor")
   public CompletableFuture<ArticleMasterId> getArticleMasterIdForArticleId(
       ArticleId articleId, String countryCode, String languageCode, Integer storeNo) {
 
@@ -101,5 +111,56 @@ public class DataSourceRepository {
             .block();
 
     return CompletableFuture.completedFuture(articleMasterId);
+  }
+
+  @Async("asyncExecutor")
+  public CompletableFuture<ArticleComponent> getArticleComponent(String countryCode, Long articleNumber) {
+
+    UriComponents url =
+        UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleComponentUrl)
+            .buildAndExpand(
+                countryCode,
+                articleNumber);
+
+    ArticleComponent articleComponent =
+        webClient
+            .get()
+            .uri(url.toString())
+            .retrieve()
+            .bodyToMono(ArticleComponent.class)
+            .onErrorResume(
+                error -> {
+                  log.error("Error on retrieving article component from DataSource ", error);
+                  return Mono.empty();
+                })
+            .block();
+
+    return CompletableFuture.completedFuture(articleComponent);
+  }
+
+  @Async("asyncExecutor")
+  public CompletableFuture<Map<ArticleId, ArticleComponent>> getArticleComponents(String countryCode, List<ArticleId> articleIds) {
+
+    UriComponents url =
+        UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleComponentsUrl)
+            .buildAndExpand(
+                countryCode);
+
+    Map<ArticleId, ArticleComponent> articleComponentMap = webClient
+        .post()
+        .uri(url.toString())
+        .bodyValue(articleIds)
+        .retrieve()
+        .bodyToMono(new ParameterizedTypeReference<Map<ArticleId, ArticleComponent>>() {
+        })
+        .onErrorResume(
+            error -> {
+              log.error("Error on retrieving article component from DataSource ", error);
+              return Mono.empty();
+            })
+        .block();
+
+    return CompletableFuture.completedFuture(articleComponentMap);
+
   }
 }

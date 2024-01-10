@@ -1,5 +1,7 @@
 package net.metrosystems.inventoryaggregator.articleid.controller;
 
+import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
@@ -13,10 +15,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.metrics.annotation.Timed;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Set;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Timed("ArticleId")
@@ -24,84 +28,94 @@ import java.util.Set;
 @Slf4j
 public class ArticleIdController {
 
-    private final ArticleIdService articleIdService;
+  private final ArticleIdService articleIdService;
 
-    private final ArticleMasterDataRepository articleMasterDataRepository;
+  private final ArticleMasterDataRepository articleMasterDataRepository;
 
-    @Autowired
-    public ArticleIdController(ArticleIdService articleIdService, ArticleMasterDataRepository articleMasterDataRepository) {
-        this.articleIdService = articleIdService;
-        this.articleMasterDataRepository = articleMasterDataRepository;
+  @Autowired
+  public ArticleIdController(
+      ArticleIdService articleIdService, ArticleMasterDataRepository articleMasterDataRepository) {
+    this.articleIdService = articleIdService;
+    this.articleMasterDataRepository = articleMasterDataRepository;
+  }
+
+  @AddTimer
+  @AddLogs
+  @GetMapping(
+      value =
+          "/countries/{countryCode}/saleslines/{salesline}/languages/{languageCode}/stores/{storeno}/article-id/barcode/{barcode}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<ArticleId>> getArticleIdByBarcode(
+      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+      @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
+      @PathVariable("languageCode") String languageCode,
+      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
+      @PathVariable("barcode") String barCode) {
+    List<ArticleId> articleIds;
+    try {
+      articleIds =
+          articleIdService.getArticleIdByBarcode(
+              countryCode, salesLine, languageCode, storeNo, barCode);
+    } catch (Exception e) {
+      throw new ArticleNotFoundException(e.getMessage(), e);
     }
-
-    @AddTimer
-    @AddLogs
-    @GetMapping(value = "/countries/{countryCode}/saleslines/{salesline}/languages/{languageCode}/stores/{storeno}/article-id/barcode/{barcode}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ArticleId>> getArticleIdByBarcode(
-            @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-            @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
-            @PathVariable("languageCode") String languageCode,
-            @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-            @PathVariable("barcode") String barCode
-    ) {
-        List<ArticleId> articleIds;
-        try {
-            articleIds = articleIdService.getArticleIdByBarcode(countryCode, salesLine, languageCode, storeNo, barCode);
-        } catch (Exception e) {
-          throw new ArticleNotFoundException(e.getMessage(), e);
-        }
-        if (articleIds == null || articleIds.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(articleIds);
+    if (articleIds == null || articleIds.isEmpty()) {
+      return ResponseEntity.notFound().build();
     }
+    return ResponseEntity.ok(articleIds);
+  }
 
-    @AddTimer
-    @AddLogs
-    @GetMapping(value = "/countries/{countryCode}/saleslines/{salesline}/languages/{languageCode}/stores/{storeno}/article-id/subsys-article-nunmber/{subsys-article-number}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ArticleId>> getArticleIdBySubsysArtNo(
-            @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-            @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
-            @PathVariable("languageCode") String languageCode,
-            @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-            @PathVariable("subsys-article-number") Long subsysArticleNumber
-    ) {
-        List<ArticleId> articleIds;
-        try {
-            articleIds = articleIdService.getArticleIdBySubsysArticleNumber(countryCode, salesLine, languageCode, storeNo, subsysArticleNumber);
-        } catch (Exception e) {
-            throw new ArticleNotFoundException(e.getMessage(), e);
-        }
-        if (articleIds == null || articleIds.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(articleIds);
+  @AddTimer
+  @AddLogs
+  @GetMapping(
+      value =
+          "/countries/{countryCode}/saleslines/{salesline}/languages/{languageCode}/stores/{storeno}/article-id/subsys-article-nunmber/{subsys-article-number}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<ArticleId>> getArticleIdBySubsysArtNo(
+      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+      @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
+      @PathVariable("languageCode") String languageCode,
+      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
+      @PathVariable("subsys-article-number") Long subsysArticleNumber) {
+    List<ArticleId> articleIds;
+    try {
+      articleIds =
+          articleIdService.getArticleIdBySubsysArticleNumber(
+              countryCode, salesLine, languageCode, storeNo, subsysArticleNumber);
+    } catch (Exception e) {
+      throw new ArticleNotFoundException(e.getMessage(), e);
     }
+    if (articleIds == null || articleIds.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(articleIds);
+  }
 
-    @AddTimer
-    @AddLogs
-    @GetMapping(value = "/countries/{countryCode}/saleslines/{salesline}/languages/{languageCode}/stores/{storeno}/article-id/article-number/{articleNumber}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ArticleId>> getArticleIdByArticleNumber(
-            @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-            @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
-            @PathVariable("languageCode") String languageCode,
-            @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-            @PathVariable("articleNumber") Long articleNumber
-    ) {
-        List<ArticleId> articleIds;
-        try {
-            articleIds = articleIdService.getArticleIdByArticleNumber(countryCode, salesLine, storeNo, articleNumber);
-        } catch (Exception e) {
-            throw new ArticleNotFoundException(e.getMessage(), e);
-        }
-        if (articleIds == null || articleIds.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(articleIds);
+  @AddTimer
+  @AddLogs
+  @GetMapping(
+      value =
+          "/countries/{countryCode}/saleslines/{salesline}/languages/{languageCode}/stores/{storeno}/article-id/article-number/{articleNumber}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<ArticleId>> getArticleIdByArticleNumber(
+      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+      @TagField(name = "salesline") @PathVariable("salesline") String salesLine,
+      @PathVariable("languageCode") String languageCode,
+      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
+      @PathVariable("articleNumber") Long articleNumber) {
+    List<ArticleId> articleIds;
+    try {
+      articleIds =
+          articleIdService.getArticleIdByArticleNumber(
+              countryCode, salesLine, storeNo, articleNumber);
+    } catch (Exception e) {
+      throw new ArticleNotFoundException(e.getMessage(), e);
     }
+    if (articleIds == null || articleIds.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(articleIds);
+  }
 
   @AddTimer
   @AddLogs
@@ -126,34 +140,34 @@ public class ArticleIdController {
             .build();
 
     List<Integer> activeStoresList =
-        articleIdService.getActiveStoresByByArtVarBundle(
-            countryCode, salesLine, languageCode, articleId);
+        articleIdService.getActiveStoresByByArtVarBundle(countryCode, salesLine, articleId);
     if (CollectionUtils.isEmpty(activeStoresList)) {
       return ResponseEntity.notFound().build();
     }
     return ResponseEntity.ok(activeStoresList);
   }
 
-    @AddTimer
-    @AddLogs
-    @PostMapping(
-            value =
-                    "/countries/{countryCode}/salesline/{salesLine}/languages/{languageCode}/storeNumber/{storeNumber}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Set<ArticleId>> getActiveArticlesForStore(
-            @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-            @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-            @TagField(name = "languageCode") @PathVariable("languageCode") String languageCode,
-            @TagField(name = "storeNumber") @PathVariable("storeNumber") Integer storeNumber,
-            @RequestBody List<ArticleId> articleIdList) throws Exception {
+  @AddTimer
+  @AddLogs
+  @PostMapping(
+      value =
+          "/countries/{countryCode}/salesline/{salesLine}/languages/{languageCode}/storeNumber/{storeNumber}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Set<ArticleId>> getActiveArticlesForStore(
+      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
+      @TagField(name = "languageCode") @PathVariable("languageCode") String languageCode,
+      @TagField(name = "storeNumber") @PathVariable("storeNumber") Integer storeNumber,
+      @RequestBody List<ArticleId> articleIdList)
+      throws Exception {
 
-        Set<ArticleId> activeArticles =
-                articleMasterDataRepository.getArticleMasterDataForArticleIdList(
-                                articleIdList, countryCode, salesLine, languageCode, storeNumber)
-                        .get()
-                        .keySet();
+    Set<ArticleId> activeArticles =
+        articleMasterDataRepository
+            .getArticleMasterDataForArticleIdList(
+                articleIdList, countryCode, salesLine, languageCode, storeNumber)
+            .get()
+            .keySet();
 
-        return ResponseEntity.ok(activeArticles);
-    }
-
+    return ResponseEntity.ok(activeArticles);
+  }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
@@ -50,40 +50,14 @@ public class ArticleDetailsServiceV2 {
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
-    ArticleComponent articleComponent =
-        transformArticleVariantBundleListToArticleComponentByArticle(
-            getArticleVariantBundleIdentifierListForArticleNumber(
-                articleId.getArticleNumber(), storeId.getCountryCode(), storeId.getSalesLine()),
-            articleId.getArticleNumber());
 
     rawArticleDataService.buildRawArticleDataList(
         articleId,
         storeId,
         languageCode,
         rawArticleDataList,
-        articleComponent,
         dataTypeList);
     return rawArticleDataList;
-  }
-
-  private ArticleComponent transformArticleVariantBundleListToArticleComponentByArticle(
-      List<ArticleVariantBundleIdentifier> articleVariantBundleList, Long articleNumber) {
-    ArticleComponent articleComponent = new ArticleComponent();
-    for (ArticleVariantBundleIdentifier articleVariantBundleIdentifier : articleVariantBundleList) {
-      if (articleVariantBundleIdentifier.getArticleNumber().equals(articleNumber)) {
-        articleComponent.addVariantBundle(
-            articleVariantBundleIdentifier.getVariantNumber(),
-            articleVariantBundleIdentifier.getBundleNumber());
-      }
-    }
-    return articleComponent;
-  }
-
-  private List<ArticleVariantBundleIdentifier>
-      getArticleVariantBundleIdentifierListForArticleNumber(
-          Long articleNumber, String countryCode, String salesLine) throws Exception {
-    return articleCacheService.getArticleVariantBundleListForArticleNumber(
-        articleNumber, countryCode, salesLine);
   }
 
   private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(

@@ -12,7 +12,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleDet
 import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleDetailsServiceV2;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
-import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -39,22 +38,6 @@ public class ArticleDataController {
   @Value("#{'${countriesV2DataSource:null}'}")
   private List<String> countriesV2DataSource;
 
-  @AddTimer
-  @AddLogs
-  @GetMapping(value = "/ean/{ean}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<RawArticleData> getArticlesByEan(
-      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-      @PathVariable("languageCode") String languageCode,
-      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-      @PathVariable("ean") String ean,
-      @RequestParam("dataType") Optional<List<String>> dataTypeList)
-      throws Exception {
-    return articleDetailsService.getArticleDataListByEan(
-        ean, countryCode, salesLine, languageCode, storeNo, dataTypeList);
-  }
-
-  @AddTimer
   @AddLogs
   @GetMapping(
       value = "/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}",
@@ -93,22 +76,5 @@ public class ArticleDataController {
       return articleDetailsService.getArticleDataListByArticleVariantBundle(
           articleId, countryCode, salesLine, languageCode, storeNo, dataTypeList);
     }
-  }
-
-  @AddTimer
-  @AddLogs
-  @GetMapping(
-      value = "/subsystemarticlenumber/{subsystemarticlenumber}",
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<RawArticleData> getArticleBySubsys(
-      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-      @PathVariable("languageCode") String languageCode,
-      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-      @PathVariable("subsystemarticlenumber") Long subsystemArticleNumber,
-      @RequestParam("dataType") Optional<List<String>> dataTypeList)
-      throws Exception {
-    return articleDetailsService.getArticleDataListBySubsys(
-        subsystemArticleNumber, countryCode, salesLine, languageCode, storeNo, dataTypeList);
   }
 }

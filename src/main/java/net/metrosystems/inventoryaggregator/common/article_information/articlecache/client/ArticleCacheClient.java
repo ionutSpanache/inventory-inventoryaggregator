@@ -13,7 +13,6 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 
 public interface ArticleCacheClient {
 
-	Documents getArticleUrlPathByEan(String ean, String countryCode, String salesLine, String languageCode) throws Exception;
 
 	Documents getArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine) throws Exception;
 

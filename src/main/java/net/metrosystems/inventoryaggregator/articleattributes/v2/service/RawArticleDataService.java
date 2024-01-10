@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
@@ -57,12 +57,14 @@ public class RawArticleDataService {
       StoreId storeId,
       String languageCode,
       List<RawArticleData> rawArticleDataList,
-      ArticleComponent articleComponent,
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
     String correctLanguageCode =
         LANGUAGE_CODE_EXCEPTIONS.getOrDefault(storeId.getCountryCode(), storeId.getCountryCode());
+
+    CompletableFuture<ArticleComponent> articleComponentCompletableFuture =
+        articleProcessingServiceV2.getArticleComponent(storeId.getCountryCode(), articleId.getArticleNumber());
 
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId =
         articleProcessingServiceV2.getArticleMasterId(
@@ -88,6 +90,7 @@ public class RawArticleDataService {
         movieService.getTotalAverageSales(storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), articleId);
 
     CompletableFuture.allOf(
+        articleComponentCompletableFuture,
         articleMasterIdForArticleId,
         rawArticleStoreMasterData,
         articleDataFromMovie,
@@ -124,7 +127,7 @@ public class RawArticleDataService {
             .stockDetails(stockDetails)
             .plannedDeliveryDates(plannedDeliveryDates)
             .stockLocations(articleStockLocationList.get())
-            .articleComponent(articleComponent)
+            .articleComponent(articleComponentCompletableFuture.get())
             .productLifeCycleData(buildProductLifeCycleData(articleMasterData))
             .maximumRetailPrice(maximumRetailPrice.get())
             .channelDeliveryFlag(articleMasterData.getChannelDeliveryFlag())

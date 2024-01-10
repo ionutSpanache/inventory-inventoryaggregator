@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client.FilterAAAClient;
@@ -319,58 +319,6 @@ public class DocumentsService {
                 (oldValue, newValue) -> oldValue));
   }
 
-  public Map<
-          net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId, ArticleComponent>
-      getArticleComponentByArticleIdList(
-          String countryCode,
-          String salesLine,
-          String languageCode,
-          List<net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId>
-              articleIdList)
-          throws Exception {
-    if (CollectionUtils.isEmpty(articleIdList)) return Collections.emptyMap();
-    Filter filter = new Filter().setFilterKeys(new ArrayList<>());
-    List<net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId>
-        articleIdsWithoutDuplicates =
-            articleIdList.stream().distinct().collect(Collectors.toList());
-    articleIdsWithoutDuplicates.forEach(
-        articleId -> {
-          FilterKey filterKey = filterAAAService.initializeFilterKey(countryCode, salesLine);
-          filterKey
-              .getSubFilterKeys()
-              .add(
-                  filterAAAService.addSubFilterKey(
-                      KeysWithTypes.mmsArtNo,
-                      String.valueOf(articleId.getArticleNumber()),
-                      languageCode));
-          filter.getFilterKeys().add(filterKey);
-        });
-
-    Documents documents =
-        this.getDocumentsNextpage(filterAAAClient.getFilteredDocuments(filter), filter);
-
-    if (documents == null || CollectionUtils.isEmpty(documents.getArticleKeys()))
-      return Collections.emptyMap();
-
-    Map<net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId, ArticleComponent>
-        response = new HashMap<>();
-
-    List<net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId>
-        articleIdsFromDocument =
-            documents.getArticleKeys().stream()
-                .map(this::transformDocumentInArticleAttributesId)
-                .collect(Collectors.toList());
-
-    articleIdsWithoutDuplicates.forEach(
-        articleId -> {
-          response.put(
-              articleId,
-              transformArticleIdIntoArticleComponentByArticle(
-                  articleIdsFromDocument, articleId.getArticleNumber()));
-        });
-    return response;
-  }
-
   public net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId
       transformDocumentInArticleAttributesId(String document) {
     net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId =
@@ -394,19 +342,6 @@ public class DocumentsService {
             });
 
     return articleId;
-  }
-
-  private ArticleComponent transformArticleIdIntoArticleComponentByArticle(
-      List<net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId> articleIds,
-      Long articleNumber) {
-    ArticleComponent articleComponent = new ArticleComponent();
-    articleIds.stream()
-        .filter(articleId -> articleId.getArticleNumber().equals(articleNumber))
-        .forEach(
-            articleId ->
-                articleComponent.addVariantBundle(
-                    articleId.getVariantNumber(), articleId.getBundleNumber()));
-    return articleComponent;
   }
 
   public Documents getIduItemDerivedUrlForMultipleArticles(

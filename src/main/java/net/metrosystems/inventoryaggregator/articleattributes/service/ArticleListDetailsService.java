@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
@@ -20,10 +20,10 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleDa
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawIsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleComponentRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleProcessingServiceV2;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
@@ -44,9 +44,9 @@ public class ArticleListDetailsService {
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final ArticleMasterDataRepository articleMasterDataRepository;
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
-  private final ArticleComponentRepository articleComponentRepository;
   private final ArticleCacheService articleCacheService;
   private final StockLocationRepository stockLocationRepository;
+  private final ArticleProcessingServiceV2 articleProcessingServiceV2;
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       List<ArticleId> articleIdList,
@@ -129,7 +129,7 @@ public class ArticleListDetailsService {
       throws ExecutionException, InterruptedException {
 
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
-        getArticleComponentForArticleId(articleIdList, countryCode, salesLine, languageCode);
+        articleProcessingServiceV2.getArticleComponents(countryCode, articleIdList);
 
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         getArticleMasterDataForArticleId(
@@ -323,25 +323,6 @@ public class ArticleListDetailsService {
           e);
     }
     return articleMasterDataForArticleId;
-  }
-
-  private CompletableFuture<Map<ArticleId, ArticleComponent>> getArticleComponentForArticleId(
-      List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode) {
-    CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
-        CompletableFuture.completedFuture(Collections.emptyMap());
-    try {
-      articleComponentForArticleId =
-          articleComponentRepository.getArticleComponentForArticleIdList(
-              articleIdList, countryCode, salesLine, languageCode);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-          "ArticleListDetailsService.buildRawArticleDataList - articleComponentForArticleId - error: {}",
-          e.getMessage(),
-          e);
-    }
-    return articleComponentForArticleId;
   }
 
   public List<PromotionArticleDataForArticleId> getFuturePromotionsForArticleIds(

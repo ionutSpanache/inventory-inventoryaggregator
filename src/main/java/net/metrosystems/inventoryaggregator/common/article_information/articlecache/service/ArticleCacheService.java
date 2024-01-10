@@ -48,19 +48,12 @@ public class ArticleCacheService {
 
   private static final String PAKISTAN_COUNTRY_CODE = "PK";
   private static final Double ZERO = 0.0;
-  private static final String IHDS_TREE = "erp_ihds_tree";
-  private static final String BUNDLE_NO = "bundleno";
-  private static final String MMS_ARTNO = "mmsartno";
-  private static final String VARIANT_NO = "variantno";
-  private static final String COMPANY = "company";
-  private static final String ENVIRONMENT = "environment";
   private static final String ARTICLE_CACHE_PP2_ENVIRONMENT = "pp2";
   private static final String ARTICLE_CACHE_PP1_ENVIRONMENT = "pp1";
   private static final String ARTICLE_CACHE_PROD_ENVIRONMENT = "prod";
   private static final String K8S_DEV_ENVIRONMENT = "dev";
   private static final String K8S_PP_ENVIRONMENT = "pp";
   private static final String LOCAL_ENVIRONMENT = "local";
-  private static final String LANGUAGE = "language";
   private static final Set<String> COUNTRY_CODES = Set.of("IN", "CZ", "SK");
   private final DocumentsService documentsService;
   private final ArticleCacheAAAClient articleCacheClient;
@@ -73,15 +66,16 @@ public class ArticleCacheService {
   @Value("${app.stage}")
   private String k8sEnvironment;
 
-  public static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>() {{
-    put("UA", "UK");
-    put("KZ", "RU");
-    put("MD", "RO");
-    put("PK", "UR");
-    put("RS", "SR");
-    put("CZ", "CS");
-  }};
+  private static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>();
 
+  static {
+    LANGUAGE_CODE_EXCEPTIONS.put("UA", "UK");
+    LANGUAGE_CODE_EXCEPTIONS.put("KZ", "RU");
+    LANGUAGE_CODE_EXCEPTIONS.put("MD", "RO");
+    LANGUAGE_CODE_EXCEPTIONS.put("PK", "UR");
+    LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");
+    LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
+  }
   @Autowired
   public ArticleCacheService(
       DocumentsService documentsService,
@@ -92,41 +86,6 @@ public class ArticleCacheService {
     this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
   }
 
-  public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForEan(
-      String ean, String countryCode, String salesLine, String languageCode) throws Exception {
-    return getArticleVariantBundleIdentifierListFromFilterUrl(
-        articleCacheClient.getArticleUrlPathByEan(ean, countryCode, salesLine, languageCode));
-  }
-
-  public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForSubsys(
-      Long subsysArtNo, String countryCode, String salesLine, String languageCode)
-      throws Exception {
-    return getArticleVariantBundleIdentifierListFromFilterUrl(
-        articleCacheClient.getArticleUrlPathBySubsysArtNo(
-            subsysArtNo, countryCode, salesLine, languageCode));
-  }
-
-  public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForArticleVariantBundle(
-      Long articleNumber,
-      Long variantNumber,
-      Long bundleNumber,
-      String countryCode,
-      String salesLine,
-      String languageCode)
-      throws Exception {
-    return getArticleVariantBundleIdentifierListFromFilterUrl(
-        articleCacheClient.getArticleUrlPathByArtVarBundle(
-            articleNumber, variantNumber, bundleNumber, countryCode, salesLine));
-  }
-
-  public List<ArticleVariantBundleIdentifier> getArticleVariantBundleListForArticleNumber(
-      Long articleNumber, String countryCode, String salesLine)
-      throws Exception {
-
-    return getArticleVariantBundleIdentifierListFromFilterUrl(
-        articleCacheClient.getArticleUrlPathByMmsArtNo(
-            articleNumber, countryCode, salesLine));
-  }
 
   private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(
       Documents filterUrlString) {
@@ -185,9 +144,7 @@ public class ArticleCacheService {
 
   private String getCorrectLanguageCode(String countryCode, String languageCode) {
     if("EN".equalsIgnoreCase(languageCode)){
-      return LANGUAGE_CODE_EXCEPTIONS.containsKey(countryCode)
-          ? LANGUAGE_CODE_EXCEPTIONS.get(countryCode)
-          : countryCode;
+      return LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
     }
     return languageCode;
   }
@@ -680,12 +637,11 @@ public class ArticleCacheService {
             articleNumber,
             storeNo,
             variantNumber);
-    // todo: change "en" to country code
     return articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
   }
 
   public List<Integer> getActiveStoresByByArtVarBundle(
-      String countryCode, String salesLine, String languageCode, ArticleId articleId)
+      String countryCode, String salesLine, ArticleId articleId)
       throws Exception {
 
     List<Integer> activeStoresList;

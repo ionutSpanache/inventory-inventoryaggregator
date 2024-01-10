@@ -34,9 +34,9 @@ public class ArticleIdService {
     }
 
   public List<Integer> getActiveStoresByByArtVarBundle(
-      String countryCode, String salesLine, String languageCode, ArticleId articleId)
+      String countryCode, String salesLine, ArticleId articleId)
       throws Exception {
     return articleCacheService.getActiveStoresByByArtVarBundle(
-        countryCode, salesLine, languageCode, articleId);
+        countryCode, salesLine, articleId);
   }
 }

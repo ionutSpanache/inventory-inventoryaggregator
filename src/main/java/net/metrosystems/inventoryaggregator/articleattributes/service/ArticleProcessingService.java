@@ -7,13 +7,11 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleComponentRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
@@ -28,7 +26,6 @@ import org.springframework.stereotype.Service;
 public class ArticleProcessingService {
 
   private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
-  private final ArticleComponentRepository articleComponentRepository;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final ArticleMasterDataRepository articleMasterDataRepository;
 
@@ -92,25 +89,6 @@ public class ArticleProcessingService {
           e);
     }
     return articleStoreMasterFromAcl;
-  }
-
-  public CompletableFuture<Map<ArticleId, ArticleComponent>> getComponentForArticleId(
-      List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode) {
-    CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
-        CompletableFuture.completedFuture(Collections.emptyMap());
-    try {
-      articleComponentForArticleId =
-          articleComponentRepository.getArticleComponentForArticleIdList(
-              articleIdList, countryCode, salesLine, languageCode);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-          "ArticleListDetailsService.buildRawArticleDataList - articleComponentForArticleId - error: {}",
-          e.getMessage(),
-          e);
-    }
-    return articleComponentForArticleId;
   }
 
   public CompletableFuture<ArticleMasterData> getArticleMasterData(

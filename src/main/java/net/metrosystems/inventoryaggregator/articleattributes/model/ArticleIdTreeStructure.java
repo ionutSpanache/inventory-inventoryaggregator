@@ -1,5 +1,7 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
+
 public class ArticleIdTreeStructure{
 	
 	private Long articleNumber;

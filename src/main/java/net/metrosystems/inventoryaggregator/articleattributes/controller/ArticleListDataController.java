@@ -39,7 +39,6 @@ public class ArticleListDataController {
   @Value("#{'${countriesV2DataSource:null}'}")
   private List<String> countriesV2DataSource;
 
-  @AddTimer
   @AddLogs
   @PostMapping(
       value =
@@ -66,7 +65,6 @@ public class ArticleListDataController {
     }
   }
 
-  @AddTimer
   @AddLogs
   @PostMapping(
       value = "countries/{countryCode}/saleslines/{salesLine}/articles/isexcludedfromdiscounts",
@@ -81,7 +79,6 @@ public class ArticleListDataController {
         articleIdList, countryCode, salesLine);
   }
 
-  @AddTimer
   @AddLogs
   @PostMapping(
       value =

@@ -54,12 +54,6 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   }
 
   @Override
-  public Documents getArticleUrlPathByEan(
-      String barCode, String countryCode, String salesLine, String languageCode) throws Exception {
-    return documentsService.getDocumentsByBarcode(countryCode, salesLine, languageCode, barCode);
-  }
-
-  @Override
   public Documents getArticleUrlPathByMmsArtNo(
       Long mmsArtNo, String countryCode, String salesLine) throws Exception {
 

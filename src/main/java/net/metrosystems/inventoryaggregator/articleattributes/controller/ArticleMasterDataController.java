@@ -3,7 +3,6 @@ package net.metrosystems.inventoryaggregator.articleattributes.controller;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleDetailsService;
@@ -35,26 +34,6 @@ public class ArticleMasterDataController {
   public ArticleMasterDataController(ArticleDetailsService articleDetailsService) {
     this.articleDetailsService = articleDetailsService;
   }
-
-  @AddTimer
-  @AddLogs
-  @GetMapping(
-      value =
-          "/articlemasterdata/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}",
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<ArticleMasterData> getArticleMasterDataListByArtVarBundle(
-      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-      @PathVariable("languageCode") String languageCode,
-      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
-      @PathVariable("articlenumber") Long articleNumber,
-      @PathVariable("variant") Long variant,
-      @PathVariable("bundlenumber") Long bundleNumber)
-      throws Exception {
-    return articleDetailsService.getArticleMasterDataListByArticleVariantBundle(
-        articleNumber, variant, bundleNumber, countryCode, salesLine, languageCode, storeNo);
-  }
-
 
   @AddTimer
   @AddLogs
