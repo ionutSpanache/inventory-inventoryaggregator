@@ -1,5 +1,8 @@
 package net.metrosystems.inventoryaggregator.articleattributes.v2.repository;
 
+import static java.util.stream.Collectors.toMap;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +13,13 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleIdComponent;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -66,7 +69,7 @@ public class DataSourceRepository {
             .block();
 
     Map<ArticleId, ArticleMasterData> articleIdArticleMasterDataMap = new HashMap<>();
-    if (!CollectionUtils.isEmpty(articleMasterIds)) {
+    if (!isEmpty(articleMasterIds)) {
       articleMasterIds.forEach(
           articleMasterId ->
               articleIdArticleMasterDataMap.put(
@@ -146,13 +149,13 @@ public class DataSourceRepository {
             .buildAndExpand(
                 countryCode);
 
-    Map<ArticleId, ArticleComponent> articleComponentMap = webClient
+    List<ArticleIdComponent> articleIdComponents = webClient
         .post()
         .uri(url.toString())
         .bodyValue(articleIds)
         .retrieve()
-        .bodyToMono(new ParameterizedTypeReference<Map<ArticleId, ArticleComponent>>() {
-        })
+        .bodyToFlux(ArticleIdComponent.class)
+        .collectList()
         .onErrorResume(
             error -> {
               log.error("Error on retrieving article component from DataSource ", error);
@@ -160,6 +163,12 @@ public class DataSourceRepository {
             })
         .block();
 
+    Map<ArticleId, ArticleComponent> articleComponentMap = new HashMap<>();
+    if(!isEmpty(articleIdComponents)){
+      articleComponentMap = articleIdComponents.stream().collect(toMap(ArticleIdComponent::getArticleId,
+            ArticleIdComponent::getArticleComponent));
+
+    }
     return CompletableFuture.completedFuture(articleComponentMap);
 
   }
