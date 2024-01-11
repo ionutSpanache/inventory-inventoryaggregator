@@ -25,6 +25,6 @@ CMD [ "sh", "-c", "java \
 -Ddd.jdbc.analytics.enabled=false \
 -Ddd.service.mapping=postgresql:${DRP_EV_DD_SOLUTION}.${DRP_CF_VERTICAL}.postgresql \
 -Ddd.tags=solution:${DRP_EV_DD_SOLUTION},vertical:${DRP_CF_VERTICAL},service:${DRP_EV_DD_SOLUTION}.${DRP_CF_VERTICAL}.${DRP_CF_SERVICE} \
--Ddd.trace.global.tags=marc_id:${DRP_EV_DD_MARC_ID},env:${DRP_CF_STAGE},solution:${DRP_EV_DD_SOLUTION},solution_id:${DRP_EV_DD_SOLUTION_ID},vertical:${DRP_CF_VERTICAL},service:${DRP_EV_DD_SOLUTION}.${DRP_CF_VERTICAL}.${DRP_CF_SERVICE} \
+-Ddd.trace.global.tags=marc_id:${DRP_EV_DD_MARC_ID},env:${DRP_CF_STAGE},solution:${DRP_EV_DD_SOLUTION},vertical:${DRP_CF_VERTICAL},service:${DRP_EV_DD_SOLUTION}.${DRP_CF_VERTICAL}.${DRP_CF_SERVICE} \
 -javaagent:/opt/dd-java-agent.jar \
 /app.jar" ]
