@@ -154,7 +154,7 @@ public class ArticleDetailsService {
     String correctLanguageCode = LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
 
     CompletableFuture<ArticleComponent> articleComponentCompletableFuture =
-        articleProcessingServiceV2.getArticleComponent(countryCode, articleId.getArticleNumber());
+        articleProcessingServiceV2.getArticleComponent(countryCode, storeNo, articleId.getArticleNumber());
 
     CompletableFuture<ArticleMasterData> articleMasterData =
         articleProcessingService.getArticleMasterData(

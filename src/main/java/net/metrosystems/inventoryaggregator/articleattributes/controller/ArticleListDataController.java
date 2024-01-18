@@ -14,7 +14,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleLis
 import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleDetailsServiceV2;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
-import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

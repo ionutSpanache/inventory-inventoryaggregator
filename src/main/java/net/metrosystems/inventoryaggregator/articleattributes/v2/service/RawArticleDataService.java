@@ -64,7 +64,7 @@ public class RawArticleDataService {
         LANGUAGE_CODE_EXCEPTIONS.getOrDefault(storeId.getCountryCode(), storeId.getCountryCode());
 
     CompletableFuture<ArticleComponent> articleComponentCompletableFuture =
-        articleProcessingServiceV2.getArticleComponent(storeId.getCountryCode(), articleId.getArticleNumber());
+        articleProcessingServiceV2.getArticleComponent(storeId.getCountryCode(),storeId.getStoreNumber(), articleId.getArticleNumber());
 
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId =
         articleProcessingServiceV2.getArticleMasterId(

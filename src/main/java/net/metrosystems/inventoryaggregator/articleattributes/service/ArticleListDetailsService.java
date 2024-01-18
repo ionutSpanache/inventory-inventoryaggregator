@@ -129,7 +129,7 @@ public class ArticleListDetailsService {
       throws ExecutionException, InterruptedException {
 
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
-        articleProcessingServiceV2.getArticleComponents(countryCode, articleIdList);
+        articleProcessingServiceV2.getArticleComponents(countryCode, storeNo, articleIdList);
 
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         getArticleMasterDataForArticleId(

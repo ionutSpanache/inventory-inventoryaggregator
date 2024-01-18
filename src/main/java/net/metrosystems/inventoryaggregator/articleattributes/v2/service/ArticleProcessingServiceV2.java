@@ -53,12 +53,12 @@ public class ArticleProcessingServiceV2 {
   }
 
   public CompletableFuture<ArticleComponent> getArticleComponent(
-      String countryCode, Long articleNumber) {
+      String countryCode,Integer storeNumber, Long articleNumber) {
     CompletableFuture<ArticleComponent> articleComponentCompletableFuture =
         new CompletableFuture<>();
     try {
       articleComponentCompletableFuture =
-          dataSourceRepository.getArticleComponent(countryCode, articleNumber);
+          dataSourceRepository.getArticleComponent(countryCode,storeNumber, articleNumber);
     } catch (Exception e) {
       log.error("ArticleProcessingServiceV2.getArticleComponent - error: {}", e.getMessage(), e);
     }
@@ -66,14 +66,14 @@ public class ArticleProcessingServiceV2 {
   }
 
   public CompletableFuture<Map<ArticleId, ArticleComponent>> getArticleComponents(
-      String countryCode, List<ArticleId> articleIdList) {
+      String countryCode, Integer storeNumber, List<ArticleId> articleIdList) {
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentsCompletableFuture =
         CompletableFuture.completedFuture(Collections.emptyMap());
 
     try {
       List<ArticleId> articleIdsWithoutDuplicates = articleIdList.stream().distinct().toList();
       articleComponentsCompletableFuture =
-          dataSourceRepository.getArticleComponents(countryCode, articleIdsWithoutDuplicates);
+          dataSourceRepository.getArticleComponents(countryCode, storeNumber, articleIdsWithoutDuplicates);
     } catch (Exception e) {
       log.error("ArticleProcessingServiceV2.getArticleComponents - error: {}", e.getMessage(), e);
     }

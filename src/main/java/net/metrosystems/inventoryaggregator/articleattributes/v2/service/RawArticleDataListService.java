@@ -58,7 +58,7 @@ public class RawArticleDataListService {
     String correctLanguageCode = LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
 
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
-        articleProcessingServiceV2.getArticleComponents(countryCode, articleIdList);
+        articleProcessingServiceV2.getArticleComponents(countryCode, storeNo, articleIdList);
 
     CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
         articleProcessingServiceV2.getMasterDataForArticleId(

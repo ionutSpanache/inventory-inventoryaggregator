@@ -117,12 +117,13 @@ public class DataSourceRepository {
   }
 
   @Async("asyncExecutor")
-  public CompletableFuture<ArticleComponent> getArticleComponent(String countryCode, Long articleNumber) {
+  public CompletableFuture<ArticleComponent> getArticleComponent(String countryCode,Integer storeNumber, Long articleNumber) {
 
     UriComponents url =
         UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleComponentUrl)
             .buildAndExpand(
                 countryCode,
+                storeNumber,
                 articleNumber);
 
     ArticleComponent articleComponent =
@@ -142,12 +143,13 @@ public class DataSourceRepository {
   }
 
   @Async("asyncExecutor")
-  public CompletableFuture<Map<ArticleId, ArticleComponent>> getArticleComponents(String countryCode, List<ArticleId> articleIds) {
+  public CompletableFuture<Map<ArticleId, ArticleComponent>> getArticleComponents(String countryCode, Integer storeNumber, List<ArticleId> articleIds) {
 
     UriComponents url =
         UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleComponentsUrl)
             .buildAndExpand(
-                countryCode);
+                countryCode,
+                storeNumber);
 
     List<ArticleIdComponent> articleIdComponents = webClient
         .post()
