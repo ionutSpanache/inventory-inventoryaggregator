@@ -25,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -33,8 +32,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class MovieClient {
-
-  private final RestTemplate restTemplate;
 
   @Value("${MOVIE_STOCK_HOST}")
   private String movieStockServiceHost;
@@ -48,13 +45,10 @@ public class MovieClient {
   @Value("${MOVIE_TOTAL_AVERAGE_PATH}")
   private String movieTotalAveragePath;
 
-
   private final WebClient webClient;
 
   @Autowired
-  public MovieClient(
-      /*@Qualifier("restTemplateMovie")*/ RestTemplate restTemplate,  @Qualifier("webClientMovie") WebClient webClient) {
-    this.restTemplate = restTemplate;
+  public MovieClient(@Qualifier("webClientMovie") WebClient webClient) {
     this.webClient = webClient;
   }
 
@@ -79,7 +73,7 @@ public class MovieClient {
           .block()
           .getStockDetails();
     } catch (Exception e) {
-      log.error("Error while calling MOVIE input{} exception{}", urlInUse, e);
+      log.error("Error while calling MOVIE input={}, exception={}", urlInUse, e.getMessage(), e);
       return null;
     }
   }
@@ -215,28 +209,21 @@ public class MovieClient {
               .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
               .bodyValue(movieRequest)
               .retrieve()
-              .onStatus(
-                  this::isErrorResponse,
-                  clientResponse ->
-                      log(
-                          clientResponse,
-                          "Movie stock details - api call unsuccessful  : status %d"))
               .bodyToMono(StockDetailsResponse.class)
+              .onErrorResume(
+                  error -> {
+                    log.error(
+                        "Movie stock details - api call unsuccessful for {}", movieRequest, error);
+                    return Mono.empty();
+                  })
               .block();
 
       return response == null ? Collections.emptyList() : response.getStockDetails();
     } catch (Exception e) {
-      log.error("Error while calling MOVIE input{} exception{}", movieRequest, e);
+      log.error(
+          "Error while calling MOVIE input={}, exception={}", movieRequest, e.getMessage(), e);
       return null;
     }
   }
 
-  private boolean isErrorResponse(HttpStatus httpStatus) {
-    return !httpStatus.is2xxSuccessful();
-  }
-
-  private Mono<? extends Throwable> log(ClientResponse clientResponse, String message) {
-    log.error(message, clientResponse.statusCode().value());
-    return Mono.empty();
-  }
 }
