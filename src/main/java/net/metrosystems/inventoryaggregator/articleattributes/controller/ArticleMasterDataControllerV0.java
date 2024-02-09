@@ -26,12 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
     value =
         "/inventoryaggregator/countries/{countryCode}/saleslines/{salesLine}/languages/{languageCode}/stores/{storeno}",
     produces = MediaType.APPLICATION_JSON_VALUE)
-public class ArticleMasterDataController {
+public class ArticleMasterDataControllerV0 {
 
   private final ArticleDetailsService articleDetailsService;
 
   @Autowired
-  public ArticleMasterDataController(ArticleDetailsService articleDetailsService) {
+  public ArticleMasterDataControllerV0(ArticleDetailsService articleDetailsService) {
     this.articleDetailsService = articleDetailsService;
   }
 

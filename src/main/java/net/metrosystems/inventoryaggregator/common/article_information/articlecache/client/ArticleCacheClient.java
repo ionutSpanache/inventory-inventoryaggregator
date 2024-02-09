@@ -23,7 +23,7 @@ public interface ArticleCacheClient {
 
 	Documents findArticleUrlPathByMmsArtNo(Long mmsArtNo, String countryCode, String salesLine) throws Exception;
 
-	ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath);
+  ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath);
 
 	Optional<ArticleCacheIhdsTree> getSupplierInformation(String countryCode, String salesLine, Optional<String> environment, Long supplierNumber)
       throws Exception;

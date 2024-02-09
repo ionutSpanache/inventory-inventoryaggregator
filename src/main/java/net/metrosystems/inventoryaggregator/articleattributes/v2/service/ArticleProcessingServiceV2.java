@@ -10,7 +10,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
-import net.metrosystems.inventoryaggregator.articleattributes.v2.repository.DataSourceRepository;
+import net.metrosystems.inventoryaggregator.articlemasterdata.repository.DataSourceRepository;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class ArticleProcessingServiceV2 {
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId = new CompletableFuture<>();
     try {
       articleMasterIdForArticleId =
-          dataSourceRepository.getArticleMasterIdForArticleId(
+          dataSourceRepository.getArticleMasterIdForArticleIdAsync(
               articleId, countryCode, languageCode, storeNo);
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
@@ -41,7 +41,7 @@ public class ArticleProcessingServiceV2 {
         CompletableFuture.completedFuture(Collections.emptyMap());
     try {
       articleMasterDataForArticleId =
-          dataSourceRepository.getArticleMasterDataForArticleIdList(
+          dataSourceRepository.getArticleMasterDataForArticleIdListAsync(
               articleIdList, countryCode, languageCode, storeNo);
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
@@ -58,7 +58,7 @@ public class ArticleProcessingServiceV2 {
         new CompletableFuture<>();
     try {
       articleComponentCompletableFuture =
-          dataSourceRepository.getArticleComponent(countryCode,storeNumber, articleNumber);
+          dataSourceRepository.getArticleComponentAsync(countryCode,storeNumber, articleNumber);
     } catch (Exception e) {
       log.error("ArticleProcessingServiceV2.getArticleComponent - error: {}", e.getMessage(), e);
     }
@@ -73,7 +73,7 @@ public class ArticleProcessingServiceV2 {
     try {
       List<ArticleId> articleIdsWithoutDuplicates = articleIdList.stream().distinct().toList();
       articleComponentsCompletableFuture =
-          dataSourceRepository.getArticleComponents(countryCode, storeNumber, articleIdsWithoutDuplicates);
+          dataSourceRepository.getArticleComponentsAsync(countryCode, storeNumber, articleIdsWithoutDuplicates);
     } catch (Exception e) {
       log.error("ArticleProcessingServiceV2.getArticleComponents - error: {}", e.getMessage(), e);
     }
