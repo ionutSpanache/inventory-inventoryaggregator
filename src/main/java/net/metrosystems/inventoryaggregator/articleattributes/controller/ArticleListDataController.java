@@ -1,7 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.controller;
 
-import static org.springframework.util.CollectionUtils.isEmpty;
-
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +13,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.v2.service.Article
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
-import org.springframework.beans.factory.annotation.Value;
+import net.metrosystems.inventoryaggregator.featuretoggle.DataSourceFeatureToggle;
 import org.springframework.http.MediaType;
 import org.springframework.metrics.annotation.Timed;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,9 +32,7 @@ public class ArticleListDataController {
 
   private final ArticleListDetailsService articleListDetailsService;
   private final ArticleDetailsServiceV2 articleDetailsServiceV2;
-
-  @Value("#{'${countriesV2DataSource:null}'}")
-  private List<String> countriesV2DataSource;
+  private final DataSourceFeatureToggle dataSourceFeatureToggle;
 
   @AddLogs
   @PostMapping(
@@ -53,8 +49,7 @@ public class ArticleListDataController {
       @RequestBody List<ArticleId> articleIdList)
       throws Exception {
 
-    boolean dataSource =
-        !isEmpty(countriesV2DataSource) && (countriesV2DataSource.contains(countryCode) || "ALL".equals(countriesV2DataSource.get(0)));
+    boolean dataSource = dataSourceFeatureToggle.isDataSourceActive(countryCode);
     if (dataSource) {
       return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
           articleIdList, countryCode, salesLine, storeNo, dataTypeList);

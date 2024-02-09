@@ -32,6 +32,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -46,8 +47,10 @@ public class ArticleMasterDataRepository {
   private static final String DEFAULT_LANGUAGE_CODE = "EN";
   private final ArticleCacheService articleCacheService;
   private final DocumentsService documentsService;
+
   @Value("${ARTICLE_DOCUMENT_ACTIVE_PROMOTION_CHANNEL}")
   private final String promotionChannel;
+
   @Qualifier("ForkJoinCustomPool")
   private final ExecutorService forkJoinPoolCustom;
 
@@ -76,21 +79,8 @@ public class ArticleMasterDataRepository {
       String languageCode,
       Integer storeNo)
       throws Exception {
-    ArticleCacheFullData articleCacheFullData =
-        getArticleCacheFullDataByArtVarBundle(
-            articleId.getArticleNumber(),
-            articleId.getVariantNumber(),
-            articleId.getBundleNumber(),
-            countryCode,
-            salesLine,
-            languageCode,
-            storeNo);
-
-    ArticleMasterData articleMasterData =
-        transformArticleCacheFullToArticleMasterData(
-            articleCacheFullData, countryCode, storeNo, languageCode, articleId);
-
-    return CompletableFuture.completedFuture(articleMasterData);
+    return CompletableFuture.completedFuture(
+        getArticleMasterDataSync(articleId, countryCode, salesLine, languageCode, storeNo));
   }
 
   @Async("asyncExecutor")
@@ -163,10 +153,13 @@ public class ArticleMasterDataRepository {
       String languageCode,
       Integer storeNo)
       throws Exception {
+    Map<ArticleId, ArticleMasterData> result = getArticleMasterDataForArticleIdListSync(articleIdList, countryCode, salesLine, languageCode, storeNo);
+    return CompletableFuture.completedFuture(result);
+  }
+
+  public Map<ArticleId, ArticleMasterData> getArticleMasterDataForArticleIdListSync(List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode, Integer storeNo) throws InterruptedException, ExecutionException {
     Map<ArticleId, ArticleMasterData> result = new ConcurrentHashMap<>();
-
     String languageCodeForAC = getCorrectLanguageCode(countryCode, languageCode);
-
     forkJoinPoolCustom
         .submit(
             () ->
@@ -189,7 +182,7 @@ public class ArticleMasterDataRepository {
                             articleCacheFullData =
                                 articleCacheService
                                     .getArticleCacheFullDataByArtVarBundleForArticleId(
-                                        storeNo, articleUrlPath);
+                                            storeNo, articleUrlPath);
                           } catch (Exception e) {
                             log.error(
                                 "ArticleMasterDataRepository.getArticleCacheFullDataByArtVarBundleForArticleId error: {}",
@@ -201,15 +194,14 @@ public class ArticleMasterDataRepository {
                                 articleId,
                                 transformArticleCacheFullToArticleMasterData(
                                     articleCacheFullData,
-                                    countryCode,
-                                    storeNo,
-                                    languageCode,
+                                        countryCode,
+                                        storeNo,
+                                        languageCode,
                                     articleId));
                         }))
         .get();
-    return CompletableFuture.completedFuture(result);
+    return result;
   }
-
 
   @Async("asyncExecutor")
   public CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> getIduItemDerivedStandards(
@@ -254,14 +246,13 @@ public class ArticleMasterDataRepository {
   }
 
   private String getCorrectLanguageCode(String countryCode, String languageCode) {
-    if("EN".equalsIgnoreCase(languageCode)){
+    if ("EN".equalsIgnoreCase(languageCode)) {
       return LANGUAGE_CODE_EXCEPTIONS.containsKey(countryCode)
           ? LANGUAGE_CODE_EXCEPTIONS.get(countryCode)
           : countryCode;
     }
     return languageCode;
   }
-
 
   private List<IduItemDerivedStandard> getIduItemDerivedStandards(
       String countryCode, ArticleId articleId) {
@@ -296,71 +287,70 @@ public class ArticleMasterDataRepository {
   }
 
   private ArticleMasterData transformArticleCacheFullToArticleMasterData(
-          ArticleCacheFullData articleCacheFullData,
-          String countryCode,
-          Integer storeNumber,
-          String languageCode,
-          ArticleId articleId) {
+      ArticleCacheFullData articleCacheFullData,
+      String countryCode,
+      Integer storeNumber,
+      String languageCode,
+      ArticleId articleId) {
 
     if (articleCacheFullData != null) {
 
       SimplePromotionArticleData promotion =
-              getActivePromotionForToday(countryCode, storeNumber, languageCode, articleId);
+          getActivePromotionForToday(countryCode, storeNumber, languageCode, articleId);
 
       return new ArticleMasterData()
-              .setArticleDescription(articleCacheFullData.getArticleDescription())
-              .setBarcode(articleCacheFullData.getBarcode())
-              .setCommercialSupplier(articleCacheFullData.getCommercialSupplier())
-              .setPresentationMerchandiseGroup(articleCacheFullData.getPresentationMerchandiseGroup())
-              .setPromotionId(promotion.getPromotionId())
-              .setPromotionDescription(promotion.getPromotionDescription())
-              .setPromotionStartDate(promotion.getPromotionStart())
-              .setPromotionEndDate(promotion.getPromotionEnd())
-              .setSellingBundleContent(articleCacheFullData.getSellingBundleContent())
-              .setWeightArticle(articleCacheFullData.getWeightArticle())
-              .setNetWeight(articleCacheFullData.getNetWeight())
-              .setSubsystemArticleNumber(articleCacheFullData.getSubsysArticleNumber())
-              .setVatPercent(articleCacheFullData.getVatPercent())
-              .setPieceNetSellPrice(articleCacheFullData.getPieceNetSellPrice())
-              .setBundleNetSellPrice(articleCacheFullData.getBundleNetSellPrice())
-              .setPromotionBundleNetPrice(
-                      promotion.getPromotionNetSalesPricePerBundle() != null
-                              ? promotion.getPromotionNetSalesPricePerBundle()
-                              : 0)
-              .setVariantDescription(articleCacheFullData.getVariantDescription())
-              .setArticleType(articleCacheFullData.getArticleType())
-              .setArticleClass(articleCacheFullData.getArticleClass())
-              .setFoodNonfoodIndicator(articleCacheFullData.getFoodNonfoodIndicator())
-              .setPresentationMainMerchandiseGroup(
-                      articleCacheFullData.getPresentationMainMerchandiseGroup())
-              .setPresentationSubMerchandiseGroup(
-                      articleCacheFullData.getPresentationSubMerchandiseGroup())
-              .setSupplierNumber(articleCacheFullData.getSupplierNumber())
-              .setProcurementCode(articleCacheFullData.getProcurementCode())
-              .setAssortmentCode(articleCacheFullData.getAssortmentCode())
-              .setBlockingCode(articleCacheFullData.getBlockingCode())
-              .setActivationStatus(articleCacheFullData.getActivationStatus())
-              .setExpiryDays(articleCacheFullData.getExpiryDays())
-              .setPieceNetBuyingPrice(articleCacheFullData.getPieceNetBuyingPrice())
-              .setBundleNetBuyingPrice(articleCacheFullData.getBundleNetBuyingPrice())
-              .setPieceNetNetBuyingPrice(articleCacheFullData.getPieceNetNetBuyingPrice())
-              .setBundleNetNetBuyingPrice(articleCacheFullData.getBundleNetNetBuyingPrice())
-              .setArticleNoEmptiesSales(articleCacheFullData.getArticleNoEmptiesSales())
-              .setBrandName(articleCacheFullData.getBrandName())
-              .setMinimumRetailPrice(articleCacheFullData.getMinimumRetailPrice())
-              .setCountryOfOrigin(articleCacheFullData.getCountryOfOrigin())
-              .setPackageFactor(articleCacheFullData.getPackageFactor())
-              .setAlcoholClass(articleCacheFullData.getAlcoholClass())
-              .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator())
-              .setCoreAssortmentIndicator(articleCacheFullData.getCoreAssortmentIndicator())
-              .setAssignedStoreSupplierType(articleCacheFullData.getAssignedStoreSupplierType())
-              .setInOutIndicator(articleCacheFullData.getInOutIndicator())
-              .setMinimumGrossSalesPricePerUnit(
-                      articleCacheFullData.getMinimumGrossSalesPricePerUnit())
-              .setBasPriceContent(articleCacheFullData.getBasPriceContent())
-              .setBasPriceContentMeasureUnit(articleCacheFullData.getBasPriceContentMeasureUnit())
-              .setBasPriceContentUnit(articleCacheFullData.getBasPriceContentUnit())
-              .setBasPriceBaseFactor(articleCacheFullData.getBasPriceBaseFactor());
+          .setArticleDescription(articleCacheFullData.getArticleDescription())
+          .setBarcode(articleCacheFullData.getBarcode())
+          .setCommercialSupplier(articleCacheFullData.getCommercialSupplier())
+          .setPresentationMerchandiseGroup(articleCacheFullData.getPresentationMerchandiseGroup())
+          .setPromotionId(promotion.getPromotionId())
+          .setPromotionDescription(promotion.getPromotionDescription())
+          .setPromotionStartDate(promotion.getPromotionStart())
+          .setPromotionEndDate(promotion.getPromotionEnd())
+          .setSellingBundleContent(articleCacheFullData.getSellingBundleContent())
+          .setWeightArticle(articleCacheFullData.getWeightArticle())
+          .setNetWeight(articleCacheFullData.getNetWeight())
+          .setSubsystemArticleNumber(articleCacheFullData.getSubsysArticleNumber())
+          .setVatPercent(articleCacheFullData.getVatPercent())
+          .setPieceNetSellPrice(articleCacheFullData.getPieceNetSellPrice())
+          .setBundleNetSellPrice(articleCacheFullData.getBundleNetSellPrice())
+          .setPromotionBundleNetPrice(
+              promotion.getPromotionNetSalesPricePerBundle() != null
+                  ? promotion.getPromotionNetSalesPricePerBundle()
+                  : 0)
+          .setVariantDescription(articleCacheFullData.getVariantDescription())
+          .setArticleType(articleCacheFullData.getArticleType())
+          .setArticleClass(articleCacheFullData.getArticleClass())
+          .setFoodNonfoodIndicator(articleCacheFullData.getFoodNonfoodIndicator())
+          .setPresentationMainMerchandiseGroup(
+              articleCacheFullData.getPresentationMainMerchandiseGroup())
+          .setPresentationSubMerchandiseGroup(
+              articleCacheFullData.getPresentationSubMerchandiseGroup())
+          .setSupplierNumber(articleCacheFullData.getSupplierNumber())
+          .setProcurementCode(articleCacheFullData.getProcurementCode())
+          .setAssortmentCode(articleCacheFullData.getAssortmentCode())
+          .setBlockingCode(articleCacheFullData.getBlockingCode())
+          .setActivationStatus(articleCacheFullData.getActivationStatus())
+          .setExpiryDays(articleCacheFullData.getExpiryDays())
+          .setPieceNetBuyingPrice(articleCacheFullData.getPieceNetBuyingPrice())
+          .setBundleNetBuyingPrice(articleCacheFullData.getBundleNetBuyingPrice())
+          .setPieceNetNetBuyingPrice(articleCacheFullData.getPieceNetNetBuyingPrice())
+          .setBundleNetNetBuyingPrice(articleCacheFullData.getBundleNetNetBuyingPrice())
+          .setArticleNoEmptiesSales(articleCacheFullData.getArticleNoEmptiesSales())
+          .setBrandName(articleCacheFullData.getBrandName())
+          .setMinimumRetailPrice(articleCacheFullData.getMinimumRetailPrice())
+          .setCountryOfOrigin(articleCacheFullData.getCountryOfOrigin())
+          .setPackageFactor(articleCacheFullData.getPackageFactor())
+          .setAlcoholClass(articleCacheFullData.getAlcoholClass())
+          .setTraceabilityIndicator(articleCacheFullData.getTraceabilityIndicator())
+          .setCoreAssortmentIndicator(articleCacheFullData.getCoreAssortmentIndicator())
+          .setAssignedStoreSupplierType(articleCacheFullData.getAssignedStoreSupplierType())
+          .setInOutIndicator(articleCacheFullData.getInOutIndicator())
+          .setMinimumGrossSalesPricePerUnit(articleCacheFullData.getMinimumGrossSalesPricePerUnit())
+          .setBasPriceContent(articleCacheFullData.getBasPriceContent())
+          .setBasPriceContentMeasureUnit(articleCacheFullData.getBasPriceContentMeasureUnit())
+          .setBasPriceContentUnit(articleCacheFullData.getBasPriceContentUnit())
+          .setBasPriceBaseFactor(articleCacheFullData.getBasPriceBaseFactor());
     }
     return null;
   }
@@ -373,7 +363,9 @@ public class ArticleMasterDataRepository {
             .filter(
                 promotion ->
                     isPromotionActiveToday(
-                        promotion.getPromotionStart(), promotion.getPromotionEnd(), promotion.getPromotionChannel()))
+                        promotion.getPromotionStart(),
+                        promotion.getPromotionEnd(),
+                        promotion.getPromotionChannel()))
             .min(Comparator.comparing(PromotionArticleData::getPromotionEnd))
             .orElse(PromotionArticleData.builder().build());
     Optional<PromotionDescription> promotionDescription = Optional.empty();
@@ -402,8 +394,9 @@ public class ArticleMasterDataRepository {
         .build();
   }
 
-  private boolean isPromotionActiveToday(LocalDate startDate, LocalDate endDate, String promotionChannelInput) {
-    if (!StringUtils.containsIgnoreCase(promotionChannel,promotionChannelInput)) {
+  private boolean isPromotionActiveToday(
+      LocalDate startDate, LocalDate endDate, String promotionChannelInput) {
+    if (!StringUtils.containsIgnoreCase(promotionChannel, promotionChannelInput)) {
       return false;
     }
     if (startDate != null && endDate != null) {
@@ -426,5 +419,26 @@ public class ArticleMasterDataRepository {
     } else {
       return "prod";
     }
+  }
+
+  public ArticleMasterData getArticleMasterDataSync(
+      ArticleId articleId,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo)
+      throws Exception {
+    ArticleCacheFullData articleCacheFullData =
+        getArticleCacheFullDataByArtVarBundle(
+            articleId.getArticleNumber(),
+            articleId.getVariantNumber(),
+            articleId.getBundleNumber(),
+            countryCode,
+            salesLine,
+            languageCode,
+            storeNo);
+
+    return transformArticleCacheFullToArticleMasterData(
+        articleCacheFullData, countryCode, storeNo, languageCode, articleId);
   }
 }

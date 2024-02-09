@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
 import net.metrosystems.inventoryaggregator.articlemasterdata.service.ArticleMasterDataService;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import org.springframework.http.MediaType;
@@ -30,13 +29,14 @@ public class ArticleMasterDataControllerV1 {
       value =
           "v1/countrycode/{countryCode}/languagecode/{languageCode}/storenumber/{storeNumber}/articlemasterdata/articlenumber/{articlenumber}/variantnumber/{variantNumber}/bundlenumber/{bundlenumber}",
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ArticleMasterId getArticleMasterDataByArtVarBundle(
+  public ArticleMasterData getArticleMasterDataByArtVarBundle(
       @PathVariable("countryCode") String countryCode,
       @PathVariable("languageCode") String languageCode,
       @PathVariable("storeNumber") Integer storeNo,
       @PathVariable("articlenumber") Long articleNumber,
       @PathVariable("variantNumber") Long variantNumber,
-      @PathVariable("bundlenumber") Long bundleNumber) {
+      @PathVariable("bundlenumber") Long bundleNumber)
+      throws Exception {
     ArticleId articleId =
         ArticleId.builder()
             .articleNumber(articleNumber)
@@ -56,7 +56,8 @@ public class ArticleMasterDataControllerV1 {
       @PathVariable("countryCode") String countryCode,
       @PathVariable("languageCode") String languageCode,
       @PathVariable("storeNumber") Integer storeNumber,
-      @RequestBody List<ArticleId> articleIds) {
+      @RequestBody List<ArticleId> articleIds)
+      throws Exception {
     return articleMasterDataService.getArticleMasterDataForArticleIdList(
         articleIds, countryCode, languageCode, storeNumber);
   }
