@@ -44,26 +44,11 @@ public class DataSourceClient {
   @Value("${mstore.inventory.datasource.articlecomponents.url}")
   private String dataSourceArticleComponentsUrl;
 
-  public Map<ArticleId, ArticleMasterData> getArticleMasterDataForArticleIdList(
+  public Map<ArticleId, ArticleMasterData> getMapArticleMasterDataForArticleIdList(
       List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
 
-    UriComponents url =
-        UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleListDataUrl)
-            .buildAndExpand(countryCode, languageCode, storeNo);
-
     List<ArticleMasterId> articleMasterIds =
-        webClient
-            .post()
-            .uri(url.toString())
-            .bodyValue(articleIdList)
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<ArticleMasterId>>() {})
-            .onErrorResume(
-                error -> {
-                  log.error("Error on retrieving article master data from DataSource ", error);
-                  return Mono.empty();
-                })
-            .block();
+        getArticleMasterDataForArticleIdList(articleIdList, countryCode, languageCode, storeNo);
 
     Map<ArticleId, ArticleMasterData> articleIdArticleMasterDataMap = new HashMap<>();
     if (!isEmpty(articleMasterIds)) {
@@ -74,6 +59,27 @@ public class DataSourceClient {
     }
 
     return articleIdArticleMasterDataMap;
+  }
+
+  public List<ArticleMasterId> getArticleMasterDataForArticleIdList(
+      List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
+
+    UriComponents url =
+        UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleListDataUrl)
+            .buildAndExpand(countryCode, languageCode, storeNo);
+
+    return webClient
+        .post()
+        .uri(url.toString())
+        .bodyValue(articleIdList)
+        .retrieve()
+        .bodyToMono(new ParameterizedTypeReference<List<ArticleMasterId>>() {})
+        .onErrorResume(
+            error -> {
+              log.error("Error on retrieving article master data from DataSource ", error);
+              return Mono.empty();
+            })
+        .block();
   }
 
   public ArticleMasterId getArticleMasterIdForArticleId(

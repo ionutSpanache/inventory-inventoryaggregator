@@ -1,7 +1,6 @@
 package net.metrosystems.inventoryaggregator.articlemasterdata.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class ArticleMasterDataService {
   private final DataSourceFeatureToggle dataSourceFeatureToggle;
   private final ArticleMasterDataRepository articleMasterDataRepository;
 
-  public Map<ArticleId, ArticleMasterData> getArticleMasterDataForArticleIdList(
+  public List<ArticleMasterId> getArticleMasterDataForArticleIdList(
       List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) throws ExecutionException, InterruptedException {
     boolean dataSourceActive = dataSourceFeatureToggle.isDataSourceActive(countryCode);
     if (!dataSourceActive) {

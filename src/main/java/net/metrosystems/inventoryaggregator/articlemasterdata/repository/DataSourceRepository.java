@@ -23,7 +23,7 @@ public class DataSourceRepository {
   public CompletableFuture<Map<ArticleId, ArticleMasterData>> getArticleMasterDataForArticleIdListAsync(
       List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
     return CompletableFuture.completedFuture(
-        dataSourceClient.getArticleMasterDataForArticleIdList(
+        dataSourceClient.getMapArticleMasterDataForArticleIdList(
             articleIdList, countryCode, languageCode, storeNo));
   }
 
