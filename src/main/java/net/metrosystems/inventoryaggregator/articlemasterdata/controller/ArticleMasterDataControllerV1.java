@@ -30,15 +30,15 @@ public class ArticleMasterDataControllerV1 {
   @AddLogs
   @GetMapping(
       value =
-          "v1/countrycode/{countryCode}/languagecode/{languageCode}/storenumber/{storeNumber}/articlemasterdata/articlenumber/{articlenumber}/variantnumber/{variantNumber}/bundlenumber/{bundlenumber}",
+          "v1/countrycode/{countryCode}/languagecode/{languageCode}/storenumber/{storeNumber}/articlemasterdata/articlenumber/{articleNumber}/variantnumber/{variantNumber}/bundlenumber/{bundleNumber}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ArticleMasterData getArticleMasterDataByArtVarBundle(
       @PathVariable("countryCode") String countryCode,
       @PathVariable("languageCode") String languageCode,
       @PathVariable("storeNumber") Integer storeNo,
-      @PathVariable("articlenumber") Long articleNumber,
+      @PathVariable("articleNumber") Long articleNumber,
       @PathVariable("variantNumber") Long variantNumber,
-      @PathVariable("bundlenumber") Long bundleNumber)
+      @PathVariable("bundleNumber") Long bundleNumber)
       throws Exception {
     ArticleId articleId =
         ArticleId.builder()
