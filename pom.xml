@@ -284,6 +284,7 @@
 					**/config/RestTemplate/RestTemplateCustom.java,
 					**/model/*.java,
 					**/PromotionArticleDataGroup.java,
+					**/config/*.java,**/config/**/*.java,**/config/**/**/*.java,
 					**/articleattributes/service/ArticleDetailsService.java,
 					**/articleid/client/ArticleIdClient.java,
 					**/articleid/controller/ArticleIdController.java,
