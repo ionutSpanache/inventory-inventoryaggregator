@@ -76,6 +76,7 @@ public class ArticleMasterData implements Serializable {
   private Integer basPriceBaseFactor;
   private String channelDeliveryFlag;
   private Long returnPossibilityStoreSupplierNumber;
+  private Boolean isTradeItemInConsignment;
   public static long getSerialversionuid() {
     return serialVersionUID;
   }
