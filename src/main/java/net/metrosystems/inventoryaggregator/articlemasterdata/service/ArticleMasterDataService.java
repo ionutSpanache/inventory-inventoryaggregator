@@ -2,7 +2,6 @@ package net.metrosystems.inventoryaggregator.articlemasterdata.service;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -23,11 +22,22 @@ public class ArticleMasterDataService {
   private final ArticleMasterDataRepository articleMasterDataRepository;
 
   public List<ArticleMasterId> getArticleMasterDataForArticleIdList(
-      List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) throws ExecutionException, InterruptedException {
+      List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo)
+      throws ExecutionException, InterruptedException {
     boolean dataSourceActive = dataSourceFeatureToggle.isDataSourceActive(countryCode);
     if (!dataSourceActive) {
-      articleMasterDataRepository.getArticleMasterDataForArticleIdListSync(
-          articleIdList, countryCode, SALES_LINE, languageCode, storeNo);
+      return articleMasterDataRepository
+          .getArticleMasterDataForArticleIdListSync(
+              articleIdList, countryCode, SALES_LINE, languageCode, storeNo)
+          .entrySet()
+          .stream()
+          .map(
+              entrySet ->
+                  ArticleMasterId.builder()
+                      .articleId(entrySet.getKey())
+                      .articleMasterData(entrySet.getValue())
+                      .build())
+          .toList();
     }
     return dataSourceClient.getArticleMasterDataForArticleIdList(
         articleIdList, countryCode, languageCode, storeNo);
