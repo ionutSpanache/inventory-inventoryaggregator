@@ -14,6 +14,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArticleMasterData implements Serializable {
+
   private static final long serialVersionUID = -2971487066548844011L;
   private String articleDescription;
   private String barcode;
@@ -77,6 +78,8 @@ public class ArticleMasterData implements Serializable {
   private String channelDeliveryFlag;
   private Long returnPossibilityStoreSupplierNumber;
   private Boolean isTradeItemInConsignment;
+  private String seasonCode;
+
   public static long getSerialversionuid() {
     return serialVersionUID;
   }
