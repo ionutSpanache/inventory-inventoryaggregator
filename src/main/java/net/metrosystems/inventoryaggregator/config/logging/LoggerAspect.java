@@ -2,6 +2,7 @@ package net.metrosystems.inventoryaggregator.config.logging;
 
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -56,16 +57,26 @@ public class LoggerAspect {
   }
 
   private void addLogging(ProceedingJoinPoint joinPoint, Boolean doClear) {
-    if (Boolean.TRUE.equals(doClear)) MDC.clear();
+    String traceId = MDC.get("traceId");
+    String spanId = MDC.get("spanId");
+    if (Boolean.TRUE.equals(doClear)) {
+      MDC.clear();
+    }
+    MDC.put("traceId", traceId);
+    MDC.put("spanId", spanId);
     MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
     Parameter[] parametersNames = methodSignature.getMethod().getParameters();
     Object[] parametersValues = joinPoint.getArgs();
+
     IntStream.range(0, parametersNames.length)
-        .forEach(
-            index ->
-                MDC.put(
-                    parametersNames[index].getName(),
-                    redactEmailAddresses(parametersValues[index].toString())));
+            .forEach(
+                    index ->
+                            MDC.put(
+                                    parametersNames[index].getName(),
+                                    Optional.ofNullable(parametersValues[index])
+                                            .map(Object::toString)
+                                            .map(this::redactEmailAddresses)
+                                            .orElse(null)));
   }
 
   @Cacheable("compiledEmailPattern")
