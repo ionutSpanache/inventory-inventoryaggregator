@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.SupplierInformation;
 import net.metrosystems.inventoryaggregator.articleattributes.service.SupplierService;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
-import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -27,8 +26,6 @@ public class SupplierController {
     this.supplierService = supplierService;
   }
 
-  @AddTimer
-  @AddLogs
   @GetMapping(
       value =
           "/supplier-information/countrycode/{countrycode}/salesline/{salesline}/supplier/{supplier}/commercialsupplier/{commercialsupplier}",

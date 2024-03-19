@@ -7,7 +7,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArti
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleDetailsService;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
-import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,7 +32,6 @@ public class ArticleMasterDataControllerV0 {
     this.articleDetailsService = articleDetailsService;
   }
 
-  @AddTimer
   @AddLogs
   @GetMapping(
       value =
@@ -52,7 +50,6 @@ public class ArticleMasterDataControllerV0 {
         articleNumber, variant, bundleNumber, countryCode, salesLine, languageCode, storeNo);
   }
 
-  @AddTimer
   @AddLogs
   @PostMapping(
       value = "/articlemasterdata/articleids",

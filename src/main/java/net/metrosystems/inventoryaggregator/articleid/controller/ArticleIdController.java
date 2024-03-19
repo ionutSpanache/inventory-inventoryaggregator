@@ -8,7 +8,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.repository.Article
 import net.metrosystems.inventoryaggregator.articleid.service.ArticleIdService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
-import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -37,7 +36,6 @@ public class ArticleIdController {
     this.articleMasterDataRepository = articleMasterDataRepository;
   }
 
-  @AddTimer
   @AddLogs
   @GetMapping(
       value =
@@ -63,7 +61,6 @@ public class ArticleIdController {
     return ResponseEntity.ok(articleIds);
   }
 
-  @AddTimer
   @AddLogs
   @GetMapping(
       value =
@@ -89,7 +86,6 @@ public class ArticleIdController {
     return ResponseEntity.ok(articleIds);
   }
 
-  @AddTimer
   @AddLogs
   @GetMapping(
       value =
@@ -115,7 +111,6 @@ public class ArticleIdController {
     return ResponseEntity.ok(articleIds);
   }
 
-  @AddTimer
   @AddLogs
   @GetMapping(
       value =
@@ -145,7 +140,6 @@ public class ArticleIdController {
     return ResponseEntity.ok(activeStoresList);
   }
 
-  @AddTimer
   @AddLogs
   @PostMapping(
       value =

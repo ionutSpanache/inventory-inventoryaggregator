@@ -4,7 +4,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclArticleStoreMasterDataService;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
-import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -25,7 +24,6 @@ public class ArticleStoreMasterDataController {
 		this.aclArticleStoreMasterDataService = aclArticleStoreMasterDataService;
 	}
 
-	@AddTimer
 	@AddLogs
 	@GetMapping(value="/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/barcode/{barcode}/articlemasterdatabyean",
 	        produces=MediaType.APPLICATION_JSON_VALUE)
@@ -42,7 +40,6 @@ public class ArticleStoreMasterDataController {
 		return ResponseEntity.ok(articleStoreMasterDataList);
 	}
 
-	@AddTimer
 	@AddLogs
 	@GetMapping(value="/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/articleNumber/{artNo}/variantNumber/{varNo}/bundleNumber/{bundleNo}/articlemasterdatabyartvarbundle",
 	        produces=MediaType.APPLICATION_JSON_VALUE)

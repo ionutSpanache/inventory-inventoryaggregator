@@ -7,7 +7,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArt
 import net.metrosystems.inventoryaggregator.articleattributes.service.PromotionService;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
-import net.metrosystems.inventoryaggregator.config.monitoring.annotation.AddTimer;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +25,6 @@ public class PromotionDataController {
     this.promotionService = promotionService;
   }
 
-  @AddTimer
   @AddLogs
   @GetMapping(
       value =
