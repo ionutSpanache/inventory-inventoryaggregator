@@ -1,6 +1,6 @@
 package net.metrosystems.inventoryaggregator.common.model;
 
-import net.metrosystems.inventory.common.apierror.starter.exception.ApiErrorAwareRuntimeException;
+import net.metrosystems.inventoryaggregator.exception.exception.ApiErrorAwareRuntimeException;
 import org.springframework.http.HttpStatus;
 
 public class InterruptedRuntimeException extends ApiErrorAwareRuntimeException {

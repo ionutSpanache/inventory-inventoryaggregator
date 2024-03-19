@@ -1,7 +1,7 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard;
 
 import com.sun.xml.txw2.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.List;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_isu_item_master.AssortmentClusterSpecificationV2;
@@ -110,7 +110,7 @@ public class ContentIduItemDerivedStandard {
         return assortmentClusterSpecificationV2;
     }
 
-    @javax.xml.bind.annotation.XmlElement(name = "assortmentClusterSpecificationV2")
+    @jakarta.xml.bind.annotation.XmlElement(name = "assortmentClusterSpecificationV2")
     public void setAssortmentClusterSpecificationV2(AssortmentClusterSpecificationV2 assortmentClusterSpecificationV2) {
         this.assortmentClusterSpecificationV2 = assortmentClusterSpecificationV2;
     }

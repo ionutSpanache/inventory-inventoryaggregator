@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.4</version>
+        <version>3.2.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -21,11 +21,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
-		<springdoc.version>1.6.11</springdoc.version>
-		<metrics.version>0.5.1.RELEASE</metrics.version>
-		<logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
-		<spring-boot-starter-inventory-api-error.version>0.0.4-SNAPSHOT
-		</spring-boot-starter-inventory-api-error.version>
+		<logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
 		<spring-cloud-starter-sleuth.version>3.1.4</spring-cloud-starter-sleuth.version>
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
 		<mockwebserver.version>4.10.0</mockwebserver.version>
@@ -80,10 +76,16 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
+			<version>5.2.3</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
@@ -94,7 +96,11 @@
 			<artifactId>logstash-logback-encoder</artifactId>
 			<version>${logstash-logback-encoder.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.fasterxml.uuid</groupId>
+			<artifactId>java-uuid-generator</artifactId>
+			<version>5.0.0</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -123,15 +129,10 @@
 		</dependency>
 
 
-		<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>${springdoc.version}</version>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -145,11 +146,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.metrics</groupId>
-			<artifactId>spring-metrics</artifactId>
-			<version>${metrics.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-core -->
 		<dependency>
@@ -167,17 +163,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-sleuth</artifactId>
-            <version>${spring-cloud-starter-sleuth.version}</version>
-        </dependency>
 
-		<dependency>
-			<groupId>net.metrosystems.common</groupId>
-			<artifactId>spring-boot-starter-inventory-api-error</artifactId>
-			<version>${spring-boot-starter-inventory-api-error.version}</version>
-		</dependency>
 
 		<!--> Test Dependencies<-->
 		<dependency>
@@ -195,6 +181,16 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.4</version>
 		</dependency>
+		<!-- Propagate traceId -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-brave</artifactId>
+			<!-- Propagate traceId -->
+		</dependency>
 
 	</dependencies>
 
@@ -208,9 +204,11 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>net.metrosystems.inventoryaggregator.InventoryAggregatorApplication</mainClass>
+					<layout>JAR</layout>
+				</configuration>
 			</plugin>
-
-			<!--SonarQube with Spring Boot 2 settings-->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -248,14 +246,6 @@
 					<reportsDirectory>${project.test.result.directory}/surefire</reportsDirectory>
 				</configuration>
 			</plugin>
-			<!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin> -->
 		</plugins>
 	</build>
 

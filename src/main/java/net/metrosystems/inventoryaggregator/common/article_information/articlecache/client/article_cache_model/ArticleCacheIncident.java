@@ -2,9 +2,9 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.Collections;
 import java.util.List;
 

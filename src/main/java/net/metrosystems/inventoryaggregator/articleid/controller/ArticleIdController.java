@@ -13,7 +13,6 @@ import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagFiel
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.metrics.annotation.Timed;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Timed("ArticleId")
 @RequestMapping(value = "/inventoryaggregator")
 @Slf4j
 public class ArticleIdController {

@@ -6,15 +6,6 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-
-
-            <providers>
-                <logstashMarkers/>
-                <throwableRootCauseClassName>
-                    <useSimpleClassName>true</useSimpleClassName>
-                </throwableRootCauseClassName>
-            </providers>
-
             <shortenedLoggerNameLength>36</shortenedLoggerNameLength>
 
             <fieldNames>
@@ -23,13 +14,10 @@
 
 
             <includeMdc>true</includeMdc>
-             <!--<includeMdcKeyName>@request.countryCode</includeMdcKeyName>-->
-             <!--<includeMdcKeyName>@request.salesLine</includeMdcKeyName>-->
-             <!--<includeMdcKeyName>@request.storeNumber</includeMdcKeyName>-->
-             <!--<includeMdcKeyName>@request.articleNumber</includeMdcKeyName>-->
-             <!--<includeMdcKeyName>@request.variantNumber</includeMdcKeyName>-->
 
-            <customFields>{"marc_id": "${DRP_EV_DD_MARC_ID}", "@vertical": "${DRP_CF_VERTICAL}", "@type": "service", "@service-name": "${DRP_CF_SERVICE}", "@hostname": "${HOSTNAME}", "@retention" : "technical"}</customFields>
+            <customFields>{"marc_id": "${DRP_EV_DD_MARC_ID}", "@vertical": "${DRP_CF_VERTICAL}", "@type": "service",
+                "@service-name": "${DRP_CF_SERVICE}", "@hostname": "${HOSTNAME}", "@retention" : "technical"}
+            </customFields>
             <includeContext>false</includeContext>
 
             <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
@@ -45,7 +33,7 @@
 
     <!-- By default, the level of the root level is set to DEBUG -->
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
         <!-- <appender-ref ref="FILE" /> -->
     </root>
 </configuration>

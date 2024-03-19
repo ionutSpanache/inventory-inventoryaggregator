@@ -1,7 +1,7 @@
 package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.http.HttpHeaders;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ public class RestTemplateConfig {
     HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
     clientHttpRequestFactory.setHttpClient(httpClient);
 //    clientHttpRequestFactory.setConnectTimeout(5000);
-    clientHttpRequestFactory.setReadTimeout(5000);
+//    clientHttpRequestFactory.setReadTimeout(5000);
     return clientHttpRequestFactory;
   }
 

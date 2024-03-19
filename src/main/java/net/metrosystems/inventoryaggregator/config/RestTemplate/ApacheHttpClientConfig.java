@@ -9,19 +9,25 @@ import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClien
 import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClientConfigConstants.REQUEST_TIMEOUT;
 import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClientConfigConstants.SOCKET_TIMEOUT;
 
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
-import org.apache.http.HeaderElement;
+import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.HttpRoute;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.HeaderElements;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.message.BasicHeaderElementIterator;
+import org.apache.hc.core5.http.message.MessageSupport;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.HeaderElement;
 import org.apache.http.HeaderElementIterator;
 import org.apache.http.HeaderIterator;
-import org.apache.http.HttpHost;
 import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -64,36 +70,34 @@ public class ApacheHttpClientConfig {
   @Bean
   public ConnectionKeepAliveStrategy connectionKeepAliveStrategy() {
     return (httpResponse, httpContext) -> {
-      HeaderIterator headerIterator = httpResponse.headerIterator(HTTP.CONN_KEEP_ALIVE);
-      HeaderElementIterator elementIterator = new BasicHeaderElementIterator(headerIterator);
-
-      while (elementIterator.hasNext()) {
-        HeaderElement element = elementIterator.nextElement();
-        String param = element.getName();
-        String value = element.getValue();
-        if (value != null && param.equalsIgnoreCase("timeout")) {
-          return Long.parseLong(value) * 1000; // convert to ms
+      final Iterator<HeaderElement> it = MessageSupport.iterate(httpResponse, HeaderElements.KEEP_ALIVE);
+      final HeaderElement he = it.next();
+      final String param = he.getName();
+      final String value = he.getValue();
+      if (value != null && param.equalsIgnoreCase("timeout")) {
+        try {
+          return TimeValue.ofSeconds(Long.parseLong(value));
+        } catch (final NumberFormatException ignore) {
         }
       }
-
-      return DEFAULT_KEEP_ALIVE_TIME;
+      return TimeValue.ofMilliseconds(DEFAULT_KEEP_ALIVE_TIME);
     };
   }
 
-  @Bean
-  public Runnable idleConnectionMonitor(PoolingHttpClientConnectionManager pool) {
-    return new Runnable() {
-      @Override
-      @Scheduled(fixedDelay = 20000)
-      public void run() {
-        // only if connection pool is initialised
-        if (pool != null) {
-          pool.closeExpiredConnections();
-          pool.closeIdleConnections(IDLE_CONNECTION_WAIT_TIME, TimeUnit.MILLISECONDS);
-        }
-      }
-    };
-  }
+//  @Bean
+//  public Runnable idleConnectionMonitor(PoolingHttpClientConnectionManager pool) {
+//    return new Runnable() {
+//      @Override
+//      @Scheduled(fixedDelay = 20000)
+//      public void run() {
+//        // only if connection pool is initialised
+//        if (pool != null) {
+//          pool.closeExpiredConnections();
+//          pool.closeIdleConnections(IDLE_CONNECTION_WAIT_TIME, TimeUnit.MILLISECONDS);
+//        }
+//      }
+//    };
+//  }
 
   @Bean
   @Qualifier("taskScheduleIdle")
@@ -108,16 +112,16 @@ public class ApacheHttpClientConfig {
   public CloseableHttpClient httpClient() {
     RequestConfig requestConfig =
         RequestConfig.custom()
-            .setConnectTimeout(CONNECTION_TIMEOUT)
-            .setConnectionRequestTimeout(REQUEST_TIMEOUT)
-            .setSocketTimeout(SOCKET_TIMEOUT)
+            .setConnectTimeout(Timeout.ofMilliseconds(CONNECTION_TIMEOUT))
+            .setConnectionRequestTimeout(Timeout.ofMilliseconds(REQUEST_TIMEOUT))
+            .setResponseTimeout(Timeout.ofMilliseconds(SOCKET_TIMEOUT))
             .build();
 
     return HttpClients.custom()
         .setDefaultRequestConfig(requestConfig)
         .setConnectionManager(poolingConnectionManager())
         .setKeepAliveStrategy(connectionKeepAliveStrategy())
-        .setRetryHandler(retryHandler)
+        .setRetryStrategy(new DefaultHttpRequestRetryStrategy(3, TimeValue.ofSeconds(3)))
         .build();
   }
 }

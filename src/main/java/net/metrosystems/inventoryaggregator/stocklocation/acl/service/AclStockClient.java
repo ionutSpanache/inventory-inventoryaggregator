@@ -15,6 +15,7 @@ import net.metrosystems.inventoryaggregator.stocklocation.acl.model.AclBundleSto
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -131,7 +132,7 @@ public class AclStockClient {
     }
   }
 
-  private boolean isErrorResponse(HttpStatus httpStatus) {
+  private boolean isErrorResponse(HttpStatusCode httpStatus) {
     return !httpStatus.is2xxSuccessful();
   }
 

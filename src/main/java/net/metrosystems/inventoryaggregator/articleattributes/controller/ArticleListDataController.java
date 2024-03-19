@@ -15,7 +15,6 @@ import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import net.metrosystems.inventoryaggregator.featuretoggle.DataSourceFeatureToggle;
 import org.springframework.http.MediaType;
-import org.springframework.metrics.annotation.Timed;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@Timed("ArticleData")
 @RequiredArgsConstructor
 @RequestMapping(value = "/inventoryaggregator", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArticleListDataController {

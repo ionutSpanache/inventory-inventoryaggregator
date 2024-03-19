@@ -1,9 +1,11 @@
 package net.metrosystems.inventoryaggregator.config.RestTemplate;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.HttpClient;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.util.TimeValue;
 import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +44,7 @@ public class RestTemplateMovieConfig {
     @Bean("httpClientWithRetry")
     public HttpClient httpClient() {
         return HttpClients.custom()
-                .setRetryHandler(retryHandler)
+            .setRetryStrategy(new DefaultHttpRequestRetryStrategy(3, TimeValue.ofSeconds(3)))
                 .build();
     }
 }

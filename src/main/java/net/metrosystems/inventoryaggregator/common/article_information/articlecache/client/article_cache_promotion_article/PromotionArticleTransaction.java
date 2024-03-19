@@ -1,7 +1,7 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="Transaction")
 public class PromotionArticleTransaction {

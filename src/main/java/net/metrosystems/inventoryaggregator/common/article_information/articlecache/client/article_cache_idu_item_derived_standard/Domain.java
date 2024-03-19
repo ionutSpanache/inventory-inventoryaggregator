@@ -2,7 +2,7 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 
 import com.sun.xml.txw2.annotation.XmlElement;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 @XmlRootElement(name = "domain")

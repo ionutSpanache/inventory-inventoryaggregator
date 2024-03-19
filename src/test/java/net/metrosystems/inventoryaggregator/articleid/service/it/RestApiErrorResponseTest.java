@@ -1,10 +1,8 @@
 package net.metrosystems.inventoryaggregator.articleid.service.it;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 
-import net.metrosystems.inventory.common.apierror.model.ApiError;
-import org.junit.Ignore;
+import net.metrosystems.inventoryaggregator.exception.model.ApiError;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -44,10 +44,5 @@ public class DataDogConfig {
             new LogbackMetrics().bindTo(registry);
         };
     }
-
-    @Bean
-    public TimedAspect timedAspect(StatsdMeterRegistry registry) {
-        return new TimedAspect(registry);
-    }
 }
 
