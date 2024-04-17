@@ -16,11 +16,12 @@ public class CountryProperties {
 
   public Optional<CountrySalesLineCode> getCountrySalesLineCode(
       String countryCode, String salesLine) {
-    InputStream inputStream =
-        getClass().getClassLoader().getResourceAsStream("countrySalesLineCodesJson");
-    if (inputStream == null) return Optional.empty();
 
-    try {
+    try (InputStream inputStream =
+        getClass().getClassLoader().getResourceAsStream("countrySalesLineCodesJson")) {
+      if (inputStream == null) {
+        return Optional.empty();
+      }
       List<CountrySalesLineCode> countrySalesLineCodes =
           ObjectMapperCustom.getMapper()
               .readValue(inputStream, new TypeReference<List<CountrySalesLineCode>>() {});
