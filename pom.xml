@@ -328,7 +328,11 @@
 				<artifactId>spring-security-web</artifactId>
 				<version>${org.springframework.security.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>com.squareup.okio</groupId>
+				<artifactId>okio-jvm</artifactId>
+				<version>3.9.0</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

@@ -25,6 +25,9 @@ public class CountryProperties {
       List<CountrySalesLineCode> countrySalesLineCodes =
           ObjectMapperCustom.getMapper()
               .readValue(inputStream, new TypeReference<List<CountrySalesLineCode>>() {});
+      if (countrySalesLineCodes == null) {
+        return Optional.empty();
+      }
       return countrySalesLineCodes.stream()
           .filter(
               countrySalesLineCode ->
