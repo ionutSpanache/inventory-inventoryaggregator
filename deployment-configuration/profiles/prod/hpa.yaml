@@ -4,7 +4,7 @@ metadata:
   name: PROJECT_NAME
 spec:
   maxReplicas: 10
-  minReplicas: 2
+  minReplicas: 4
   metrics:
     - type: Resource
       resource:
