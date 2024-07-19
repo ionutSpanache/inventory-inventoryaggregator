@@ -79,6 +79,7 @@ public class ArticleMasterData implements Serializable {
   private Long returnPossibilityStoreSupplierNumber;
   private Boolean isTradeItemInConsignment;
   private String seasonCode;
+  private Boolean isTradeItemOnOrder;
 
   public static long getSerialversionuid() {
     return serialVersionUID;
