@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclArticleStoreMasterDataService;
@@ -28,8 +27,6 @@ public class RawArticleStoreMasterDataRepository {
 
   private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
   private final ArticleCacheService articleCacheService;
-  private static final String INDIA_COUNTRY_CODE = "IN";
-
   @Qualifier("ForkJoinCustomPool")
   private final ExecutorService forkJoinPoolCustom;
 
@@ -42,18 +39,6 @@ public class RawArticleStoreMasterDataRepository {
 
     return CompletableFuture.completedFuture(
         articleStoreMasterData.isEmpty() ? RawArticleStoreMasterData.builder().build() : articleStoreMasterData.get(articleId));
-  }
-
-  @Async("asyncExecutor")
-  public CompletableFuture<MaximumRetailPrice> getMaximumRetailPrice(
-          String countryCode, String salesLine, Integer storeNumber, ArticleId articleId) {
-
-    if (INDIA_COUNTRY_CODE.equalsIgnoreCase(countryCode)) {
-      return CompletableFuture.completedFuture(aclArticleStoreMasterDataService.getMaximumRetailPrice(countryCode,
-              salesLine, storeNumber, articleId));
-    }
-
-    return CompletableFuture.completedFuture(MaximumRetailPrice.builder().build());
   }
 
   @Async("asyncExecutor")

@@ -411,7 +411,7 @@ public class ArticleMasterDataRepository {
         || "pp".equalsIgnoreCase(k8sEnvironment)
         || "local".equalsIgnoreCase(k8sEnvironment)) {
 
-      if (Set.of("IN", "CZ", "SK").contains(countryCode)) {
+      if (Set.of("CZ", "SK").contains(countryCode)) {
         return "pp2";
       } else {
         return "pp1";

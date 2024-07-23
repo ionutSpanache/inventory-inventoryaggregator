@@ -54,7 +54,7 @@ public class ArticleCacheService {
   private static final String K8S_DEV_ENVIRONMENT = "dev";
   private static final String K8S_PP_ENVIRONMENT = "pp";
   private static final String LOCAL_ENVIRONMENT = "local";
-  private static final Set<String> COUNTRY_CODES = Set.of("IN", "CZ", "SK");
+  private static final Set<String> COUNTRY_CODES = Set.of("CZ", "SK");
   private final DocumentsService documentsService;
   private final ArticleCacheAAAClient articleCacheClient;
   private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;

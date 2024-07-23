@@ -15,13 +15,11 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
-import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
@@ -34,7 +32,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RawArticleDataService {
 
-  private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final GeneralDataRepository generalDataRepository;
   private final MovieService movieService;
   private final ArticleProcessingService articleProcessingService;
@@ -82,10 +79,6 @@ public class RawArticleDataService {
         stockLocationRepository.getArticleStockLocation(
             articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), dataTypeList);
 
-    CompletableFuture<MaximumRetailPrice> maximumRetailPrice =
-        rawArticleStoreMasterDataRepository.getMaximumRetailPrice(
-            storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), articleId);
-
     CompletableFuture<String> dailyMeanSales =
         movieService.getTotalAverageSales(storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), articleId);
 
@@ -95,7 +88,6 @@ public class RawArticleDataService {
         rawArticleStoreMasterData,
         articleDataFromMovie,
         articleStockLocationList,
-        maximumRetailPrice,
         dailyMeanSales);
 
     generalDataRepository.enhanceRawArticleStoreMasterDataWithDepartmentName(
@@ -129,7 +121,6 @@ public class RawArticleDataService {
             .stockLocations(articleStockLocationList.get())
             .articleComponent(articleComponentCompletableFuture.get())
             .productLifeCycleData(buildProductLifeCycleData(articleMasterData))
-            .maximumRetailPrice(maximumRetailPrice.get())
             .channelDeliveryFlag(articleMasterData.getChannelDeliveryFlag())
             .returnPossibilityStoreSupplierNumber(
                 articleMasterData.getReturnPossibilityStoreSupplierNumber())

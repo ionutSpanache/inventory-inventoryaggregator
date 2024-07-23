@@ -27,7 +27,6 @@ public class RawArticleData implements Serializable {
     private ArticleLocation articleLocation;
     private ArticleComponent articleComponent;
     private ProductLifeCycleData productLifeCycleData;
-    private MaximumRetailPrice maximumRetailPrice;
     private String channelDeliveryFlag;
     private Long returnPossibilityStoreSupplierNumber;
     private MinimumRetailPrice minimumRetailPrice;
@@ -42,7 +41,6 @@ public class RawArticleData implements Serializable {
         return "RawArticleData [articleId=" + articleId + ", articleMasterData=" + articleMasterData
                 + ", stockDetails=" + stockDetails + ", plannedDeliveryDates=" + plannedDeliveryDates
                 + ", stockLocations=" + stockLocations + ", articleComponent=" + articleComponent +
-                ", maximumRetailPrice=" + maximumRetailPrice +
                 ", channelDeliveryFlag=" + channelDeliveryFlag +
                 ", minimumRetailPrice=" + minimumRetailPrice +
                 ", multiLanguageData=" + multiLanguageData +

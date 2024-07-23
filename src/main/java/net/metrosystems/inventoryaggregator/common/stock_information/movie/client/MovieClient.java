@@ -187,9 +187,6 @@ public class MovieClient {
     dataGroupsList.add(new MovieDataGroups("OPMO", reasonsList));
     dataGroupsList.add(new MovieDataGroups("SYST"));
     dataGroupsList.add(new MovieDataGroups("STRD"));
-    if ("IN".equals(countryCode) && "MCC".equals(salesLine)) {
-      dataGroupsList.add(new MovieDataGroups("PARK"));
-    }
     dataGroupsList.add(new MovieDataGroups("MODE", LocalDate.now()));
     dataGroupsList.add(new MovieDataGroups("RESV"));
 

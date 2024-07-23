@@ -16,7 +16,6 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMaste
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
 import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.LanguageData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.MaximumRetailPrice;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MultiLanguageData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
@@ -175,10 +174,6 @@ public class ArticleDetailsService {
     CompletableFuture<List<IduItemDerivedStandard>> iduDerivedStandardsList =
         articleMasterDataRepository.getIduItemDerivedStandardsAsync(countryCode, articleId);
 
-    CompletableFuture<MaximumRetailPrice> maximumRetailPrice =
-        rawArticleStoreMasterDataRepository.getMaximumRetailPrice(
-            countryCode, salesLine, storeNo, articleId);
-
     CompletableFuture<StoreInformationGroup> storeInformationGroup =
         articleMasterDataRepository.getDeliveryFlagAndStoreInformation(
             countryCode, articleId, storeNo);
@@ -195,7 +190,6 @@ public class ArticleDetailsService {
         articleDataFromMovie,
         articleStockLocationList,
         iduDerivedStandardsList,
-        maximumRetailPrice,
         iduItemDerivedStandard,
         dailyMeanSales);
 
@@ -233,7 +227,6 @@ public class ArticleDetailsService {
             .articleComponent(articleComponentCompletableFuture.get())
             .productLifeCycleData(
                 articleCacheService.buildProductLifeCycleData(iduDerivedStandardsList.get()))
-            .maximumRetailPrice(maximumRetailPrice.get())
             .channelDeliveryFlag(storeInformationGroup.get().getChannelDeliveryFlag())
             .returnPossibilityStoreSupplierNumber(
                 storeInformationGroup.get().getStoreItemPhaseOutInformation() != null
