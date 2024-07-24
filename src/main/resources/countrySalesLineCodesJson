@@ -40,11 +40,6 @@
         "salesLineCode":84
       },
       {
-        "countryCode":"IN",
-        "salesLine": "MCC",
-        "salesLineCode":54
-      },
-      {
         "countryCode":"IT",
         "salesLine": "MCC",
         "salesLineCode":71
