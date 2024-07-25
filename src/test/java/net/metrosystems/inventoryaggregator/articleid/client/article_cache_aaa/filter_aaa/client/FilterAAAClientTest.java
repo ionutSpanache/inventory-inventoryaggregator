@@ -1,10 +1,9 @@
 package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
+import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.ArticleFilterKey;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.FilterIsuMaster;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.FilterSupplierInformation;
 import net.metrosystems.inventoryaggregator.config.RestTemplate.RestTemplateCustom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,7 +35,7 @@ class FilterAAAClientTest {
   @Test
   void getFilteredDocuments_shouldReturnFilteredDocuments() throws Exception {
     // Arrange
-    FilterSupplierInformation filter = new FilterSupplierInformation();
+    ArticleFilterKey filter = new ArticleFilterKey();
     Documents expectedDocuments = new Documents();
     expectedDocuments.setArticleKeys(new ArrayList<>());
     expectedDocuments.getArticleKeys().add("key1");
@@ -101,7 +99,7 @@ class FilterAAAClientTest {
   @Test
   void getFilteredDocumentsNextPage_shouldReturnFilteredDocuments() throws Exception {
     // Arrange
-    FilterSupplierInformation filter = new FilterSupplierInformation();
+    ArticleFilterKey filter = new ArticleFilterKey();
     String nextPage = "2";
     Documents expectedDocuments = new Documents();
     expectedDocuments.setArticleKeys(new ArrayList<>());

@@ -1,8 +1,7 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
-
 import java.util.List;
+import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariant;
 
 public class ArticleData {
 	

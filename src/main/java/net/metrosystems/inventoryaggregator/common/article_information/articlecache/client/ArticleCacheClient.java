@@ -25,8 +25,6 @@ public interface ArticleCacheClient {
 
   ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath);
 
-	Optional<ArticleCacheIhdsTree> getSupplierInformation(String countryCode, String salesLine, Optional<String> environment, Long supplierNumber)
-      throws Exception;
 
 	Documents getProductLifeCycleDocumentUrl(String countryCode, ArticleId articleId);
 

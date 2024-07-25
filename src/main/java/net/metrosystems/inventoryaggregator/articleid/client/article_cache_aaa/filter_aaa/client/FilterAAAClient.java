@@ -144,26 +144,6 @@ public class FilterAAAClient {
     return documents;
   }
 
-  public Documents getFilteredDocuments(FilterSupplierInformation filter) throws Exception {
-    UriComponents uriComponents =
-        UriComponentsBuilder.newInstance()
-            .uri(configArticleCacheAAA.getHost())
-            .path(configArticleCacheAAA.getGeneral())
-            .query(configArticleCacheAAA.getGeneralQueryParam())
-            .buildAndExpand()
-            .encode();
-    // todo add suport for multi page response.
-    String filterAsString;
-    try {
-      filterAsString = ObjectMapperCustom.getMapper().writeValueAsString(filter);
-    } catch (JsonProcessingException e) {
-      throw new Exception(e);
-    }
-    return (Documents)
-        restTemplateCustom.postForObject(
-            uriComponents.toUri().toString(), filterAsString, Documents.class, true);
-  }
-
   public <T> Documents getFilteredDocumentsNextPage(T filter, String nextPage) throws Exception {
     UriComponents uriComponents =
         UriComponentsBuilder.newInstance()

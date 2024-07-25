@@ -231,22 +231,6 @@ public class DocumentsService {
     return this.getDocumentsNextpage(documents, filter);
   }
 
-  public Documents getDocumentsBySupplier(
-      String countryCode, String salesLine, Long supplierNumber) throws Exception {
-    FilterSupplierInformation filter =
-        filterAAAService.initializeSupplierInformationFilter(
-            countryCode, salesLine, supplierNumber);
-    Documents documents = filterAAAClient.getFilteredDocuments(filter);
-    if (documents != null && !CollectionUtils.isEmpty(documents.getArticleKeys()))
-      documents
-          .getArticleKeys()
-          .removeIf(
-              articleKey ->
-                  articleKey.toLowerCase().contains("environment=dev")
-                      || articleKey.toLowerCase().contains("environment=qa"));
-    return documents;
-  }
-
   public boolean isStorePresent(String documents, Integer storeNo) {
     ArticleCacheIhdsTree articleCacheDocument =
         articleCacheClient.getArticleCacheDocumentByURL(documents);

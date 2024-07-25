@@ -20,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -103,16 +102,6 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
             articleUrlPath, IsuItemStoreMerchandise.class);
   }
 
-  @Override
-  public Optional<ArticleCacheIhdsTree> getSupplierInformation(
-      String countryCode, String salesLine, Optional<String> environment, Long supplierNumber) throws Exception {
-    Documents articleUrlPathList =
-        documentsService.getDocumentsBySupplier(countryCode, salesLine, supplierNumber);
-    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) return Optional.empty();
-
-    String url = articleUrlPathList.getArticleKeys().get(0);
-    return Optional.ofNullable(getForArticleCacheObject(url, ArticleCacheIhdsTree.class));
-  }
 
   @Override
   public Documents getProductLifeCycleDocumentUrl(String countryCode, ArticleId articleId) {

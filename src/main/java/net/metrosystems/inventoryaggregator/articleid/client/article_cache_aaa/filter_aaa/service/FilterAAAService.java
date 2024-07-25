@@ -52,19 +52,6 @@ public class FilterAAAService {
         return filter;
     }
 
-    public FilterSupplierInformation initializeSupplierInformationFilter(String countryCode, String salesLine, Long supplierNumber) {
-        FilterSupplierInformation filter = new FilterSupplierInformation();
-        List<FilterKeySupplierInformation> filterKeyList = new ArrayList<>();
-        filter.setFilterKeys(filterKeyList);
-        FilterKeySupplierInformation filterKey = new FilterKeySupplierInformation();
-        filterKey.setHardKeyDocument("supplier-information");
-        filterKey.setCountry(countryCode.toLowerCase());
-        filterKey.setSalesLine(salesLine.toLowerCase());
-        filterKey.setSupplierNumber(supplierNumber);
-        filterKeyList.add(filterKey);
-        return filter;
-    }
-
     public List<ArticleId> getArticleIdByBarcode(String countryCode, String salesLine, String languageCode, Integer storeNo, String barCode) throws Exception {
         return documentsService.
                 transformDocumentListInArticleIdList(
