@@ -5,8 +5,8 @@ on:
       - master
     paths-ignore:
       - .github/waas.yaml
-      - .github/secret-management.yaml
       - .github/workflows/deploy.yaml
+      - .github/workflows/polaris.yaml
 concurrency:
   group: 'WaaS: Deployment pipeline'
   cancel-in-progress: false
