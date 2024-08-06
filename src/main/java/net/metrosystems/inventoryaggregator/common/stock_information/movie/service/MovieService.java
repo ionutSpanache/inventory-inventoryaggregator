@@ -200,22 +200,6 @@ public class MovieService {
             : null);
   }
 
-  public List<MovieAdapter> getArticleStockForVariant(
-      String countryCode, String salesLine, int storeNo, Long mmsArtNo, Long variantNo) {
-    List<MovieAdapter> movieStockAdapterList = new ArrayList<>();
-    List<StockDetails> stockDetailsList =
-        movieClient.getStockDetailsForArticleVariant(
-            countryCode, salesLine, storeNo, mmsArtNo, variantNo);
-    if (!stockDetailsList.isEmpty()) {
-      for (StockDetails stockDetails : stockDetailsList) {
-        if (stockDetails.getReturnCode() == 0) {
-          movieStockAdapterList.add(this.transformStockDetailToMovieAdapter(stockDetails));
-        }
-      }
-    }
-    return movieStockAdapterList;
-  }
-
   public MovieAdapter getArticleStockForVariantBundle(
       String countryCode,
       String salesLine,

@@ -21,11 +21,9 @@ import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -35,9 +33,6 @@ public class MovieClient {
 
   @Value("${MOVIE_STOCK_HOST}")
   private String movieStockServiceHost;
-
-  @Value("${MOVIE_STOCK_PATH_FOR_VARIANT}")
-  private String movieStockPathForVariant;
 
   @Value("${MOVIE_TOTAL_AVERAGE_SALES_HOST}")
   private String movieTotalAverageSalesHost;
@@ -50,32 +45,6 @@ public class MovieClient {
   @Autowired
   public MovieClient(@Qualifier("webClientMovie") WebClient webClient) {
     this.webClient = webClient;
-  }
-
-  public List<StockDetails> getStockDetailsForArticleVariant(
-      String countryCode, String salesLine, int storeNo, Long mmsArtNo, Long variantNo) {
-    String urlInUse =
-        String.format(
-            movieStockServiceHost + movieStockPathForVariant,
-            countryCode.toUpperCase(),
-            salesLine.toUpperCase(),
-            storeNo,
-            mmsArtNo,
-            variantNo);
-    try {
-      //      return restTemplate.getForObject(urlInUse,
-      // StockDetailsResponse.class).getStockDetails();
-      return webClient
-          .get()
-          .uri(urlInUse)
-          .retrieve()
-          .bodyToMono(StockDetailsResponse.class)
-          .block()
-          .getStockDetails();
-    } catch (Exception e) {
-      log.error("Error while calling MOVIE input={}, exception={}", urlInUse, e.getMessage(), e);
-      return null;
-    }
   }
 
   public String getTotalAverageSales(
@@ -222,5 +191,4 @@ public class MovieClient {
       return null;
     }
   }
-
 }

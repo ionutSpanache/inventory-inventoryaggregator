@@ -163,7 +163,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       try {
         JsonNode data = objectMapper.readTree(responseBody);
         subError = objectMapper.treeToValue(data, ApiError.class);
-        subError.setDebugMessage(null);
+        if(subError!=null){
+          subError.setDebugMessage(null);
+        }
       } catch (Exception e) {
         log.debug("Unable to parse the body message as ApiError: {}", responseBody);
         subError = toFallbackApiError.apply(valueOf(ex.getStatusCode().value()));

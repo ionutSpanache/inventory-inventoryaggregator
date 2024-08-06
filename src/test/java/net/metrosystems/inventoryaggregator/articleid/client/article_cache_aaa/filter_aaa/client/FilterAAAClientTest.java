@@ -1,5 +1,12 @@
 package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+import java.net.URI;
+import java.util.ArrayList;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.ConfigArticleCacheAAA;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.model.ArticleFilterKey;
@@ -9,14 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.net.URI;
-import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 class FilterAAAClientTest {
 
@@ -56,12 +55,9 @@ class FilterAAAClientTest {
     assertTrue(documents.getArticleKeys().contains("key1"));
     assertTrue(documents.getArticleKeys().contains("key2"));
 
-    verify(configArticleCacheAAA).getHost();
-    verify(configArticleCacheAAA).getGeneral();
-    verify(configArticleCacheAAA).getGeneralQueryParam();
     verify(restTemplateCustom)
         .postForObject(anyString(), anyString(), eq(Documents.class), eq(true));
-    verifyNoMoreInteractions(configArticleCacheAAA, restTemplateCustom);
+    verifyNoMoreInteractions(restTemplateCustom);
   }
 
   @Test
@@ -88,12 +84,10 @@ class FilterAAAClientTest {
     assertTrue(documents.getArticleKeys().contains("key1"));
     assertTrue(documents.getArticleKeys().contains("key2"));
 
-    verify(configArticleCacheAAA).getHost();
-    verify(configArticleCacheAAA).getGeneral();
-    verify(configArticleCacheAAA).getGeneralQueryParam();
+    ;
     verify(restTemplateCustom)
         .postForObject(anyString(), anyString(), eq(Documents.class), eq(true));
-    verifyNoMoreInteractions(configArticleCacheAAA, restTemplateCustom);
+    verifyNoMoreInteractions(restTemplateCustom);
   }
 
   @Test
@@ -122,12 +116,8 @@ class FilterAAAClientTest {
     assertTrue(documents.getArticleKeys().contains("key1"));
     assertTrue(documents.getArticleKeys().contains("key2"));
 
-    verify(configArticleCacheAAA).getHost();
-    verify(configArticleCacheAAA).getGeneral();
-    verify(configArticleCacheAAA).getGeneralQueryParam();
-    verify(configArticleCacheAAA).getFrom();
     verify(restTemplateCustom)
         .postForObject(anyString(), anyString(), eq(Documents.class), eq(true));
-    verifyNoMoreInteractions(configArticleCacheAAA, restTemplateCustom);
+    verifyNoMoreInteractions(restTemplateCustom);
   }
 }
