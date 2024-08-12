@@ -70,24 +70,4 @@ public class ArticleListDataController {
     return articleListDetailsService.isTradeItemExcludedFromDiscounts(
         articleIdList, countryCode, salesLine);
   }
-
-  @AddLogs
-  @PostMapping(
-      value =
-          "country/{countryCode}/salesline/{salesLine}/storenumber/{storeNumber}/articles/future-promotions",
-      consumes = "application/json",
-      produces = "application/json")
-  public List<PromotionArticleDataForArticleId> getFuturePromotionsByArticleIds(
-      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-      @TagField(name = "storeNumber") @PathVariable("storeNumber") Integer storeNumber,
-      @RequestBody List<ArticleId> articleIdList) {
-    return articleListDetailsService.getFuturePromotionsForArticleIds(
-        articleIdList,
-        StoreId.builder()
-            .countryCode(countryCode)
-            .salesLine(salesLine)
-            .storeNumber(storeNumber)
-            .build());
-  }
 }

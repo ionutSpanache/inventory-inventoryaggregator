@@ -108,34 +108,6 @@ public class ArticleMasterDataRepository {
   }
 
   @Async("asyncExecutor")
-  public CompletableFuture<List<PromotionArticleDataForArticleId>>
-      getPromotionDataArticlesForArticleIds(
-          List<ArticleId> articleIdList, String countryCode, Integer storeId)
-          throws ExecutionException, InterruptedException {
-    List<PromotionArticleDataForArticleId> promotionArticleDataList =
-        forkJoinPoolCustom
-            .submit(
-                () ->
-                    articleIdList.parallelStream()
-                        .map(
-                            articleId -> {
-                              List<PromotionArticleData> promotionArticleData;
-                              promotionArticleData =
-                                  getPromotionArticle(countryCode, storeId, articleId).stream()
-                                      .filter(t -> Boolean.TRUE.equals(t.getValid()))
-                                      .toList();
-                              return PromotionArticleDataForArticleId.builder()
-                                  .articleId(articleId)
-                                  .promotionArticleData(promotionArticleData)
-                                  .build();
-                            })
-                        .filter(Objects::nonNull)
-                        .toList())
-            .get();
-    return CompletableFuture.completedFuture(promotionArticleDataList);
-  }
-
-  @Async("asyncExecutor")
   public CompletableFuture<StoreInformationGroup> getDeliveryFlagAndStoreInformation(
       String countryCode, ArticleId articleId, Integer storeNumber) {
     StoreInformationGroup storeInformationGroup =

@@ -324,21 +324,4 @@ public class ArticleListDetailsService {
     }
     return articleMasterDataForArticleId;
   }
-
-  public List<PromotionArticleDataForArticleId> getFuturePromotionsForArticleIds(
-      List<ArticleId> articleIds, StoreId storeId) {
-    if (articleIds == null || articleIds.isEmpty()) {
-      return Collections.emptyList();
-    }
-    try {
-      return articleMasterDataRepository
-          .getPromotionDataArticlesForArticleIds(
-              articleIds, storeId.getCountryCode(), storeId.getStoreNumber())
-          .get();
-    } catch (InterruptedException | ExecutionException e) {
-      log.error("Could not getFuturePromotionsForArticleIds={}", e.getMessage(), e);
-      Thread.currentThread().interrupt();
-      throw new InterruptedRuntimeException("Could not getFuturePromotionsForArticleIds");
-    }
-  }
 }
