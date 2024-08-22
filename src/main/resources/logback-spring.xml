@@ -15,8 +15,9 @@
 
             <includeMdc>true</includeMdc>
 
-            <customFields>{"marc_id": "${DRP_EV_DD_MARC_ID}", "@vertical": "${DRP_CF_VERTICAL}", "@type": "service",
-                "@service-name": "${DRP_CF_SERVICE}", "@hostname": "${HOSTNAME}", "@retention" : "technical"}
+            <customFields>{"@vertical": "${DRP_CF_VERTICAL}", "@type": "service", "@service-name": "${DRP_CF_SERVICE}",
+                "@hostname": "${HOSTNAME}", "@retention" : "technical", "marc_id": "${DRP_EV_DD_MARC_ID}", "vertical":
+                "${DRP_CF_VERTICAL}", "solution": "${DRP_EV_DD_SOLUTION}", "solution_id": "${DRP_EV_DD_SOLUTION_ID}" }
             </customFields>
             <includeContext>false</includeContext>
 
