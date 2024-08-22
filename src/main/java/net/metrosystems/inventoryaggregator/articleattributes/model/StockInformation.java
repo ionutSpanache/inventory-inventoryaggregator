@@ -3,7 +3,6 @@ package net.metrosystems.inventoryaggregator.articleattributes.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.model.ParkedStock;
 
 import java.io.Serializable;
 import java.util.List;

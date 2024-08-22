@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.common.stock_information.movie.model;
+package net.metrosystems.inventoryaggregator.articleattributes.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

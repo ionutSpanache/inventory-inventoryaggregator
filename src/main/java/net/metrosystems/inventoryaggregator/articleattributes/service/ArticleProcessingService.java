@@ -7,17 +7,16 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.common.stock_information.movieacl.MovieAclService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,9 +24,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ArticleProcessingService {
 
-  private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final ArticleMasterDataRepository articleMasterDataRepository;
+  private final MovieAclService movieAclService;
 
   public CompletableFuture<List<StockData>> getStockDataFromMovie(
       List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo) {
@@ -35,8 +34,7 @@ public class ArticleProcessingService {
         CompletableFuture.completedFuture(Collections.emptyList());
     try {
       stockDataFromMovie =
-          articleDataFromMovieRepository.getArticleListDataFromMovie(
-              articleIdList, countryCode, salesLine, storeNo);
+          movieAclService.getStockDataListAsync(articleIdList, countryCode, salesLine, storeNo);
 
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
@@ -133,13 +131,12 @@ public class ArticleProcessingService {
     return rawArticleStoreMasterData;
   }
 
-  public CompletableFuture<ArticleDataFromMovie> getArticleDataFromMovie(
+  public CompletableFuture<StockData> getArticleDataFromMovie(
       ArticleId articleId, String countryCode, String salesLine, Integer storeNo) {
-    CompletableFuture<ArticleDataFromMovie> articleDataFromMovie = new CompletableFuture<>();
+    CompletableFuture<StockData> stockDataCompletableFuture = new CompletableFuture<>();
     try {
-      articleDataFromMovie =
-          articleDataFromMovieRepository.getArticleDataFromMovie(
-              articleId, countryCode, salesLine, storeNo);
+      stockDataCompletableFuture =
+          movieAclService.getStockDataAsync(articleId, countryCode, salesLine, storeNo);
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
@@ -148,6 +145,6 @@ public class ArticleProcessingService {
           e.getMessage(),
           e);
     }
-    return articleDataFromMovie;
+    return stockDataCompletableFuture;
   }
 }

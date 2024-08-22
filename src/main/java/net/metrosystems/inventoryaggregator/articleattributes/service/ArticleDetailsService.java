@@ -21,6 +21,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleDa
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
 import net.metrosystems.inventoryaggregator.articleattributes.model.VariantDescription;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
@@ -163,7 +164,7 @@ public class ArticleDetailsService {
         articleProcessingService.getRawArticleStoreMasterData(
             articleId, countryCode, salesLine, storeNo);
 
-    CompletableFuture<ArticleDataFromMovie> articleDataFromMovie =
+    CompletableFuture<StockData> stockData =
         articleProcessingService.getArticleDataFromMovie(
             articleId, countryCode, salesLine, storeNo);
 
@@ -187,7 +188,7 @@ public class ArticleDetailsService {
     CompletableFuture.allOf(
         articleMasterData,
         rawArticleStoreMasterData,
-        articleDataFromMovie,
+        stockData,
         articleStockLocationList,
         iduDerivedStandardsList,
         iduItemDerivedStandard,
@@ -204,9 +205,9 @@ public class ArticleDetailsService {
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
 
-    if (articleDataFromMovie.get() != null) {
-      stockDetails = articleDataFromMovie.get().getArticleStockData();
-      plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
+    if (stockData.get() != null) {
+      stockDetails = stockData.get().getArticleStockData();
+      plannedDeliveryDates = stockData.get().getArticlePlannedDeliveryDates();
       if (dailyMeanSales.get() != null && stockDetails != null) {
         Float parsedDailyMeanSales = Float.parseFloat(dailyMeanSales.get());
         DecimalFormat df = new DecimalFormat();

@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -71,7 +72,7 @@ public class RawArticleDataService {
         articleProcessingService.getRawArticleStoreMasterData(
             articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber());
 
-    CompletableFuture<ArticleDataFromMovie> articleDataFromMovie =
+    CompletableFuture<StockData> stockData =
         articleProcessingService.getArticleDataFromMovie(
             articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber());
 
@@ -86,7 +87,7 @@ public class RawArticleDataService {
         articleComponentCompletableFuture,
         articleMasterIdForArticleId,
         rawArticleStoreMasterData,
-        articleDataFromMovie,
+        stockData,
         articleStockLocationList,
         dailyMeanSales);
 
@@ -98,9 +99,9 @@ public class RawArticleDataService {
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
 
-    if (articleDataFromMovie.get() != null) {
-      stockDetails = articleDataFromMovie.get().getArticleStockData();
-      plannedDeliveryDates = articleDataFromMovie.get().getArticlePlannedDeliveryDates();
+    if (stockData.get() != null) {
+      stockDetails = stockData.get().getArticleStockData();
+      plannedDeliveryDates = stockData.get().getArticlePlannedDeliveryDates();
       if (dailyMeanSales.get() != null && stockDetails != null) {
         Float parsedDailyMeanSales = Float.parseFloat(dailyMeanSales.get());
         DecimalFormat df = new DecimalFormat();

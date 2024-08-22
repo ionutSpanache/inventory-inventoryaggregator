@@ -11,16 +11,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawIsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleDataFromMovieRepository;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleProcessingServiceV2;
@@ -30,8 +28,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
-import net.metrosystems.inventoryaggregator.common.model.InterruptedRuntimeException;
-import net.metrosystems.inventoryaggregator.common.model.StoreId;
+import net.metrosystems.inventoryaggregator.common.stock_information.movieacl.MovieAclService;
 import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
 import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import org.springframework.stereotype.Service;
@@ -43,10 +40,10 @@ public class ArticleListDetailsService {
 
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final ArticleMasterDataRepository articleMasterDataRepository;
-  private final ArticleDataFromMovieRepository articleDataFromMovieRepository;
   private final ArticleCacheService articleCacheService;
   private final StockLocationRepository stockLocationRepository;
   private final ArticleProcessingServiceV2 articleProcessingServiceV2;
+  private final MovieAclService movieAclService;
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       List<ArticleId> articleIdList,
@@ -228,8 +225,7 @@ public class ArticleListDetailsService {
         CompletableFuture.completedFuture(Collections.emptyList());
     try {
       stockDataFromMovie =
-          articleDataFromMovieRepository.getArticleListDataFromMovie(
-              articleIdList, countryCode, salesLine, storeNo);
+          movieAclService.getStockDataListAsync(articleIdList, countryCode, salesLine, storeNo);
 
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
