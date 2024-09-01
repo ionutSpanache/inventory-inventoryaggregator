@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
@@ -23,7 +22,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.StockInforma
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
+import net.metrosystems.inventoryaggregator.common.movieacl.MovieAclService;
 import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,6 @@ import org.springframework.stereotype.Service;
 public class RawArticleDataService {
 
   private final GeneralDataRepository generalDataRepository;
-  private final MovieService movieService;
   private final ArticleProcessingService articleProcessingService;
   private final ArticleProcessingServiceV2 articleProcessingServiceV2;
   private final StockLocationRepository stockLocationRepository;
@@ -49,6 +47,8 @@ public class RawArticleDataService {
     LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");
     LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
   }
+
+  private final MovieAclService movieAclService;
 
   public void buildRawArticleDataList(
       ArticleId articleId,
@@ -81,7 +81,8 @@ public class RawArticleDataService {
             articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), dataTypeList);
 
     CompletableFuture<String> dailyMeanSales =
-        movieService.getTotalAverageSales(storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), articleId);
+        movieAclService.getAverageSales(
+            articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber());
 
     CompletableFuture.allOf(
         articleComponentCompletableFuture,
