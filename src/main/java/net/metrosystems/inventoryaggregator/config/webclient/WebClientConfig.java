@@ -47,15 +47,4 @@ public class WebClientConfig {
   public WebClient simpleWebClient() {
     return WebClient.builder().build();
   }
-
-  @Bean
-  @Qualifier(value = "webClientMovie")
-  public WebClient webClientMovieAcl() {
-    return WebClient.builder()
-        .exchangeStrategies(
-            ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
-                .build())
-        .build();
-  }
 }

@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleDataFromMovie;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
@@ -34,7 +33,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.MerchandiseArticleDescription;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
-import net.metrosystems.inventoryaggregator.common.stock_information.movie.service.MovieService;
+import net.metrosystems.inventoryaggregator.common.movieacl.MovieAclService;
 import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import org.springframework.stereotype.Service;
@@ -57,13 +56,13 @@ public class ArticleDetailsService {
   }
 
   private final ArticleCacheService articleCacheService;
-  private final MovieService movieService;
   private final ArticleMasterDataRepository articleMasterDataRepository;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final GeneralDataRepository generalDataRepository;
   private final ArticleProcessingService articleProcessingService;
   private final StockLocationRepository stockLocationRepository;
   private final ArticleProcessingServiceV2 articleProcessingServiceV2;
+  private final MovieAclService movieAclService;
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       ArticleId articleId,
@@ -183,7 +182,7 @@ public class ArticleDetailsService {
         articleMasterDataRepository.getMultiLanguageData(countryCode, articleId);
 
     CompletableFuture<String> dailyMeanSales =
-        movieService.getTotalAverageSales(countryCode, salesLine, storeNo, articleId);
+        movieAclService.getAverageSales(articleId, countryCode, salesLine, storeNo);
 
     CompletableFuture.allOf(
         articleMasterData,

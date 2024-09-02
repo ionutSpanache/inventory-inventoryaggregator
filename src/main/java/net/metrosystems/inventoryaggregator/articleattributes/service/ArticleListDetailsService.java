@@ -28,7 +28,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
-import net.metrosystems.inventoryaggregator.common.stock_information.movieacl.MovieAclService;
+import net.metrosystems.inventoryaggregator.common.movieacl.MovieAclService;
 import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
 import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import org.springframework.stereotype.Service;

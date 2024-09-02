@@ -16,7 +16,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArti
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
-import net.metrosystems.inventoryaggregator.common.stock_information.movieacl.MovieAclService;
+import net.metrosystems.inventoryaggregator.common.movieacl.MovieAclService;
 import org.springframework.stereotype.Service;
 
 @Service

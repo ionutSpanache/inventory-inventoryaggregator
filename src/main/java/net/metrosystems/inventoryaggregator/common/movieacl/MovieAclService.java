@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.common.stock_information.movieacl;
+package net.metrosystems.inventoryaggregator.common.movieacl;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.common.stock_information.movieacl.client.MovieAclClient;
+import net.metrosystems.inventoryaggregator.common.movieacl.client.MovieAclClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -35,5 +35,12 @@ public class MovieAclService {
       return CompletableFuture.completedFuture(null);
     }
     return CompletableFuture.completedFuture(stockDataList.get(0));
+  }
+
+  @Async("asyncExecutor")
+  public CompletableFuture<String> getAverageSales(
+      ArticleId articleId, String countryCode, String salesLine, Integer storeNumber) {
+    return CompletableFuture.completedFuture(
+        movieAclClient.getAverageSales(articleId, countryCode, salesLine, storeNumber));
   }
 }

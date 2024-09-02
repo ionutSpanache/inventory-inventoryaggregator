@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.common.stock_information.movieacl.client;
+package net.metrosystems.inventoryaggregator.common.movieacl.client;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +24,9 @@ public class MovieAclClient {
   @Value("${mstore.movieacl.stock.data.url}")
   private String stockDataUrl;
 
+  @Value("${mstore.movieacl.average-sales.url}")
+  private String averageSalesPath;
+
   private final WebClient webClient;
 
   public List<StockData> getStockDataList(
@@ -46,6 +49,38 @@ public class MovieAclClient {
               return Mono.empty();
             })
         .collectList()
+        .block();
+  }
+
+  public String getAverageSales(
+      ArticleId articleId, String countryCode, String salesLine, Integer storeNumber) {
+    String uri =
+        UriComponentsBuilder.fromHttpUrl(mstoreHost)
+            .path(averageSalesPath)
+            .buildAndExpand(
+                countryCode,
+                salesLine,
+                storeNumber,
+                articleId.getArticleNumber(),
+                articleId.getVariantNumber(),
+                articleId.getBundleNumber())
+            .toUriString();
+
+    return webClient
+        .get()
+        .uri(uri)
+        .retrieve()
+        .bodyToMono(String.class)
+        .onErrorResume(
+            error -> {
+              log.error(
+                  "#getAverageSales unsuccessful call for country:{},storeNumber:{}, articleId:{}",
+                  countryCode,
+                  storeNumber,
+                  articleId,
+                  error);
+              return Mono.empty();
+            })
         .block();
   }
 }
