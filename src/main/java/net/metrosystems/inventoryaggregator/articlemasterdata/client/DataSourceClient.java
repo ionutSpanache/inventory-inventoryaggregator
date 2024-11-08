@@ -1,6 +1,5 @@
 package net.metrosystems.inventoryaggregator.articlemasterdata.client;
 
-import static java.util.function.Function.*;
 import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
