@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articlemasterdata.client.DataSourceClient;
@@ -20,10 +19,11 @@ public class DataSourceRepository {
   private final DataSourceClient dataSourceClient;
 
   @Async("asyncExecutor")
-  public CompletableFuture<Map<ArticleId, ArticleMasterData>> getArticleMasterDataForArticleIdListAsync(
-      List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
+  public CompletableFuture<Map<ArticleId, ArticleMasterId>>
+      getArticleMasterDataForArticleIdListAsync(
+          List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
     return CompletableFuture.completedFuture(
-        dataSourceClient.getMapArticleMasterDataForArticleIdList(
+        dataSourceClient.getArticleMasterIdByArticleId(
             articleIdList, countryCode, languageCode, storeNo));
   }
 

@@ -7,7 +7,6 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articlemasterdata.repository.DataSourceRepository;
@@ -35,12 +34,12 @@ public class ArticleProcessingServiceV2 {
     return articleMasterIdForArticleId;
   }
 
-  public CompletableFuture<Map<ArticleId, ArticleMasterData>> getMasterDataForArticleId(
+  public CompletableFuture<Map<ArticleId, ArticleMasterId>> getMasterDataForArticleId(
       List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
-    CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
+    CompletableFuture<Map<ArticleId, ArticleMasterId>> articleMasterIdForArticleId =
         CompletableFuture.completedFuture(Collections.emptyMap());
     try {
-      articleMasterDataForArticleId =
+      articleMasterIdForArticleId =
           dataSourceRepository.getArticleMasterDataForArticleIdListAsync(
               articleIdList, countryCode, languageCode, storeNo);
     } catch (ArticleNotFoundException ex) {
@@ -49,16 +48,16 @@ public class ArticleProcessingServiceV2 {
       log.error(
           "ArticleProcessingServiceV2.getMasterDataForArticleId - error: {}", e.getMessage(), e);
     }
-    return articleMasterDataForArticleId;
+    return articleMasterIdForArticleId;
   }
 
   public CompletableFuture<ArticleComponent> getArticleComponent(
-      String countryCode,Integer storeNumber, Long articleNumber) {
+      String countryCode, Integer storeNumber, Long articleNumber) {
     CompletableFuture<ArticleComponent> articleComponentCompletableFuture =
         new CompletableFuture<>();
     try {
       articleComponentCompletableFuture =
-          dataSourceRepository.getArticleComponentAsync(countryCode,storeNumber, articleNumber);
+          dataSourceRepository.getArticleComponentAsync(countryCode, storeNumber, articleNumber);
     } catch (Exception e) {
       log.error("ArticleProcessingServiceV2.getArticleComponent - error: {}", e.getMessage(), e);
     }
@@ -73,7 +72,8 @@ public class ArticleProcessingServiceV2 {
     try {
       List<ArticleId> articleIdsWithoutDuplicates = articleIdList.stream().distinct().toList();
       articleComponentsCompletableFuture =
-          dataSourceRepository.getArticleComponentsAsync(countryCode, storeNumber, articleIdsWithoutDuplicates);
+          dataSourceRepository.getArticleComponentsAsync(
+              countryCode, storeNumber, articleIdsWithoutDuplicates);
     } catch (Exception e) {
       log.error("ArticleProcessingServiceV2.getArticleComponents - error: {}", e.getMessage(), e);
     }
