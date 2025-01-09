@@ -5,8 +5,8 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
+import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -57,7 +57,8 @@ public class StockLocationClientService {
                 error -> {
                   if(error instanceof WebClientResponseException webClientResponseException && HttpStatus.NOT_FOUND != webClientResponseException.getStatusCode()){
                     log.error(
-                        "Error on retrieving article stock Location for ArticleList from DataSource. Error={} ",
+                        "Error on retrieving articleStockLocation for articleId={} from MstoreAcl. Error={} ",
+                        articleId,
                         error.getMessage(),
                         error);
                   }
@@ -86,7 +87,7 @@ public class StockLocationClientService {
             error -> {
               if(error instanceof WebClientResponseException webClientResponseException && HttpStatus.NOT_FOUND != webClientResponseException.getStatusCode()){
                 log.error(
-                    "Error on retrieving article stock Location for ArticleList from DataSource. Error={} ",
+                    "Error on retrieving articleStockLocation for ArticleList from MstoreAcl. Error={} ",
                     error.getMessage(),
                     error);
               }
