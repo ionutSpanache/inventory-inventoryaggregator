@@ -10,11 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
@@ -60,7 +56,7 @@ public class RawArticleDataListService {
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
         articleProcessingServiceV2.getArticleComponents(countryCode, storeNo, articleIdList);
 
-    CompletableFuture<Map<ArticleId, ArticleMasterData>> articleMasterDataForArticleId =
+    CompletableFuture<Map<ArticleId, ArticleMasterId>> articleMasterId =
         articleProcessingServiceV2.getMasterDataForArticleId(
             articleIdList, countryCode, correctLanguageCode, storeNo);
 
@@ -83,7 +79,7 @@ public class RawArticleDataListService {
 
     CompletableFuture.allOf(
         articleComponentForArticleId,
-        articleMasterDataForArticleId,
+        articleMasterId,
         articleStoreMasterFromAcl,
         articleStoreExceptionsFromAC,
         stockDataFromMovie,
@@ -109,37 +105,44 @@ public class RawArticleDataListService {
                     (oldValue, newValue) -> oldValue));
 
     Map<ArticleId, ProductLifeCycleData> productLifeCycleMap =
-        articleMasterDataForArticleId.get().entrySet().stream()
+        articleMasterId.get().entrySet().stream()
             .collect(
                 Collectors.toMap(
                     Map.Entry::getKey,
                     entry ->
-                        Optional.ofNullable(buildProductLifeCycleData(entry.getValue()))
+                        Optional.ofNullable(
+                                buildProductLifeCycleData(entry.getValue().getArticleMasterData()))
                             .orElse(new ProductLifeCycleData())));
 
     for (RawArticleData rawArticleData : rawArticleDataList) {
-      rawArticleData.setArticleMasterData(
-          articleMasterDataForArticleId.get().get(rawArticleData.getArticleId()));
-      rawArticleData.setArticleStoreMasterData(
-          rawArticleStoreMasterDataMap.getOrDefault(
-              rawArticleData.getArticleId(), RawArticleStoreMasterData.builder().build()));
-      rawArticleData.setStockDetails(
-          Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
-              .map(StockData::getArticleStockData)
-              .orElse(null));
-      rawArticleData.setPlannedDeliveryDates(
-          Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
-              .map(StockData::getArticlePlannedDeliveryDates)
-              .orElse(Collections.emptyList()));
-      rawArticleData.setStockLocations(
-          Optional.ofNullable(articleStockLocationListMap.get(rawArticleData.getArticleId()))
-              .map(ArticleStockLocations::getStockLocations)
-              .orElse(Collections.emptyList()));
-      rawArticleData.setArticleComponent(
-          articleComponentForArticleId.get().get(rawArticleData.getArticleId()));
-      rawArticleData.setProductLifeCycleData(
-          productLifeCycleMap.getOrDefault(
-              rawArticleData.getArticleId(), new ProductLifeCycleData()));
+      Optional<ArticleMasterId> articleMasterIdOpt =
+          Optional.ofNullable(articleMasterId.get().get(rawArticleData.getArticleId()));
+
+      rawArticleData
+          .setArticleMasterData(
+              articleMasterIdOpt.map(ArticleMasterId::getArticleMasterData).orElse(null))
+          .setArticleStoreMasterData(
+              rawArticleStoreMasterDataMap.getOrDefault(
+                  rawArticleData.getArticleId(), RawArticleStoreMasterData.builder().build()))
+          .setStockDetails(
+              Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
+                  .map(StockData::getArticleStockData)
+                  .orElse(null))
+          .setPlannedDeliveryDates(
+              Optional.ofNullable(stockDataFromMovieMap.get(rawArticleData.getArticleId()))
+                  .map(StockData::getArticlePlannedDeliveryDates)
+                  .orElse(Collections.emptyList()))
+          .setStockLocations(
+              Optional.ofNullable(articleStockLocationListMap.get(rawArticleData.getArticleId()))
+                  .map(ArticleStockLocations::getStockLocations)
+                  .orElse(Collections.emptyList()))
+          .setArticleComponent(
+              articleComponentForArticleId.get().get(rawArticleData.getArticleId()))
+          .setProductLifeCycleData(
+              productLifeCycleMap.getOrDefault(
+                  rawArticleData.getArticleId(), new ProductLifeCycleData()))
+          .setMultiLanguageData(
+              articleMasterIdOpt.map(ArticleMasterId::getMultiLanguageData).orElse(null));
     }
   }
 

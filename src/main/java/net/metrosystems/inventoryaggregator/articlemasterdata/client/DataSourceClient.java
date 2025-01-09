@@ -9,7 +9,6 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleIdComponent;
@@ -44,18 +43,17 @@ public class DataSourceClient {
   @Value("${mstore.inventory.datasource.articlecomponents.url}")
   private String dataSourceArticleComponentsUrl;
 
-  public Map<ArticleId, ArticleMasterData> getMapArticleMasterDataForArticleIdList(
+  public Map<ArticleId, ArticleMasterId> getArticleMasterIdByArticleId(
       List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
 
     List<ArticleMasterId> articleMasterIds =
         getArticleMasterDataForArticleIdList(articleIdList, countryCode, languageCode, storeNo);
 
-    Map<ArticleId, ArticleMasterData> articleIdArticleMasterDataMap = new HashMap<>();
+    Map<ArticleId, ArticleMasterId> articleIdArticleMasterDataMap = new HashMap<>();
     if (!isEmpty(articleMasterIds)) {
       articleMasterIds.forEach(
           articleMasterId ->
-              articleIdArticleMasterDataMap.put(
-                  articleMasterId.getArticleId(), articleMasterId.getArticleMasterData()));
+              articleIdArticleMasterDataMap.put(articleMasterId.getArticleId(), articleMasterId));
     }
 
     return articleIdArticleMasterDataMap;
