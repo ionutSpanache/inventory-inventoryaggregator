@@ -14,6 +14,10 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
+
+import static org.apache.http.HttpHeaders.ACCEPT_ENCODING;
+
 @Configuration
 public class WebClientConfig {
   @Bean
@@ -43,8 +47,31 @@ public class WebClientConfig {
   }
 
   @Bean
+  public OAuth2AuthorizedClientManager authorizedClientManager(
+          ClientRegistrationRepository clientRegistrationRepository,
+          OAuth2AuthorizedClientService clientService) {
+    OAuth2AuthorizedClientProvider authorizedClientProvider =
+            OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build();
+    AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
+            new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+                    clientRegistrationRepository, clientService);
+    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+    return authorizedClientManager;
+  }
+
+  @Bean
   @Qualifier(value = "webClientForMstoreAcl")
-  public WebClient simpleWebClient() {
-    return WebClient.builder().build();
+  WebClient webClientMstoreSecured(OAuth2AuthorizedClientManager authorizedClientManager) {
+    ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
+            new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+    oauth2.setDefaultClientRegistrationId("idam");
+    return WebClient.builder()
+            .apply(oauth2.oauth2Configuration())
+            .exchangeStrategies(
+                    ExchangeStrategies.builder()
+                            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                            .build())
+            .defaultHeaders(httpHeaders -> httpHeaders.put(ACCEPT_ENCODING, List.of("gzip")))
+            .build();
   }
 }
