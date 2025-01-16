@@ -5,7 +5,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawIsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleListDetailsService;
@@ -48,12 +47,13 @@ public class ArticleListDataController {
       throws Exception {
 
     boolean dataSource = dataSourceFeatureToggle.isDataSourceActive(countryCode);
+    StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
     if (dataSource) {
       return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
-          articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+          articleIdList, storeId, dataTypeList);
     } else {
       return articleListDetailsService.getArticleDataListByArticleVariantBundle(
-          articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+          articleIdList, storeId, languageCode, dataTypeList);
     }
   }
 

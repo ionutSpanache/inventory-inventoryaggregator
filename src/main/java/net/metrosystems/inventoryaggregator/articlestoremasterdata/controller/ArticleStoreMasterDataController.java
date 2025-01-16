@@ -67,10 +67,10 @@ public class ArticleStoreMasterDataController {
                 .bundleNumber(Long.valueOf(varNo))
                 .variantNumber(Long.valueOf(bundleNo))
                 .build());
-
+    StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
     List<ArticleStoreMasterData> articleStoreMasterDataList =
         aclArticleStoreMasterDataService.getArticleStoreMasterDataByArtVarBundle(
-            countryCode, salesLine, storeNo, articleIdList);
+            storeId, articleIdList);
     if (articleStoreMasterDataList == null) {
       return ResponseEntity.notFound().build();
     }

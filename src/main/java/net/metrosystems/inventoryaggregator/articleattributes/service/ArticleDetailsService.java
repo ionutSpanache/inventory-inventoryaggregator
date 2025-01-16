@@ -84,10 +84,8 @@ public class ArticleDetailsService {
       Long articleNumber,
       Long variantNumber,
       Long bundleNumber,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo)
+      StoreId storeId,
+      String languageCode)
       throws Exception {
 
     ArticleId articleId =
@@ -102,7 +100,11 @@ public class ArticleDetailsService {
     try {
       articleMasterData =
           articleMasterDataRepository.getArticleMasterData(
-              articleId, countryCode, salesLine, languageCode, storeNo);
+              articleId,
+              storeId.getCountryCode(),
+              storeId.getSalesLine(),
+              languageCode,
+              storeId.getStoreNumber());
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
@@ -114,7 +116,11 @@ public class ArticleDetailsService {
     try {
       discountArticleStoreMasterData =
           rawArticleStoreMasterDataRepository.getDiscountArticleStoreMasterData(
-              articleId, countryCode, salesLine, languageCode, storeNo);
+              articleId,
+              storeId.getCountryCode(),
+              storeId.getSalesLine(),
+              languageCode,
+              storeId.getStoreNumber());
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {

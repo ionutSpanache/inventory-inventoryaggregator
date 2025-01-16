@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.stereotype.Service;
@@ -32,14 +30,14 @@ public class ArticleDetailsServiceV2 {
   }
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
-      List<ArticleId> articleIdList,
-      String countryCode,
-      String salesLine,
-      Integer storeNo,
-      Optional<List<String>> dataTypeList)
+      List<ArticleId> articleIdList, StoreId storeId, Optional<List<String>> dataTypeList)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+        articleIdList,
+        storeId.getCountryCode(),
+        storeId.getSalesLine(),
+        storeId.getStoreNumber(),
+        dataTypeList);
   }
 
   private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(
@@ -50,13 +48,8 @@ public class ArticleDetailsServiceV2 {
       throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
-
     rawArticleDataService.buildRawArticleDataList(
-        articleId,
-        storeId,
-        languageCode,
-        rawArticleDataList,
-        dataTypeList);
+        articleId, storeId, languageCode, rawArticleDataList, dataTypeList);
     return rawArticleDataList;
   }
 

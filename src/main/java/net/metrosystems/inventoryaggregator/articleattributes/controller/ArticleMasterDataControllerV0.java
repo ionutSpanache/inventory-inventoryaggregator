@@ -6,6 +6,7 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.CompleteArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleDetailsService;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +47,9 @@ public class ArticleMasterDataControllerV0 {
       @PathVariable("variant") Long variant,
       @PathVariable("bundlenumber") Long bundleNumber)
       throws Exception {
+    StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
     return articleDetailsService.getCompleteArticleMasterDataByArticleVariantBundle(
-        articleNumber, variant, bundleNumber, countryCode, salesLine, languageCode, storeNo);
+        articleNumber, variant, bundleNumber, storeId, languageCode);
   }
 
   @AddLogs

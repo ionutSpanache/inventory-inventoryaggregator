@@ -28,6 +28,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.common.movieacl.MovieAclService;
 import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
 import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
@@ -47,14 +48,17 @@ public class ArticleListDetailsService {
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       List<ArticleId> articleIdList,
-      String countryCode,
-      String salesLine,
+      StoreId storeId,
       String languageCode,
-      Integer storeNo,
       Optional<List<String>> dataTypeList)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleIdList, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+        articleIdList,
+        storeId.getCountryCode(),
+        storeId.getSalesLine(),
+        languageCode,
+        storeId.getStoreNumber(),
+        dataTypeList);
   }
 
   public List<RawIsTradeItemExcludedFromDiscounts> isTradeItemExcludedFromDiscounts(

@@ -15,6 +15,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIncident;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
@@ -27,29 +28,34 @@ public class RawArticleStoreMasterDataRepository {
 
   private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
   private final ArticleCacheService articleCacheService;
+
   @Qualifier("ForkJoinCustomPool")
   private final ExecutorService forkJoinPoolCustom;
 
   @Async("asyncExecutor")
-  public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(ArticleId articleId, String countryCode,
-      String salesLine, Integer storeNo) throws ExecutionException, InterruptedException {
+  public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(
+      ArticleId articleId, String countryCode, String salesLine, Integer storeNo)
+      throws ExecutionException, InterruptedException {
 
-    Map<ArticleId, RawArticleStoreMasterData> articleStoreMasterData = getSynchronouslyRawArticleStoreMasterData(
-        List.of(articleId), countryCode, salesLine, storeNo);
+    Map<ArticleId, RawArticleStoreMasterData> articleStoreMasterData =
+        getSynchronouslyRawArticleStoreMasterData(
+            List.of(articleId), countryCode, salesLine, storeNo);
 
     return CompletableFuture.completedFuture(
-        articleStoreMasterData.isEmpty() ? RawArticleStoreMasterData.builder().build() : articleStoreMasterData.get(articleId));
+        articleStoreMasterData.isEmpty()
+            ? RawArticleStoreMasterData.builder().build()
+            : articleStoreMasterData.get(articleId));
   }
 
   @Async("asyncExecutor")
   public CompletableFuture<Map<ArticleId, ArticleStoreMasterData>> getArticleStoreMasterFromAcl(
       List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo) {
-
+    StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
     List<ArticleStoreMasterData> articleStoreMasterDataList =
         aclArticleStoreMasterDataService.getArticleStoreMasterDataByArtVarBundle(
-            countryCode, salesLine, storeNo, articleIdList);
+            storeId, articleIdList);
     if (CollectionUtils.isEmpty(articleStoreMasterDataList)) {
-        return CompletableFuture.completedFuture(Collections.emptyMap());
+      return CompletableFuture.completedFuture(Collections.emptyMap());
     }
 
     return CompletableFuture.completedFuture(
@@ -74,9 +80,10 @@ public class RawArticleStoreMasterDataRepository {
   public Map<ArticleId, RawArticleStoreMasterData> getSynchronouslyRawArticleStoreMasterData(
       List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNo)
       throws ExecutionException, InterruptedException {
+    StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
     Map<ArticleId, ArticleStoreMasterData> articleIdArticleStoreMasterDataMap =
         aclArticleStoreMasterDataService
-            .getArticleStoreMasterDataByArtVarBundle(countryCode, salesLine, storeNo, articleIdList)
+            .getArticleStoreMasterDataByArtVarBundle(storeId, articleIdList)
             .stream()
             .collect(
                 Collectors.toMap(
@@ -95,80 +102,102 @@ public class RawArticleStoreMasterDataRepository {
                 .get();
 
     return getArticleIdRawArticleStoreMasterDataMap(
-            articleIdArticleStoreMasterDataMap, articleIdArticleCacheStoreExceptionsIhdsTreeMap);
+        articleIdArticleStoreMasterDataMap, articleIdArticleCacheStoreExceptionsIhdsTreeMap);
   }
 
-    public Map<ArticleId, RawArticleStoreMasterData> getArticleIdRawArticleStoreMasterDataMap(
-            Map<ArticleId, ArticleStoreMasterData> articleIdArticleStoreMasterDataMap,
-            Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>
-                    articleIdArticleCacheStoreExceptionsIhdsTreeMap) {
-        Map<ArticleId ,ArticleCacheStoreExceptionsDataGroup> articleIdArticleCacheStoreExceptionsDataGroup100Map = new HashMap<>();
-        Map<ArticleId ,ArticleCacheStoreExceptionsDataGroup> articleIdArticleCacheStoreExceptionsDataGroup200Map = new HashMap<>();
-        Map<ArticleId ,ArticleCacheStoreExceptionsDataGroup> articleIdArticleCacheStoreExceptionsDataGroup300Map = new HashMap<>();
+  public Map<ArticleId, RawArticleStoreMasterData> getArticleIdRawArticleStoreMasterDataMap(
+      Map<ArticleId, ArticleStoreMasterData> articleIdArticleStoreMasterDataMap,
+      Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>
+          articleIdArticleCacheStoreExceptionsIhdsTreeMap) {
+    Map<ArticleId, ArticleCacheStoreExceptionsDataGroup>
+        articleIdArticleCacheStoreExceptionsDataGroup100Map = new HashMap<>();
+    Map<ArticleId, ArticleCacheStoreExceptionsDataGroup>
+        articleIdArticleCacheStoreExceptionsDataGroup200Map = new HashMap<>();
+    Map<ArticleId, ArticleCacheStoreExceptionsDataGroup>
+        articleIdArticleCacheStoreExceptionsDataGroup300Map = new HashMap<>();
 
-        articleIdArticleCacheStoreExceptionsIhdsTreeMap.forEach(
-                (articleId, articleCacheStoreExceptionsIhdsTree) -> {
-                    if(articleCacheStoreExceptionsIhdsTree != null) {
+    articleIdArticleCacheStoreExceptionsIhdsTreeMap.forEach(
+        (articleId, articleCacheStoreExceptionsIhdsTree) -> {
+          if (articleCacheStoreExceptionsIhdsTree != null) {
 
-                        ArticleCacheStoreExceptionsIncident articleCacheStoreExceptionsIncident =
-                                articleCacheStoreExceptionsIhdsTree.getTransaction().getArticleCacheIncident();
+            ArticleCacheStoreExceptionsIncident articleCacheStoreExceptionsIncident =
+                articleCacheStoreExceptionsIhdsTree.getTransaction().getArticleCacheIncident();
 
-                        articleIdArticleCacheStoreExceptionsDataGroup100Map.put(
-                                articleId, articleCacheStoreExceptionsIncident.getArticleCacheStoreExceptionsDataGroupById(100));
-                        articleIdArticleCacheStoreExceptionsDataGroup200Map.put(
-                                articleId, articleCacheStoreExceptionsIncident.getArticleCacheStoreExceptionsDataGroupById(200));
-                        articleIdArticleCacheStoreExceptionsDataGroup300Map.put(
-                                articleId, articleCacheStoreExceptionsIncident.getArticleCacheStoreExceptionsDataGroupById(300));
-                    }
-                }
-        );
+            articleIdArticleCacheStoreExceptionsDataGroup100Map.put(
+                articleId,
+                articleCacheStoreExceptionsIncident.getArticleCacheStoreExceptionsDataGroupById(
+                    100));
+            articleIdArticleCacheStoreExceptionsDataGroup200Map.put(
+                articleId,
+                articleCacheStoreExceptionsIncident.getArticleCacheStoreExceptionsDataGroupById(
+                    200));
+            articleIdArticleCacheStoreExceptionsDataGroup300Map.put(
+                articleId,
+                articleCacheStoreExceptionsIncident.getArticleCacheStoreExceptionsDataGroupById(
+                    300));
+          }
+        });
 
-        Map<ArticleId, RawArticleStoreMasterData> result = new HashMap<>();
+    Map<ArticleId, RawArticleStoreMasterData> result = new HashMap<>();
 
-        articleIdArticleStoreMasterDataMap.forEach(
-                (articleId, articleStoreMasterData) -> {
+    articleIdArticleStoreMasterDataMap.forEach(
+        (articleId, articleStoreMasterData) -> {
+          ArticleCacheStoreExceptionsDataGroup articleIdArticleCacheStoreExceptionsDataGroup100 =
+              articleIdArticleCacheStoreExceptionsDataGroup100Map.get(articleId);
+          ArticleCacheStoreExceptionsDataGroup articleIdArticleCacheStoreExceptionsDataGroup200 =
+              articleIdArticleCacheStoreExceptionsDataGroup200Map.get(articleId);
+          ArticleCacheStoreExceptionsDataGroup articleIdArticleCacheStoreExceptionsDataGroup300 =
+              articleIdArticleCacheStoreExceptionsDataGroup300Map.get(articleId);
 
-                    ArticleCacheStoreExceptionsDataGroup articleIdArticleCacheStoreExceptionsDataGroup100 =
-                            articleIdArticleCacheStoreExceptionsDataGroup100Map.get(articleId);
-                    ArticleCacheStoreExceptionsDataGroup articleIdArticleCacheStoreExceptionsDataGroup200 =
-                            articleIdArticleCacheStoreExceptionsDataGroup200Map.get(articleId);
-                    ArticleCacheStoreExceptionsDataGroup articleIdArticleCacheStoreExceptionsDataGroup300 =
-                            articleIdArticleCacheStoreExceptionsDataGroup300Map.get(articleId);
+          RawArticleStoreMasterData rawArticleStoreMasterData =
+              RawArticleStoreMasterData.builder()
+                  .departmentNumber(articleStoreMasterData.getDepartmentNumber())
+                  .shelfEdgeTicketType(articleStoreMasterData.getShelfEdgeTicketType())
+                  .leadTime(articleStoreMasterData.getLeadTime())
+                  .orderProposalBlockingCode(articleStoreMasterData.getOrderProposalBlockingCode())
+                  .build();
 
+          if (articleIdArticleCacheStoreExceptionsDataGroup100 != null) {
+            rawArticleStoreMasterData.setStorePieceNetSellPrice(
+                articleIdArticleCacheStoreExceptionsDataGroup100.getNetSalesPricePerPiece());
+            rawArticleStoreMasterData.setStoreBundleNetSellPrice(
+                articleIdArticleCacheStoreExceptionsDataGroup100.getNetSalesPricePerBundle());
+            rawArticleStoreMasterData.setStorePieceGrossSellPrice(
+                articleIdArticleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerPiece());
+            rawArticleStoreMasterData.setStoreBundleGrossSellPrice(
+                articleIdArticleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerBundle());
+            rawArticleStoreMasterData.setStorePriceValidFrom(
+                articleIdArticleCacheStoreExceptionsDataGroup100.getValidFrom());
+            rawArticleStoreMasterData.setStorePriceValidTo(
+                articleIdArticleCacheStoreExceptionsDataGroup100.getValidTo());
+          }
+          if (articleIdArticleCacheStoreExceptionsDataGroup200 != null) {
+            rawArticleStoreMasterData.setStorePromotionPieceNetPrice(
+                articleIdArticleCacheStoreExceptionsDataGroup200
+                    .getPromotionNetSalesPricePerPiece());
+            rawArticleStoreMasterData.setStorePromotionBundleNetPrice(
+                articleIdArticleCacheStoreExceptionsDataGroup200
+                    .getPromotionNetSalesPricePerBundle());
+            rawArticleStoreMasterData.setStorePromotionPieceGrossPrice(
+                articleIdArticleCacheStoreExceptionsDataGroup200
+                    .getPromotionGrossSalesPricePerPiece());
+            rawArticleStoreMasterData.setStorePromotionBundleGrossPrice(
+                articleIdArticleCacheStoreExceptionsDataGroup200
+                    .getPromotionGrossSalesPricePerBundle());
+            rawArticleStoreMasterData.setStorePromotionValidFrom(
+                articleIdArticleCacheStoreExceptionsDataGroup200.getValidFrom());
+            rawArticleStoreMasterData.setStorePromotionValidTo(
+                articleIdArticleCacheStoreExceptionsDataGroup200.getValidTo());
+          }
+          if (articleIdArticleCacheStoreExceptionsDataGroup300 != null) {
+            rawArticleStoreMasterData.setSalesBlockingCode(
+                articleIdArticleCacheStoreExceptionsDataGroup300.getSalesBlockingCode());
+          }
 
-                    RawArticleStoreMasterData rawArticleStoreMasterData =
-                            RawArticleStoreMasterData.builder()
-                                    .departmentNumber(articleStoreMasterData.getDepartmentNumber())
-                                    .shelfEdgeTicketType(articleStoreMasterData.getShelfEdgeTicketType())
-                                    .leadTime(articleStoreMasterData.getLeadTime())
-                                    .orderProposalBlockingCode(articleStoreMasterData.getOrderProposalBlockingCode())
-                                    .build();
-
-                    if(articleIdArticleCacheStoreExceptionsDataGroup100 != null){
-                        rawArticleStoreMasterData.setStorePieceNetSellPrice(articleIdArticleCacheStoreExceptionsDataGroup100.getNetSalesPricePerPiece());
-                        rawArticleStoreMasterData.setStoreBundleNetSellPrice(articleIdArticleCacheStoreExceptionsDataGroup100.getNetSalesPricePerBundle());
-                        rawArticleStoreMasterData.setStorePieceGrossSellPrice(articleIdArticleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerPiece());
-                        rawArticleStoreMasterData.setStoreBundleGrossSellPrice(articleIdArticleCacheStoreExceptionsDataGroup100.getGrossSalesPricePerBundle());
-                        rawArticleStoreMasterData.setStorePriceValidFrom(articleIdArticleCacheStoreExceptionsDataGroup100.getValidFrom());
-                        rawArticleStoreMasterData.setStorePriceValidTo(articleIdArticleCacheStoreExceptionsDataGroup100.getValidTo());
-                    }
-                    if(articleIdArticleCacheStoreExceptionsDataGroup200 != null){
-                        rawArticleStoreMasterData.setStorePromotionPieceNetPrice(articleIdArticleCacheStoreExceptionsDataGroup200.getPromotionNetSalesPricePerPiece());
-                        rawArticleStoreMasterData.setStorePromotionBundleNetPrice(articleIdArticleCacheStoreExceptionsDataGroup200.getPromotionNetSalesPricePerBundle());
-                        rawArticleStoreMasterData.setStorePromotionPieceGrossPrice(articleIdArticleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerPiece());
-                        rawArticleStoreMasterData.setStorePromotionBundleGrossPrice(articleIdArticleCacheStoreExceptionsDataGroup200.getPromotionGrossSalesPricePerBundle());
-                        rawArticleStoreMasterData.setStorePromotionValidFrom(articleIdArticleCacheStoreExceptionsDataGroup200.getValidFrom());
-                        rawArticleStoreMasterData.setStorePromotionValidTo(articleIdArticleCacheStoreExceptionsDataGroup200.getValidTo());
-                    }
-                    if(articleIdArticleCacheStoreExceptionsDataGroup300 != null){
-                        rawArticleStoreMasterData.setSalesBlockingCode(articleIdArticleCacheStoreExceptionsDataGroup300.getSalesBlockingCode());
-                    }
-
-                    result.put(articleId, rawArticleStoreMasterData);
-                }
-        );
-        return result;
-    }
+          result.put(articleId, rawArticleStoreMasterData);
+        });
+    return result;
+  }
 
   @Async("asyncExecutor")
   public CompletableFuture<Map<ArticleId, ArticleCacheStoreExceptionsIhdsTree>>
@@ -277,5 +306,4 @@ public class RawArticleStoreMasterDataRepository {
 
     return CompletableFuture.completedFuture(rawArticleStoreMasterData);
   }
-
 }

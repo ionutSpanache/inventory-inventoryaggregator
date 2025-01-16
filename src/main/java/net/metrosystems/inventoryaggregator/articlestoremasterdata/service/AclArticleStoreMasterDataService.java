@@ -27,9 +27,9 @@ public class AclArticleStoreMasterDataService {
   }
 
   public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
-      String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
+      StoreId storeId, List<ArticleId> articleIdList) {
 
     return aclArticleStoreMasterDataClient.getArticleStoreMasterDataByArtVarBundle(
-        countryCode, salesLine, storeNo, articleIdList);
+        storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), articleIdList);
   }
 }
