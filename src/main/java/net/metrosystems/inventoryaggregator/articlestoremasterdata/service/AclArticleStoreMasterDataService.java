@@ -1,60 +1,35 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.service;
 
 import java.util.List;
-
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.client.AclArticleStoreMasterDataClient;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class AclArticleStoreMasterDataService {
 
-	private final AclArticleStoreMasterDataClient aclArticleStoreMasterDataClient;
+  private final AclArticleStoreMasterDataClient aclArticleStoreMasterDataClient;
 
-	@Autowired
-	public AclArticleStoreMasterDataService(AclArticleStoreMasterDataClient aclArticleStoreMasterDataClient) {
-		this.aclArticleStoreMasterDataClient = aclArticleStoreMasterDataClient;
-	}
-
-   public List<ArticleStoreMasterData> getArticleStoreMasterDataByEan(String countryCode, String salesLine, Integer storeNo,String barcode){
-
-	  return aclArticleStoreMasterDataClient.getArticleStoreMasterDataByEan(countryCode, salesLine, storeNo, barcode);
-
+  @Autowired
+  public AclArticleStoreMasterDataService(
+      AclArticleStoreMasterDataClient aclArticleStoreMasterDataClient) {
+    this.aclArticleStoreMasterDataClient = aclArticleStoreMasterDataClient;
   }
 
-   public List<ArticleStoreMasterData> getArticleStoreMasterDataBySubsys(String countryCode, String salesLine, Integer storeNo, Integer subsys){
+  public List<ArticleStoreMasterData> getArticleStoreMasterDataByEan(
+      StoreId storeId, String barcode) {
 
-	 return aclArticleStoreMasterDataClient.getArticleStoreMasterDataBySubsys(countryCode, salesLine, storeNo, subsys);
+    return aclArticleStoreMasterDataClient.getArticleStoreMasterDataByEan(
+        storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), barcode);
+  }
 
-   }
+  public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
+      String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
 
-   public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(String countryCode, String salesLine, Integer storeNo,
-		                                                                    List<ArticleId> articleIdList){
-
-    return aclArticleStoreMasterDataClient.getArticleStoreMasterDataByArtVarBundle(countryCode, salesLine, storeNo, articleIdList);
-
-   }
-
-   public ArticleStoreMasterData getArticleStoreMasterData(String countryCode, String salesLine, Integer storeNo,
-           Integer articleNumber, Integer variantNumber, Integer bundleNumber) {
-
-	   List<ArticleStoreMasterData> articleStoreMasterDataList = getArticleStoreMasterDataByArtVarBundle(countryCode,salesLine, storeNo,
-				 List.of(ArticleId.builder()
-						 .articleNumber(Long.valueOf(articleNumber))
-						 .variantNumber(Long.valueOf(variantNumber))
-						 .bundleNumber(Long.valueOf(bundleNumber))
-						 .build()));
-
-	   for (ArticleStoreMasterData articleStoreMasterData : articleStoreMasterDataList) {
-		 if  (articleStoreMasterData.getArticleNumber().intValue() == articleNumber.intValue() &&
-			  articleStoreMasterData.getVariantNumber().intValue() == variantNumber.intValue()  &&
-			  articleStoreMasterData.getBundleNumber().intValue() == bundleNumber.intValue())
-		   return articleStoreMasterData;
-	   }
-	   return null;
-   }
+    return aclArticleStoreMasterDataClient.getArticleStoreMasterDataByArtVarBundle(
+        countryCode, salesLine, storeNo, articleIdList);
+  }
 }
-

@@ -1,8 +1,12 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.controller;
 
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
+
+import java.util.List;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.service.AclArticleStoreMasterDataService;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,60 +14,66 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-
 @RestController
 @RequestMapping(value = "/inventoryaggregator")
 public class ArticleStoreMasterDataController {
 
-	private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
+  private final AclArticleStoreMasterDataService aclArticleStoreMasterDataService;
 
-	@Autowired
-	public ArticleStoreMasterDataController(AclArticleStoreMasterDataService aclArticleStoreMasterDataService) {
-		this.aclArticleStoreMasterDataService = aclArticleStoreMasterDataService;
-	}
+  @Autowired
+  public ArticleStoreMasterDataController(
+      AclArticleStoreMasterDataService aclArticleStoreMasterDataService) {
+    this.aclArticleStoreMasterDataService = aclArticleStoreMasterDataService;
+  }
 
-	@AddLogs
-	@GetMapping(value="/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/barcode/{barcode}/articlemasterdatabyean",
-	        produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ArticleStoreMasterData>> getAclArticleStoreMasterDataByEan(
-			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-			@TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-			@TagField(name = "storeNo") @PathVariable("storeNo") 	Integer storeNo,
-			@PathVariable("barcode") String barcode) {
+  @AddLogs
+  @GetMapping(
+      value =
+          "/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/barcode/{barcode}/articlemasterdatabyean",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<ArticleStoreMasterData>> getAclArticleStoreMasterDataByEan(
+      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
+      @TagField(name = "storeNo") @PathVariable("storeNo") Integer storeNo,
+      @PathVariable("barcode") String barcode) {
 
-		List<ArticleStoreMasterData> articleStoreMasterDataList = aclArticleStoreMasterDataService.getArticleStoreMasterDataByEan(countryCode, salesLine, storeNo, barcode);
-		if(articleStoreMasterDataList == null) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(articleStoreMasterDataList);
-	}
-
-	@AddLogs
-	@GetMapping(value="/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/articleNumber/{artNo}/variantNumber/{varNo}/bundleNumber/{bundleNo}/articlemasterdatabyartvarbundle",
-	        produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ArticleStoreMasterData>> getAclArticleStoreMasterDataByArtVArBundle(
-			@TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-			@TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-			@TagField(name = "storeNo") @PathVariable("storeNo") 	Integer storeNo,
-			@PathVariable("artNo")Integer artNo,
-            @PathVariable("varNo")Integer varNo,
-            @PathVariable("bundleNo")Integer bundleNo ) {
-
-		List<ArticleId> articleIdList = List.of(
-				ArticleId.builder()
-						.articleNumber(Long.valueOf(artNo))
-						.bundleNumber(Long.valueOf(varNo))
-						.variantNumber(Long.valueOf(bundleNo))
-						.build());
-
-		List<ArticleStoreMasterData> articleStoreMasterDataList =
-				aclArticleStoreMasterDataService.getArticleStoreMasterDataByArtVarBundle(countryCode, salesLine, storeNo, articleIdList);
-        if(articleStoreMasterDataList == null) {		
-	     return ResponseEntity.notFound().build();
-        }
-       return ResponseEntity.ok(articleStoreMasterDataList);		
+    StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
+    List<ArticleStoreMasterData> articleStoreMasterDataList =
+        aclArticleStoreMasterDataService.getArticleStoreMasterDataByEan(
+            storeId, escapeHtml4(barcode));
+    if (articleStoreMasterDataList == null) {
+      return ResponseEntity.notFound().build();
     }
+    return ResponseEntity.ok(articleStoreMasterDataList);
+  }
 
+  @AddLogs
+  @GetMapping(
+      value =
+          "/countries/{countryCode}/saleslines/{salesLine}/stores/{storeNo}/articleNumber/{artNo}/variantNumber/{varNo}/bundleNumber/{bundleNo}/articlemasterdatabyartvarbundle",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<ArticleStoreMasterData>> getAclArticleStoreMasterDataByArtVArBundle(
+      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
+      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
+      @TagField(name = "storeNo") @PathVariable("storeNo") Integer storeNo,
+      @PathVariable("artNo") Integer artNo,
+      @PathVariable("varNo") Integer varNo,
+      @PathVariable("bundleNo") Integer bundleNo) {
+
+    List<ArticleId> articleIdList =
+        List.of(
+            ArticleId.builder()
+                .articleNumber(Long.valueOf(artNo))
+                .bundleNumber(Long.valueOf(varNo))
+                .variantNumber(Long.valueOf(bundleNo))
+                .build());
+
+    List<ArticleStoreMasterData> articleStoreMasterDataList =
+        aclArticleStoreMasterDataService.getArticleStoreMasterDataByArtVarBundle(
+            countryCode, salesLine, storeNo, articleIdList);
+    if (articleStoreMasterDataList == null) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(articleStoreMasterDataList);
+  }
 }
