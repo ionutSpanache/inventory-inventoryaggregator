@@ -1,5 +1,7 @@
 package net.metrosystems.inventoryaggregator.articleattributes.controller;
 
+import static org.apache.commons.text.StringEscapeUtils.*;
+
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -47,9 +49,9 @@ public class ArticleMasterDataControllerV0 {
       @PathVariable("variant") Long variant,
       @PathVariable("bundlenumber") Long bundleNumber)
       throws Exception {
-    StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
+    StoreId storeId = new StoreId(escapeHtml4(countryCode), escapeHtml4(salesLine), storeNo);
     return articleDetailsService.getCompleteArticleMasterDataByArticleVariantBundle(
-        articleNumber, variant, bundleNumber, storeId, languageCode);
+        articleNumber, variant, bundleNumber, storeId, escapeHtml4(languageCode));
   }
 
   @AddLogs
@@ -65,6 +67,10 @@ public class ArticleMasterDataControllerV0 {
       @RequestBody List<ArticleId> articleIds)
       throws Exception {
     return articleDetailsService.getArticleMasterDataListByArticleIds(
-        articleIds, countryCode, salesLine, languageCode, storeNo);
+        articleIds,
+        escapeHtml4(countryCode),
+        escapeHtml4(salesLine),
+        escapeHtml4(languageCode),
+        storeNo);
   }
 }
