@@ -33,6 +33,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.MerchandiseArticleDescription;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.common.movieacl.MovieAclService;
 import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
@@ -66,14 +67,17 @@ public class ArticleDetailsService {
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       ArticleId articleId,
-      String countryCode,
-      String salesLine,
+      StoreId storeId,
       String languageCode,
-      Integer storeNo,
       Optional<List<String>> dataTypeList)
       throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleId, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+        articleId,
+        storeId.getCountryCode(),
+        storeId.getSalesLine(),
+        languageCode,
+        storeId.getStoreNumber(),
+        dataTypeList);
   }
 
   public CompleteArticleMasterData getCompleteArticleMasterDataByArticleVariantBundle(
@@ -153,7 +157,8 @@ public class ArticleDetailsService {
     String correctLanguageCode = LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
 
     CompletableFuture<ArticleComponent> articleComponentCompletableFuture =
-        articleProcessingServiceV2.getArticleComponent(countryCode, storeNo, articleId.getArticleNumber());
+        articleProcessingServiceV2.getArticleComponent(
+            countryCode, storeNo, articleId.getArticleNumber());
 
     CompletableFuture<ArticleMasterData> articleMasterData =
         articleProcessingService.getArticleMasterData(

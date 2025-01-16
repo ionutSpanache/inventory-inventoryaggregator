@@ -54,13 +54,18 @@ public class ArticleDataController {
             .variantNumber(variant)
             .bundleNumber(bundleNumber)
             .build();
-    StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
+    StoreId storeId =
+        StoreId.builder()
+            .countryCode(countryCode)
+            .salesLine(salesLine)
+            .storeNumber(storeNo)
+            .build();
     if (dataSource) {
       return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
           articleId, storeId, languageCode, dataTypeList);
     } else {
       return articleDetailsService.getArticleDataListByArticleVariantBundle(
-          articleId, countryCode, salesLine, languageCode, storeNo, dataTypeList);
+          articleId, storeId, languageCode, dataTypeList);
     }
   }
 }
