@@ -54,12 +54,7 @@ public class ArticleDataController {
             .variantNumber(variant)
             .bundleNumber(bundleNumber)
             .build();
-    StoreId storeId =
-        StoreId.builder()
-            .countryCode(countryCode)
-            .salesLine(salesLine)
-            .storeNumber(storeNo)
-            .build();
+    StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
     if (dataSource) {
       return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
           articleId, storeId, languageCode, dataTypeList);
