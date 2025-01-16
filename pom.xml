@@ -528,7 +528,11 @@
 			<artifactId>micrometer-tracing-bridge-brave</artifactId>
 			<!-- Propagate traceId -->
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.13.0</version>
+		</dependency>
 	</dependencies>
 
 	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
