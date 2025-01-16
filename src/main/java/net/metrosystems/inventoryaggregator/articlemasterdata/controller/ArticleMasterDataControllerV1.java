@@ -1,8 +1,9 @@
 package net.metrosystems.inventoryaggregator.articlemasterdata.controller;
 
-import java.util.List;
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -47,7 +48,7 @@ public class ArticleMasterDataControllerV1 {
             .bundleNumber(bundleNumber)
             .build();
     return articleMasterDataService.getArticleMasterIdForArticleId(
-        articleId, countryCode, languageCode, storeNo);
+        articleId, escapeHtml4(countryCode), escapeHtml4(languageCode), storeNo);
   }
 
   @PostMapping(
@@ -62,6 +63,6 @@ public class ArticleMasterDataControllerV1 {
       @RequestBody List<ArticleId> articleIds)
       throws Exception {
     return articleMasterDataService.getArticleMasterDataForArticleIdList(
-        articleIds, countryCode, languageCode, storeNumber);
+        articleIds, escapeHtml4(countryCode), escapeHtml4(languageCode), storeNumber);
   }
 }

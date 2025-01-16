@@ -1,10 +1,11 @@
 package net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service;
 
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.filter_aaa.client.FilterAAAClient;
@@ -21,13 +22,10 @@ import org.springframework.util.CollectionUtils;
 @Service
 public class DocumentsService {
 
-  @Autowired
-  FilterAAAClient filterAAAClient;
-  @Autowired
-  @Lazy //TODO: resolve circular dependency
+  @Autowired FilterAAAClient filterAAAClient;
+  @Autowired @Lazy // TODO: resolve circular dependency
   FilterAAAService filterAAAService;
-  @Autowired
-  @Lazy //TODO: resolve circular dependency
+  @Autowired @Lazy // TODO: resolve circular dependency
   private ArticleCacheAAAClient articleCacheClient;
 
   public ArticleId tranformDocumentInArticleId(String document) {
@@ -72,11 +70,12 @@ public class DocumentsService {
 
     while (documents != null && documents.getNextPageToken() != null) {
       Documents documentsNextPage =
-              filterAAAClient.getFilteredDocumentsNextPage(filter, documents.getNextPageToken());
+          filterAAAClient.getFilteredDocumentsNextPage(
+              filter, escapeHtml4(documents.getNextPageToken()));
       if (documentsNextPage != null) {
         documents
-                .getArticleKeys()
-                .addAll((Collection<? extends String>) documentsNextPage.getArticleKeys());
+            .getArticleKeys()
+            .addAll((Collection<? extends String>) documentsNextPage.getArticleKeys());
         documents.setNextPageToken(documentsNextPage.getNextPageToken());
       }
     }
@@ -169,10 +168,8 @@ public class DocumentsService {
         filterIduItemDerivedStandard);
   }
 
-
   public Documents getIsuItemStoreMerchandiseByArtVarBundle(
-      String countryCode,
-      ArticleId articleId) {
+      String countryCode, ArticleId articleId) {
     FilterKeyIsuItemStoreMerchandise filterKeyStoreMerchandise =
         FilterKeyIsuItemStoreMerchandise.builder()
             .bundleNumber(articleId.getBundleNumber())
@@ -190,12 +187,11 @@ public class DocumentsService {
   }
 
   public Documents getDocumentsByArticleNumber(
-      String countryCode, String salesLine, Long articleNumber)
-      throws Exception {
+      String countryCode, String salesLine, Long articleNumber) throws Exception {
 
-    ArticleFilterKey artFilterKey  = new ArticleFilterKey();
-    ArticleHardKey artHardKey = new ArticleHardKey(countryCode, salesLine, String.valueOf(articleNumber),
-            null, null);
+    ArticleFilterKey artFilterKey = new ArticleFilterKey();
+    ArticleHardKey artHardKey =
+        new ArticleHardKey(countryCode, salesLine, String.valueOf(articleNumber), null, null);
     artFilterKey.getSubFilterKeys().add(artHardKey);
 
     Documents documents = filterAAAClient.getFilteredDocuments(artFilterKey);
@@ -203,16 +199,17 @@ public class DocumentsService {
   }
 
   public Documents getDocumentsByArticleNumberVarianBundleId(
-      String countryCode,
-      String salesLine,
-      Long articleNumber,
-      Long variantNr,
-      Long bundleId)
+      String countryCode, String salesLine, Long articleNumber, Long variantNr, Long bundleId)
       throws Exception {
 
-    ArticleFilterKey artFilterKey  = new ArticleFilterKey();
-    ArticleHardKey artHardKey = new ArticleHardKey(countryCode, salesLine, String.valueOf(articleNumber),
-            String.valueOf(variantNr), String.valueOf(bundleId));
+    ArticleFilterKey artFilterKey = new ArticleFilterKey();
+    ArticleHardKey artHardKey =
+        new ArticleHardKey(
+            countryCode,
+            salesLine,
+            String.valueOf(articleNumber),
+            String.valueOf(variantNr),
+            String.valueOf(bundleId));
     artFilterKey.getSubFilterKeys().add(artHardKey);
 
     Documents documents = filterAAAClient.getFilteredDocuments(artFilterKey);

@@ -1,5 +1,7 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +37,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.IsTradeItem;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -58,8 +61,10 @@ public class ArticleCacheService {
   private final DocumentsService documentsService;
   private final ArticleCacheAAAClient articleCacheClient;
   private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
+
   @Value("${ARTICLE_CACHE_STORE_EXCEPTIONS_PATH}")
   private String articleCacheStoreExceptionsPath;
+
   @Value("${ARTICLE_CACHE_DOCUMENTS}")
   private String articleCacheErpPath;
 
@@ -76,6 +81,7 @@ public class ArticleCacheService {
     LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");
     LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
   }
+
   @Autowired
   public ArticleCacheService(
       DocumentsService documentsService,
@@ -85,7 +91,6 @@ public class ArticleCacheService {
     this.articleCacheClient = articleCacheClient;
     this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
   }
-
 
   private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(
       Documents filterUrlString) {
@@ -114,8 +119,7 @@ public class ArticleCacheService {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
-       {
+      Integer storeNo) {
 
     String languageCodeForAC = getCorrectLanguageCode(countryCode, languageCode);
 
@@ -129,13 +133,13 @@ public class ArticleCacheService {
             languageCodeForAC.toLowerCase(),
             articleNumber,
             variantNumber);
-    try{
-      ArticleCacheIhdsTree articleCacheIhdsTree = articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
-      return transformArticleCacheDocumentToArticleFullData(
-          articleCacheIhdsTree,
-          storeNo);
-    }catch(Exception e){
-      if(e instanceof HttpClientErrorException httpClientErrorException && HttpStatus.CONFLICT == httpClientErrorException.getStatusCode()){
+    try {
+      ArticleCacheIhdsTree articleCacheIhdsTree =
+          articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
+      return transformArticleCacheDocumentToArticleFullData(articleCacheIhdsTree, storeNo);
+    } catch (Exception e) {
+      if (e instanceof HttpClientErrorException httpClientErrorException
+          && HttpStatus.CONFLICT == httpClientErrorException.getStatusCode()) {
         throw new ArticleNotFoundException();
       }
       throw e;
@@ -143,7 +147,7 @@ public class ArticleCacheService {
   }
 
   private String getCorrectLanguageCode(String countryCode, String languageCode) {
-    if("EN".equalsIgnoreCase(languageCode)){
+    if ("EN".equalsIgnoreCase(languageCode)) {
       return LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
     }
     return languageCode;
@@ -159,7 +163,10 @@ public class ArticleCacheService {
     }
     try {
       return articleUrlPathList.getArticleKeys().stream()
-          .map(articleCacheClient::getIduItemDerivedStandardDocument)
+          .map(
+              a ->
+                  articleCacheClient.getIduItemDerivedStandardDocument(
+                      StringEscapeUtils.escapeHtml4(a)))
           .filter(
               iduItemDerivedStandard ->
                   iduItemDerivedStandard
@@ -243,7 +250,8 @@ public class ArticleCacheService {
       promotionArticleData =
           mapToPromotionArticleData(articleCacheClient.getPromotionArticle(documentUrl));
     } catch (Exception ex) {
-      if(ex instanceof HttpClientErrorException exception && exception.getStatusCode() == HttpStatus.CONFLICT){
+      if (ex instanceof HttpClientErrorException exception
+          && exception.getStatusCode() == HttpStatus.CONFLICT) {
 
         log.debug(ex.getMessage(), ex);
       } else {
@@ -302,7 +310,7 @@ public class ArticleCacheService {
     String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 
     IsuItemStoreMerchandise isuItemStoreMerchandise =
-        articleCacheClient.getIsuItemStoreMerchandiseDocument(articleUrlPath);
+        articleCacheClient.getIsuItemStoreMerchandiseDocument(escapeHtml4(articleUrlPath));
 
     return mapToStoreInformationGroupForStore(isuItemStoreMerchandise, storeNumber);
   }
@@ -311,15 +319,14 @@ public class ArticleCacheService {
       IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
     if (isuItemStoreMerchandise == null) return Optional.empty();
     return isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
-                == null
-            ? Optional.empty()
-            : isuItemStoreMerchandise
-                .getContentIsuItemStoreMerchandise()
-                .getStoreInformationGroups()
-                .stream()
-                .filter(
-                    storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
-                .findFirst();
+            == null
+        ? Optional.empty()
+        : isuItemStoreMerchandise
+            .getContentIsuItemStoreMerchandise()
+            .getStoreInformationGroups()
+            .stream()
+            .filter(storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
+            .findFirst();
   }
 
   private String getEnvironment(String countryCode) {
@@ -356,8 +363,7 @@ public class ArticleCacheService {
       return null;
     }
 
-    return transformArticleCacheDocumentToArticleFullData(
-        articleCacheDocument, storeNo);
+    return transformArticleCacheDocumentToArticleFullData(articleCacheDocument, storeNo);
   }
 
   public List<String> getArticleKeysForDerivedStandardDocument(
@@ -412,101 +418,100 @@ public class ArticleCacheService {
   }
 
   private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData(
-          ArticleCacheIhdsTree articleCacheDocument,
-          Integer storeNo) {
+      ArticleCacheIhdsTree articleCacheDocument, Integer storeNo) {
     Integer hierarchySequenceStoreNo =
-            articleCacheDocument
-                    .getTransaction()
-                    .getArticleCacheIncident()
-                    .getHierarchySequenceStoreNo(storeNo);
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getHierarchySequenceStoreNo(storeNo);
     if (hierarchySequenceStoreNo == null) {
       throw new ArticleNotFoundException();
     }
     ArticleCacheReaderDigest articleCacheReaderDigest =
-            articleCacheDocument
-                    .getTransaction()
-                    .getArticleCacheIncident()
-                    .getArticleCacheReaderDigest();
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheReaderDigest();
     ArticleCacheDataGroup articleCacheDataGroup100 =
-            articleCacheDocument
-                    .getTransaction()
-                    .getArticleCacheIncident()
-                    .getArticleCacheDataGroupWithoutStore(100);
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithoutStore(100);
     ArticleCacheDataGroup articleCacheDataGroup300 =
-            articleCacheDocument
-                    .getTransaction()
-                    .getArticleCacheIncident()
-                    .getArticleCacheDataGroupWithoutStore(300);
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithoutStore(300);
     ArticleCacheDataGroup articleCacheDataGroup310 =
-            articleCacheDocument
-                    .getTransaction()
-                    .getArticleCacheIncident()
-                    .getArticleCacheDataGroupWithoutStore(310);
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithoutStore(310);
     ArticleCacheDataGroup articleCacheDataGroup320 =
-            articleCacheDocument
-                    .getTransaction()
-                    .getArticleCacheIncident()
-                    .getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithStore(320, hierarchySequenceStoreNo);
     ArticleCacheDataGroup articleCacheDataGroup325 =
-            articleCacheDocument
-                    .getTransaction()
-                    .getArticleCacheIncident()
-                    .getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithStoreRef(325, hierarchySequenceStoreNo);
     ArticleCacheDataGroup articleCacheDataGroup200 =
-            articleCacheDocument
-                    .getTransaction()
-                    .getArticleCacheIncident()
-                    .getArticleCacheDataGroupWithoutStore(200);
+        articleCacheDocument
+            .getTransaction()
+            .getArticleCacheIncident()
+            .getArticleCacheDataGroupWithoutStore(200);
 
     return new ArticleCacheFullData(
-            articleCacheReaderDigest.getMmsArtNo(),
-            articleCacheReaderDigest.getVariantNo(),
-            articleCacheReaderDigest.getBundleNo(),
-            articleCacheReaderDigest.getArticleDescription(),
-            articleCacheDocument.getTransaction().getArticleCacheIncident().getBarcodeForBundle(),
-            articleCacheReaderDigest.getProducingSupplier(),
-            articleCacheDataGroup100.getPresentationMerchandiseGroup(),
-            articleCacheDataGroup310.getSellingBundleContent(),
-            articleCacheDataGroup100.getWeightArticles(),
-            articleCacheDataGroup200.getNetWeight(),
-            articleCacheReaderDigest.getSubsysNo(),
-            articleCacheDataGroup100.getVatPercent(),
-            articleCacheDataGroup320.getPieceNetSellPrice(),
-            articleCacheDataGroup320.getBundleNetSellPrice(),
-            articleCacheReaderDigest.getVariantText(),
-            articleCacheReaderDigest.getArticleType(),
-            articleCacheDataGroup325.getArticleClass(),
-            articleCacheDataGroup100.getFoodNonfoodIndicator(),
-            articleCacheDataGroup100.getPresentationMainMerchandiseGroup(),
-            articleCacheDataGroup100.getPresentationSubMerchandiseGroup(),
-            articleCacheDataGroup320.getAssignedStoreSupplier(),
-            articleCacheDataGroup325.getProcurementCd(),
-            articleCacheDataGroup320.getAssortmentCode(),
-            articleCacheDataGroup320.getBlockingCode(),
-            articleCacheDataGroup320.getActivationStatus(),
-            articleCacheDataGroup200.getExpiryDays(),
-            articleCacheDataGroup325.getPieceNetBuyingPrice(),
-            articleCacheDataGroup325.getBundleNetBuyingPrice(),
-            articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
-            articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
-            articleCacheDataGroup300.getArticleNoEmptiesSales(),
-            articleCacheReaderDigest.getBrandName(),
-            calculateMinimumRetailPrice(
-                    articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
-            articleCacheDataGroup200.getCountryOfOrigin(),
-            articleCacheDataGroup200.getPackageFactor(),
-            articleCacheDataGroup100.getAlcoholClass(),
-            articleCacheReaderDigest.getTraceabilityIndicator(),
-            articleCacheDataGroup320.getCoreAssortmentIndicator() != null
-                    ? articleCacheDataGroup320.getCoreAssortmentIndicator()
-                    : 0,
-            articleCacheDataGroup320.getAssignedStoreSupplierType(),
-            articleCacheDataGroup310.getInOutIndicator(),
-            articleCacheDataGroup320.getMinimumGrossSalesPricePerUnit(),
-            articleCacheDataGroup200.getBasPriceContent(),
-            articleCacheDataGroup200.getBasPriceContentMeasureUnit(),
-            articleCacheDataGroup200.getBasPriceContentUnit(),
-            articleCacheDataGroup200.getBasPriceFactor());
+        articleCacheReaderDigest.getMmsArtNo(),
+        articleCacheReaderDigest.getVariantNo(),
+        articleCacheReaderDigest.getBundleNo(),
+        articleCacheReaderDigest.getArticleDescription(),
+        articleCacheDocument.getTransaction().getArticleCacheIncident().getBarcodeForBundle(),
+        articleCacheReaderDigest.getProducingSupplier(),
+        articleCacheDataGroup100.getPresentationMerchandiseGroup(),
+        articleCacheDataGroup310.getSellingBundleContent(),
+        articleCacheDataGroup100.getWeightArticles(),
+        articleCacheDataGroup200.getNetWeight(),
+        articleCacheReaderDigest.getSubsysNo(),
+        articleCacheDataGroup100.getVatPercent(),
+        articleCacheDataGroup320.getPieceNetSellPrice(),
+        articleCacheDataGroup320.getBundleNetSellPrice(),
+        articleCacheReaderDigest.getVariantText(),
+        articleCacheReaderDigest.getArticleType(),
+        articleCacheDataGroup325.getArticleClass(),
+        articleCacheDataGroup100.getFoodNonfoodIndicator(),
+        articleCacheDataGroup100.getPresentationMainMerchandiseGroup(),
+        articleCacheDataGroup100.getPresentationSubMerchandiseGroup(),
+        articleCacheDataGroup320.getAssignedStoreSupplier(),
+        articleCacheDataGroup325.getProcurementCd(),
+        articleCacheDataGroup320.getAssortmentCode(),
+        articleCacheDataGroup320.getBlockingCode(),
+        articleCacheDataGroup320.getActivationStatus(),
+        articleCacheDataGroup200.getExpiryDays(),
+        articleCacheDataGroup325.getPieceNetBuyingPrice(),
+        articleCacheDataGroup325.getBundleNetBuyingPrice(),
+        articleCacheDataGroup325.getPieceNetNetBuyingPrice(),
+        articleCacheDataGroup325.getBundleNetNetBuyingPrice(),
+        articleCacheDataGroup300.getArticleNoEmptiesSales(),
+        articleCacheReaderDigest.getBrandName(),
+        calculateMinimumRetailPrice(
+            articleCacheDocument, storeNo, articleCacheDataGroup310.getSellingBundleContent()),
+        articleCacheDataGroup200.getCountryOfOrigin(),
+        articleCacheDataGroup200.getPackageFactor(),
+        articleCacheDataGroup100.getAlcoholClass(),
+        articleCacheReaderDigest.getTraceabilityIndicator(),
+        articleCacheDataGroup320.getCoreAssortmentIndicator() != null
+            ? articleCacheDataGroup320.getCoreAssortmentIndicator()
+            : 0,
+        articleCacheDataGroup320.getAssignedStoreSupplierType(),
+        articleCacheDataGroup310.getInOutIndicator(),
+        articleCacheDataGroup320.getMinimumGrossSalesPricePerUnit(),
+        articleCacheDataGroup200.getBasPriceContent(),
+        articleCacheDataGroup200.getBasPriceContentMeasureUnit(),
+        articleCacheDataGroup200.getBasPriceContentUnit(),
+        articleCacheDataGroup200.getBasPriceFactor());
   }
 
   private MinimumRetailPrice calculateMinimumRetailPrice(
@@ -641,8 +646,7 @@ public class ArticleCacheService {
   }
 
   public List<Integer> getActiveStoresByByArtVarBundle(
-      String countryCode, String salesLine, ArticleId articleId)
-      throws Exception {
+      String countryCode, String salesLine, ArticleId articleId) throws Exception {
 
     List<Integer> activeStoresList;
 
@@ -678,13 +682,15 @@ public class ArticleCacheService {
     if (articleMasterData == null || CollectionUtils.isEmpty(iduItemDerivedStandards)) return;
     articleMasterData
         .setIsTradeItemExcludedFromDiscounts(
-                getIsTradeItem(iduItemDerivedStandards,"isTradeItemExcludedFromDiscounts"))
+            getIsTradeItem(iduItemDerivedStandards, "isTradeItemExcludedFromDiscounts"))
         .setGradeCodeReferenceFruitsVegetables(
             getGradeCodeReferenceFruitsVegetables(iduItemDerivedStandards))
-        .setIsTradeItemInSellOut(getIsTradeItem(iduItemDerivedStandards,"isTradeItemInSellOut"))
-        .setIsTradeItemSellableInPFSShop(getIsTradeItem(iduItemDerivedStandards,"isTradeItemSellableInPFSShop"))
-        .setIsTradeItemDiscountMachine(getIsTradeItem(iduItemDerivedStandards,"isTradeItemDiscountMachine"))
-        .setIsMerchandiseOwnBrand(getIsTradeItem(iduItemDerivedStandards,"merchandiseBrand"));
+        .setIsTradeItemInSellOut(getIsTradeItem(iduItemDerivedStandards, "isTradeItemInSellOut"))
+        .setIsTradeItemSellableInPFSShop(
+            getIsTradeItem(iduItemDerivedStandards, "isTradeItemSellableInPFSShop"))
+        .setIsTradeItemDiscountMachine(
+            getIsTradeItem(iduItemDerivedStandards, "isTradeItemDiscountMachine"))
+        .setIsMerchandiseOwnBrand(getIsTradeItem(iduItemDerivedStandards, "merchandiseBrand"));
   }
 
   public String getGradeCodeReferenceFruitsVegetables(
@@ -709,50 +715,55 @@ public class ArticleCacheService {
   }
 
   public Boolean getIsTradeItem(
-          List<IduItemDerivedStandard> iduItemDerivedStandards, String tradeIdem) {
+      List<IduItemDerivedStandard> iduItemDerivedStandards, String tradeIdem) {
     IsTradeItem resultIsTradeItem = new IsTradeItem();
-    iduItemDerivedStandards.forEach(elem -> {
-      if (elem.getContentIduItemDerivedStandard() != null) {
-        IsTradeItem isTradeItem = getSpecificItem(elem
-                .getContentIduItemDerivedStandard(), tradeIdem);
-        if (isTradeItem != null
-                && Boolean.TRUE.equals(isTradeItem.getValue())) {
-          resultIsTradeItem.setValue(true);
-          if (resultIsTradeItem.getValidFrom() == null
+    iduItemDerivedStandards.forEach(
+        elem -> {
+          if (elem.getContentIduItemDerivedStandard() != null) {
+            IsTradeItem isTradeItem =
+                getSpecificItem(elem.getContentIduItemDerivedStandard(), tradeIdem);
+            if (isTradeItem != null && Boolean.TRUE.equals(isTradeItem.getValue())) {
+              resultIsTradeItem.setValue(true);
+              if (resultIsTradeItem.getValidFrom() == null
                   || isTradeItem.getValidFrom().after(resultIsTradeItem.getValidFrom())) {
-            resultIsTradeItem.setValidFrom(isTradeItem.getValidFrom());
+                resultIsTradeItem.setValidFrom(isTradeItem.getValidFrom());
+              }
+            }
           }
-        }
-      }
-    });
+        });
 
     if (Boolean.TRUE.equals(resultIsTradeItem.getValue())) {
       if (resultIsTradeItem.getValidFrom() == null) {
         return true;
       } else {
         LocalDate validFrom =
-                resultIsTradeItem.getValidFrom().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            resultIsTradeItem
+                .getValidFrom()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
         return LocalDate.now().isAfter(validFrom);
       }
     }
     return false;
   }
 
-  private IsTradeItem getSpecificItem(ContentIduItemDerivedStandard contentIduItemDerivedStandard, String tradeItem) {
-    if("isTradeItemExcludedFromDiscounts".equals(tradeItem)
-            && contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts() != null) {
+  private IsTradeItem getSpecificItem(
+      ContentIduItemDerivedStandard contentIduItemDerivedStandard, String tradeItem) {
+    if ("isTradeItemExcludedFromDiscounts".equals(tradeItem)
+        && contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts() != null) {
       return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts());
-    } else if("isTradeItemInSellOut".equals(tradeItem)
-            && contentIduItemDerivedStandard.getIsTradeItemInSellOut() != null) {
+    } else if ("isTradeItemInSellOut".equals(tradeItem)
+        && contentIduItemDerivedStandard.getIsTradeItemInSellOut() != null) {
       return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemInSellOut());
-    }else if("isTradeItemSellableInPFSShop".equals(tradeItem)
-            && contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop() != null){
+    } else if ("isTradeItemSellableInPFSShop".equals(tradeItem)
+        && contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop() != null) {
       return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop());
-    }else if("isTradeItemDiscountMachine".equals(tradeItem)
-            && contentIduItemDerivedStandard.getIsTradeItemDiscountMachine() != null) {
+    } else if ("isTradeItemDiscountMachine".equals(tradeItem)
+        && contentIduItemDerivedStandard.getIsTradeItemDiscountMachine() != null) {
       return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemDiscountMachine());
-    }else if("merchandiseBrand".equals(tradeItem)
-            && contentIduItemDerivedStandard.getMerchandiseBrand() != null) {
+    } else if ("merchandiseBrand".equals(tradeItem)
+        && contentIduItemDerivedStandard.getMerchandiseBrand() != null) {
       return new IsTradeItem(contentIduItemDerivedStandard.getMerchandiseBrand());
     }
     return null;
