@@ -1,7 +1,5 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
-import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -310,7 +308,7 @@ public class ArticleCacheService {
     String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
 
     IsuItemStoreMerchandise isuItemStoreMerchandise =
-        articleCacheClient.getIsuItemStoreMerchandiseDocument(escapeHtml4(articleUrlPath));
+        articleCacheClient.getIsuItemStoreMerchandiseDocument(articleUrlPath);
 
     return mapToStoreInformationGroupForStore(isuItemStoreMerchandise, storeNumber);
   }
