@@ -1,509 +1,509 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>net.metrosystems</groupId>
-	<artifactId>inventoryaggregator</artifactId>
-	<version>0.0.1</version>
-	<packaging>jar</packaging>
-	<name>inventoryaggregator</name>
-	<description>Store inventory aggregator</description>
+    <groupId>net.metrosystems</groupId>
+    <artifactId>inventoryaggregator</artifactId>
+    <version>0.0.1</version>
+    <packaging>jar</packaging>
+    <name>inventoryaggregator</name>
+    <description>Store inventory aggregator</description>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.7</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>17</java.version>
-		<logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
-		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
-		<mockwebserver.version>4.10.0</mockwebserver.version>
-		<ch.qos.logback.version>1.5.15</ch.qos.logback.version>
-		<spring-cloud.version>2023.0.1</spring-cloud.version>
-		<netty.version>4.1.118.Final</netty.version>
-		<org.springframework.version>6.1.14</org.springframework.version>
-		<com.fasterxml.jackson.core.version>2.17.0</com.fasterxml.jackson.core.version>
-		<com.nimbusds.version>9.37.3</com.nimbusds.version>
-		<org.apache.kafka.version>3.7.0</org.apache.kafka.version>
-		<org.apache.commons.version>1.26.1</org.apache.commons.version>
-		<org.springframework.security.version>6.4.2</org.springframework.security.version>
-		<org.apache.tomcat.embed.version>10.1.39</org.apache.tomcat.embed.version>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>17</java.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+        <mockwebserver.version>4.10.0</mockwebserver.version>
+        <ch.qos.logback.version>1.5.15</ch.qos.logback.version>
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <netty.version>4.1.118.Final</netty.version>
+        <org.springframework.version>6.1.14</org.springframework.version>
+        <com.fasterxml.jackson.core.version>2.17.0</com.fasterxml.jackson.core.version>
+        <com.nimbusds.version>9.37.3</com.nimbusds.version>
+        <org.apache.kafka.version>3.7.0</org.apache.kafka.version>
+        <org.apache.commons.version>1.26.1</org.apache.commons.version>
+        <org.springframework.security.version>6.4.2</org.springframework.security.version>
+        <org.apache.tomcat.embed.version>10.1.39</org.apache.tomcat.embed.version>
+    </properties>
 
-	<dependencyManagement>
-		<dependencies>
+    <dependencyManagement>
+        <dependencies>
 
-			<!-- ######################### NETTY ###########################  -->
+            <!-- ######################### NETTY ###########################  -->
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-codec-http2 -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-codec-http2</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-codec-http2 -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http2</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-codec-http -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-codec-http</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-codec-http -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-buffer -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-buffer</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-buffer -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-buffer</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-handler-proxy -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-handler-proxy</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-handler-proxy -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler-proxy</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-codec -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-codec</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-codec -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-codec-socks -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-codec-socks</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-codec-socks -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-socks</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-handler -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-handler</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-handler -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-resolver -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-resolver</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-resolver -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-resolver</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-transport-native-epoll -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-transport-native-epoll</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-transport-native-epoll -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-native-epoll</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-transport-native-epoll</artifactId>
-				<version>${netty.version}</version>
-				<classifier>linux-x86_64</classifier>
-			</dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-native-epoll</artifactId>
+                <version>${netty.version}</version>
+                <classifier>linux-x86_64</classifier>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-codec-dns -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-codec-dns</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-codec-dns -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-dns</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-transport -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-transport</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-transport -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-common -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-common</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-common -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-common</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/io.netty/netty-resolver-dns -->
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-resolver-dns</artifactId>
-				<version>${netty.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/io.netty/netty-resolver-dns -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-resolver-dns</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
-			<!-- ######################### NETTY ###########################  -->
+            <!-- ######################### NETTY ###########################  -->
 
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-			<!-- ######################### SPRING  ###########################  -->
+            <!-- ######################### SPRING  ###########################  -->
 
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-aop -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-aop</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework/spring-aop -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-test</artifactId>
-				<version>${org.springframework.version}</version>
-				<scope>test</scope>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${org.springframework.version}</version>
+                <scope>test</scope>
+            </dependency>
 
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-jdbc</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context-support</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-web</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-tx -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-tx</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework/spring-tx -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-webmvc</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-core</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-messaging -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-messaging</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework/spring-messaging -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-messaging</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-aspects -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-aspects</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework/spring-aspects -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aspects</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-expression -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-expression</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-beans</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework/spring-expression -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
 
-			<!-- ######################### SPRING  ###########################  -->
+            <!-- ######################### SPRING  ###########################  -->
 
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-classic</artifactId>
-				<version>${ch.qos.logback.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-core</artifactId>
-				<version>${ch.qos.logback.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-access</artifactId>
-				<version>${ch.qos.logback.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.beanshell</groupId>
-				<artifactId>bsh</artifactId>
-				<version>2.1b5</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-beanutils</groupId>
-				<artifactId>commons-beanutils</artifactId>
-				<version>1.9.4</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-collections</groupId>
-				<artifactId>commons-collections</artifactId>
-				<version>3.2.2</version>
-			</dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${ch.qos.logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${ch.qos.logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-access</artifactId>
+                <version>${ch.qos.logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.beanshell</groupId>
+                <artifactId>bsh</artifactId>
+                <version>2.1b5</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.9.4</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.2</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
-			<dependency>
-				<groupId>com.nimbusds</groupId>
-				<artifactId>nimbus-jose-jwt</artifactId>
-				<version>${com.nimbusds.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>${com.nimbusds.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
-			<dependency>
-				<groupId>org.apache.kafka</groupId>
-				<artifactId>kafka-clients</artifactId>
-				<version>${org.apache.kafka.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${org.apache.kafka.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-compress</artifactId>
-				<version>${org.apache.commons.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${org.apache.commons.version}</version>
+            </dependency>
 
 
-			<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>${com.fasterxml.jackson.core.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${com.fasterxml.jackson.core.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-core</artifactId>
-				<version>${com.fasterxml.jackson.core.version}</version>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${com.fasterxml.jackson.core.version}</version>
+            </dependency>
 
-			<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson/jackson-bom -->
-			<dependency>
-				<groupId>com.fasterxml.jackson</groupId>
-				<artifactId>jackson-bom</artifactId>
-				<version>${com.fasterxml.jackson.core.version}</version>
-				<type>pom</type>
-			</dependency>
+            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson/jackson-bom -->
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${com.fasterxml.jackson.core.version}</version>
+                <type>pom</type>
+            </dependency>
 
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-config</artifactId>
-				<version>${org.springframework.security.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-crypto</artifactId>
-				<version>${org.springframework.security.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-core</artifactId>
-				<version>${org.springframework.security.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-web</artifactId>
-				<version>${org.springframework.security.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.squareup.okio</groupId>
-				<artifactId>okio-jvm</artifactId>
-				<version>3.9.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.tomcat.embed</groupId>
-				<artifactId>tomcat-embed-websocket</artifactId>
-				<version>${org.apache.tomcat.embed.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.tomcat.embed</groupId>
-				<artifactId>tomcat-embed-core</artifactId>
-				<version>${org.apache.tomcat.embed.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.tomcat.embed</groupId>
-				<artifactId>tomcat-embed-el</artifactId>
-				<version>${org.apache.tomcat.embed.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.tomcat.embed</groupId>
-				<artifactId>tomcat-annotations-api</artifactId>
-				<version>${org.apache.tomcat.embed.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>2.18.0</version>
-			</dependency>
-			<dependency>
-				<groupId>net.minidev</groupId>
-				<artifactId>json-smart</artifactId>
-				<version>2.5.2</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-config</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-web</artifactId>
+                <version>${org.springframework.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio-jvm</artifactId>
+                <version>3.9.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>${org.apache.tomcat.embed.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>${org.apache.tomcat.embed.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>${org.apache.tomcat.embed.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-annotations-api</artifactId>
+                <version>${org.apache.tomcat.embed.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>2.5.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<exclusions>
-				<!-- TODO: upgrade to latest spring boot! -->
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- OAUTH -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-client</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-		</dependency>
-
-		<!-- WebClient -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-core</artifactId>
-		</dependency>
-
-		<dependency>
-		    <groupId>com.fasterxml.jackson.dataformat</groupId>
-		    <artifactId>jackson-dataformat-xml</artifactId>
-			<version>${com.fasterxml.jackson.core.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>${com.fasterxml.jackson.core.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5.14</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents.client5</groupId>
-			<artifactId>httpclient5</artifactId>
-			<version>5.2.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>net.logstash.logback</groupId>
-			<artifactId>logstash-logback-encoder</artifactId>
-			<version>${logstash-logback-encoder.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.uuid</groupId>
-			<artifactId>java-uuid-generator</artifactId>
-			<version>5.0.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>mockwebserver</artifactId>
-			<version>4.10.0</version>
-		</dependency>
-		<!--security-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.springframework.retry/spring-retry -->
+    <dependencies>
         <dependency>
-          <groupId>org.springframework.retry</groupId>
-          <artifactId>spring-retry</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.glassfish.jaxb</groupId>
-			<artifactId>jaxb-runtime</artifactId>
-		</dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <exclusions>
+                <!-- TODO: upgrade to latest spring boot! -->
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- OAUTH -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <!-- WebClient -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${com.fasterxml.jackson.core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${com.fasterxml.jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash-logback-encoder.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.uuid</groupId>
+            <artifactId>java-uuid-generator</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>4.10.0</version>
+        </dependency>
+        <!--security-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.retry/spring-retry -->
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
 
 
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
-		<!--metrics-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-core -->
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-registry-statsd</artifactId>
-		</dependency>
-		<!--metrics end-->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <!--metrics-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-core -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-statsd</artifactId>
+        </dependency>
+        <!--metrics end-->
 
         <!-- Ops -->
         <dependency>
@@ -512,156 +512,155 @@
         </dependency>
 
 
-		<!--> Test Dependencies<-->
+        <!--> Test Dependencies<-->
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-			<version>4.4</version>
-		</dependency>
-		<!-- Propagate traceId -->
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-tracing</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-tracing-bridge-brave</artifactId>
-			<!-- Propagate traceId -->
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-text</artifactId>
-			<version>1.13.0</version>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
+        </dependency>
+        <!-- Propagate traceId -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+            <!-- Propagate traceId -->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.13.0</version>
+        </dependency>
+    </dependencies>
 
-	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
 
 
-	<build>
-		<finalName>${project.artifactId}</finalName>
+    <build>
+        <finalName>${project.artifactId}</finalName>
 
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<mainClass>net.metrosystems.inventoryaggregator.InventoryAggregatorApplication</mainClass>
-					<layout>JAR</layout>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>pre-test</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<propertyName>jacocoArgLine</propertyName>
-							<destFile>${project.test.result.directory}/jacoco/jacoco.exec</destFile>
-						</configuration>
-					</execution>
-					<execution>
-						<id>post-test</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-						<configuration>
-							<dataFile>${project.test.result.directory}/jacoco/jacoco.exec</dataFile>
-							<outputDirectory>${project.test.result.directory}/jacoco</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<!--suppress UnresolvedMavenProperty -->
-					<argLine>${jacocoArgLine}</argLine>
-					<reportsDirectory>${project.test.result.directory}/surefire</reportsDirectory>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>${lombok.version}</version>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>net.metrosystems.inventoryaggregator.InventoryAggregatorApplication</mainClass>
+                    <layout>JAR</layout>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>pre-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>jacocoArgLine</propertyName>
+                            <destFile>${project.test.result.directory}/jacoco/jacoco.exec</destFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.test.result.directory}/jacoco/jacoco.exec</dataFile>
+                            <outputDirectory>${project.test.result.directory}/jacoco</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <argLine>${jacocoArgLine}</argLine>
+                    <reportsDirectory>${project.test.result.directory}/surefire</reportsDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-	<profiles>
-		<profile>
-			<id>coverage</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<project.test.result.directory>${project.build.directory}/test-results</project.test.result.directory>
-				<sonar.host.url>https://sonarqube.metrosystems.net</sonar.host.url>
-				<sonar.projectKey>inventory-inventoryaggregator</sonar.projectKey>
-				<sonar.login>8aef148ef484c80118f0e13f0adf9a20e60523c5</sonar.login>
-				<sonar.java.codeCoveragePlugin>jacoco</sonar.java.codeCoveragePlugin>
-				<sonar.coverage.jacoco.xmlReportPaths>${project.test.result.directory}/jacoco/jacoco.xml
-				</sonar.coverage.jacoco.xmlReportPaths>
-				<sonar.exclusions>
-					src/main/java/net/metrosystems/inventoryaggregator/InventoryAggregatorApplication.java,
-					src/main/java/net/metrosystems/inventoryaggregator/config/RestTemplate/RestTemplateCustom.java,
-					src/main/java/net/metrosystems/inventoryaggregator/**/model/*.java,
-					src/main/java/net/metrosystems/inventoryaggregator/articleattributes/**/model/*.java,
-					**/PromotionArticleDataGroup.java
-				</sonar.exclusions>
-				<sonar.coverage.exclusions>
-					**/config/RestTemplate/RestTemplateCustom.java,
-					**/model/*.java,
-					**/PromotionArticleDataGroup.java,
-					**/config/*.java,**/config/**/*.java,**/config/**/**/*.java,
-					**/articleattributes/service/ArticleDetailsService.java,
-					**/articleid/client/ArticleIdClient.java,
-					**/articleid/controller/ArticleIdController.java,
-					**/articleid/service/ArticleIdService.java,
-					**/articleid/client/article_cache_aaa/filter_aaa/service/FilterAAAService.java,
-					**/articleid/client/article_cache_aaa/filter_aaa/client/FilterAAAClient.java,
-					**/common/article_information/articlecache/client/article_cache_aaa/ArticleCacheAAAClient.java,
-					**/common/utils/JsonHelper.java
-				</sonar.coverage.exclusions>
-			</properties>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <project.test.result.directory>${project.build.directory}/test-results</project.test.result.directory>
+                <sonar.host.url>https://sonarqube.metrosystems.net</sonar.host.url>
+                <sonar.projectKey>inventory-inventoryaggregator</sonar.projectKey>
+                <sonar.java.codeCoveragePlugin>jacoco</sonar.java.codeCoveragePlugin>
+                <sonar.coverage.jacoco.xmlReportPaths>${project.test.result.directory}/jacoco/jacoco.xml
+                </sonar.coverage.jacoco.xmlReportPaths>
+                <sonar.exclusions>
+                    src/main/java/net/metrosystems/inventoryaggregator/InventoryAggregatorApplication.java,
+                    src/main/java/net/metrosystems/inventoryaggregator/config/RestTemplate/RestTemplateCustom.java,
+                    src/main/java/net/metrosystems/inventoryaggregator/**/model/*.java,
+                    src/main/java/net/metrosystems/inventoryaggregator/articleattributes/**/model/*.java,
+                    **/PromotionArticleDataGroup.java
+                </sonar.exclusions>
+                <sonar.coverage.exclusions>
+                    **/config/RestTemplate/RestTemplateCustom.java,
+                    **/model/*.java,
+                    **/PromotionArticleDataGroup.java,
+                    **/config/*.java,**/config/**/*.java,**/config/**/**/*.java,
+                    **/articleattributes/service/ArticleDetailsService.java,
+                    **/articleid/client/ArticleIdClient.java,
+                    **/articleid/controller/ArticleIdController.java,
+                    **/articleid/service/ArticleIdService.java,
+                    **/articleid/client/article_cache_aaa/filter_aaa/service/FilterAAAService.java,
+                    **/articleid/client/article_cache_aaa/filter_aaa/client/FilterAAAClient.java,
+                    **/common/article_information/articlecache/client/article_cache_aaa/ArticleCacheAAAClient.java,
+                    **/common/utils/JsonHelper.java
+                </sonar.coverage.exclusions>
+            </properties>
+        </profile>
+    </profiles>
 
-	<repositories>
-		<repository>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<id>msys.artifactory.central</id>
-			<name>libs-release</name>
-			<url>https://artifactory.metrosystems.net/artifactory/libs-release</url>
-		</repository>
-		<repository>
-			<snapshots/>
-			<id>msys.artifactory.snapshots</id>
-			<name>libs-snapshot</name>
-			<url>https://artifactory.metrosystems.net/artifactory/libs-snapshot</url>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>msys.artifactory.central</id>
+            <name>libs-release</name>
+            <url>https://artifactory.metrosystems.net/artifactory/libs-release</url>
+        </repository>
+        <repository>
+            <snapshots/>
+            <id>msys.artifactory.snapshots</id>
+            <name>libs-snapshot</name>
+            <url>https://artifactory.metrosystems.net/artifactory/libs-snapshot</url>
+        </repository>
+    </repositories>
 
 </project>

@@ -108,7 +108,7 @@ public class ArticleDetailsService {
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
 
     CompletableFuture<RawArticleStoreMasterData> discountArticleStoreMasterData =
@@ -124,7 +124,7 @@ public class ArticleDetailsService {
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
 
     CompletableFuture.allOf(articleMasterData, discountArticleStoreMasterData);
@@ -180,7 +180,7 @@ public class ArticleDetailsService {
 
     CompletableFuture<List<StockLocation>> articleStockLocationList =
         stockLocationRepository.getArticleStockLocation(
-            articleId, countryCode, salesLine, storeNo, dataTypeList);
+            articleId, countryCode, storeNo, dataTypeList);
 
     CompletableFuture<List<IduItemDerivedStandard>> iduDerivedStandardsList =
         articleMasterDataRepository.getIduItemDerivedStandardsAsync(countryCode, articleId);

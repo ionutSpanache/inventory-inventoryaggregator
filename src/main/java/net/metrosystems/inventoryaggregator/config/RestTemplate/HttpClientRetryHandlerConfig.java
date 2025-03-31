@@ -13,34 +13,34 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class HttpClientRetryHandlerConfig {
 
-    @Value("${rest.template.retry.count}")
-    private int retryCount;
+  @Value("${rest.template.retry.count}")
+  private int retryCount;
 
-    @Value("${rest.template.time.to.wait.between.retry}")
-    private int timeToWaitBetweenRetry;
+  @Value("${rest.template.time.to.wait.between.retry}")
+  private int timeToWaitBetweenRetry;
 
-    @Bean
-    public HttpRequestRetryHandler retryHandler() {
-        return (exception, executionCount, context) -> {
-            if (executionCount > retryCount) {
-                log.warn("Maximum retries {} reached", retryCount);
-                return false;
-            }
+  @Bean
+  public HttpRequestRetryHandler retryHandler() {
+    return (exception, executionCount, context) -> {
+      if (executionCount > retryCount) {
+        log.warn("Maximum retries {} reached", retryCount);
+        return false;
+      }
 
-            if(exception instanceof SocketException) {
-                return  false;
-            }
+      if (exception instanceof SocketException) {
+        return false;
+      }
 
-            if (exception instanceof Exception) {
-                log.warn("Retry {}", executionCount);
-                try {
-                    TimeUnit.SECONDS.sleep(timeToWaitBetweenRetry);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return true;
-            }
-            return false;
-        };
-    }
+      if (exception instanceof Exception) {
+        log.warn("Retry {}", executionCount);
+        try {
+          TimeUnit.SECONDS.sleep(timeToWaitBetweenRetry);
+        } catch (InterruptedException e) {
+          log.warn("Interrupted while waiting for retry {}", executionCount, e);
+        }
+        return true;
+      }
+      return false;
+    };
+  }
 }

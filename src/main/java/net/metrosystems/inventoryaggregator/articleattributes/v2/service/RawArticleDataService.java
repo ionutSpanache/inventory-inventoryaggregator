@@ -9,8 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
@@ -19,6 +17,8 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeC
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
+import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
@@ -62,7 +62,8 @@ public class RawArticleDataService {
         LANGUAGE_CODE_EXCEPTIONS.getOrDefault(storeId.getCountryCode(), storeId.getCountryCode());
 
     CompletableFuture<ArticleComponent> articleComponentCompletableFuture =
-        articleProcessingServiceV2.getArticleComponent(storeId.getCountryCode(),storeId.getStoreNumber(), articleId.getArticleNumber());
+        articleProcessingServiceV2.getArticleComponent(
+            storeId.getCountryCode(), storeId.getStoreNumber(), articleId.getArticleNumber());
 
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId =
         articleProcessingServiceV2.getArticleMasterId(
@@ -78,7 +79,7 @@ public class RawArticleDataService {
 
     CompletableFuture<List<StockLocation>> articleStockLocationList =
         stockLocationRepository.getArticleStockLocation(
-            articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), dataTypeList);
+            articleId, storeId.getCountryCode(), storeId.getStoreNumber(), dataTypeList);
 
     CompletableFuture<String> dailyMeanSales =
         movieAclService.getAverageSales(
@@ -93,7 +94,10 @@ public class RawArticleDataService {
         dailyMeanSales);
 
     generalDataRepository.enhanceRawArticleStoreMasterDataWithDepartmentName(
-        storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), rawArticleStoreMasterData.get());
+        storeId.getCountryCode(),
+        storeId.getSalesLine(),
+        storeId.getStoreNumber(),
+        rawArticleStoreMasterData.get());
 
     updateWithDefaultValues(rawArticleStoreMasterData.get());
 

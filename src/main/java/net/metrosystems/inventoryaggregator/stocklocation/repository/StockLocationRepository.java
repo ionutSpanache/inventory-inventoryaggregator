@@ -1,6 +1,6 @@
 package net.metrosystems.inventoryaggregator.stocklocation.repository;
 
-import static org.springframework.util.CollectionUtils.isEmpty;
+import static net.metrosystems.inventoryaggregator.articleattributes.model.DataType.ARTICLE_STOCK_LOCATION;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,11 +9,8 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.DataType;
-import net.metrosystems.inventoryaggregator.stocklocation.acl.repository.AclBundleStockLocationRepository;
 import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
 import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -23,15 +20,9 @@ public class StockLocationRepository {
 
   private final MstoreAclStockLocationRepository mstoreAclStockLocationRepository;
 
-  private final AclBundleStockLocationRepository aclBundleStockLocationRepository;
-
-  @Value("#{'${countries.slm.active:null}'}")
-  private List<String> countriesSlmActive;
-
   public CompletableFuture<List<StockLocation>> getArticleStockLocation(
       ArticleId articleId,
       String countryCode,
-      String salesLine,
       Integer storeNo,
       Optional<List<String>> dataTypeList) {
 
@@ -39,26 +30,15 @@ public class StockLocationRepository {
         CompletableFuture.completedFuture(Collections.emptyList());
 
     if (dataTypeList.isEmpty()
-        || !dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
+        || !dataTypeList.get().contains(ARTICLE_STOCK_LOCATION.getDataType())) {
       return articleStockLocations;
     }
 
-    boolean slmActive =
-        !isEmpty(countriesSlmActive)
-            && (countriesSlmActive.contains(countryCode)
-                || "ALL".equals(countriesSlmActive.get(0)));
     try {
-      if (slmActive) {
-        articleStockLocations =
-            mstoreAclStockLocationRepository.getArticleStockLocation(
-                articleId, countryCode, storeNo);
-      } else {
-        articleStockLocations =
-            aclBundleStockLocationRepository.getArticleStockLocation(
-                articleId, countryCode, salesLine, storeNo);
-      }
+      articleStockLocations =
+          mstoreAclStockLocationRepository.getArticleStockLocation(articleId, countryCode, storeNo);
     } catch (Exception e) {
-      log.error("StockLocationRepository.getArticleStockLocation - - error: {}", e.getMessage(), e);
+      log.error("StockLocationRepository.getArticleStockLocation - error: {}", e.getMessage(), e);
     }
     return articleStockLocations;
   }
@@ -66,7 +46,6 @@ public class StockLocationRepository {
   public CompletableFuture<List<ArticleStockLocations>> getArticleStockLocation(
       List<ArticleId> articleIdList,
       String countryCode,
-      String salesLine,
       Integer storeNo,
       Optional<List<String>> dataTypeList) {
 
@@ -74,30 +53,16 @@ public class StockLocationRepository {
         CompletableFuture.completedFuture(Collections.emptyList());
 
     if (dataTypeList.isEmpty()
-        || !dataTypeList.get().contains(DataType.ARTICLE_STOCK_LOCATION.getDataType())) {
+        || !dataTypeList.get().contains(ARTICLE_STOCK_LOCATION.getDataType())) {
       return articleStockLocations;
     }
 
-    boolean slmActive =
-        !isEmpty(countriesSlmActive)
-            && (countriesSlmActive.contains(countryCode)
-                || "ALL".equals(countriesSlmActive.get(0)));
     try {
-      if (slmActive) {
-        articleStockLocations =
-            mstoreAclStockLocationRepository.getStockLocationsForArticleList(
-                articleIdList, countryCode, storeNo);
-      } else {
-        articleStockLocations =
-            aclBundleStockLocationRepository.getStockLocationsForArticleList(
-                articleIdList, countryCode, salesLine, storeNo);
-      }
-
+      articleStockLocations =
+          mstoreAclStockLocationRepository.getStockLocationsForArticleList(
+              articleIdList, countryCode, storeNo);
     } catch (Exception e) {
-      log.error(
-          "ArticleListDetailsService.articleStockLocationList - articleDataFromMovieRepository - error: {}",
-          e.getMessage(),
-          e);
+      log.error("StockLocationRepository.getArticleStockLocation - error: {}", e.getMessage(), e);
     }
     return articleStockLocations;
   }

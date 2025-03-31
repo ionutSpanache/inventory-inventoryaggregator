@@ -151,7 +151,7 @@ public class ArticleListDetailsService {
 
     CompletableFuture<List<ArticleStockLocations>> articleStockLocationList =
         stockLocationRepository.getArticleStockLocation(
-            articleIdList, countryCode, salesLine, storeNo, dataTypeList);
+            articleIdList, countryCode, storeNo, dataTypeList);
 
     CompletableFuture.allOf(
         articleComponentForArticleId,
