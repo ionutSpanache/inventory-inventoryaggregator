@@ -1,13 +1,12 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 @Data
 @Builder
@@ -25,6 +24,7 @@ public class ArticleMasterData implements Serializable {
   private LocalDate promotionStartDate;
   private LocalDate promotionEndDate;
   private Integer sellingBundleContent;
+  private Integer buyingBundleContent;
   private Integer packageFactor;
   private Double weightArticle;
   private Double netWeight;
