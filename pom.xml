@@ -32,7 +32,7 @@
         <com.nimbusds.version>9.37.3</com.nimbusds.version>
         <org.apache.kafka.version>3.7.0</org.apache.kafka.version>
         <org.apache.commons.version>1.26.1</org.apache.commons.version>
-        <org.springframework.security.version>6.4.5</org.springframework.security.version>
+        <org.springframework.security.version>6.4.6</org.springframework.security.version>
         <org.apache.tomcat.embed.version>10.1.40</org.apache.tomcat.embed.version>
     </properties>
 
