@@ -6,13 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawIsTradeItemExcludedFromDiscounts;
-import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleListDetailsService;
 import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleDetailsServiceV2;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
-import net.metrosystems.inventoryaggregator.featuretoggle.DataSourceFeatureToggle;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,9 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/inventoryaggregator", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArticleListDataController {
 
-  private final ArticleListDetailsService articleListDetailsService;
   private final ArticleDetailsServiceV2 articleDetailsServiceV2;
-  private final DataSourceFeatureToggle dataSourceFeatureToggle;
 
   @AddLogs
   @PostMapping(
@@ -46,28 +41,8 @@ public class ArticleListDataController {
       @RequestBody List<ArticleId> articleIdList)
       throws Exception {
 
-    boolean dataSource = dataSourceFeatureToggle.isDataSourceActive(countryCode);
     StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
-    if (dataSource) {
-      return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
-          articleIdList, storeId, dataTypeList);
-    } else {
-      return articleListDetailsService.getArticleDataListByArticleVariantBundle(
-          articleIdList, storeId, languageCode, dataTypeList);
-    }
-  }
-
-  @AddLogs
-  @PostMapping(
-      value = "countries/{countryCode}/saleslines/{salesLine}/articles/isexcludedfromdiscounts",
-      consumes = "application/json",
-      produces = "application/json")
-  public List<RawIsTradeItemExcludedFromDiscounts>
-      getIsTradeItemExcludedFromDiscountsByArtVarBundle(
-          @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-          @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-          @RequestBody List<ArticleId> articleIdList) {
-    return articleListDetailsService.isTradeItemExcludedFromDiscounts(
-        articleIdList, countryCode, salesLine);
+    return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
+        articleIdList, storeId, dataTypeList);
   }
 }

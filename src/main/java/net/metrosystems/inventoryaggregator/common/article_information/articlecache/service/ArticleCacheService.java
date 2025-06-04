@@ -25,14 +25,12 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.ContentIduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IsTradeItemExcludedFromDiscounts;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticle;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticleDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleVariantBundleIdentifier;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.IsTradeItem;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.apache.commons.text.StringEscapeUtils;
@@ -90,25 +88,7 @@ public class ArticleCacheService {
     this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
   }
 
-  private List<ArticleVariantBundleIdentifier> getArticleVariantBundleIdentifierListFromFilterUrl(
-      Documents filterUrlString) {
-    if (filterUrlString == null || CollectionUtils.isEmpty(filterUrlString.getArticleKeys())) {
-      return Collections.emptyList();
-    }
 
-    List<ArticleVariantBundleIdentifier> articleVariantBundleIdentifierList = new ArrayList<>();
-    for (String articleUrlPath : filterUrlString.getArticleKeys()) {
-      ArticleId articleId = documentsService.tranformDocumentInArticleId(articleUrlPath);
-      ArticleVariantBundleIdentifier articleVariantBundleIdentifier =
-          new ArticleVariantBundleIdentifier();
-      articleVariantBundleIdentifier.setArticleNumber(articleId.getArticleNumber());
-      articleVariantBundleIdentifier.setVariantNumber(articleId.getVariantNumber());
-      articleVariantBundleIdentifier.setBundleNumber(articleId.getBundleNumber());
-      articleVariantBundleIdentifierList.add(articleVariantBundleIdentifier);
-    }
-
-    return articleVariantBundleIdentifierList;
-  }
 
   public ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
       Long articleNumber,
@@ -203,23 +183,6 @@ public class ArticleCacheService {
     return articleCacheClient.getIduItemDerivedStandardDocument(documentUrl);
   }
 
-  public ProductLifeCycleData buildProductLifeCycleData(
-      List<IduItemDerivedStandard> iduItemDerivedStandardList) {
-    if (CollectionUtils.isEmpty(iduItemDerivedStandardList)) return null;
-    Optional<IduItemDerivedStandard> documentWithProductLifecycle =
-        iduItemDerivedStandardList.stream()
-            .filter(
-                iduItemDerivedStandard ->
-                    iduItemDerivedStandard
-                            .getContentIduItemDerivedStandard()
-                            .getAssortmentClusterSpecificationV2()
-                        != null)
-            .findFirst();
-
-    if (documentWithProductLifecycle.isEmpty()) return null;
-
-    return mapToProductLifeCycleData(documentWithProductLifecycle.get());
-  }
 
   public List<PromotionArticleData> getPromotionArticleData(
       String countryCode,
@@ -381,38 +344,6 @@ public class ArticleCacheService {
                 .build(),
             salesLine)
         .getArticleKeys();
-  }
-
-  public IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts(
-      List<String> articleKeys) {
-
-    IsTradeItemExcludedFromDiscounts result = new IsTradeItemExcludedFromDiscounts();
-
-    if (!CollectionUtils.isEmpty(articleKeys)) {
-      articleKeys.forEach(
-          articleKey -> {
-            IduItemDerivedStandard iduItemDerivedStandard =
-                articleCacheClient.getIduItemDerivedStandardDocument(articleKey);
-            if (iduItemDerivedStandard != null
-                && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null) {
-              IsTradeItemExcludedFromDiscounts isTradeItemExcludedFromDiscounts =
-                  iduItemDerivedStandard
-                      .getContentIduItemDerivedStandard()
-                      .getIsTradeItemExcludedFromDiscounts();
-              if (isTradeItemExcludedFromDiscounts != null
-                  && Boolean.TRUE.equals(isTradeItemExcludedFromDiscounts.getValue())) {
-                result.setValue(true);
-                if (result.getValidFrom() == null
-                    || isTradeItemExcludedFromDiscounts
-                        .getValidFrom()
-                        .after(result.getValidFrom())) {
-                  result.setValidFrom(isTradeItemExcludedFromDiscounts.getValidFrom());
-                }
-              }
-            }
-          });
-    }
-    return result;
   }
 
   private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData(

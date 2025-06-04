@@ -6,12 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
-import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleDetailsService;
 import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleDetailsServiceV2;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
-import net.metrosystems.inventoryaggregator.featuretoggle.DataSourceFeatureToggle;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,9 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
     produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArticleDataController {
 
-  private final ArticleDetailsService articleDetailsService;
   private final ArticleDetailsServiceV2 articleDetailsServiceV2;
-  private final DataSourceFeatureToggle dataSourceFeatureToggle;
 
   @AddLogs
   @GetMapping(
@@ -46,7 +42,6 @@ public class ArticleDataController {
       @PathVariable("bundlenumber") Long bundleNumber,
       @RequestParam("dataType") Optional<List<String>> dataTypeList)
       throws Exception {
-    boolean dataSource = dataSourceFeatureToggle.isDataSourceActive(countryCode);
 
     ArticleId articleId =
         ArticleId.builder()
@@ -60,12 +55,7 @@ public class ArticleDataController {
             .salesLine(salesLine)
             .storeNumber(storeNo)
             .build();
-    if (dataSource) {
-      return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
-          articleId, storeId, languageCode, dataTypeList);
-    } else {
-      return articleDetailsService.getArticleDataListByArticleVariantBundle(
-          articleId, storeId, languageCode, dataTypeList);
-    }
+    return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
+        articleId, storeId, languageCode, dataTypeList);
   }
 }

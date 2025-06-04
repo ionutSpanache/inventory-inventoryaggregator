@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -22,17 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleDataForArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.SimplePromotionArticleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionDescription;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -83,38 +79,10 @@ public class ArticleMasterDataRepository {
         getArticleMasterDataSync(articleId, countryCode, salesLine, languageCode, storeNo));
   }
 
-  @Async("asyncExecutor")
-  public CompletableFuture<Optional<IduItemDerivedStandard>> getMultiLanguageData(
-      String countryCode, ArticleId articleId) {
-    Optional<IduItemDerivedStandard> multiLanguageData =
-        getMultiLanguageDataByArtVarBundle(countryCode, articleId);
-
-    return CompletableFuture.completedFuture(multiLanguageData);
-  }
-
-  @Async("asyncExecutor")
-  public CompletableFuture<List<IduItemDerivedStandard>> getIduItemDerivedStandardsAsync(
-      String countryCode, ArticleId articleId) {
-    List<IduItemDerivedStandard> iduItemDerivedStandards =
-        getIduItemDerivedStandards(countryCode, articleId);
-
-    return CompletableFuture.completedFuture(iduItemDerivedStandards);
-  }
-
   public List<PromotionArticleData> getPromotionArticle(
       String countryCode, Integer storeNumber, ArticleId articleId) {
 
     return articleCacheService.getPromotionArticleData(countryCode, articleId, storeNumber);
-  }
-
-  @Async("asyncExecutor")
-  public CompletableFuture<StoreInformationGroup> getDeliveryFlagAndStoreInformation(
-      String countryCode, ArticleId articleId, Integer storeNumber) {
-    StoreInformationGroup storeInformationGroup =
-        getStoreSupplierInformationGroup(countryCode, articleId, storeNumber)
-            .orElse(new StoreInformationGroup());
-
-    return CompletableFuture.completedFuture(storeInformationGroup);
   }
 
   @Async("asyncExecutor")
@@ -125,11 +93,19 @@ public class ArticleMasterDataRepository {
       String languageCode,
       Integer storeNo)
       throws Exception {
-    Map<ArticleId, ArticleMasterData> result = getArticleMasterDataForArticleIdListSync(articleIdList, countryCode, salesLine, languageCode, storeNo);
+    Map<ArticleId, ArticleMasterData> result =
+        getArticleMasterDataForArticleIdListSync(
+            articleIdList, countryCode, salesLine, languageCode, storeNo);
     return CompletableFuture.completedFuture(result);
   }
 
-  public Map<ArticleId, ArticleMasterData> getArticleMasterDataForArticleIdListSync(List<ArticleId> articleIdList, String countryCode, String salesLine, String languageCode, Integer storeNo) throws InterruptedException, ExecutionException {
+  public Map<ArticleId, ArticleMasterData> getArticleMasterDataForArticleIdListSync(
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String salesLine,
+      String languageCode,
+      Integer storeNo)
+      throws InterruptedException, ExecutionException {
     Map<ArticleId, ArticleMasterData> result = new ConcurrentHashMap<>();
     String languageCodeForAC = getCorrectLanguageCode(countryCode, languageCode);
     forkJoinPoolCustom
@@ -154,7 +130,7 @@ public class ArticleMasterDataRepository {
                             articleCacheFullData =
                                 articleCacheService
                                     .getArticleCacheFullDataByArtVarBundleForArticleId(
-                                            storeNo, articleUrlPath);
+                                        storeNo, articleUrlPath);
                           } catch (Exception e) {
                             log.error(
                                 "ArticleMasterDataRepository.getArticleCacheFullDataByArtVarBundleForArticleId error: {}",
@@ -166,9 +142,9 @@ public class ArticleMasterDataRepository {
                                 articleId,
                                 transformArticleCacheFullToArticleMasterData(
                                     articleCacheFullData,
-                                        countryCode,
-                                        storeNo,
-                                        languageCode,
+                                    countryCode,
+                                    storeNo,
+                                    languageCode,
                                     articleId));
                         }))
         .get();
@@ -226,18 +202,6 @@ public class ArticleMasterDataRepository {
     return languageCode;
   }
 
-  private List<IduItemDerivedStandard> getIduItemDerivedStandards(
-      String countryCode, ArticleId articleId) {
-
-    return articleCacheService.getIduItemDerivedStandards(countryCode, articleId);
-  }
-
-  private Optional<StoreInformationGroup> getStoreSupplierInformationGroup(
-      String countryCode, ArticleId articleId, Integer storeNumber) {
-
-    return articleCacheService.getStoreInformationGroup(countryCode, articleId, storeNumber);
-  }
-
   private ArticleCacheFullData getArticleCacheFullDataByArtVarBundle(
       Long articleNumber,
       Long variantNumber,
@@ -245,17 +209,10 @@ public class ArticleMasterDataRepository {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
-      throws Exception {
+      Integer storeNo) {
 
     return articleCacheService.getArticleCacheFullDataByArtVarBundle(
         articleNumber, variantNumber, bundleNumber, countryCode, salesLine, languageCode, storeNo);
-  }
-
-  private Optional<IduItemDerivedStandard> getMultiLanguageDataByArtVarBundle(
-      String countryCode, ArticleId articleId) {
-
-    return articleCacheService.getMultiLanguageDataByArtVarBundle(countryCode, articleId);
   }
 
   private ArticleMasterData transformArticleCacheFullToArticleMasterData(
