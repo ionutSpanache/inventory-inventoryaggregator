@@ -63,7 +63,7 @@ public class DataSourceClient {
       List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
 
     UriComponents url =
-        UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleListDataUrl)
+        UriComponentsBuilder.fromUriString(inventoryHost + dataSourceArticleListDataUrl)
             .buildAndExpand(countryCode, languageCode, storeNo);
 
     return webClient
@@ -84,7 +84,7 @@ public class DataSourceClient {
       ArticleId articleId, String countryCode, String languageCode, Integer storeNo) {
 
     UriComponents url =
-        UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleDataUrl)
+        UriComponentsBuilder.fromUriString(inventoryHost + dataSourceArticleDataUrl)
             .buildAndExpand(
                 countryCode,
                 languageCode,
@@ -116,7 +116,7 @@ public class DataSourceClient {
       String countryCode, Integer storeNumber, Long articleNumber) {
 
     UriComponents url =
-        UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleComponentUrl)
+        UriComponentsBuilder.fromUriString(inventoryHost + dataSourceArticleComponentUrl)
             .buildAndExpand(countryCode, storeNumber, articleNumber);
 
     return webClient
@@ -136,7 +136,7 @@ public class DataSourceClient {
       String countryCode, Integer storeNumber, List<ArticleId> articleIds) {
 
     UriComponents url =
-        UriComponentsBuilder.fromHttpUrl(inventoryHost + dataSourceArticleComponentsUrl)
+        UriComponentsBuilder.fromUriString(inventoryHost + dataSourceArticleComponentsUrl)
             .buildAndExpand(countryCode, storeNumber);
 
     List<ArticleIdComponent> articleIdComponents =
