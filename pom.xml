@@ -27,13 +27,13 @@
         <ch.qos.logback.version>1.5.15</ch.qos.logback.version>
         <spring-cloud.version>2024.0.1</spring-cloud.version>
         <netty.version>4.1.118.Final</netty.version>
-        <org.springframework.version>6.2.6</org.springframework.version>
+        <org.springframework.version>6.2.7</org.springframework.version>
         <com.fasterxml.jackson.core.version>2.17.0</com.fasterxml.jackson.core.version>
         <com.nimbusds.version>9.37.3</com.nimbusds.version>
         <org.apache.kafka.version>3.7.0</org.apache.kafka.version>
         <org.apache.commons.version>1.26.1</org.apache.commons.version>
         <org.springframework.security.version>6.4.6</org.springframework.security.version>
-        <org.apache.tomcat.embed.version>10.1.40</org.apache.tomcat.embed.version>
+        <org.apache.tomcat.embed.version>11.0.7</org.apache.tomcat.embed.version>
     </properties>
 
 
