@@ -19,13 +19,6 @@ public class AclArticleStoreMasterDataService {
     this.aclArticleStoreMasterDataClient = aclArticleStoreMasterDataClient;
   }
 
-  public List<ArticleStoreMasterData> getArticleStoreMasterDataByEan(
-      StoreId storeId, String barcode) {
-
-    return aclArticleStoreMasterDataClient.getArticleStoreMasterDataByEan(
-        storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber(), barcode);
-  }
-
   public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
       StoreId storeId, List<ArticleId> articleIdList) {
 

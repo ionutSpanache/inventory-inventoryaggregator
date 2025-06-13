@@ -1,12 +1,10 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.client;
 
-import java.util.Collections;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articlestoremasterdata.client.model.ArticleStoreMasterDataACLResponse;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,79 +12,33 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AclArticleStoreMasterDataClient {
 
   @Qualifier("webClientForAcl")
-  @Autowired
-  private WebClient webClient;
+  private final WebClient webClient;
 
   @Value("${ACL_STORE_MASTER_DATA_HOST}")
-  private String aclArticleMasterDataHost;
-  @Value("${ACL_STORE_MASTER_DATA_PATH_BY_EAN}")
-  private String aclArticleMasterDataPathByEan;
-  @Value("${ACL_STORE_MASTER_DATA_PATH_BY_SUBSYS}")
-  private String aclArticleMasterDataPathBySubsys;
+  private final String aclArticleMasterDataHost;
+
   @Value("${ACL_STORE_MASTER_DATA_PATH_ARTICLES_BY_ART_VAR_BUNDLE}")
-  private String aclArticlesMasterDataPathByArtVarBundle;
-
-  public List<ArticleStoreMasterData> getArticleStoreMasterDataByEan(String countryCode,
-                                                                     String salesLine,
-                                                                     Integer storeNo,
-                                                                     String barcode) {
-    UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
-            aclArticleMasterDataHost + aclArticleMasterDataPathByEan)
-            .buildAndExpand(countryCode.toUpperCase(),
-                    salesLine.toUpperCase(),
-                    storeNo,
-                    barcode);
-
-    return getArticleStoreMasterData(uriComponents);
-  }
-
-  public List<ArticleStoreMasterData> getArticleStoreMasterDataBySubsys(String countryCode,
-                                                                        String salesLine,
-                                                                        Integer storeNo,
-                                                                        Integer subsys) {
-    UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(
-            aclArticleMasterDataHost + aclArticleMasterDataPathBySubsys)
-            .buildAndExpand(countryCode.toUpperCase(),
-                    salesLine.toUpperCase(),
-                    storeNo,
-                    subsys);
-
-    return getArticleStoreMasterData(uriComponents);
-  }
+  private final String aclArticlesMasterDataPathByArtVarBundle;
 
   public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
-      String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList ) {
+      String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
     UriComponents uriComponents =
-        UriComponentsBuilder.fromHttpUrl(
+        UriComponentsBuilder.fromUriString(
                 aclArticleMasterDataHost + aclArticlesMasterDataPathByArtVarBundle)
             .buildAndExpand(countryCode.toUpperCase(), salesLine.toUpperCase(), storeNo);
 
-    return getArticlesFromStoreMasterData(uriComponents,articleIdList);
+    return getArticlesFromStoreMasterData(uriComponents, articleIdList);
   }
 
-  private List<ArticleStoreMasterData> getArticleStoreMasterData(UriComponents uriComponents) {
-    return webClient.get()
-            .uri(uriComponents.toString())
-            .retrieve()
-            .bodyToMono(ArticleStoreMasterDataACLResponse.class)
-            .map(ArticleStoreMasterDataACLResponse::getArticleStoreMasterData)
-            .defaultIfEmpty(Collections.emptyList())
-            .onErrorResume(throwable -> {
-              log.error("ACL error when calling " + uriComponents.toUriString());
-              return Mono.just(Collections.emptyList());
-            })
-            .block();
-  }
-
-
-  private List<ArticleStoreMasterData> getArticlesFromStoreMasterData(UriComponents uriComponents, List<ArticleId> articleIdList) {
+  private List<ArticleStoreMasterData> getArticlesFromStoreMasterData(
+      UriComponents uriComponents, List<ArticleId> articleIdList) {
     return webClient
         .post()
         .uri(uriComponents.toString())
