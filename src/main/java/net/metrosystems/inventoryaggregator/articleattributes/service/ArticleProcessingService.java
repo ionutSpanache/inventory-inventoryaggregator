@@ -8,7 +8,6 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
@@ -87,28 +86,6 @@ public class ArticleProcessingService {
           e);
     }
     return articleStoreMasterFromAcl;
-  }
-
-  public CompletableFuture<ArticleMasterData> getArticleMasterData(
-      ArticleId articleId,
-      String countryCode,
-      String salesLine,
-      String languageCode,
-      Integer storeNo) {
-    CompletableFuture<ArticleMasterData> articleMasterData = new CompletableFuture<>();
-    try {
-      articleMasterData =
-          articleMasterDataRepository.getArticleMasterData(
-              articleId, countryCode, salesLine, languageCode, storeNo);
-    } catch (ArticleNotFoundException ex) {
-      throw new ArticleNotFoundException();
-    } catch (Exception e) {
-      log.error(
-          "ArticleDetailsService.buildRawArticleDataList - articleMasterData - error: {}",
-          e.getMessage(),
-          e);
-    }
-    return articleMasterData;
   }
 
   public CompletableFuture<RawArticleStoreMasterData> getRawArticleStoreMasterData(

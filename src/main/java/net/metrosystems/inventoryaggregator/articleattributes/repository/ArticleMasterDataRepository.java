@@ -355,8 +355,7 @@ public class ArticleMasterDataRepository {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
-      throws Exception {
+      Integer storeNo) {
     ArticleCacheFullData articleCacheFullData =
         getArticleCacheFullDataByArtVarBundle(
             articleId.getArticleNumber(),

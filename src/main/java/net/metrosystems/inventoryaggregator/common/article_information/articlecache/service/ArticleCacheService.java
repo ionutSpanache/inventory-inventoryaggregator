@@ -1,29 +1,20 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.StoreInformationGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.ContentIduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
@@ -31,9 +22,7 @@ import net.metrosystems.inventoryaggregator.common.article_information.articleca
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticle;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticleDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.IsTradeItem;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -54,7 +43,6 @@ public class ArticleCacheService {
   private static final String K8S_PP_ENVIRONMENT = "pp";
   private static final String LOCAL_ENVIRONMENT = "local";
   private static final Set<String> COUNTRY_CODES = Set.of("CZ", "SK");
-  private final DocumentsService documentsService;
   private final ArticleCacheAAAClient articleCacheClient;
   private final ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient;
 
@@ -80,10 +68,8 @@ public class ArticleCacheService {
 
   @Autowired
   public ArticleCacheService(
-      DocumentsService documentsService,
       ArticleCacheAAAClient articleCacheClient,
       ArticleCacheStoreExceptionsClient articleCacheStoreExceptionsClient) {
-    this.documentsService = documentsService;
     this.articleCacheClient = articleCacheClient;
     this.articleCacheStoreExceptionsClient = articleCacheStoreExceptionsClient;
   }
@@ -129,51 +115,6 @@ public class ArticleCacheService {
       return LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
     }
     return languageCode;
-  }
-
-  public Optional<IduItemDerivedStandard> getMultiLanguageDataByArtVarBundle(
-      String countryCode,
-      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
-    Documents articleUrlPathList =
-        articleCacheClient.getMultiLanguageDocumentUrl(countryCode, articleId);
-    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-      return Optional.empty();
-    }
-    try {
-      return articleUrlPathList.getArticleKeys().stream()
-          .map(
-              a ->
-                  articleCacheClient.getIduItemDerivedStandardDocument(
-                      StringEscapeUtils.escapeHtml4(a)))
-          .filter(
-              iduItemDerivedStandard ->
-                  iduItemDerivedStandard
-                              .getContentIduItemDerivedStandard()
-                              .getVariantSortDescriptionV2()
-                          != null
-                      && iduItemDerivedStandard
-                              .getContentIduItemDerivedStandard()
-                              .getMerchandiseArticleDescription()
-                          != null)
-          .findAny();
-    } catch (Exception e) {
-      return Optional.empty();
-    }
-  }
-
-  public List<IduItemDerivedStandard> getIduItemDerivedStandards(
-      String countryCode,
-      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId) {
-    Documents articleUrlPathList =
-        articleCacheClient.getMultiLanguageDocumentUrl(countryCode, articleId);
-
-    if (articleUrlPathList == null
-        || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-      return Collections.emptyList();
-    }
-    List<String> articleUrlPath = articleUrlPathList.getArticleKeys();
-
-    return articleCacheClient.getMultipleIduItemDerivedStandardDocument(articleUrlPath);
   }
 
   public IduItemDerivedStandard getIduItemDerivedStandard(String documentUrl) {
@@ -257,39 +198,6 @@ public class ArticleCacheService {
     return promotions;
   }
 
-  public Optional<StoreInformationGroup> getStoreInformationGroup(
-      String countryCode,
-      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
-      Integer storeNumber) {
-    Documents articleUrlPathList =
-        articleCacheClient.getChannelDeliveryFlagUrl(countryCode, articleId);
-
-    if (articleUrlPathList == null
-        || CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-      return Optional.empty();
-    }
-    String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
-
-    IsuItemStoreMerchandise isuItemStoreMerchandise =
-        articleCacheClient.getIsuItemStoreMerchandiseDocument(articleUrlPath);
-
-    return mapToStoreInformationGroupForStore(isuItemStoreMerchandise, storeNumber);
-  }
-
-  private Optional<StoreInformationGroup> mapToStoreInformationGroupForStore(
-      IsuItemStoreMerchandise isuItemStoreMerchandise, Integer storeNumber) {
-    if (isuItemStoreMerchandise == null) return Optional.empty();
-    return isuItemStoreMerchandise.getContentIsuItemStoreMerchandise().getStoreInformationGroups()
-            == null
-        ? Optional.empty()
-        : isuItemStoreMerchandise
-            .getContentIsuItemStoreMerchandise()
-            .getStoreInformationGroups()
-            .stream()
-            .filter(storeInformationGroup -> storeInformationGroup.getGroupingId() == storeNumber)
-            .findFirst();
-  }
-
   private String getEnvironment(String countryCode) {
 
     if (K8S_DEV_ENVIRONMENT.equalsIgnoreCase(k8sEnvironment)
@@ -325,25 +233,6 @@ public class ArticleCacheService {
     }
 
     return transformArticleCacheDocumentToArticleFullData(articleCacheDocument, storeNo);
-  }
-
-  public List<String> getArticleKeysForDerivedStandardDocument(
-      String countryCode,
-      Long articleNumber,
-      Long bundleNumber,
-      Long variantNumber,
-      String salesLine) {
-
-    return documentsService
-        .getIduItemDerivedUrlByArtVarBundle(
-            countryCode,
-            net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId.builder()
-                .articleNumber(articleNumber)
-                .bundleNumber(bundleNumber)
-                .variantNumber(variantNumber)
-                .build(),
-            salesLine)
-        .getArticleKeys();
   }
 
   private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData(
@@ -485,74 +374,6 @@ public class ArticleCacheService {
     return MinimumRetailPrice.builder().indicator(Boolean.FALSE).value(ZERO).build();
   }
 
-  private ProductLifeCycleData mapToProductLifeCycleData(
-      IduItemDerivedStandard iduItemDerivedStandard) {
-
-    Long presencePeriodEndWeek =
-        iduItemDerivedStandard
-                    .getContentIduItemDerivedStandard()
-                    .getAssortmentClusterSpecificationV2()
-                    .getPresencePeriodV3()
-                == null
-            ? null
-            : iduItemDerivedStandard
-                .getContentIduItemDerivedStandard()
-                .getAssortmentClusterSpecificationV2()
-                .getPresencePeriodV3()
-                .getPresencePeriodEndWeekV2();
-
-    Long presencePeriodEndYear =
-        iduItemDerivedStandard
-                    .getContentIduItemDerivedStandard()
-                    .getAssortmentClusterSpecificationV2()
-                    .getPresencePeriodV3()
-                == null
-            ? null
-            : iduItemDerivedStandard
-                .getContentIduItemDerivedStandard()
-                .getAssortmentClusterSpecificationV2()
-                .getPresencePeriodV3()
-                .getPresencePeriodEndYearV2();
-
-    Long presencePeriodStartWeek =
-        iduItemDerivedStandard
-                    .getContentIduItemDerivedStandard()
-                    .getAssortmentClusterSpecificationV2()
-                    .getPresencePeriodV3()
-                == null
-            ? null
-            : iduItemDerivedStandard
-                .getContentIduItemDerivedStandard()
-                .getAssortmentClusterSpecificationV2()
-                .getPresencePeriodV3()
-                .getPresencePeriodStartWeekV2();
-
-    Long presencePeriodStartYear =
-        iduItemDerivedStandard
-                    .getContentIduItemDerivedStandard()
-                    .getAssortmentClusterSpecificationV2()
-                    .getPresencePeriodV3()
-                == null
-            ? null
-            : iduItemDerivedStandard
-                .getContentIduItemDerivedStandard()
-                .getAssortmentClusterSpecificationV2()
-                .getPresencePeriodV3()
-                .getPresencePeriodStartYearV2();
-
-    return ProductLifeCycleData.builder()
-        .assortmentCluster(
-            iduItemDerivedStandard
-                .getContentIduItemDerivedStandard()
-                .getAssortmentClusterSpecificationV2()
-                .getAssortmentClusterV2())
-        .presencePeriodEndWeek(presencePeriodEndWeek)
-        .presencePeriodEndYear(presencePeriodEndYear)
-        .presencePeriodStartWeek(presencePeriodStartWeek)
-        .presencePeriodStartYear(presencePeriodStartYear)
-        .build();
-  }
-
   public ArticleCacheStoreExceptionsIhdsTree getArticleCacheStoreExceptions(
       Long articleNumber,
       Long variantNumber,
@@ -604,97 +425,5 @@ public class ArticleCacheService {
             .toList();
 
     return activeStoresList;
-  }
-
-  public void enhanceArticleMasterData(
-      ArticleMasterData articleMasterData, List<IduItemDerivedStandard> iduItemDerivedStandards) {
-    if (articleMasterData == null || CollectionUtils.isEmpty(iduItemDerivedStandards)) return;
-    articleMasterData
-        .setIsTradeItemExcludedFromDiscounts(
-            getIsTradeItem(iduItemDerivedStandards, "isTradeItemExcludedFromDiscounts"))
-        .setGradeCodeReferenceFruitsVegetables(
-            getGradeCodeReferenceFruitsVegetables(iduItemDerivedStandards))
-        .setIsTradeItemInSellOut(getIsTradeItem(iduItemDerivedStandards, "isTradeItemInSellOut"))
-        .setIsTradeItemSellableInPFSShop(
-            getIsTradeItem(iduItemDerivedStandards, "isTradeItemSellableInPFSShop"))
-        .setIsTradeItemDiscountMachine(
-            getIsTradeItem(iduItemDerivedStandards, "isTradeItemDiscountMachine"))
-        .setIsMerchandiseOwnBrand(getIsTradeItem(iduItemDerivedStandards, "merchandiseBrand"));
-  }
-
-  public String getGradeCodeReferenceFruitsVegetables(
-      List<IduItemDerivedStandard> iduItemDerivedStandards) {
-
-    if (CollectionUtils.isEmpty(iduItemDerivedStandards)) return null;
-
-    for (IduItemDerivedStandard iduItemDerivedStandard : iduItemDerivedStandards) {
-      if (iduItemDerivedStandard != null
-          && iduItemDerivedStandard.getContentIduItemDerivedStandard() != null
-          && iduItemDerivedStandard
-                  .getContentIduItemDerivedStandard()
-                  .getGradeCodeReferenceFruitsVegetables()
-              != null) {
-        return iduItemDerivedStandard
-            .getContentIduItemDerivedStandard()
-            .getGradeCodeReferenceFruitsVegetables()
-            .getValue();
-      }
-    }
-    return null;
-  }
-
-  public Boolean getIsTradeItem(
-      List<IduItemDerivedStandard> iduItemDerivedStandards, String tradeIdem) {
-    IsTradeItem resultIsTradeItem = new IsTradeItem();
-    iduItemDerivedStandards.forEach(
-        elem -> {
-          if (elem.getContentIduItemDerivedStandard() != null) {
-            IsTradeItem isTradeItem =
-                getSpecificItem(elem.getContentIduItemDerivedStandard(), tradeIdem);
-            if (isTradeItem != null && Boolean.TRUE.equals(isTradeItem.getValue())) {
-              resultIsTradeItem.setValue(true);
-              if (resultIsTradeItem.getValidFrom() == null
-                  || isTradeItem.getValidFrom().after(resultIsTradeItem.getValidFrom())) {
-                resultIsTradeItem.setValidFrom(isTradeItem.getValidFrom());
-              }
-            }
-          }
-        });
-
-    if (Boolean.TRUE.equals(resultIsTradeItem.getValue())) {
-      if (resultIsTradeItem.getValidFrom() == null) {
-        return true;
-      } else {
-        LocalDate validFrom =
-            resultIsTradeItem
-                .getValidFrom()
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-        return LocalDate.now().isAfter(validFrom);
-      }
-    }
-    return false;
-  }
-
-  private IsTradeItem getSpecificItem(
-      ContentIduItemDerivedStandard contentIduItemDerivedStandard, String tradeItem) {
-    if ("isTradeItemExcludedFromDiscounts".equals(tradeItem)
-        && contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts() != null) {
-      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemExcludedFromDiscounts());
-    } else if ("isTradeItemInSellOut".equals(tradeItem)
-        && contentIduItemDerivedStandard.getIsTradeItemInSellOut() != null) {
-      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemInSellOut());
-    } else if ("isTradeItemSellableInPFSShop".equals(tradeItem)
-        && contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop() != null) {
-      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemSellableInPFSShop());
-    } else if ("isTradeItemDiscountMachine".equals(tradeItem)
-        && contentIduItemDerivedStandard.getIsTradeItemDiscountMachine() != null) {
-      return new IsTradeItem(contentIduItemDerivedStandard.getIsTradeItemDiscountMachine());
-    } else if ("merchandiseBrand".equals(tradeItem)
-        && contentIduItemDerivedStandard.getMerchandiseBrand() != null) {
-      return new IsTradeItem(contentIduItemDerivedStandard.getMerchandiseBrand());
-    }
-    return null;
   }
 }

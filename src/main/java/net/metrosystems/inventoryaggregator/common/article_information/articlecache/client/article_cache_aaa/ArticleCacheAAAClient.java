@@ -3,13 +3,10 @@ package net.metrosystems.inventoryaggregator.common.article_information.articlec
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.aricle_cache_isu_istem_store_merchandise.IsuItemStoreMerchandise;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticle;
@@ -53,14 +50,6 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   }
 
   @Override
-  public Documents getArticleUrlPathByMmsArtNo(
-      Long mmsArtNo, String countryCode, String salesLine) throws Exception {
-
-    return documentsService.getDocumentsByArticleNumber(
-        countryCode, salesLine, mmsArtNo);
-  }
-
-  @Override
   public Documents getArticleUrlPathByArtVarBundle(
       Long articleNumber,
       Long variantNumber,
@@ -72,19 +61,6 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
         countryCode, salesLine, articleNumber, variantNumber, bundleNumber);
   }
 
-  @Override
-  public Documents getArticleUrlPathBySubsysArtNo(
-      Long subsysArtNo, String countryCode, String salesLine, String languageCode)
-      throws Exception {
-    return documentsService.getDocumentsBySubsysArticleNumber(
-        countryCode, salesLine, languageCode, subsysArtNo);
-  }
-
-  @Override
-  public Documents findArticleUrlPathByMmsArtNo(
-      Long mmsArtNo, String countryCode, String salesLine) throws Exception {
-    return getArticleUrlPathByMmsArtNo(mmsArtNo, countryCode, salesLine);
-  }
 
   @Override
   public ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath) {
@@ -97,45 +73,11 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   }
 
   @Override
-  public IsuItemStoreMerchandise getIsuItemStoreMerchandiseDocument(String articleUrlPath) {
-    return getForArticleCacheObject(
-            articleUrlPath, IsuItemStoreMerchandise.class);
-  }
-
-
-  @Override
-  public Documents getProductLifeCycleDocumentUrl(String countryCode, ArticleId articleId) {
-    return documentsService.getIsuItemUrlByArtVarBundle(countryCode, articleId);
-  }
-
-  @Override
-  public Documents getChannelDeliveryFlagUrl(String countryCode, ArticleId articleId) {
-    return documentsService.getIsuItemStoreMerchandiseByArtVarBundle(countryCode, articleId);
-  }
-
-
-  @Override
-  public Documents getMultiLanguageDocumentUrl(String countryCode, ArticleId articleId) {
-    return documentsService.getIduItemDerivedUrlByArtVarBundle(countryCode, articleId, null);
-  }
-
-  @Override
   public IduItemDerivedStandard getIduItemDerivedStandardDocument(String articlePath) {
     return getForArticleCacheObject(
             articlePath, IduItemDerivedStandard.class);
   }
 
-  @Override
-  public List<IduItemDerivedStandard> getMultipleIduItemDerivedStandardDocument(
-      List<String> articlePaths) {
-    List<IduItemDerivedStandard> iduItemDerivedStandards = new ArrayList<>();
-    articlePaths.forEach(
-        articlePath ->
-            iduItemDerivedStandards.add(
-                getForArticleCacheObject(articlePath, IduItemDerivedStandard.class)));
-
-    return iduItemDerivedStandards;
-  }
 
   private <T> T getForArticleCacheObject(String articleUrl, Class<T> responseType) {
     try {
