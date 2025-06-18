@@ -41,6 +41,7 @@ public class ArticleListDataController {
       @RequestBody List<ArticleId> articleIdList)
       throws Exception {
 
+    log.debug("languageCode: {}", languageCode);
     StoreId storeId = new StoreId(countryCode, salesLine, storeNo);
     return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
         articleIdList, storeId, dataTypeList);

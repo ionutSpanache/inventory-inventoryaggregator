@@ -39,8 +39,7 @@ public class ArticleMasterDataControllerV1 {
       @PathVariable("storeNumber") Integer storeNo,
       @PathVariable("articleNumber") Long articleNumber,
       @PathVariable("variantNumber") Long variantNumber,
-      @PathVariable("bundleNumber") Long bundleNumber)
-      throws Exception {
+      @PathVariable("bundleNumber") Long bundleNumber) {
     ArticleId articleId =
         ArticleId.builder()
             .articleNumber(articleNumber)
@@ -60,8 +59,7 @@ public class ArticleMasterDataControllerV1 {
       @PathVariable("countryCode") String countryCode,
       @PathVariable("languageCode") String languageCode,
       @PathVariable("storeNumber") Integer storeNumber,
-      @RequestBody List<ArticleId> articleIds)
-      throws Exception {
+      @RequestBody List<ArticleId> articleIds) {
     return articleMasterDataService.getArticleMasterDataForArticleIdList(
         articleIds, escapeHtml4(countryCode), escapeHtml4(languageCode), storeNumber);
   }

@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticle;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,12 +69,6 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
   @Override
   public PromotionArticle getPromotionArticle(String articleUrlPath) {
     return getForArticleCacheObject(articleUrlPath, PromotionArticle.class);
-  }
-
-  @Override
-  public IduItemDerivedStandard getIduItemDerivedStandardDocument(String articlePath) {
-    return getForArticleCacheObject(
-            articlePath, IduItemDerivedStandard.class);
   }
 
 

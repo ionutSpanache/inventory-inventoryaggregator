@@ -15,7 +15,6 @@ import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.d
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
@@ -116,14 +115,6 @@ public class ArticleCacheService {
     }
     return languageCode;
   }
-
-  public IduItemDerivedStandard getIduItemDerivedStandard(String documentUrl) {
-
-    if (documentUrl == null) return null;
-
-    return articleCacheClient.getIduItemDerivedStandardDocument(documentUrl);
-  }
-
 
   public List<PromotionArticleData> getPromotionArticleData(
       String countryCode,

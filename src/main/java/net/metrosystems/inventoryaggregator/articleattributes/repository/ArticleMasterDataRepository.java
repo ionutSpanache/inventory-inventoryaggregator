@@ -3,8 +3,6 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 import static java.time.LocalDate.now;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -15,16 +13,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.SimplePromotionArticleData;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_idu_item_derived_standard.IduItemDerivedStandard;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionDescription;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
@@ -73,8 +68,7 @@ public class ArticleMasterDataRepository {
       String countryCode,
       String salesLine,
       String languageCode,
-      Integer storeNo)
-      throws Exception {
+      Integer storeNo) {
     return CompletableFuture.completedFuture(
         getArticleMasterDataSync(articleId, countryCode, salesLine, languageCode, storeNo));
   }
@@ -149,48 +143,6 @@ public class ArticleMasterDataRepository {
                         }))
         .get();
     return result;
-  }
-
-  @Async("asyncExecutor")
-  public CompletableFuture<Map<ArticleId, List<IduItemDerivedStandard>>> getIduItemDerivedStandards(
-      List<ArticleId> articleIdList, String countryCode) throws Exception {
-
-    Documents documents =
-        documentsService.getIduItemDerivedUrlForMultipleArticles(countryCode, articleIdList, null);
-
-    if (documents == null || CollectionUtils.isEmpty(documents.getArticleKeys()))
-      return CompletableFuture.completedFuture(Collections.emptyMap());
-
-    List<IduItemDerivedStandard> iduItemDerivedStandardList = new ArrayList<>();
-
-    forkJoinPoolCustom
-        .submit(
-            () ->
-                documents.getArticleKeys().parallelStream()
-                    .forEach(
-                        documentUrl -> {
-                          try {
-                            iduItemDerivedStandardList.add(
-                                articleCacheService.getIduItemDerivedStandard(documentUrl));
-                          } catch (Exception e) {
-                            log.error(
-                                "ArticleMasterDataRepository.getIduItemDerivedStandards error: {}",
-                                e.getMessage(),
-                                e);
-                          }
-                        }))
-        .get();
-
-    return CompletableFuture.completedFuture(
-        iduItemDerivedStandardList.stream()
-            .collect(
-                Collectors.groupingBy(
-                    iduItemDerivedStandard ->
-                        ArticleId.builder()
-                            .articleNumber(iduItemDerivedStandard.getDomain().getArticleNumber())
-                            .variantNumber(iduItemDerivedStandard.getDomain().getVariantNumber())
-                            .bundleNumber(iduItemDerivedStandard.getDomain().getBundleNumber())
-                            .build())));
   }
 
   private String getCorrectLanguageCode(String countryCode, String languageCode) {
