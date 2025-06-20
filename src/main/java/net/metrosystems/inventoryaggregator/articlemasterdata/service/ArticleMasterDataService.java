@@ -1,6 +1,5 @@
 package net.metrosystems.inventoryaggregator.articlemasterdata.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -14,13 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ArticleMasterDataService {
   private final DataSourceClient dataSourceClient;
-
-  public List<ArticleMasterId> getArticleMasterDataForArticleIdList(
-      List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
-
-    return dataSourceClient.getArticleMasterDataForArticleIdList(
-        articleIdList, countryCode, languageCode, storeNo);
-  }
 
   public ArticleMasterData getArticleMasterIdForArticleId(
       ArticleId articleId, String countryCode, String languageCode, Integer storeNumber) {

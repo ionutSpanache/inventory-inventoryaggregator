@@ -3,19 +3,15 @@ package net.metrosystems.inventoryaggregator.articlemasterdata.controller;
 import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
 import net.metrosystems.inventoryaggregator.articlemasterdata.service.ArticleMasterDataService;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,19 +44,5 @@ public class ArticleMasterDataControllerV1 {
             .build();
     return articleMasterDataService.getArticleMasterIdForArticleId(
         articleId, escapeHtml4(countryCode), escapeHtml4(languageCode), storeNo);
-  }
-
-  @PostMapping(
-      value =
-          "v1/countrycode/{countryCode}/languagecode/{languageCode}/storenumber/{storeNumber}/articlemasterdata/articleids",
-      consumes = MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<ArticleMasterId> getArticleMasterDataListByArtVarBundle(
-      @PathVariable("countryCode") String countryCode,
-      @PathVariable("languageCode") String languageCode,
-      @PathVariable("storeNumber") Integer storeNumber,
-      @RequestBody List<ArticleId> articleIds) {
-    return articleMasterDataService.getArticleMasterDataForArticleIdList(
-        articleIds, escapeHtml4(countryCode), escapeHtml4(languageCode), storeNumber);
   }
 }
