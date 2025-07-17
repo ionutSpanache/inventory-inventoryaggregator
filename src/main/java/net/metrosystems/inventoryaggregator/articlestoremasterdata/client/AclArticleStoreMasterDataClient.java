@@ -24,14 +24,20 @@ public class AclArticleStoreMasterDataClient {
   @Value("${ACL_STORE_MASTER_DATA_HOST}")
   private final String aclArticleMasterDataHost;
 
+  @Value("${ACL_STORE_MASTER_DATA_RU_HOST}")
+  private final String aclArticleMasterDataRuHost;
+
   @Value("${ACL_STORE_MASTER_DATA_PATH_ARTICLES_BY_ART_VAR_BUNDLE}")
   private final String aclArticlesMasterDataPathByArtVarBundle;
 
   public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
       String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
+
+    String host =
+        "RU".equalsIgnoreCase(countryCode) ? aclArticleMasterDataRuHost : aclArticleMasterDataHost;
+
     UriComponents uriComponents =
-        UriComponentsBuilder.fromUriString(
-                aclArticleMasterDataHost + aclArticlesMasterDataPathByArtVarBundle)
+        UriComponentsBuilder.fromUriString(host + aclArticlesMasterDataPathByArtVarBundle)
             .buildAndExpand(countryCode.toUpperCase(), salesLine.toUpperCase(), storeNo);
 
     return getArticlesFromStoreMasterData(uriComponents, articleIdList);
