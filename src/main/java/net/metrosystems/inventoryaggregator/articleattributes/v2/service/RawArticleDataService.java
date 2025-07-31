@@ -53,7 +53,6 @@ public class RawArticleDataService {
   public void buildRawArticleDataList(
       ArticleId articleId,
       StoreId storeId,
-      String languageCode,
       List<RawArticleData> rawArticleDataList,
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {

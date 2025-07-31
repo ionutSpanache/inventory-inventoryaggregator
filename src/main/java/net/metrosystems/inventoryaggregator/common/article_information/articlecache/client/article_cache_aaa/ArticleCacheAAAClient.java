@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.service.DocumentsService;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.ArticleCacheClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +21,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class ArticleCacheAAAClient implements ArticleCacheClient {
 
-  @Autowired DocumentsService documentsService;
 
   @Value("${ARTICLE_CACHE_SERVICE_HOST}")
   private String articleCacheServiceHost;
@@ -47,30 +43,12 @@ public class ArticleCacheAAAClient implements ArticleCacheClient {
     messageConverters.add(converter);
     return messageConverters;
   }
-
-  @Override
-  public Documents getArticleUrlPathByArtVarBundle(
-      Long articleNumber,
-      Long variantNumber,
-      Long bundleNumber,
-      String countryCode,
-      String salesLine)
-      throws Exception {
-    return documentsService.getDocumentsByArticleNumberVarianBundleId(
-        countryCode, salesLine, articleNumber, variantNumber, bundleNumber);
-  }
-
+  
 
   @Override
   public ArticleCacheIhdsTree getArticleCacheDocumentByURL(String articleUrlPath) {
     return getForArticleCacheObject(articleUrlPath, ArticleCacheIhdsTree.class);
   }
-
-  @Override
-  public PromotionArticle getPromotionArticle(String articleUrlPath) {
-    return getForArticleCacheObject(articleUrlPath, PromotionArticle.class);
-  }
-
 
   private <T> T getForArticleCacheObject(String articleUrl, Class<T> responseType) {
     try {

@@ -39,7 +39,7 @@ public class StockLocationClientService {
   public List<StockLocation> getArticleStockLocation(
       ArticleId articleId, String countryCode, Integer storeNumber) {
     UriComponents url =
-        UriComponentsBuilder.fromHttpUrl(inventoryHost + stockLocationArticleDataUrl)
+        UriComponentsBuilder.fromUriString(inventoryHost + stockLocationArticleDataUrl)
             .buildAndExpand(
                 countryCode,
                 storeNumber,
@@ -55,7 +55,8 @@ public class StockLocationClientService {
             .bodyToMono(ArticleStockLocations.class)
             .onErrorResume(
                 error -> {
-                  if(error instanceof WebClientResponseException webClientResponseException && HttpStatus.NOT_FOUND != webClientResponseException.getStatusCode()){
+                  if (error instanceof WebClientResponseException webClientResponseException
+                      && HttpStatus.NOT_FOUND != webClientResponseException.getStatusCode()) {
                     log.error(
                         "Error on retrieving articleStockLocation for articleId={} from MstoreAcl. Error={} ",
                         articleId,
@@ -73,7 +74,7 @@ public class StockLocationClientService {
   public List<ArticleStockLocations> getArticleStockLocationForArticleList(
       List<ArticleId> articleIds, String countryCode, Integer storeNo) {
     UriComponents url =
-        UriComponentsBuilder.fromHttpUrl(inventoryHost + stockLocationArticleListDataUrl)
+        UriComponentsBuilder.fromUriString(inventoryHost + stockLocationArticleListDataUrl)
             .buildAndExpand(countryCode, storeNo);
     return webClient
         .post()
@@ -85,7 +86,8 @@ public class StockLocationClientService {
         .collectList()
         .onErrorResume(
             error -> {
-              if(error instanceof WebClientResponseException webClientResponseException && HttpStatus.NOT_FOUND != webClientResponseException.getStatusCode()){
+              if (error instanceof WebClientResponseException webClientResponseException
+                  && HttpStatus.NOT_FOUND != webClientResponseException.getStatusCode()) {
                 log.error(
                     "Error on retrieving articleStockLocation for ArticleList from MstoreAcl. Error={} ",
                     error.getMessage(),

@@ -25,19 +25,6 @@ public class AspectConfig {
     public void client() {
     }
 
-    @Pointcut("execution (* net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.*.*.*(..))")
-    public void articleCacheAAA() {
-    }
-
-    @Pointcut("execution (* net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.config.*.*(..))")
-    public void articleCacheAAAConfig() {
-    }
-
-
-    @Pointcut("(articleCacheAAA())&&!articleCacheAAAConfig()")
-    public void appFlow() {
-    }
-
     @Bean
     @Lazy
     public PerformanceMonitorInterceptor performanceMonitorInterceptor() {

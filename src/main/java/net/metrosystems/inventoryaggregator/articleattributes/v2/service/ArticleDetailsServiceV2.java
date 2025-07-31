@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.service.ArticleCacheService;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class ArticleDetailsServiceV2 {
   private final RawArticleDataService rawArticleDataService;
   private final RawArticleDataListService rawArticleDataListService;
-  private final ArticleCacheService articleCacheService;
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
       ArticleId articleId,
@@ -49,7 +47,7 @@ public class ArticleDetailsServiceV2 {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
     rawArticleDataService.buildRawArticleDataList(
-        articleId, storeId, languageCode, rawArticleDataList, dataTypeList);
+        articleId, storeId, rawArticleDataList, dataTypeList);
     return rawArticleDataList;
   }
 

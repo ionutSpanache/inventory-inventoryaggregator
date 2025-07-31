@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
-import net.metrosystems.inventoryaggregator.articleattributes.repository.ArticleMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 public class ArticleProcessingService {
 
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
-  private final ArticleMasterDataRepository articleMasterDataRepository;
   private final MovieAclService movieAclService;
 
   public CompletableFuture<List<StockData>> getStockDataFromMovie(

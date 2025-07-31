@@ -1,32 +1,22 @@
 package net.metrosystems.inventoryaggregator.common.article_information.articlecache.service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articleattributes.model.MinimumRetailPrice;
-import net.metrosystems.inventoryaggregator.articleattributes.model.PromotionArticleData;
-import net.metrosystems.inventoryaggregator.articleid.client.article_cache_aaa.document.model.Documents;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.ArticleCacheStoreExceptionsClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.articleCacheStoreExceptions.model.ArticleCacheStoreExceptionsIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_aaa.ArticleCacheAAAClient;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheIhdsTree;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_model.ArticleCacheReaderDigest;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticle;
-import net.metrosystems.inventoryaggregator.common.article_information.articlecache.client.article_cache_promotion_article.PromotionArticleDataGroup;
 import net.metrosystems.inventoryaggregator.common.article_information.articlecache.model.ArticleCacheFullData;
 import net.metrosystems.inventoryaggregator.common.model.ArticleNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 
 @Slf4j
@@ -116,78 +106,6 @@ public class ArticleCacheService {
     return languageCode;
   }
 
-  public List<PromotionArticleData> getPromotionArticleData(
-      String countryCode,
-      net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId articleId,
-      Integer storeNumber) {
-
-    String documentUrl =
-        "documents/"
-            + countryCode.toLowerCase()
-            + "/promotion-article"
-            + "?bundleno="
-            + articleId.getBundleNumber()
-            + "&company=mcc"
-            + "&environment="
-            + getEnvironment(countryCode)
-            + "&mmsartno="
-            + articleId.getArticleNumber()
-            + "&storeno="
-            + storeNumber
-            + "&variantno="
-            + articleId.getVariantNumber();
-
-    List<PromotionArticleData> promotionArticleData = new ArrayList<>();
-
-    try {
-      promotionArticleData =
-          mapToPromotionArticleData(articleCacheClient.getPromotionArticle(documentUrl));
-    } catch (Exception ex) {
-      if (ex instanceof HttpClientErrorException exception
-          && exception.getStatusCode() == HttpStatus.CONFLICT) {
-
-        log.debug(ex.getMessage(), ex);
-      } else {
-        log.error("PROMOTION_ARTICLE_NOT_FOUND " + documentUrl, ex);
-      }
-    }
-
-    return promotionArticleData;
-  }
-
-  private List<PromotionArticleData> mapToPromotionArticleData(PromotionArticle promotionArticle) {
-
-    List<PromotionArticleDataGroup> data =
-        promotionArticle
-            .getPromotionArticleTransaction()
-            .getPromotionArticleIncident()
-            .getPromotionArticleDataGroups()
-            .stream()
-            .filter(
-                promotionArticleDataGroup ->
-                    promotionArticleDataGroup.getId().equalsIgnoreCase("110"))
-            .toList();
-
-    List<PromotionArticleData> promotions = new ArrayList<>();
-
-    if (!data.isEmpty()) {
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-      data.forEach(
-          t ->
-              promotions.add(
-                  PromotionArticleData.builder()
-                      .promotionId(t.getPromotionId())
-                      .promotionNetSalesPricePerBundle(t.getPromotionNetSalesPricePerBundle())
-                      .promotionNetSalesPricePerPiece(t.getPromotionNetSalesPricePerPiece())
-                      .promotionStart(LocalDate.parse(t.getPromotionActiveStartDate(), formatter))
-                      .promotionEnd(LocalDate.parse(t.getPromotionActiveEndDate(), formatter))
-                      .valid(t.getValidity())
-                      .descriptions(t.getDescriptions())
-                      .promotionChannel(t.getPromotionChannel())
-                      .build()));
-    }
-    return promotions;
-  }
 
   private String getEnvironment(String countryCode) {
 
@@ -205,26 +123,6 @@ public class ArticleCacheService {
     }
   }
 
-  public ArticleCacheFullData getArticleCacheFullDataByArtVarBundleForArticleId(
-      Integer storeNo, String documentUrl) {
-
-    if (documentUrl == null) return null;
-    ArticleCacheIhdsTree articleCacheDocument =
-        articleCacheClient.getArticleCacheDocumentByURL(documentUrl);
-
-    if (articleCacheDocument == null
-        || articleCacheDocument.getTransaction() == null
-        || articleCacheDocument.getTransaction().getArticleCacheIncident() == null
-        || articleCacheDocument
-                .getTransaction()
-                .getArticleCacheIncident()
-                .getHierarchySequenceStoreNo(storeNo)
-            == null) {
-      return null;
-    }
-
-    return transformArticleCacheDocumentToArticleFullData(articleCacheDocument, storeNo);
-  }
 
   private ArticleCacheFullData transformArticleCacheDocumentToArticleFullData(
       ArticleCacheIhdsTree articleCacheDocument, Integer storeNo) {
@@ -384,37 +282,5 @@ public class ArticleCacheService {
             storeNo,
             variantNumber);
     return articleCacheStoreExceptionsClient.getArticleCacheDocumentByURL(articleUrlPath);
-  }
-
-  public List<Integer> getActiveStoresByByArtVarBundle(
-      String countryCode, String salesLine, ArticleId articleId) throws Exception {
-
-    List<Integer> activeStoresList;
-
-    Documents articleUrlPathList =
-        articleCacheClient.getArticleUrlPathByArtVarBundle(
-            articleId.getArticleNumber(),
-            articleId.getVariantNumber(),
-            articleId.getBundleNumber(),
-            countryCode,
-            salesLine);
-    if (CollectionUtils.isEmpty(articleUrlPathList.getArticleKeys())) {
-      throw new ArticleNotFoundException();
-    }
-    String articleUrlPath = articleUrlPathList.getArticleKeys().get(0);
-    ArticleCacheIhdsTree articleCacheIhdsTree =
-        articleCacheClient.getArticleCacheDocumentByURL(articleUrlPath);
-
-    activeStoresList =
-        articleCacheIhdsTree
-            .getTransaction()
-            .getArticleCacheIncident()
-            .getArticleCacheDataGroup()
-            .stream()
-            .filter(articleCacheDataGroup -> (articleCacheDataGroup.getId() == 320))
-            .map(ArticleCacheDataGroup::getStoreNo)
-            .toList();
-
-    return activeStoresList;
   }
 }
