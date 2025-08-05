@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.AclStoreMasterData;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ public class AclArticleStoreMasterDataClient {
   @Value("${ACL_STORE_MASTER_DATA_PATH_ARTICLES_BY_ART_VAR_BUNDLE}")
   private final String aclArticlesMasterDataPathByArtVarBundle;
 
-  public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
+  public List<AclStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
       String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
 
     String host =
@@ -43,14 +43,14 @@ public class AclArticleStoreMasterDataClient {
     return getArticlesFromStoreMasterData(uriComponents, articleIdList);
   }
 
-  private List<ArticleStoreMasterData> getArticlesFromStoreMasterData(
+  private List<AclStoreMasterData> getArticlesFromStoreMasterData(
       UriComponents uriComponents, List<ArticleId> articleIdList) {
     return webClient
         .post()
         .uri(uriComponents.toString())
         .bodyValue(articleIdList)
         .retrieve()
-        .bodyToFlux(ArticleStoreMasterData.class)
+        .bodyToFlux(AclStoreMasterData.class)
         .onErrorResume(
             error -> {
               log.error(

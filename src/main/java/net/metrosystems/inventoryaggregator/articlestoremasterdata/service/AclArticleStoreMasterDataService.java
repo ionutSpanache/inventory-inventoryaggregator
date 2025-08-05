@@ -3,7 +3,7 @@ package net.metrosystems.inventoryaggregator.articlestoremasterdata.service;
 import java.util.List;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.client.AclArticleStoreMasterDataClient;
-import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.ArticleStoreMasterData;
+import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.AclStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class AclArticleStoreMasterDataService {
     this.aclArticleStoreMasterDataClient = aclArticleStoreMasterDataClient;
   }
 
-  public List<ArticleStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
+  public List<AclStoreMasterData> getAclStoreMasterDataByArtVarBundle(
       StoreId storeId, List<ArticleId> articleIdList) {
 
     return aclArticleStoreMasterDataClient.getArticleStoreMasterDataByArtVarBundle(

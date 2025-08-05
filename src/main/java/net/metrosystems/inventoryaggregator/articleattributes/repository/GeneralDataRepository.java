@@ -2,8 +2,8 @@ package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.generaldata.Department;
+import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.AclStoreMasterData;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,8 +15,10 @@ import reactor.core.publisher.Mono;
 public class GeneralDataRepository {
 
   private final WebClient webClient;
+
   @Value("${mstore.inventory.host}")
   private String mstoreInventoryHost;
+
   @Value("${mstore.generaldata.department.path}")
   private String inventoryGeneralDataDepartmentPath;
 
@@ -47,14 +49,12 @@ public class GeneralDataRepository {
       String countryCode,
       String salesLine,
       Integer storeNo,
-      RawArticleStoreMasterData rawArticleStoreMasterData) {
-    if (rawArticleStoreMasterData != null
-        && rawArticleStoreMasterData.getDepartmentNumber() != null) {
+      AclStoreMasterData aclStoreMasterData) {
+    if (aclStoreMasterData != null && aclStoreMasterData.getDepartmentNumber() != null) {
       Department department =
-          getDepartment(
-              countryCode, salesLine, storeNo, rawArticleStoreMasterData.getDepartmentNumber());
+          getDepartment(countryCode, salesLine, storeNo, aclStoreMasterData.getDepartmentNumber());
       if (department != null) {
-        rawArticleStoreMasterData.setDepartmentName(department.getDepartmentDescription());
+        aclStoreMasterData.setDepartmentName(department.getDepartmentDescription());
       }
     }
   }

@@ -1,26 +1,17 @@
 package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleMasterId;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ArticlePlannedDeliveryDate;
-import net.metrosystems.inventoryaggregator.articleattributes.model.ProductLifeCycleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleStoreMasterData;
-import net.metrosystems.inventoryaggregator.articleattributes.model.StockInformation;
+import net.metrosystems.inventoryaggregator.articleattributes.model.*;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articleattributeslist.StockData;
 import net.metrosystems.inventoryaggregator.articleattributes.model.articlecomponent.ArticleComponent;
 import net.metrosystems.inventoryaggregator.articleattributes.repository.GeneralDataRepository;
-import net.metrosystems.inventoryaggregator.articleattributes.service.ArticleProcessingService;
+import net.metrosystems.inventoryaggregator.articleattributes.repository.RawArticleStoreMasterDataRepository;
+import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.AclStoreMasterData;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.common.movieacl.MovieAclService;
 import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
@@ -34,8 +25,8 @@ public class RawArticleDataService {
 
   private final GeneralDataRepository generalDataRepository;
   private final ArticleProcessingService articleProcessingService;
-  private final ArticleProcessingServiceV2 articleProcessingServiceV2;
   private final StockLocationRepository stockLocationRepository;
+  private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
 
   private static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>();
 
@@ -61,19 +52,19 @@ public class RawArticleDataService {
         LANGUAGE_CODE_EXCEPTIONS.getOrDefault(storeId.getCountryCode(), storeId.getCountryCode());
 
     CompletableFuture<ArticleComponent> articleComponentCompletableFuture =
-        articleProcessingServiceV2.getArticleComponent(
+        articleProcessingService.getArticleComponent(
             storeId.getCountryCode(), storeId.getStoreNumber(), articleId.getArticleNumber());
 
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId =
-        articleProcessingServiceV2.getArticleMasterId(
+        articleProcessingService.getArticleMasterId(
             articleId, storeId.getCountryCode(), correctLanguageCode, storeId.getStoreNumber());
 
-    CompletableFuture<RawArticleStoreMasterData> rawArticleStoreMasterData =
-        articleProcessingService.getRawArticleStoreMasterData(
+    CompletableFuture<AclStoreMasterData> aclStoreMasterData =
+            articleProcessingService.getAclStoreMasterData(
             articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber());
 
     CompletableFuture<StockData> stockData =
-        articleProcessingService.getArticleDataFromMovie(
+            articleProcessingService.getArticleDataFromMovie(
             articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber());
 
     CompletableFuture<List<StockLocation>> articleStockLocationList =
@@ -87,7 +78,7 @@ public class RawArticleDataService {
     CompletableFuture.allOf(
         articleComponentCompletableFuture,
         articleMasterIdForArticleId,
-        rawArticleStoreMasterData,
+        aclStoreMasterData,
         stockData,
         articleStockLocationList,
         dailyMeanSales);
@@ -96,9 +87,7 @@ public class RawArticleDataService {
         storeId.getCountryCode(),
         storeId.getSalesLine(),
         storeId.getStoreNumber(),
-        rawArticleStoreMasterData.get());
-
-    updateWithDefaultValues(rawArticleStoreMasterData.get());
+        aclStoreMasterData.get());
 
     StockInformation stockDetails = null;
     List<ArticlePlannedDeliveryDate> plannedDeliveryDates = null;
@@ -120,7 +109,10 @@ public class RawArticleDataService {
         RawArticleData.builder()
             .articleId(articleId)
             .articleMasterData(articleMasterData)
-            .articleStoreMasterData(rawArticleStoreMasterData.get())
+            .articleStoreMasterData(
+                    rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
+                    articleMasterIdForArticleId.get().getArticleStoreMasterData(),
+                    aclStoreMasterData.get()))
             .stockDetails(stockDetails)
             .plannedDeliveryDates(plannedDeliveryDates)
             .stockLocations(articleStockLocationList.get())
@@ -148,9 +140,4 @@ public class RawArticleDataService {
         .build();
   }
 
-  private void updateWithDefaultValues(RawArticleStoreMasterData rawArticleStoreMasterData) {
-    if (rawArticleStoreMasterData.getSalesBlockingCode() == null) {
-      rawArticleStoreMasterData.setSalesBlockingCode(1);
-    }
-  }
 }

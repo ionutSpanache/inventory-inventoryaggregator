@@ -17,14 +17,11 @@ public class ArticleDetailsServiceV2 {
   private final RawArticleDataService rawArticleDataService;
   private final RawArticleDataListService rawArticleDataListService;
 
+
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
-      ArticleId articleId,
-      StoreId storeId,
-      String languageCode,
-      Optional<List<String>> dataTypeList)
-      throws Exception {
+      ArticleId articleId, StoreId storeId, Optional<List<String>> dataTypeList) throws Exception {
     return getRawArticleDataListForArticleVariantBundleIdentifierList(
-        articleId, storeId, languageCode, dataTypeList);
+        articleId, storeId, dataTypeList);
   }
 
   public List<RawArticleData> getArticleDataListByArticleVariantBundle(
@@ -39,11 +36,7 @@ public class ArticleDetailsServiceV2 {
   }
 
   private List<RawArticleData> getRawArticleDataListForArticleVariantBundleIdentifierList(
-      ArticleId articleId,
-      StoreId storeId,
-      String languageCode,
-      Optional<List<String>> dataTypeList)
-      throws Exception {
+      ArticleId articleId, StoreId storeId, Optional<List<String>> dataTypeList) throws Exception {
     List<RawArticleData> rawArticleDataList = new ArrayList<>();
 
     rawArticleDataService.buildRawArticleDataList(

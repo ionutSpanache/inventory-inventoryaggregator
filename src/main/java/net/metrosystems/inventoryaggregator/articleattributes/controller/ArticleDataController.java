@@ -56,6 +56,6 @@ public class ArticleDataController {
             .storeNumber(storeNo)
             .build();
     return articleDetailsServiceV2.getArticleDataListByArticleVariantBundle(
-        articleId, storeId, languageCode, dataTypeList);
+        articleId, storeId, dataTypeList);
   }
 }

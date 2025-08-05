@@ -22,7 +22,7 @@ The inventory-inventoryaggregator project is a Spring Boot application designed 
 
 The application can be configured using the `application.properties`. Below are some key configuration properties:
 
-`ARTICLE_CACHE_PASSWORD`: The password for Article Cache.
+`IDAM_SECRET`: IDAM secret key for authentication.
 
 ## Steps
 
