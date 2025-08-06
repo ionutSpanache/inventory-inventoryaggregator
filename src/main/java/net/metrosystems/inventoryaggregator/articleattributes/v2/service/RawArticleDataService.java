@@ -60,11 +60,11 @@ public class RawArticleDataService {
             articleId, storeId.getCountryCode(), correctLanguageCode, storeId.getStoreNumber());
 
     CompletableFuture<AclStoreMasterData> aclStoreMasterData =
-            articleProcessingService.getAclStoreMasterData(
+        articleProcessingService.getAclStoreMasterData(
             articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber());
 
     CompletableFuture<StockData> stockData =
-            articleProcessingService.getArticleDataFromMovie(
+        articleProcessingService.getArticleDataFromMovie(
             articleId, storeId.getCountryCode(), storeId.getSalesLine(), storeId.getStoreNumber());
 
     CompletableFuture<List<StockLocation>> articleStockLocationList =
@@ -110,9 +110,8 @@ public class RawArticleDataService {
             .articleId(articleId)
             .articleMasterData(articleMasterData)
             .articleStoreMasterData(
-                    rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
-                    articleMasterIdForArticleId.get().getArticleStoreMasterData(),
-                    aclStoreMasterData.get()))
+                rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
+                    articleMasterIdForArticleId.get(), aclStoreMasterData.get()))
             .stockDetails(stockDetails)
             .plannedDeliveryDates(plannedDeliveryDates)
             .stockLocations(articleStockLocationList.get())
@@ -139,5 +138,4 @@ public class RawArticleDataService {
         .presencePeriodStartYear(articleMasterData.getPresencePeriodStartYear())
         .build();
   }
-
 }

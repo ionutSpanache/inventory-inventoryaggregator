@@ -95,33 +95,42 @@ public class RawArticleStoreMasterDataRepository {
             result.put(
                 articleId,
                 getRawArticleStoreMasterData(
-                    articleIdArticleMasterIdMap.get(articleId).getArticleStoreMasterData(),
-                    aclStoreMasterData)));
+                    articleIdArticleMasterIdMap.get(articleId), aclStoreMasterData)));
 
     return result;
   }
 
   public RawArticleStoreMasterData getRawArticleStoreMasterData(
-      ArticleStoreMasterData articleStoreMasterData, AclStoreMasterData aclStoreMasterData) {
-    return RawArticleStoreMasterData.builder()
-        .salesBlockingCode(articleStoreMasterData.getSalesBlockingCode())
-        .storePieceNetSellPrice(articleStoreMasterData.getStorePieceNetSellPrice())
-        .storeBundleNetSellPrice(articleStoreMasterData.getStoreBundleNetSellPrice())
-        .storePieceGrossSellPrice(articleStoreMasterData.getStorePieceGrossSellPrice())
-        .storeBundleGrossSellPrice(articleStoreMasterData.getStoreBundleGrossSellPrice())
-        .storePriceValidFrom(articleStoreMasterData.getStorePriceValidFrom())
-        .storePriceValidTo(articleStoreMasterData.getStorePriceValidTo())
-        .storePromotionPieceNetPrice(articleStoreMasterData.getStorePromotionPieceNetPrice())
-        .storePromotionBundleNetPrice(articleStoreMasterData.getStorePromotionBundleNetPrice())
-        .storePromotionPieceGrossPrice(articleStoreMasterData.getStorePromotionPieceGrossPrice())
-        .storePromotionBundleGrossPrice(articleStoreMasterData.getStorePromotionBundleGrossPrice())
-        .storePromotionValidFrom(articleStoreMasterData.getStorePromotionValidFrom())
-        .storePromotionValidTo(articleStoreMasterData.getStorePromotionValidTo())
-        .departmentNumber(aclStoreMasterData.getDepartmentNumber())
-        .shelfEdgeTicketType(aclStoreMasterData.getShelfEdgeTicketType())
-        .leadTime(aclStoreMasterData.getLeadTime())
-        .orderProposalBlockingCode(aclStoreMasterData.getOrderProposalBlockingCode())
-        .departmentName(aclStoreMasterData.getDepartmentName())
-        .build();
+      ArticleMasterId articleMasterId, AclStoreMasterData aclStoreMasterData) {
+
+    RawArticleStoreMasterData rawArticleStoreMasterData =
+        RawArticleStoreMasterData.builder()
+            .departmentNumber(aclStoreMasterData.getDepartmentNumber())
+            .shelfEdgeTicketType(aclStoreMasterData.getShelfEdgeTicketType())
+            .leadTime(aclStoreMasterData.getLeadTime())
+            .orderProposalBlockingCode(aclStoreMasterData.getOrderProposalBlockingCode())
+            .departmentName(aclStoreMasterData.getDepartmentName())
+            .build();
+
+    if (articleMasterId != null && articleMasterId.getArticleStoreMasterData() != null) {
+      ArticleStoreMasterData articleStoreMasterData = articleMasterId.getArticleStoreMasterData();
+      rawArticleStoreMasterData
+          .setSalesBlockingCode(articleStoreMasterData.getSalesBlockingCode())
+          .setStorePieceNetSellPrice(articleStoreMasterData.getStorePieceNetSellPrice())
+          .setStoreBundleNetSellPrice(articleStoreMasterData.getStoreBundleNetSellPrice())
+          .setStorePieceGrossSellPrice(articleStoreMasterData.getStorePieceGrossSellPrice())
+          .setStoreBundleGrossSellPrice(articleStoreMasterData.getStoreBundleGrossSellPrice())
+          .setStorePriceValidFrom(articleStoreMasterData.getStorePriceValidFrom())
+          .setStorePriceValidTo(articleStoreMasterData.getStorePriceValidTo())
+          .setStorePromotionPieceNetPrice(articleStoreMasterData.getStorePromotionPieceNetPrice())
+          .setStorePromotionBundleNetPrice(articleStoreMasterData.getStorePromotionBundleNetPrice())
+          .setStorePromotionPieceGrossPrice(
+              articleStoreMasterData.getStorePromotionPieceGrossPrice())
+          .setStorePromotionBundleGrossPrice(
+              articleStoreMasterData.getStorePromotionBundleGrossPrice())
+          .setStorePromotionValidFrom(articleStoreMasterData.getStorePromotionValidFrom())
+          .setStorePromotionValidTo(articleStoreMasterData.getStorePromotionValidTo());
+    }
+    return rawArticleStoreMasterData;
   }
 }
