@@ -22,5 +22,7 @@ public class StockLocation {
 	private String serialShippingContainerCode;
 	private String storeLocation;
 	private String masterSscc;
+	private String location;
+	private String spotCoordinates;
 
 }
