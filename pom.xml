@@ -27,7 +27,6 @@
         <ch.qos.logback.version>1.5.15</ch.qos.logback.version>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <com.fasterxml.jackson.core.version>2.17.0</com.fasterxml.jackson.core.version>
-        <com.nimbusds.version>9.37.3</com.nimbusds.version>
         <org.apache.kafka.version>3.7.0</org.apache.kafka.version>
         <org.apache.commons.version>1.26.1</org.apache.commons.version>
         <org.springframework.security.version>6.4.6</org.springframework.security.version>
@@ -73,13 +72,6 @@
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>3.2.2</version>
-            </dependency>
-
-            <!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
-            <dependency>
-                <groupId>com.nimbusds</groupId>
-                <artifactId>nimbus-jose-jwt</artifactId>
-                <version>${com.nimbusds.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
