@@ -1,6 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -12,9 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArticleMasterData implements Serializable {
-
-  private static final long serialVersionUID = -2971487066548844011L;
+public class ArticleMasterData {
   private String articleDescription;
   private String barcode;
   private Integer commercialSupplier;
@@ -81,8 +78,5 @@ public class ArticleMasterData implements Serializable {
   private String seasonCode;
   private Boolean isTradeItemOnOrder;
   private Long supplierArticleNumber;
-
-  public static long getSerialversionuid() {
-    return serialVersionUID;
-  }
+  private Boolean exciseIndicator;
 }
