@@ -1,7 +1,6 @@
 package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,17 +23,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RawArticleDataListService {
 
-  private static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>();
-
-  static {
-    LANGUAGE_CODE_EXCEPTIONS.put("UA", "UK");
-    LANGUAGE_CODE_EXCEPTIONS.put("KZ", "RU");
-    LANGUAGE_CODE_EXCEPTIONS.put("MD", "RO");
-    LANGUAGE_CODE_EXCEPTIONS.put("PK", "UR");
-    LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");
-    LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
-  }
-
   private final ArticleProcessingService articleProcessingService;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
   private final StockLocationRepository stockLocationRepository;
@@ -48,14 +36,12 @@ public class RawArticleDataListService {
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
-    String correctLanguageCode = LANGUAGE_CODE_EXCEPTIONS.getOrDefault(countryCode, countryCode);
-
     CompletableFuture<Map<ArticleId, ArticleComponent>> articleComponentForArticleId =
         articleProcessingService.getArticleComponents(countryCode, storeNo, articleIdList);
 
     CompletableFuture<Map<ArticleId, ArticleMasterId>> articleMasterId =
         articleProcessingService.getMasterDataForArticleId(
-            articleIdList, countryCode, correctLanguageCode, storeNo);
+            articleIdList, countryCode, "EN", storeNo);
 
     CompletableFuture<Map<ArticleId, AclStoreMasterData>> articleStoreMasterFromAcl =
         articleProcessingService.getAclStoreMasterDataMap(

@@ -1,5 +1,8 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
+import lombok.Getter;
+
+@Getter
 public enum DataType {
   ARTICLE_COMPONENT("articleComponent"),
   ARTICLE_MASTER_DATA("articleMasterData"),
@@ -8,13 +11,9 @@ public enum DataType {
   ARTICLE_STORE_EXCEPTIONS("articleStoreExceptions"),
   STOCK_DATA("stockData"),
   ARTICLE_STOCK_LOCATION("articleStockLocation");
-  private final String dataType;
+  private final String dataTypeValue;
 
-  DataType(String dataType) {
-    this.dataType = dataType;
-  }
-
-  public String getDataType() {
-    return dataType;
+  DataType(String dataTypeValue) {
+    this.dataTypeValue = dataTypeValue;
   }
 }

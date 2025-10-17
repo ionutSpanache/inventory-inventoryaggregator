@@ -28,17 +28,6 @@ public class RawArticleDataService {
   private final StockLocationRepository stockLocationRepository;
   private final RawArticleStoreMasterDataRepository rawArticleStoreMasterDataRepository;
 
-  private static final Map<String, String> LANGUAGE_CODE_EXCEPTIONS = new HashMap<>();
-
-  static {
-    LANGUAGE_CODE_EXCEPTIONS.put("UA", "UK");
-    LANGUAGE_CODE_EXCEPTIONS.put("KZ", "RU");
-    LANGUAGE_CODE_EXCEPTIONS.put("MD", "RO");
-    LANGUAGE_CODE_EXCEPTIONS.put("PK", "UR");
-    LANGUAGE_CODE_EXCEPTIONS.put("RS", "SR");
-    LANGUAGE_CODE_EXCEPTIONS.put("CZ", "CS");
-  }
-
   private final MovieAclService movieAclService;
 
   public void buildRawArticleDataList(
@@ -48,16 +37,13 @@ public class RawArticleDataService {
       Optional<List<String>> dataTypeList)
       throws ExecutionException, InterruptedException {
 
-    String correctLanguageCode =
-        LANGUAGE_CODE_EXCEPTIONS.getOrDefault(storeId.getCountryCode(), storeId.getCountryCode());
-
     CompletableFuture<ArticleComponent> articleComponentCompletableFuture =
         articleProcessingService.getArticleComponent(
             storeId.getCountryCode(), storeId.getStoreNumber(), articleId.getArticleNumber());
 
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId =
         articleProcessingService.getArticleMasterId(
-            articleId, storeId.getCountryCode(), correctLanguageCode, storeId.getStoreNumber());
+            articleId, storeId.getCountryCode(), "EN", storeId.getStoreNumber());
 
     CompletableFuture<AclStoreMasterData> aclStoreMasterData =
         articleProcessingService.getAclStoreMasterData(

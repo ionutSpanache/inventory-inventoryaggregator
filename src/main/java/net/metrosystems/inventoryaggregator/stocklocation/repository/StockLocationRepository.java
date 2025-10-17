@@ -30,7 +30,7 @@ public class StockLocationRepository {
         CompletableFuture.completedFuture(Collections.emptyList());
 
     if (dataTypeList.isEmpty()
-        || !dataTypeList.get().contains(ARTICLE_STOCK_LOCATION.getDataType())) {
+        || !dataTypeList.get().contains(ARTICLE_STOCK_LOCATION.getDataTypeValue())) {
       return articleStockLocations;
     }
 
@@ -53,7 +53,7 @@ public class StockLocationRepository {
         CompletableFuture.completedFuture(Collections.emptyList());
 
     if (dataTypeList.isEmpty()
-        || !dataTypeList.get().contains(ARTICLE_STOCK_LOCATION.getDataType())) {
+        || !dataTypeList.get().contains(ARTICLE_STOCK_LOCATION.getDataTypeValue())) {
       return articleStockLocations;
     }
 
