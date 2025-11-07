@@ -79,4 +79,6 @@ public class ArticleMasterData {
   private Boolean isTradeItemOnOrder;
   private Long supplierArticleNumber;
   private Boolean exciseIndicator;
+  private String packagingTypeId;
+  private Double netContent;
 }
