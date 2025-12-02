@@ -81,4 +81,5 @@ public class ArticleMasterData {
   private Boolean exciseIndicator;
   private String packagingTypeId;
   private Double netContent;
+  private Boolean isTradeItemOneTouchPallet;
 }
