@@ -77,7 +77,7 @@ public class ArticleMasterData {
   private Boolean isTradeItemInConsignment;
   private String seasonCode;
   private Boolean isTradeItemOnOrder;
-  private Long supplierArticleNumber;
+  private String supplierArticleNumber;
   private Boolean exciseIndicator;
   private String packagingTypeId;
   private Double netContent;
