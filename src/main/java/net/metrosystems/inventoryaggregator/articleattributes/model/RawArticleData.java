@@ -17,34 +17,47 @@ import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 @NoArgsConstructor
 public class RawArticleData implements Serializable {
 
-    private static final long serialVersionUID = -4203872992143967958L;
-    private ArticleId articleId;
-    private ArticleMasterData articleMasterData;
-    private RawArticleStoreMasterData articleStoreMasterData;
-    private StockInformation stockDetails;
-    private List<ArticlePlannedDeliveryDate> plannedDeliveryDates;
-    private List<StockLocation> stockLocations;
-    private ArticleLocation articleLocation;
-    private ArticleComponent articleComponent;
-    private ProductLifeCycleData productLifeCycleData;
-    private String channelDeliveryFlag;
-    private Long returnPossibilityStoreSupplierNumber;
-    private MinimumRetailPrice minimumRetailPrice;
-    private MultiLanguageData multiLanguageData;
+  private static final long serialVersionUID = -4203872992143967958L;
+  private ArticleId articleId;
+  private ArticleMasterData articleMasterData;
+  private RawArticleStoreMasterData articleStoreMasterData;
+  private StockInformation stockDetails;
+  private List<ArticlePlannedDeliveryDate> plannedDeliveryDates;
+  private List<StockLocation> stockLocations;
+  private ArticleLocation articleLocation;
+  private ArticleComponent articleComponent;
+  private ProductLifeCycleData productLifeCycleData;
+  private String channelDeliveryFlag;
+  private Boolean salesAreaFlag;
+  private Long returnPossibilityStoreSupplierNumber;
+  private MinimumRetailPrice minimumRetailPrice;
+  private MultiLanguageData multiLanguageData;
 
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-
-    @Override
-    public String toString() {
-        return "RawArticleData [articleId=" + articleId + ", articleMasterData=" + articleMasterData
-                + ", stockDetails=" + stockDetails + ", plannedDeliveryDates=" + plannedDeliveryDates
-                + ", stockLocations=" + stockLocations + ", articleComponent=" + articleComponent +
-                ", channelDeliveryFlag=" + channelDeliveryFlag +
-                ", minimumRetailPrice=" + minimumRetailPrice +
-                ", multiLanguageData=" + multiLanguageData +
-                ", returnPossibilityStoreSupplierNumber=" + returnPossibilityStoreSupplierNumber +
-                ", util=" + "]";
-    }
+  @Override
+  public String toString() {
+    return "RawArticleData [articleId="
+        + articleId
+        + ", articleMasterData="
+        + articleMasterData
+        + ", stockDetails="
+        + stockDetails
+        + ", plannedDeliveryDates="
+        + plannedDeliveryDates
+        + ", stockLocations="
+        + stockLocations
+        + ", articleComponent="
+        + articleComponent
+        + ", channelDeliveryFlag="
+        + channelDeliveryFlag
+        + ", salesAreaFlag="
+        + salesAreaFlag
+        + ", minimumRetailPrice="
+        + minimumRetailPrice
+        + ", multiLanguageData="
+        + multiLanguageData
+        + ", returnPossibilityStoreSupplierNumber="
+        + returnPossibilityStoreSupplierNumber
+        + ", util="
+        + "]";
+  }
 }

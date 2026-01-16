@@ -104,6 +104,7 @@ public class RawArticleDataService {
             .articleComponent(articleComponentCompletableFuture.get())
             .productLifeCycleData(buildProductLifeCycleData(articleMasterData))
             .channelDeliveryFlag(articleMasterData.getChannelDeliveryFlag())
+            .salesAreaFlag(articleMasterData.getSalesAreaFlag())
             .returnPossibilityStoreSupplierNumber(
                 articleMasterData.getReturnPossibilityStoreSupplierNumber())
             .minimumRetailPrice(articleMasterData.getMinimumRetailPrice())

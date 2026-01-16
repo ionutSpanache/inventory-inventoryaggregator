@@ -2,6 +2,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -73,6 +74,7 @@ public class ArticleMasterData {
   private Integer basPriceContentUnit;
   private Integer basPriceBaseFactor;
   private String channelDeliveryFlag;
+  private Boolean salesAreaFlag;
   private Long returnPossibilityStoreSupplierNumber;
   private Boolean isTradeItemInConsignment;
   private String seasonCode;
