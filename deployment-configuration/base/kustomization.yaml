@@ -1,5 +1,7 @@
 resources:
 - templates/deployment.yaml
+- templates/pdb.yaml
+- templates/service.yaml
 configMapGenerator:
 - name: PROJECT_NAME
   envs:
