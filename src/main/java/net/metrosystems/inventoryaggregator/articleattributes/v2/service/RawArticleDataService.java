@@ -1,9 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.*;
@@ -17,6 +13,12 @@ import net.metrosystems.inventoryaggregator.common.movieacl.MovieAclService;
 import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
 import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import org.springframework.stereotype.Service;
+
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -89,30 +91,31 @@ public class RawArticleDataService {
         stockDetails.setDailyMeanSales30(dailyMeanSales30);
       }
     }
+    if (articleMasterIdForArticleId.get() != null) {
+      ArticleMasterData articleMasterData = articleMasterIdForArticleId.get().getArticleMasterData();
+      RawArticleData rawArticleData =
+              RawArticleData.builder()
+                      .articleId(articleId)
+                      .articleMasterData(articleMasterData)
+                      .articleStoreMasterData(
+                              rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
+                                      articleMasterIdForArticleId.get(), aclStoreMasterData.get()))
+                      .stockDetails(stockDetails)
+                      .plannedDeliveryDates(plannedDeliveryDates)
+                      .stockLocations(articleStockLocationList.get())
+                      .articleComponent(articleComponentCompletableFuture.get())
+                      .productLifeCycleData(buildProductLifeCycleData(articleMasterData))
+                      .channelDeliveryFlag(articleMasterData.getChannelDeliveryFlag())
+                      .salesAreaFlag(articleMasterData.getSalesAreaFlag())
+                      .returnPossibilityStoreSupplierNumber(
+                              articleMasterData.getReturnPossibilityStoreSupplierNumber())
+                      .minimumRetailPrice(articleMasterData.getMinimumRetailPrice())
+                      .multiLanguageData(articleMasterIdForArticleId.get().getMultiLanguageData())
+                      .build();
 
-    ArticleMasterData articleMasterData = articleMasterIdForArticleId.get().getArticleMasterData();
-    RawArticleData rawArticleData =
-        RawArticleData.builder()
-            .articleId(articleId)
-            .articleMasterData(articleMasterData)
-            .articleStoreMasterData(
-                rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
-                    articleMasterIdForArticleId.get(), aclStoreMasterData.get()))
-            .stockDetails(stockDetails)
-            .plannedDeliveryDates(plannedDeliveryDates)
-            .stockLocations(articleStockLocationList.get())
-            .articleComponent(articleComponentCompletableFuture.get())
-            .productLifeCycleData(buildProductLifeCycleData(articleMasterData))
-            .channelDeliveryFlag(articleMasterData.getChannelDeliveryFlag())
-            .salesAreaFlag(articleMasterData.getSalesAreaFlag())
-            .returnPossibilityStoreSupplierNumber(
-                articleMasterData.getReturnPossibilityStoreSupplierNumber())
-            .minimumRetailPrice(articleMasterData.getMinimumRetailPrice())
-            .multiLanguageData(articleMasterIdForArticleId.get().getMultiLanguageData())
-            .build();
-
-    if (rawArticleDataList != null) {
-      rawArticleDataList.add(rawArticleData);
+      if (rawArticleDataList != null) {
+        rawArticleDataList.add(rawArticleData);
+      }
     }
   }
 
