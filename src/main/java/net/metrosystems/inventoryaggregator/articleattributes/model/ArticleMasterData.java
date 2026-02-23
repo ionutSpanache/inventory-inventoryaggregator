@@ -1,12 +1,12 @@
 package net.metrosystems.inventoryaggregator.articleattributes.model;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -28,9 +28,9 @@ public class ArticleMasterData {
   private Double netWeight;
   private Long subsystemArticleNumber;
   private Double vatPercent;
-  private double pieceNetSellPrice;
-  private double bundleNetSellPrice;
-  private double promotionBundleNetPrice;
+  private Double pieceNetSellPrice;
+  private Double bundleNetSellPrice;
+  private Double promotionBundleNetPrice;
   private String variantDescription;
   private Long articleType;
   private String articleClass;
@@ -43,10 +43,10 @@ public class ArticleMasterData {
   private Byte blockingCode;
   private Byte activationStatus;
   private Integer expiryDays;
-  private double pieceNetBuyingPrice;
-  private double bundleNetBuyingPrice;
-  private double pieceNetNetBuyingPrice;
-  private double bundleNetNetBuyingPrice;
+  private Double pieceNetBuyingPrice;
+  private Double bundleNetBuyingPrice;
+  private Double pieceNetNetBuyingPrice;
+  private Double bundleNetNetBuyingPrice;
   private Long articleNoEmptiesSales;
   private String brandName;
   private MinimumRetailPrice minimumRetailPrice;
