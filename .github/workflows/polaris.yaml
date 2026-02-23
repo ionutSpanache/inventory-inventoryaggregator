@@ -2,13 +2,15 @@ name: Polaris Vulnerability Scan
 on:
   push:
     ### run scans on each push to branches
-    branches: [ main, master ]  
-  schedule: 
+    branches: [ main, master ]
+  schedule:
     ### run scheduled scans to ensure repositories are scaned even if not actively developed
     - cron: '55 16 * * *'
   workflow_dispatch:
     ### allow manual trigger if needed
 jobs:
   trigger-polaris:
-    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/polaris.yaml@master
+    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/polaris-with-args.yaml@master
+    with:
+      java_version: '25'
     secrets: inherit

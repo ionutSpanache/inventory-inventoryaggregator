@@ -1,5 +1,5 @@
 #Base build image with maven and DDAgent
-FROM europe-docker.pkg.dev/cf-inventory-development-qq/inventory/mstore-alpine-jre17:latest
+FROM europe-docker.pkg.dev/cf-inventory-development-qq/inventory/mstore-alpine-jre25:latest
 LABEL maintainer="andrei.meran@metro-external.digital"
 
 ARG CACHEBUST

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
@@ -16,7 +17,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
-import static org.apache.http.HttpHeaders.ACCEPT_ENCODING;
 
 @Configuration
 public class WebClientConfig {
@@ -71,7 +71,7 @@ public class WebClientConfig {
                     ExchangeStrategies.builder()
                             .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
                             .build())
-            .defaultHeaders(httpHeaders -> httpHeaders.put(ACCEPT_ENCODING, List.of("gzip")))
+            .defaultHeaders(httpHeaders -> httpHeaders.put(HttpHeaders.ACCEPT_ENCODING, List.of("gzip")))
             .build();
   }
 }

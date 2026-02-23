@@ -22,10 +22,10 @@ public class MovieAclClient {
   private final String mstoreHost;
 
   @Value("${mstore.movieacl.stock.data.url}")
-  private String stockDataUrl;
+  private final String stockDataUrl;
 
   @Value("${mstore.movieacl.average-sales.url}")
-  private String averageSalesPath;
+  private final String averageSalesPath;
 
   private final WebClient webClient;
 
@@ -33,7 +33,7 @@ public class MovieAclClient {
       List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNumber) {
 
     UriComponents uri =
-        UriComponentsBuilder.fromHttpUrl(mstoreHost + stockDataUrl)
+        UriComponentsBuilder.fromUriString(mstoreHost + stockDataUrl)
             .buildAndExpand(countryCode, salesLine, storeNumber);
 
     return webClient
@@ -55,7 +55,7 @@ public class MovieAclClient {
   public String getAverageSales(
       ArticleId articleId, String countryCode, String salesLine, Integer storeNumber) {
     String uri =
-        UriComponentsBuilder.fromHttpUrl(mstoreHost)
+        UriComponentsBuilder.fromUriString(mstoreHost)
             .path(averageSalesPath)
             .buildAndExpand(
                 countryCode,

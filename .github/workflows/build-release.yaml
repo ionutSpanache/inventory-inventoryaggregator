@@ -12,5 +12,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   trigger-deployment-pipeline:
-    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/deployment-pipeline-without-tests.yaml@master
+    uses: metro-digital-inner-source/inventory-configuration/.github/workflows/deployment-pipeline-without-tests-with-args.yaml@master
+    with:
+      java_version: '25'
     secrets: inherit

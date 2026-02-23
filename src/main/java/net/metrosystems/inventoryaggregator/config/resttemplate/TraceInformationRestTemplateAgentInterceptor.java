@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.config.RestTemplate;
+package net.metrosystems.inventoryaggregator.config.resttemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +45,6 @@ public class TraceInformationRestTemplateAgentInterceptor implements ClientHttpR
         List<MediaType> acceptMediaTypeList = new ArrayList<>();
         acceptMediaTypeList.add(MediaType.valueOf("application/json;charset=UTF-8"));
         headers.setAccept(acceptMediaTypeList);
-        headers.addIfAbsent(HttpHeaders.ACCEPT_ENCODING, "gzip");
+        headers.add(HttpHeaders.ACCEPT_ENCODING, "gzip");
     }
 }

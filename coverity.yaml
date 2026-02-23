@@ -1,0 +1,6 @@
+capture:
+  languages:
+    include:
+      - java
+  build:
+    build-command: mvn clean install -DskipTests

@@ -1,9 +1,8 @@
-package net.metrosystems.inventoryaggregator.config.RestTemplate;
+package net.metrosystems.inventoryaggregator.config.resttemplate;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.codec.binary.Base64;
+
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,14 +23,7 @@ public class HTTPHeaderConfig {
     List<MediaType> acceptMediaTypeList = new ArrayList<>();
     acceptMediaTypeList.add(MediaType.valueOf("application/json;charset=UTF-8"));
     headers.setAccept(acceptMediaTypeList);
-    headers.addIfAbsent(HttpHeaders.ACCEPT_ENCODING, "gzip");
+    headers.add(HttpHeaders.ACCEPT_ENCODING, "gzip");
 
-  }
-
-  public String addBasicAuth(String username, String password) {
-    String auth = username + ":" + password;
-    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
-
-    return  "Basic " + new String(encodedAuth);
   }
 }

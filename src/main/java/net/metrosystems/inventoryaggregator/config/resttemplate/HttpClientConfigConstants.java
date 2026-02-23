@@ -1,4 +1,4 @@
-package net.metrosystems.inventoryaggregator.config.RestTemplate;
+package net.metrosystems.inventoryaggregator.config.resttemplate;
 
 public interface HttpClientConfigConstants {
 

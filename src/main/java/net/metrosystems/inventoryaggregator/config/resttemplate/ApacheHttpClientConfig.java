@@ -1,12 +1,12 @@
-package net.metrosystems.inventoryaggregator.config.RestTemplate;
+package net.metrosystems.inventoryaggregator.config.resttemplate;
 
-import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClientConfigConstants.CONNECTION_TIMEOUT;
-import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClientConfigConstants.DEFAULT_KEEP_ALIVE_TIME;
-import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClientConfigConstants.MAX_LOCALHOST_CONNECTIONS;
-import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClientConfigConstants.MAX_ROUTE_CONNECTIONS;
-import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClientConfigConstants.MAX_TOTAL_CONNECTIONS;
-import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClientConfigConstants.REQUEST_TIMEOUT;
-import static net.metrosystems.inventoryaggregator.config.RestTemplate.HttpClientConfigConstants.SOCKET_TIMEOUT;
+import static net.metrosystems.inventoryaggregator.config.resttemplate.HttpClientConfigConstants.CONNECTION_TIMEOUT;
+import static net.metrosystems.inventoryaggregator.config.resttemplate.HttpClientConfigConstants.DEFAULT_KEEP_ALIVE_TIME;
+import static net.metrosystems.inventoryaggregator.config.resttemplate.HttpClientConfigConstants.MAX_LOCALHOST_CONNECTIONS;
+import static net.metrosystems.inventoryaggregator.config.resttemplate.HttpClientConfigConstants.MAX_ROUTE_CONNECTIONS;
+import static net.metrosystems.inventoryaggregator.config.resttemplate.HttpClientConfigConstants.MAX_TOTAL_CONNECTIONS;
+import static net.metrosystems.inventoryaggregator.config.resttemplate.HttpClientConfigConstants.REQUEST_TIMEOUT;
+import static net.metrosystems.inventoryaggregator.config.resttemplate.HttpClientConfigConstants.SOCKET_TIMEOUT;
 
 import java.util.Iterator;
 import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
@@ -22,8 +22,6 @@ import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.message.MessageSupport;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
-import org.apache.http.client.HttpRequestRetryHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,12 +33,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @EnableScheduling
 public class ApacheHttpClientConfig {
 
-  private HttpRequestRetryHandler retryHandler;
-
-  @Autowired
-  public ApacheHttpClientConfig(HttpRequestRetryHandler retryHandler) {
-    this.retryHandler = retryHandler;
-  }
 
   @Bean
   public PoolingHttpClientConnectionManager poolingConnectionManager() {
@@ -80,20 +72,6 @@ public class ApacheHttpClientConfig {
     };
   }
 
-//  @Bean
-//  public Runnable idleConnectionMonitor(PoolingHttpClientConnectionManager pool) {
-//    return new Runnable() {
-//      @Override
-//      @Scheduled(fixedDelay = 20000)
-//      public void run() {
-//        // only if connection pool is initialised
-//        if (pool != null) {
-//          pool.closeExpiredConnections();
-//          pool.closeIdleConnections(IDLE_CONNECTION_WAIT_TIME, TimeUnit.MILLISECONDS);
-//        }
-//      }
-//    };
-//  }
 
   @Bean
   @Qualifier("taskScheduleIdle")
