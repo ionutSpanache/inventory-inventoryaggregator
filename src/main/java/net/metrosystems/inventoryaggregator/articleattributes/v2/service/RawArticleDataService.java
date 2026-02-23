@@ -91,31 +91,29 @@ public class RawArticleDataService {
         stockDetails.setDailyMeanSales30(dailyMeanSales30);
       }
     }
-    if (articleMasterIdForArticleId.get() != null) {
-      ArticleMasterData articleMasterData = articleMasterIdForArticleId.get().getArticleMasterData();
-      RawArticleData rawArticleData =
-              RawArticleData.builder()
-                      .articleId(articleId)
-                      .articleMasterData(articleMasterData)
-                      .articleStoreMasterData(
-                              rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
-                                      articleMasterIdForArticleId.get(), aclStoreMasterData.get()))
-                      .stockDetails(stockDetails)
-                      .plannedDeliveryDates(plannedDeliveryDates)
-                      .stockLocations(articleStockLocationList.get())
-                      .articleComponent(articleComponentCompletableFuture.get())
-                      .productLifeCycleData(buildProductLifeCycleData(articleMasterData))
-                      .channelDeliveryFlag(articleMasterData.getChannelDeliveryFlag())
-                      .salesAreaFlag(articleMasterData.getSalesAreaFlag())
-                      .returnPossibilityStoreSupplierNumber(
-                              articleMasterData.getReturnPossibilityStoreSupplierNumber())
-                      .minimumRetailPrice(articleMasterData.getMinimumRetailPrice())
-                      .multiLanguageData(articleMasterIdForArticleId.get().getMultiLanguageData())
-                      .build();
+    ArticleMasterData articleMasterData = articleMasterIdForArticleId.get().getArticleMasterData();
+    RawArticleData rawArticleData =
+        RawArticleData.builder()
+            .articleId(articleId)
+            .articleMasterData(articleMasterData)
+            .articleStoreMasterData(
+                rawArticleStoreMasterDataRepository.getRawArticleStoreMasterData(
+                    articleMasterIdForArticleId.get(), aclStoreMasterData.get()))
+            .stockDetails(stockDetails)
+            .plannedDeliveryDates(plannedDeliveryDates)
+            .stockLocations(articleStockLocationList.get())
+            .articleComponent(articleComponentCompletableFuture.get())
+            .productLifeCycleData(buildProductLifeCycleData(articleMasterData))
+            .channelDeliveryFlag(articleMasterData.getChannelDeliveryFlag())
+            .salesAreaFlag(articleMasterData.getSalesAreaFlag())
+            .returnPossibilityStoreSupplierNumber(
+                articleMasterData.getReturnPossibilityStoreSupplierNumber())
+            .minimumRetailPrice(articleMasterData.getMinimumRetailPrice())
+            .multiLanguageData(articleMasterIdForArticleId.get().getMultiLanguageData())
+            .build();
 
-      if (rawArticleDataList != null) {
-        rawArticleDataList.add(rawArticleData);
-      }
+    if (rawArticleDataList != null) {
+      rawArticleDataList.add(rawArticleData);
     }
   }
 
