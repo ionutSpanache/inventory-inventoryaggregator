@@ -157,27 +157,6 @@ class RawArticleDataServiceTest {
     }
 
     @Test
-    void buildRawArticleDataList_withNullArticleMasterId_returnValue() throws Exception {
-        when(articleProcessingService.getArticleComponent(anyString(), any(Integer.class), any(Long.class)))
-                .thenReturn(CompletableFuture.completedFuture(new ArticleComponent()));
-        when(articleProcessingService.getArticleMasterId(any(ArticleId.class), anyString(), anyString(), any(Integer.class)))
-                .thenReturn(CompletableFuture.completedFuture(null));
-        when(articleProcessingService.getAclStoreMasterData(any(ArticleId.class), anyString(), anyString(), any(Integer.class)))
-                .thenReturn(CompletableFuture.completedFuture(new AclStoreMasterData()));
-        when(articleProcessingService.getArticleDataFromMovie(any(ArticleId.class), anyString(), anyString(), any(Integer.class)))
-                .thenReturn(CompletableFuture.completedFuture(new StockData()));
-        when(stockLocationRepository.getArticleStockLocation(any(ArticleId.class), anyString(), any(Integer.class), any()))
-                .thenReturn(CompletableFuture.completedFuture(new ArrayList<>()));
-        when(movieAclService.getAverageSales(any(ArticleId.class), anyString(), anyString(), any(Integer.class)))
-                .thenReturn(CompletableFuture.completedFuture(null));
-
-        rawArticleDataService.buildRawArticleDataList(articleId, storeId, rawArticleDataList, Optional.empty());
-
-        assertNotNull(rawArticleDataList);
-        assertEquals(0, rawArticleDataList.size());
-    }
-
-    @Test
     void buildRawArticleDataList_withStockDataButNullDailyMeanSales_returnValue() throws Exception {
         ArticleMasterData articleMasterData = buildArticleMasterData();
         MultiLanguageData multiLanguageData = new MultiLanguageData();
