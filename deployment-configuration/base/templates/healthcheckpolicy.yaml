@@ -1,0 +1,19 @@
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: PROJECT_NAME-healthcheck
+spec:
+  default:
+    checkIntervalSec: 10
+    config:
+      httpHealthCheck:
+        port: 8080
+        requestPath: /.well-known/live
+      type: HTTP
+    healthyThreshold: 2
+    timeoutSec: 5
+    unhealthyThreshold: 2
+  targetRef:
+    kind: Service
+    name: PROJECT_NAME-svc
+
