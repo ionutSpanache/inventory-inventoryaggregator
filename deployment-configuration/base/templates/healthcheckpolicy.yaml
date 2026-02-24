@@ -14,6 +14,7 @@ spec:
     timeoutSec: 5
     unhealthyThreshold: 2
   targetRef:
+    group: ""
     kind: Service
     name: PROJECT_NAME-svc
 
