@@ -1,7 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.controller;
 
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -9,14 +7,11 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleDa
 import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleDetailsServiceV2;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
-import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -33,10 +28,10 @@ public class ArticleListDataController {
       consumes = "application/json",
       produces = "application/json")
   public List<RawArticleData> getArticleByArtVarBundle(
-      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-      @PathVariable("languageCode") String languageCode,
-      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
+      @PathVariable String countryCode,
+      @PathVariable String salesLine,
+      @PathVariable String languageCode,
+      @PathVariable("storeno") Integer storeNo,
       @RequestParam("dataType") Optional<List<String>> dataTypeList,
       @RequestBody List<ArticleId> articleIdList)
       throws Exception {

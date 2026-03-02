@@ -1,7 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.controller;
 
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -9,13 +7,11 @@ import net.metrosystems.inventoryaggregator.articleattributes.model.RawArticleDa
 import net.metrosystems.inventoryaggregator.articleattributes.v2.service.ArticleDetailsServiceV2;
 import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import net.metrosystems.inventoryaggregator.config.logging.AddLogs;
-import net.metrosystems.inventoryaggregator.config.monitoring.annotation.TagField;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -33,12 +29,12 @@ public class ArticleDataController {
       value = "/articlenumber/{articlenumber}/variant/{variant}/bundlenumber/{bundlenumber}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<RawArticleData> getArticleByArtVarBundle(
-      @TagField(name = "countryCode") @PathVariable("countryCode") String countryCode,
-      @TagField(name = "salesLine") @PathVariable("salesLine") String salesLine,
-      @PathVariable("languageCode") String languageCode,
-      @TagField(name = "storeno") @PathVariable("storeno") Integer storeNo,
+      @PathVariable String countryCode,
+      @PathVariable String salesLine,
+      @PathVariable String languageCode,
+      @PathVariable("storeno") Integer storeNo,
       @PathVariable("articlenumber") Long articleNumber,
-      @PathVariable("variant") Long variant,
+      @PathVariable Long variant,
       @PathVariable("bundlenumber") Long bundleNumber,
       @RequestParam("dataType") Optional<List<String>> dataTypeList)
       throws Exception {
