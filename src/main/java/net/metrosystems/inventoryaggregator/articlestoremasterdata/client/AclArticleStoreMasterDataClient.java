@@ -1,6 +1,5 @@
 package net.metrosystems.inventoryaggregator.articlestoremasterdata.client;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -13,6 +12,8 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -24,27 +25,17 @@ public class AclArticleStoreMasterDataClient {
   @Value("${ACL_STORE_MASTER_DATA_HOST}")
   private final String aclArticleMasterDataHost;
 
-  @Value("${ACL_STORE_MASTER_DATA_RU_HOST}")
-  private final String aclArticleMasterDataRuHost;
-
   @Value("${ACL_STORE_MASTER_DATA_PATH_ARTICLES_BY_ART_VAR_BUNDLE}")
   private final String aclArticlesMasterDataPathByArtVarBundle;
 
   public List<AclStoreMasterData> getArticleStoreMasterDataByArtVarBundle(
       String countryCode, String salesLine, Integer storeNo, List<ArticleId> articleIdList) {
 
-    String host =
-        "RU".equalsIgnoreCase(countryCode) ? aclArticleMasterDataRuHost : aclArticleMasterDataHost;
-
     UriComponents uriComponents =
-        UriComponentsBuilder.fromUriString(host + aclArticlesMasterDataPathByArtVarBundle)
+        UriComponentsBuilder.fromUriString(
+                aclArticleMasterDataHost + aclArticlesMasterDataPathByArtVarBundle)
             .buildAndExpand(countryCode.toUpperCase(), salesLine.toUpperCase(), storeNo);
 
-    return getArticlesFromStoreMasterData(uriComponents, articleIdList);
-  }
-
-  private List<AclStoreMasterData> getArticlesFromStoreMasterData(
-      UriComponents uriComponents, List<ArticleId> articleIdList) {
     return webClient
         .post()
         .uri(uriComponents.toString())

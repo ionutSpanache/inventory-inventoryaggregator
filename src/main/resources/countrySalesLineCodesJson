@@ -90,11 +90,6 @@
          "salesLineCode":60
       },
       {
-         "countryCode":"RU",
-         "salesLine": "MCC",
-         "salesLineCode":11
-      },
-      {
          "countryCode":"SK",
          "salesLine": "MCC",
          "salesLineCode":69
