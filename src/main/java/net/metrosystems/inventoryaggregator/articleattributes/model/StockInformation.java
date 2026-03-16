@@ -30,7 +30,7 @@ public class StockInformation implements Serializable {
   private Double lastSCQuantity;
   private Double lastSalesQuantity;
   private Double lastGRQuantity;
-  private Boolean isConsigStock;
+  private Boolean consigStock;
   private Float consignmentStock;
   private List<ParkedStock> parkedStock;
   private Float totalSaleQuantity;
