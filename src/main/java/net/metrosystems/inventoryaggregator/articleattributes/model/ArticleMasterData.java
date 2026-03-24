@@ -84,4 +84,6 @@ public class ArticleMasterData {
   private String packagingTypeId;
   private Double netContent;
   private Boolean isTradeItemOneTouchPallet;
+  private String merchandiseExciseTypeCode;
+  private String merchandiseExciseTypeName;
 }
