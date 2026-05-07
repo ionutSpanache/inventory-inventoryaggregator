@@ -24,5 +24,6 @@ public class StockLocation {
 	private String masterSscc;
 	private String location;
 	private String spotCoordinates;
-
+	private String sscc;
+	private Boolean inFSDLocation;
 }
