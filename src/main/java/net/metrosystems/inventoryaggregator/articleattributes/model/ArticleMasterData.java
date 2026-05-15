@@ -86,4 +86,15 @@ public class ArticleMasterData {
   private Boolean isTradeItemOneTouchPallet;
   private String merchandiseExciseTypeCode;
   private String merchandiseExciseTypeName;
+  private String gammaAlcoholClass;
+  private String alcoholFiscalDesignation;
+  private String alcoholCodeAccise;
+  private String alcoholCirculationRights;
+  private String alcoholWineColour;
+  private String alcoholCodeInao;
+  private String crdCapsule;
+  private String degreeOfOriginalWort;
+  private String customsTariffCd;
+  private Double alcoholPercent;
+  private String goodsNoOnVariantLevel;
 }
