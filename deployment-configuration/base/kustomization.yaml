@@ -4,6 +4,7 @@ resources:
 - templates/service.yaml
 - templates/httproute.yaml
 - templates/healthcheckpolicy.yaml
+- templates/gcpbackendpolicy.yaml
 configMapGenerator:
 - name: PROJECT_NAME
   envs:

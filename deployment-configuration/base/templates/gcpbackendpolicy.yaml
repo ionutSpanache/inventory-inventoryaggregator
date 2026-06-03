@@ -1,0 +1,13 @@
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: PROJECT_NAME-backendpolicy
+spec:
+  default:
+    logging:
+      enabled: false
+  targetRef:
+    group: ""
+    kind: Service
+    name: PROJECT_NAME-svc
+
