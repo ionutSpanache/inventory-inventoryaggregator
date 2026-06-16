@@ -27,8 +27,8 @@ public class StockLocationClientService {
   @Qualifier("webClientForMstoreAcl")
   private final WebClient webClient;
 
-  @Value("${mstore.inventory.host}")
-  private String inventoryHost;
+  @Value("${mstore.inventory.mstoreacl.host}")
+  private String mStoreAclHost;
 
   @Value("${mstore.inventory.mstoreacl.stockLocation.articlelist.url}")
   private String stockLocationArticleListDataUrl;
@@ -39,7 +39,7 @@ public class StockLocationClientService {
   public List<StockLocation> getArticleStockLocation(
       ArticleId articleId, String countryCode, Integer storeNumber) {
     UriComponents url =
-        UriComponentsBuilder.fromUriString(inventoryHost + stockLocationArticleDataUrl)
+        UriComponentsBuilder.fromUriString(mStoreAclHost + stockLocationArticleDataUrl)
             .buildAndExpand(
                 countryCode,
                 storeNumber,
@@ -74,7 +74,7 @@ public class StockLocationClientService {
   public List<ArticleStockLocations> getArticleStockLocationForArticleList(
       List<ArticleId> articleIds, String countryCode, Integer storeNo) {
     UriComponents url =
-        UriComponentsBuilder.fromUriString(inventoryHost + stockLocationArticleListDataUrl)
+        UriComponentsBuilder.fromUriString(mStoreAclHost + stockLocationArticleListDataUrl)
             .buildAndExpand(countryCode, storeNo);
     return webClient
         .post()

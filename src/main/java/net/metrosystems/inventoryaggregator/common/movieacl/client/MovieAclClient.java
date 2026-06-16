@@ -18,8 +18,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class MovieAclClient {
 
-  @Value("${mstore.inventory.host}")
-  private final String mstoreHost;
+  @Value("${mstore.movieacl.host}")
+  private final String movieAclHost;
 
   @Value("${mstore.movieacl.stock.data.url}")
   private final String stockDataUrl;
@@ -33,7 +33,7 @@ public class MovieAclClient {
       List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNumber) {
 
     UriComponents uri =
-        UriComponentsBuilder.fromUriString(mstoreHost + stockDataUrl)
+        UriComponentsBuilder.fromUriString(movieAclHost + stockDataUrl)
             .buildAndExpand(countryCode, salesLine, storeNumber);
 
     return webClient
@@ -55,7 +55,7 @@ public class MovieAclClient {
   public String getAverageSales(
       ArticleId articleId, String countryCode, String salesLine, Integer storeNumber) {
     String uri =
-        UriComponentsBuilder.fromUriString(mstoreHost)
+        UriComponentsBuilder.fromUriString(movieAclHost)
             .path(averageSalesPath)
             .buildAndExpand(
                 countryCode,

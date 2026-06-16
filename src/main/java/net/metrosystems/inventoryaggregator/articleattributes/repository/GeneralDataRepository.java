@@ -16,8 +16,8 @@ public class GeneralDataRepository {
 
   private final WebClient webClient;
 
-  @Value("${mstore.inventory.host}")
-  private String mstoreInventoryHost;
+  @Value("${mstore.generaldata.host}")
+  private String generalDataHost;
 
   @Value("${mstore.generaldata.department.path}")
   private String inventoryGeneralDataDepartmentPath;
@@ -27,7 +27,7 @@ public class GeneralDataRepository {
     return webClient
         .get()
         .uri(
-            mstoreInventoryHost + inventoryGeneralDataDepartmentPath,
+            generalDataHost + inventoryGeneralDataDepartmentPath,
             countryCode,
             salesLine,
             storeNumber,

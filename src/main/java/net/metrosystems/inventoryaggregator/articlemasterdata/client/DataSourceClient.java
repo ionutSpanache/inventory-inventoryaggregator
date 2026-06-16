@@ -28,8 +28,8 @@ import reactor.core.publisher.Mono;
 public class DataSourceClient {
   private final WebClient webClient;
 
-  @Value("${mstore.inventory.host}")
-  private String inventoryHost;
+  @Value("${mstore.inventory.datasource.host}")
+  private String dataSourceHost;
 
   @Value("${mstore.inventory.datasource.articlelistdata.url}")
   private String dataSourceArticleListDataUrl;
@@ -63,7 +63,7 @@ public class DataSourceClient {
       List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
 
     UriComponents url =
-        UriComponentsBuilder.fromUriString(inventoryHost + dataSourceArticleListDataUrl)
+        UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleListDataUrl)
             .buildAndExpand(countryCode, languageCode, storeNo);
 
     return webClient
@@ -84,7 +84,7 @@ public class DataSourceClient {
       ArticleId articleId, String countryCode, String languageCode, Integer storeNo) {
 
     UriComponents url =
-        UriComponentsBuilder.fromUriString(inventoryHost + dataSourceArticleDataUrl)
+        UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleDataUrl)
             .buildAndExpand(
                 countryCode,
                 languageCode,
@@ -116,7 +116,7 @@ public class DataSourceClient {
       String countryCode, Integer storeNumber, Long articleNumber) {
 
     UriComponents url =
-        UriComponentsBuilder.fromUriString(inventoryHost + dataSourceArticleComponentUrl)
+        UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleComponentUrl)
             .buildAndExpand(countryCode, storeNumber, articleNumber);
 
     return webClient
@@ -136,7 +136,7 @@ public class DataSourceClient {
       String countryCode, Integer storeNumber, List<ArticleId> articleIds) {
 
     UriComponents url =
-        UriComponentsBuilder.fromUriString(inventoryHost + dataSourceArticleComponentsUrl)
+        UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleComponentsUrl)
             .buildAndExpand(countryCode, storeNumber);
 
     List<ArticleIdComponent> articleIdComponents =
