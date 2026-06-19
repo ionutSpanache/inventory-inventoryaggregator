@@ -26,6 +26,8 @@ public class ArticleMasterData {
   private Integer packageFactor;
   private Double weightArticle;
   private Double netWeight;
+  private Double grossWeight;
+  private String grossWeightUom;
   private Long subsystemArticleNumber;
   private Double vatPercent;
   private Double pieceNetSellPrice;
