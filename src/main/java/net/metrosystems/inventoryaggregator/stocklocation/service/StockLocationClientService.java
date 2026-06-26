@@ -1,13 +1,10 @@
 package net.metrosystems.inventoryaggregator.stocklocation.service;
 
-import java.util.Collections;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
 import net.metrosystems.inventoryaggregator.stocklocation.model.StockLocation;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,13 +16,15 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.List;
+
 @Slf4j
 @Repository
 @AllArgsConstructor
 public class StockLocationClientService {
 
-  @Qualifier("webClientForMstoreAcl")
-  private final WebClient webClient;
+  private final WebClient webClientMstoreSecured;
 
   @Value("${mstore.inventory.mstoreacl.host}")
   private String mStoreAclHost;
@@ -48,7 +47,7 @@ public class StockLocationClientService {
                 articleId.getBundleNumber());
 
     ArticleStockLocations articleStockLocation =
-        webClient
+        webClientMstoreSecured
             .get()
             .uri(url.toString())
             .retrieve()
@@ -76,7 +75,7 @@ public class StockLocationClientService {
     UriComponents url =
         UriComponentsBuilder.fromUriString(mStoreAclHost + stockLocationArticleListDataUrl)
             .buildAndExpand(countryCode, storeNo);
-    return webClient
+    return webClientMstoreSecured
         .post()
         .uri(url.toString())
         .contentType(MediaType.APPLICATION_JSON)
