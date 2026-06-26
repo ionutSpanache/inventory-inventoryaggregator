@@ -1,11 +1,5 @@
 package net.metrosystems.inventoryaggregator.articlemasterdata.client;
 
-import static java.util.stream.Collectors.toMap;
-import static org.springframework.util.CollectionUtils.isEmpty;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -22,11 +16,18 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class DataSourceClient {
-  private final WebClient webClient;
+  private final WebClient webClientMstoreSecured;
 
   @Value("${mstore.inventory.datasource.host}")
   private String dataSourceHost;
@@ -66,7 +67,7 @@ public class DataSourceClient {
         UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleListDataUrl)
             .buildAndExpand(countryCode, languageCode, storeNo);
 
-    return webClient
+    return webClientMstoreSecured
         .post()
         .uri(url.toString())
         .bodyValue(articleIdList)
@@ -93,13 +94,13 @@ public class DataSourceClient {
                 articleId.getVariantNumber(),
                 articleId.getBundleNumber());
 
-    return webClient
+    return webClientMstoreSecured
         .get()
         .uri(url.toString())
         .retrieve()
         .onStatus(
             httpStatus -> httpStatus == HttpStatus.NOT_FOUND,
-            error -> Mono.error(new ArticleNotFoundException("Article not found in local cache")))
+            _ -> Mono.error(new ArticleNotFoundException("Article not found in local cache")))
         .bodyToMono(ArticleMasterId.class)
         .onErrorResume(
             error -> {
@@ -119,7 +120,7 @@ public class DataSourceClient {
         UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleComponentUrl)
             .buildAndExpand(countryCode, storeNumber, articleNumber);
 
-    return webClient
+    return webClientMstoreSecured
         .get()
         .uri(url.toString())
         .retrieve()
@@ -140,7 +141,7 @@ public class DataSourceClient {
             .buildAndExpand(countryCode, storeNumber);
 
     List<ArticleIdComponent> articleIdComponents =
-        webClient
+        webClientMstoreSecured
             .post()
             .uri(url.toString())
             .bodyValue(articleIds)

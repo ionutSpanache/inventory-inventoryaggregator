@@ -1,6 +1,5 @@
 package net.metrosystems.inventoryaggregator.common.movieacl.client;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
@@ -12,6 +11,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -27,7 +28,7 @@ public class MovieAclClient {
   @Value("${mstore.movieacl.average-sales.url}")
   private final String averageSalesPath;
 
-  private final WebClient webClient;
+  private final WebClient webClientMstoreSecured;
 
   public List<StockData> getStockDataList(
       List<ArticleId> articleIdList, String countryCode, String salesLine, Integer storeNumber) {
@@ -36,7 +37,7 @@ public class MovieAclClient {
         UriComponentsBuilder.fromUriString(movieAclHost + stockDataUrl)
             .buildAndExpand(countryCode, salesLine, storeNumber);
 
-    return webClient
+    return webClientMstoreSecured
         .post()
         .uri(uri.toUriString())
         .contentType(MediaType.APPLICATION_JSON)
@@ -66,7 +67,7 @@ public class MovieAclClient {
                 articleId.getBundleNumber())
             .toUriString();
 
-    return webClient
+    return webClientMstoreSecured
         .get()
         .uri(uri)
         .retrieve()

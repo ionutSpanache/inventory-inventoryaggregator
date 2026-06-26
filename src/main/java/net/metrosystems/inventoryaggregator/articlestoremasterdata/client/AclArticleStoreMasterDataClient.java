@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.ArticleId;
 import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.AclStoreMasterData;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -19,8 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AclArticleStoreMasterDataClient {
 
-  @Qualifier("webClientForAcl")
-  private final WebClient webClient;
+  private final WebClient webClientForAcl;
 
   @Value("${ACL_STORE_MASTER_DATA_HOST}")
   private final String aclArticleMasterDataHost;
@@ -36,7 +34,7 @@ public class AclArticleStoreMasterDataClient {
                 aclArticleMasterDataHost + aclArticlesMasterDataPathByArtVarBundle)
             .buildAndExpand(countryCode.toUpperCase(), salesLine.toUpperCase(), storeNo);
 
-    return webClient
+    return webClientForAcl
         .post()
         .uri(uriComponents.toString())
         .bodyValue(articleIdList)

@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class GeneralDataRepository {
 
-  private final WebClient webClient;
+  private final WebClient webClientMstoreSecured;
 
   @Value("${mstore.generaldata.host}")
   private String generalDataHost;
@@ -24,7 +24,7 @@ public class GeneralDataRepository {
 
   private Department getDepartment(
       String countryCode, String salesLine, Integer storeNumber, Integer departmentNumber) {
-    return webClient
+    return webClientMstoreSecured
         .get()
         .uri(
             generalDataHost + inventoryGeneralDataDepartmentPath,
