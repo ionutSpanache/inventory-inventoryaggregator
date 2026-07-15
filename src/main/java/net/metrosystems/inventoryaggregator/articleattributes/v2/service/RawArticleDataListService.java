@@ -41,7 +41,7 @@ public class RawArticleDataListService {
 
     CompletableFuture<Map<ArticleId, ArticleMasterId>> articleMasterId =
         articleProcessingService.getMasterDataForArticleId(
-            articleIdList, countryCode, "EN", storeNo);
+            articleIdList, countryCode, "EN", storeNo, dataTypeList);
 
     CompletableFuture<Map<ArticleId, AclStoreMasterData>> articleStoreMasterFromAcl =
         articleProcessingService.getAclStoreMasterDataMap(

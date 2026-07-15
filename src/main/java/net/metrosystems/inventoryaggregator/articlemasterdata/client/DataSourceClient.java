@@ -21,12 +21,15 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class DataSourceClient {
+  public static final String DATA_TYPE = "dataType";
+
   private final WebClient webClientMstoreSecured;
 
   @Value("${mstore.inventory.datasource.host}")
@@ -45,10 +48,15 @@ public class DataSourceClient {
   private String dataSourceArticleComponentsUrl;
 
   public Map<ArticleId, ArticleMasterId> getArticleMasterIdByArticleId(
-      List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String languageCode,
+      Integer storeNo,
+      List<String> dataTypeList) {
 
     List<ArticleMasterId> articleMasterIds =
-        getArticleMasterDataForArticleIdList(articleIdList, countryCode, languageCode, storeNo);
+        getArticleMasterDataForArticleIdList(
+            articleIdList, countryCode, languageCode, storeNo, dataTypeList);
 
     Map<ArticleId, ArticleMasterId> articleIdArticleMasterDataMap = new HashMap<>();
     if (!isEmpty(articleMasterIds)) {
@@ -61,11 +69,22 @@ public class DataSourceClient {
   }
 
   public List<ArticleMasterId> getArticleMasterDataForArticleIdList(
-      List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String languageCode,
+      Integer storeNo,
+      List<String> dataTypeList) {
 
-    UriComponents url =
-        UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleListDataUrl)
-            .buildAndExpand(countryCode, languageCode, storeNo);
+    UriComponentsBuilder uriComponentsBuilder =
+        UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleListDataUrl);
+
+    if (!isEmpty(dataTypeList)) {
+      for (String dataType : dataTypeList) {
+        uriComponentsBuilder.queryParam(DATA_TYPE, escapeHtml4(dataType));
+      }
+    }
+
+    UriComponents url = uriComponentsBuilder.buildAndExpand(countryCode, languageCode, storeNo);
 
     return webClientMstoreSecured
         .post()
@@ -82,17 +101,29 @@ public class DataSourceClient {
   }
 
   public ArticleMasterId getArticleMasterIdForArticleId(
-      ArticleId articleId, String countryCode, String languageCode, Integer storeNo) {
+      ArticleId articleId,
+      String countryCode,
+      String languageCode,
+      Integer storeNo,
+      List<String> dataTypeList) {
+
+    UriComponentsBuilder uriComponentsBuilder =
+        UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleDataUrl);
+
+    if (!isEmpty(dataTypeList)) {
+      for (String dataType : dataTypeList) {
+        uriComponentsBuilder.queryParam(DATA_TYPE, escapeHtml4(dataType));
+      }
+    }
 
     UriComponents url =
-        UriComponentsBuilder.fromUriString(dataSourceHost + dataSourceArticleDataUrl)
-            .buildAndExpand(
-                countryCode,
-                languageCode,
-                storeNo,
-                articleId.getArticleNumber(),
-                articleId.getVariantNumber(),
-                articleId.getBundleNumber());
+        uriComponentsBuilder.buildAndExpand(
+            countryCode,
+            languageCode,
+            storeNo,
+            articleId.getArticleNumber(),
+            articleId.getVariantNumber(),
+            articleId.getBundleNumber());
 
     return webClientMstoreSecured
         .get()

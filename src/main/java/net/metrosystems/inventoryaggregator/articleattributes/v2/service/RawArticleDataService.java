@@ -45,7 +45,7 @@ public class RawArticleDataService {
 
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId =
         articleProcessingService.getArticleMasterId(
-            articleId, storeId.getCountryCode(), "EN", storeId.getStoreNumber());
+            articleId, storeId.getCountryCode(), "EN", storeId.getStoreNumber(), dataTypeList);
 
     CompletableFuture<AclStoreMasterData> aclStoreMasterData =
         articleProcessingService.getAclStoreMasterData(

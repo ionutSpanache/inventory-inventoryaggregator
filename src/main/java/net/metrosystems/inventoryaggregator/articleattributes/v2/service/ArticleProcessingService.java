@@ -3,6 +3,7 @@ package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +27,16 @@ public class ArticleProcessingService {
   private final MovieAclService movieAclService;
 
   public CompletableFuture<ArticleMasterId> getArticleMasterId(
-      ArticleId articleId, String countryCode, String languageCode, Integer storeNo) {
+      ArticleId articleId,
+      String countryCode,
+      String languageCode,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList) {
     CompletableFuture<ArticleMasterId> articleMasterIdForArticleId = new CompletableFuture<>();
     try {
       articleMasterIdForArticleId =
           dataSourceRepository.getArticleMasterIdForArticleIdAsync(
-              articleId, countryCode, languageCode, storeNo);
+              articleId, countryCode, languageCode, storeNo, dataTypeList.orElse(null));
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {
@@ -41,13 +46,17 @@ public class ArticleProcessingService {
   }
 
   public CompletableFuture<Map<ArticleId, ArticleMasterId>> getMasterDataForArticleId(
-      List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
+      List<ArticleId> articleIdList,
+      String countryCode,
+      String languageCode,
+      Integer storeNo,
+      Optional<List<String>> dataTypeList) {
     CompletableFuture<Map<ArticleId, ArticleMasterId>> articleMasterIdForArticleId =
         CompletableFuture.completedFuture(Collections.emptyMap());
     try {
       articleMasterIdForArticleId =
           dataSourceRepository.getArticleMasterDataForArticleIdListAsync(
-              articleIdList, countryCode, languageCode, storeNo);
+              articleIdList, countryCode, languageCode, storeNo, dataTypeList.orElse(null));
     } catch (ArticleNotFoundException ex) {
       throw new ArticleNotFoundException();
     } catch (Exception e) {

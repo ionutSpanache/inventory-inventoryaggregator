@@ -99,4 +99,6 @@ public class ArticleMasterData {
   private String customsTariffCd;
   private Double alcoholPercent;
   private String goodsNoOnVariantLevel;
+
+  private HazardousGoodsInformation hazardousGoodsInformation;
 }

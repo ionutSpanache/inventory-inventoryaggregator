@@ -21,18 +21,26 @@ public class DataSourceRepository {
   @Async("asyncExecutor")
   public CompletableFuture<Map<ArticleId, ArticleMasterId>>
       getArticleMasterDataForArticleIdListAsync(
-          List<ArticleId> articleIdList, String countryCode, String languageCode, Integer storeNo) {
+          List<ArticleId> articleIdList,
+          String countryCode,
+          String languageCode,
+          Integer storeNo,
+          List<String> dataTypeList) {
     return CompletableFuture.completedFuture(
         dataSourceClient.getArticleMasterIdByArticleId(
-            articleIdList, countryCode, languageCode, storeNo));
+            articleIdList, countryCode, languageCode, storeNo, dataTypeList));
   }
 
   @Async("asyncExecutor")
   public CompletableFuture<ArticleMasterId> getArticleMasterIdForArticleIdAsync(
-      ArticleId articleId, String countryCode, String languageCode, Integer storeNo) {
+      ArticleId articleId,
+      String countryCode,
+      String languageCode,
+      Integer storeNo,
+      List<String> dataTypeList) {
     return CompletableFuture.completedFuture(
         dataSourceClient.getArticleMasterIdForArticleId(
-            articleId, countryCode, languageCode, storeNo));
+            articleId, countryCode, languageCode, storeNo, dataTypeList));
   }
 
   @Async("asyncExecutor")
