@@ -26,7 +26,7 @@
         <spring-cloud.version>2025.1.1</spring-cloud.version>
         <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
         <ch.qos.logback.version>1.5.35</ch.qos.logback.version>
-        <httpclient5.version>5.4.4</httpclient5.version>
+        <httpclient5.version>5.5.2</httpclient5.version>
         <mockwebserver.version>4.12.0</mockwebserver.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <springdoc-openapi.version>2.8.8</springdoc-openapi.version>
@@ -36,6 +36,10 @@
         <tomcat.version>11.0.23</tomcat.version>
         <kotlin.version>2.4.0</kotlin.version>
         <jackson-2-bom.version>2.22.0</jackson-2-bom.version>
+
+        <jackson-bom.version>3.2.1</jackson-bom.version>
+        <netty.version>4.2.16.Final</netty.version>
+        <tomcat.version>11.0.24</tomcat.version>
     </properties>
 
     <dependencyManagement>
@@ -302,11 +306,6 @@
 
     <repositories>
         <repository>
-            <id>central</id>
-            <name>Maven Central</name>
-            <url>https://repo.maven.apache.org/maven2</url>
-        </repository>
-        <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -321,5 +320,29 @@
             <url>https://artifactory.metrosystems.net/artifactory/libs-snapshot</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>msys.artifactory.central</id>
+            <name>plugins-release</name>
+            <url>https://artifactory.metrosystems.net/artifactory/libs-release</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>msys.artifactory.snapshots</id>
+            <name>plugins-snapshot</name>
+            <url>https://artifactory.metrosystems.net/artifactory/libs-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>
