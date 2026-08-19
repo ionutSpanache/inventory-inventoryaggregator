@@ -6,15 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AclStoreMasterData implements Serializable {
-  private static final long serialVersionUID = -6578051573443000702L;
+public class AclStoreMasterData {
   private Integer articleNumber;
   private Integer variantNumber;
   private Integer bundleNumber;
@@ -24,4 +21,5 @@ public class AclStoreMasterData implements Serializable {
   private Integer leadTime;
   private Integer orderProposalBlockingCode;
   private String departmentName;
+  private String labelType;
 }

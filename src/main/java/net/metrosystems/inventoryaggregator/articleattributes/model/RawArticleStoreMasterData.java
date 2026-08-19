@@ -30,4 +30,5 @@ public class RawArticleStoreMasterData {
     private Integer leadTime;
     private Integer orderProposalBlockingCode;
     private String departmentName;
+    private String labelType;
 }

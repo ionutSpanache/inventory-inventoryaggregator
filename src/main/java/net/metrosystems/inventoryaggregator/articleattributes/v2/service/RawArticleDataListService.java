@@ -1,12 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.v2.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.metrosystems.inventoryaggregator.articleattributes.model.*;
@@ -17,6 +10,14 @@ import net.metrosystems.inventoryaggregator.articlestoremasterdata.model.AclStor
 import net.metrosystems.inventoryaggregator.stocklocation.model.ArticleStockLocations;
 import net.metrosystems.inventoryaggregator.stocklocation.repository.StockLocationRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -70,16 +71,14 @@ public class RawArticleDataListService {
         stockDataFromMovie.get().stream()
             .collect(
                 Collectors.toMap(
-                    StockData::getArticleId,
-                    stockData -> stockData,
-                    (oldValue, newValue) -> oldValue));
+                    StockData::getArticleId, stockData -> stockData, (oldValue, _) -> oldValue));
     Map<ArticleId, ArticleStockLocations> articleStockLocationListMap =
         articleStockLocationList.get().stream()
             .collect(
                 Collectors.toMap(
                     ArticleStockLocations::getArticleId,
                     articleIdStockLocation -> articleIdStockLocation,
-                    (oldValue, newValue) -> oldValue));
+                    (oldValue, _) -> oldValue));
 
     Map<ArticleId, ProductLifeCycleData> productLifeCycleMap =
         articleMasterId.get().entrySet().stream()

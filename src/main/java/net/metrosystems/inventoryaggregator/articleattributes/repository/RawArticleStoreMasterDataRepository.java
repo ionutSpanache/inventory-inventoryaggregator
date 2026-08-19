@@ -1,9 +1,5 @@
 package net.metrosystems.inventoryaggregator.articleattributes.repository;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +13,13 @@ import net.metrosystems.inventoryaggregator.common.model.StoreId;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
@@ -111,6 +114,7 @@ public class RawArticleStoreMasterDataRepository {
             .leadTime(aclStoreMasterData.getLeadTime())
             .orderProposalBlockingCode(aclStoreMasterData.getOrderProposalBlockingCode())
             .departmentName(aclStoreMasterData.getDepartmentName())
+            .labelType(aclStoreMasterData.getLabelType())
             .build();
 
     if (articleMasterId != null && articleMasterId.getArticleStoreMasterData() != null) {
