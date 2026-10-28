@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StockInformation implements Serializable {
+
   private static final long serialVersionUID = -5281084687617302420L;
   private Float availableStock; // should be Double
   private String lastGoodReceivingDate;
